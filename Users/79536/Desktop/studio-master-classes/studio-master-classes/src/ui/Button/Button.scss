@@ -1,0 +1,49 @@
+.btn {
+  border-radius: 84px;
+  border: none;
+  font-weight: 700;
+
+  &-small {
+    width: 148px;
+    height: 39px;
+    font-size: 15px;
+  }
+
+  &-medium {
+    min-width: 213px;
+    height: 49px;
+    font-size: 24px;
+  }
+
+  &-large {
+    width: 261px;
+    height: 49px;
+    font-size: 24px;
+  }
+
+  &-secondary {
+    background: #c0cfab;
+  }
+
+  &-base {
+    background: #7AB168;
+  }
+
+  &-basic {
+    color: #ffffff;
+  }
+
+  &-dark {
+    color: #4C6644;
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  &:not(:disabled):hover {
+    opacity: 0.9;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,75 @@
+.header {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .logo-container {
+    display: flex;
+    justify-content: space-around;
+    flex-grow: 1; /* Позволяет контейнеру увеличиваться */
+  }
+
+  
+  .menu, .image, .info {
+    display: flex;
+    justify-content: space-around;
+    flex-grow: 1; /* Позволяет контейнерам увеличиваться */
+  }
+  
+  .menu {
+    border-left: 4px solid #CF1900;
+    border-bottom: 4px solid #CF1900;
+    justify-content: center;
+    flex-direction: column;
+
+    .menu-container {
+        display: flex;
+        justify-content: space-around;
+    }
+  }
+
+  .image {
+    border-bottom: 4px solid #CF1900;
+    padding-bottom: 200px;
+  }
+
+  .info {
+    flex-direction: column;
+    justify-content: center;
+    border-left: 4px solid #CF1900;
+    border-bottom: 4px solid #CF1900;
+
+    .info-container {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        width: 70%;
+        margin: 0 auto;
+    }
+  }
+  
+  .menu span:hover {
+    cursor: pointer;
+    color: #529C3B;
+  }
+  
+  @media (min-width: 429px) and (max-width: 768px) {
+    .header {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 428px) {
+    .logo-container {
+      display: none; 
+    }
+    .header {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  img {
+    max-width: 100%; /* Изображениям можно уменьшаться до размера контейнера */
+    height: auto; /* Сохраняет пропорции изображения */
+  }
+  
