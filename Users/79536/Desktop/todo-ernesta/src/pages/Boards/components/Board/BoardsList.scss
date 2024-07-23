@@ -1,0 +1,52 @@
+.boards-list {
+  display: flex;
+  flex-direction: column;
+
+  .board {
+    padding: 20px;
+    margin-top: 12px;
+    border-radius: 12px;
+    background: #fff;
+    position: relative;
+    border: 1px solid #d3d9de;
+
+    .container-blocks {
+      display: flex;
+      gap: 20px;
+
+      .block-todos-onBoard {
+        padding: 0 15px 15px 15px;
+        border: 1px solid #d3d9de;
+        border-radius: 12px;
+        flex-grow: 1;
+        flex-basis: 0;
+
+        h3 {
+          padding-bottom: 8px;
+          border-bottom: 1px solid #d3d9de;
+        }
+      }
+    }
+
+    .container-btn-del-board {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+    }
+  }
+}
+
+.board-enter {
+  opacity: 0;
+}
+.board-enter-active {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+.board-exit {
+  opacity: 0;
+}
+.board-exit-active {
+  opacity: 1;
+  transition: opacity 200ms;
+}

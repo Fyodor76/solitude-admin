@@ -1,0 +1,40 @@
+.todo-container {
+  margin-bottom: 10px;
+}
+
+.todo-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  &:hover {
+    background: #faf9f9;
+    border-radius: 4px;
+    cursor: grab;
+  }
+}
+
+.todo-title {
+  padding: 8px;
+}
+
+.block-modal.entering {
+  opacity: 1;
+  // transition: all .8s ease 0s;
+}
+
+.block-modal.entered {
+  opacity: 1;
+  // transition: opacity 300ms;
+}
+
+.block-modal.exiting {
+  opacity: 1;
+  // transition: opacity 300ms ease-out;
+}
+
+.block-modal.exited {
+  opacity: 0;
+  // transition: opacity 300ms;
+}

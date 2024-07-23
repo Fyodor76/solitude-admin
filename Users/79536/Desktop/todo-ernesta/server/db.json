@@ -1,0 +1,64 @@
+{
+  "boards": [
+    {
+      "id": "46f6",
+      "date": "1710950871641",
+      "boardName": "g"
+    },
+    {
+      "id": "5c2b",
+      "date": "1710954919977",
+      "boardName": "g"
+    }
+  ],
+  "todos": [
+    {
+      "id": "3619",
+      "completed": false,
+      "title": "tt",
+      "checked": false,
+      "type": "В процессе",
+      "boardId": "46f6"
+    },
+    {
+      "id": "8842",
+      "completed": false,
+      "title": ".",
+      "checked": false,
+      "type": "Запланированно",
+      "boardId": "46f6"
+    },
+    {
+      "id": "313c",
+      "completed": false,
+      "title": "ll",
+      "checked": false,
+      "type": "Выполнено",
+      "boardId": "46f6"
+    },
+    {
+      "id": "7bce",
+      "completed": false,
+      "title": "акак",
+      "checked": false,
+      "type": "Запланированно",
+      "boardId": "46f6"
+    },
+    {
+      "id": "db03",
+      "completed": false,
+      "title": "ккк",
+      "checked": false,
+      "type": "Запланированно",
+      "boardId": "46f6"
+    },
+    {
+      "id": "b8a2",
+      "completed": false,
+      "title": "ff",
+      "checked": false,
+      "type": "В процессе",
+      "boardId": "46f6"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+.modal-template-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.block-change-todo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-input {
+  width: 100%;
+}
+
+.container-btn {
+  display: flex;
+  gap: 15px;
+}

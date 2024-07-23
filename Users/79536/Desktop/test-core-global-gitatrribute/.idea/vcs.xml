@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$/@kodix/one.golf.library.atomic" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/@kodix/one.golf.library.generic" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/@kodix/one.golf.library.haval" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/@kodix/one.golf.utilities.common" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/one.golf.projects" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/render.processing.golf" vcs="Git" />
+  </component>
+</project>

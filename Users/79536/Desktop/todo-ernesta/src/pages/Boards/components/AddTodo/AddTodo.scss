@@ -1,0 +1,70 @@
+.btn-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+
+  .add-task-btn {
+    display: flex;
+    gap: 10px;
+  }
+}
+
+.container-add-todo {
+  padding: 20px;
+  border: 1px solid #d3d9de;
+  border-radius: 10px;
+  color: #606061;
+}
+
+@media (max-width: 876px) {
+  .boards-container {
+    width: 90%;
+  }
+}
+
+.content-add-btn {
+  display: flex;
+  gap: 8px;
+}
+
+.select-content {
+  display: flex;
+  gap: 20px;
+}
+
+.input-todo {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.filter-todo {
+  background: #dfeaf6;
+  border-radius: 12px;
+  color: #57a6dd;
+  padding: 2px 10px;
+}
+
+.block-input.entering {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.block-input.entered {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
+
+.block-input.exiting {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+.block-input.exited {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+
+.sel {
+  height: 32px;
+}

@@ -1,0 +1,17 @@
+.container-create-board {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.input-create-board {
+  input {
+    width: 100%;
+    padding: 8px 4px;
+    outline: none;
+    border: none;
+  }
+  width: 100%;
+  color: #606061;
+}

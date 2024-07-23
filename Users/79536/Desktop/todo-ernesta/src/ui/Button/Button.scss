@@ -1,0 +1,47 @@
+.btn {
+  border-radius: 4px;
+
+  &-miniature {
+    width: 35px;
+    height: 40px;
+  }
+
+  &-small {
+    width: 50px;
+    height: 35px;
+  }
+
+  &-medium {
+    width: 75px;
+    height: 35px;
+  }
+
+  &-large {
+    width: 130px;
+    height: 35px;
+  }
+
+  &-primary {
+    background: #1976d2;
+  }
+
+  &-secondary {
+    background: #6a6d6d;
+  }
+
+  &-tertiary {
+    background: #6060d0;
+  }
+
+  &-accent {
+    color: #de4c4a;
+  }
+
+  &-basic {
+    color: #ffffff;
+  }
+
+  &-bark {
+    color: #606061;
+  }
+}

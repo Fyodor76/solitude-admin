@@ -1,0 +1,29 @@
+.input {
+  &-none {
+    border: none;
+  }
+  &-primary {
+    border: 1px solid #d3d9de;
+  }
+  &-none {
+    outline: none;
+  }
+  &-transparent {
+    background: transparent;
+  }
+  &-primary {
+    background: #fff;
+  }
+
+  &-large {
+    width: 100%;
+  }
+
+  &-small {
+    padding: 7px 4px;
+  }
+
+  &-small {
+    border-radius: 5px;
+  }
+}
