@@ -1,8 +1,10 @@
+import { Outlet } from "react-router-dom";
 import "./styles/global.scss";
+
 function App() {
   return (
     <div>
-      <h1>Тест App</h1>
+      <Outlet />
     </div>
   );
 }
