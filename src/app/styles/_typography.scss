@@ -1,0 +1,20 @@
+@mixin text-h1 {
+  font-weight: var(--h1-font-weight);
+  font-family: var(--h1-font-family);
+  margin-top: var(--h1-margin-top);
+
+  font-size: var(--h1-font-size-phone);
+  line-height: var(--h1-line-height-phone);
+  margin-bottom: var(--h1-margin-bottom-phone);
+
+  @media (min-width: var(--breakpoint-tablet)) {
+    font-size: var(--h1-font-size-tablet);
+    line-height: var(--h1-line-height-tablet);
+    margin-bottom: var(--h1-margin-bottom-tablet);
+  }
+}
+
+//Классы:
+.text-h1 {
+  @include text-h1();
+}

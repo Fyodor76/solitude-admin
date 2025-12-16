@@ -18,13 +18,3 @@ $font-primary: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
   sans-serif;
 $font-secondary: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
   sans-serif;
-
-@mixin font-primary {
-  font-family: $font-primary;
-  font-weight: 400;
-}
-
-@mixin font-secondary {
-  font-family: $font-secondary;
-  font-weight: 700;
-}
