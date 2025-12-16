@@ -4,8 +4,8 @@ interface ProtectedRouterProps {
   children: React.ReactNode;
 }
 const ProtectedRouter = ({ children }: ProtectedRouterProps) => {
-  const user = localStorage.getItem("user");
-  if (!user) {
+  const isAuth = localStorage.getItem("isAuth");
+  if (!isAuth) {
     return <Navigate to="/authorisation" replace />;
   }
   return <div>{children}</div>;
