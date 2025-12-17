@@ -1,23 +1,23 @@
-$black: #000000;
-$white: #ffffff;
-$grey1: #222;
-$grey2: #444;
-$grey3: #666;
-$grey4: #888;
-$grey5: #aaa;
-$grey6: #bbb;
-$grey7: #ccc;
-$grey8: #dddddd;
-$grey9: #eeeeee;
-$grey10: #f8f8f8;
-$grey13: #000;
+:root {
+  --color-black: #000000;
+  --color-white: #ffffff;
+  --color-grey-1: #222222;
+  --color-grey-2: #444444;
+  --color-grey-3: #666666;
+  --color-grey-4: #888888;
+  --color-grey-5: #aaaaaa;
+  --color-grey-6: #bbbbbb;
+  --color-grey-7: #cccccc;
+  --color-grey-8: #dddddd;
+  --color-grey-9: #eeeeee;
+  --color-grey-10: #f8f8f8;
+  --color-grey-13: #000;
 
-$info: #ffffff;
-$error: #ff0000;
-$success: #3db014;
-$warning: #ffad1f;
+  --color-error: #ff0000;
+  --color-success: #3db014;
+  --color-warning: #ffad1f;
+  --color-info: #ffffff;
 
-$brandPrimary1: #000000;
-$brandSecondary1: #ffffff;
-$brandPrimary2: #000000;
-$brandSecondary2: #ffffff;
+  --color-brand-primary: #000000;
+  --color-brand-secondary: #ffffff;
+}
