@@ -1,0 +1,28 @@
+.container {
+  width: 100%;
+  max-width: 1700px;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  @media (min-width: 1024px) {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+.fullWidth {
+  max-width: 100% !important;
+}
+.fullHeight {
+  height: 100%;
+}
+
+.fullScreen {
+  max-width: 100% !important;
+  height: 100%;
+}
+
+.noPadding {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
