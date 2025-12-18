@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
-import styles from "./Container.module.scss";
+import  "./Container.scss";
+import cn from "classnames"
 
 interface ContainerProps {
   children: ReactNode;
@@ -21,18 +22,17 @@ const Container: React.FC<ContainerProps> = ({
   className = "",
   ...props
 }) => {
-  const containerClasses = [
-    styles.container,
-    fullWidth && styles.fullWidth,
-    fullHeight && styles.fullHeight,
-    fullScreen && styles.fullScreen,
-    noPadding && styles.noPadding,
+  const containerClasses = cn(
+    "container",
+    { 
+   "container--fullWidth":fullWidth,
+    "container--fullHeight":fullHeight,
+    "container--fullScreen":fullScreen,
+    "container--noPadding":noPadding,
+  },
     className,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  return (
+  )
+     return (
     <Component className={containerClasses} {...props}>
       {children}
     </Component>
@@ -40,3 +40,5 @@ const Container: React.FC<ContainerProps> = ({
 };
 
 export default Container;
+
+  

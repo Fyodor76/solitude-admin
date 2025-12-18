@@ -1,6 +1,8 @@
 .container {
   width: 100%;
   max-width: 1700px;
+  margin-left: auto;
+  margin-right: auto;
   padding-left: 20px;
   padding-right: 20px;
 
@@ -10,19 +12,19 @@
   }
 }
 
-.fullWidth {
+.container--fullWidth {
   max-width: 100% !important;
 }
-.fullHeight {
+.container--fullHeight {
   height: 100%;
 }
 
-.fullScreen {
+.container--fullScreen {
   max-width: 100% !important;
   height: 100%;
 }
 
-.noPadding {
+.container--noPadding {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
