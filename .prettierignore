@@ -1,8 +1,15 @@
+# Игнорируем
 node_modules
 dist
 build
-.coverage
+.next
+out
+*.log
 .env
+.env.local
+.DS_Store
+coverage
+.yarn
 package-lock.json
 yarn.lock
-*.log
+pnpm-lock.yaml
