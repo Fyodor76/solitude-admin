@@ -1,12 +1,12 @@
-import { RouteObject } from "react-router-dom";
-import App from "../App";
-import RouterErrorElement from "./RouterErrorElement";
-import MainPage from "../components/MainPage";
-import ProtectedRouter from "./ProtectedRouter";
+import { RouteObject } from 'react-router-dom';
+import App from '../App';
+import RouterErrorElement from './RouterErrorElement';
+import MainPage from '../components/MainPage';
+import ProtectedRouter from './ProtectedRouter';
 
 export const Router: RouteObject[] = [
   {
-    path: "/",
+    path: '/',
     element: <App />, //обёртка
     errorElement: <RouterErrorElement />,
 
@@ -20,11 +20,11 @@ export const Router: RouteObject[] = [
         ),
       },
       {
-        path: "authorisation",
+        path: 'authorisation',
         // element: <Authorisation/>
       },
       {
-        path: "registration",
+        path: 'registration',
         // element: <Registration/>
       },
     ],
