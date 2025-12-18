@@ -1,0 +1,3 @@
+﻿const bad = () => {
+  return 'hello'
+}
