@@ -1,5 +1,10 @@
+import ApiTest from "./ApiTest"
+
 const MainPage = () => {
-  return <h1 className="text-h1">MainPage </h1>;
+  return <div>
+    <h1>Главная страница</h1>
+    <ApiTest/>
+    </div>
 };
 
 export default MainPage;
