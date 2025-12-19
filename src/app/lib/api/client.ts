@@ -1,8 +1,10 @@
 import axios, { AxiosInstance } from 'axios'
 import { CustomApiClient } from './type'
 
+const baseUrl = import.meta.env.VITE_API_URL
+
 const instance: AxiosInstance = axios.create({
-baseURL: 'https://api.solitude-store.ru',
+baseURL: baseUrl, 
 headers: {
 'Content-Type': 'application/json',
  },
