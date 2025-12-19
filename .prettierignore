@@ -1,0 +1,15 @@
+# Игнорируем
+node_modules
+dist
+build
+.next
+out
+*.log
+.env
+.env.local
+.DS_Store
+coverage
+.yarn
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

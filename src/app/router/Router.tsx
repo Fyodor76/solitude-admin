@@ -6,7 +6,7 @@ import MainPage from "../components/MainPage";
 
 export const Router: RouteObject[] = [
   {
-    path: "/",
+    path: '/',
     element: <App />, //обёртка
     errorElement: <RouterErrorElement />,
 
@@ -24,7 +24,7 @@ export const Router: RouteObject[] = [
         // element: <Authorisation/>
       },
       {
-        path: "registration",
+        path: 'registration',
         // element: <Registration/>
       },*/
     ],
