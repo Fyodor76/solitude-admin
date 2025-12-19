@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import {apiClient} from "../lib/api/Client"
+import {apiClient} from "../lib/api/client"
 interface Category {
   id: string
   name: string
