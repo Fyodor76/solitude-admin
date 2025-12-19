@@ -1,5 +1,5 @@
 {
-  "*.{ts,tsx}": ["prettier --write"],
-  "*.{js,jsx}": ["prettier --write"],
-  "*.{json,css,scss,md,html}": ["prettier --write"]
+  "*.{ts,tsx}": ["./node_modules/.bin/prettier --write"],
+  "*.{js,jsx}": ["./node_modules/.bin/prettier --write"],
+  "*.{json,css,scss,md,html}": ["./node_modules/.bin/prettier --write"]
 }
