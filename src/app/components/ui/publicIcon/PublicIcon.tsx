@@ -1,7 +1,5 @@
 import React from 'react'
 
-import './PublicIcon.scss'
-
 interface PublicIconProps {
   name: string
   size?: number
