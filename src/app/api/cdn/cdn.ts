@@ -43,3 +43,22 @@ export const deleteFileForId = async (fileId: string): Promise<DeleteFileRespons
     throw error
   }
 }
+
+export const uploadFileToCdn = async (file: File, folder?: string): Promise<UploadResponse> => {
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (folder) {
+      formData.append('folder', folder)
+    }
+    const respons = await apiClient.post(`/cdn/upload`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+    return respons
+  } catch (error) {
+    console.error('❌ Ошибка удаления файла:', error)
+    throw error
+  }
+}
