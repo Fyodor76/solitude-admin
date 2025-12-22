@@ -15,6 +15,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.1",
     "@types/node": "^25.0.0",
+    "classnames": "^2.5.1",
     "axios": "^1.13.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/classnames": "^2.3.4",
     "@types/axios": "^0.14.4",
     "@trivago/prettier-plugin-sort-imports": "^6.0.0",
     "@types/react": "^19.2.7",

@@ -21,7 +21,7 @@ export const Router: RouteObject[] = [
       }
       /*{
         path: "authorisation",
-        // element: <Authorisation/>
+         element:  <div style={{ padding: '50px' }}>Страница авторизации (в разработке)</div>
       },
       {
         path: 'registration',
