@@ -1,4 +1,4 @@
-import { apiClient } from '@/app/lib/api/client'
+import { apiClient } from '../../lib/api/client'
 
 interface UploadResponse {
   success: boolean
@@ -58,7 +58,7 @@ export const uploadFileToCdn = async (file: File, folder?: string): Promise<Uplo
     })
     return respons
   } catch (error) {
-    console.error('❌ Ошибка удаления файла:', error)
+    console.error('❌ Ошибка загрузки файла:', error)
     throw error
   }
 }
