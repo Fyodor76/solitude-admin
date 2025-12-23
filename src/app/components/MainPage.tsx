@@ -1,5 +1,5 @@
 import ApiTest from './ApiTest'
-import PublicIcon from './ui/publicIcon/PublicIcon'
+import PublicIcon from './ui/public-icon/PublicIcon'
 
 const MainPage = () => {
   return (
