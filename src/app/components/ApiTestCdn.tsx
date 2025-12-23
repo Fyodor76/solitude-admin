@@ -5,6 +5,7 @@ import { deleteFileForId, getFileUrlForId, uploadFileToCdn } from '../api/upload
 const ApiTestCdn: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [uploadResult, setUploadResult] = useState<any>(null)
+
   const testData = {
     fileId: '1701234567890-abc123def456',
     folder: 'products',

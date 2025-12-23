@@ -1,30 +1,12 @@
 import { apiClient } from '../lib/api/client'
+import { ApiResponse } from '../lib/api/type'
 
-interface UploadResponse {
-  success: boolean
-  data: {
-    fileId: string
-    url: string
-  }
-  message: string
+export interface imgUpload {
+  fileId: string
+  url: string
 }
 
-interface GetUrlResponse {
-  success: boolean
-  data: {
-    fileId: string
-    url: string
-  }
-}
-
-interface DeleteFileResponse {
-  success: boolean
-  data: {
-    message: string
-  }
-  message: string
-}
-export const getFileUrlForId = async (fileId: string): Promise<GetUrlResponse> => {
+export const getFileUrlForId = async (fileId: string): Promise<ApiResponse<imgUpload, any>> => {
   try {
     const respons = await apiClient.get(`/cdn/url/${fileId}`)
     return respons
@@ -34,7 +16,7 @@ export const getFileUrlForId = async (fileId: string): Promise<GetUrlResponse> =
   }
 }
 
-export const deleteFileForId = async (fileId: string): Promise<DeleteFileResponse> => {
+export const deleteFileForId = async (fileId: string): Promise<ApiResponse<imgUpload, any>> => {
   try {
     const respons = await apiClient.delete(`/cdn/${fileId}`)
     return respons
@@ -44,7 +26,10 @@ export const deleteFileForId = async (fileId: string): Promise<DeleteFileRespons
   }
 }
 
-export const uploadFileToCdn = async (file: File, folder?: string): Promise<UploadResponse> => {
+export const uploadFileToCdn = async (
+  file: File,
+  folder?: string
+): Promise<ApiResponse<imgUpload, any>> => {
   try {
     const formData = new FormData()
     formData.append('file', file)
