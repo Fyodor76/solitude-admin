@@ -1,22 +1,56 @@
-import { apiClient } from '../lib/api/client'
 import { ApiResponse } from '../lib/api/type'
+import { baseApi } from '../store/api/baseApi'
 
+//import { apiClient } from '../lib/api/client';
 export interface imgUpload {
   fileId: string
   url: string
 }
 
-export const getFileUrlForId = async (fileId: string): Promise<ApiResponse<imgUpload, any>> => {
-  try {
-    const respons = await apiClient.get(`/cdn/url/${fileId}`)
-    return respons
-  } catch (error) {
-    console.error('❌ Ошибка получения URL:', error)
-    throw error
-  }
-}
+export const uploadFiles = baseApi.injectEndpoints({
+  endpoints: builder => ({
+    getFileUrlForId: builder.query<ApiResponse<imgUpload, any>, string>({
+      query: fileId => ({
+        url: `/cdn/url/${fileId}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, fileId) => (result ? [{ type: 'File', id: fileId }] : []),
+    }),
 
-export const deleteFileForId = async (fileId: string): Promise<ApiResponse<imgUpload, any>> => {
+    uploadFileToCdn: builder.mutation<ApiResponse<imgUpload, any>, { file: File; folder?: string }>(
+      {
+        query: ({ file, folder }) => {
+          const formData = new FormData()
+          formData.append('file', file)
+          if (folder) formData.append('folder', folder)
+          return {
+            url: `/cdn/upload`,
+            method: 'POST',
+            body: formData,
+          }
+        },
+        invalidatesTags: ['File'],
+      }
+    ),
+
+    deleteFileForId: builder.mutation<ApiResponse<imgUpload, any>, string>({
+      query: fileId => ({
+        url: `/cdn/${fileId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, fileId) => [{ type: 'File', id: fileId }],
+    }),
+  }),
+})
+
+export const {
+  useGetFileUrlForIdQuery,
+  useUploadFileToCdnMutation,
+  useDeleteFileForIdMutation,
+  useLazyGetFileUrlForIdQuery,
+} = uploadFiles
+
+/*export const deleteFileForId = async (fileId: string): Promise<ApiResponse<imgUpload, any>> => {
   try {
     const respons = await apiClient.delete(`/cdn/${fileId}`)
     return respons
@@ -46,4 +80,4 @@ export const uploadFileToCdn = async (
     console.error('❌ Ошибка загрузки файла:', error)
     throw error
   }
-}
+}*/
