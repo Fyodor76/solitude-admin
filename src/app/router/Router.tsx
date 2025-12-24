@@ -14,14 +14,14 @@ export const Router: RouteObject[] = [
       {
         index: true, // главная
         element: (
-        /*  <ProtectedRouter>*/
+         /* <ProtectedRouter>*/
             <MainPage />
          /* </ProtectedRouter>*/
         ),
-      }
+      },
       /*{
-        path: "authorisation",
-         element:  <div style={{ padding: '50px' }}>Страница авторизации (в разработке)</div>
+        path: 'authorisation',
+        // element: <Authorisation/>
       },
       {
         path: 'registration',
