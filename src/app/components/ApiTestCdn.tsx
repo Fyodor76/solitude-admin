@@ -1,9 +1,16 @@
 import React, { useState } from 'react'
 
-import { deleteFileForId, getFileUrlForId, uploadFileToCdn } from '../api/upload-files'
+import {
+  useDeleteFileForIdMutation,
+  useLazyGetFileUrlForIdQuery,
+  useUploadFileToCdnMutation,
+} from '../api/upload-files'
 
 const ApiTestCdn: React.FC = () => {
-  const [loading, setLoading] = useState(false)
+  const [getUrl, { isLoading: isLoadingGetUrl }] = useLazyGetFileUrlForIdQuery()
+  const [uploadFile, { isLoading: isLoadingUpload }] = useUploadFileToCdnMutation()
+  const [deleteFile, { isLoading: isLoadingDelete }] = useDeleteFileForIdMutation()
+
   const [uploadResult, setUploadResult] = useState<any>(null)
 
   const testData = {
@@ -11,21 +18,17 @@ const ApiTestCdn: React.FC = () => {
     folder: 'products',
   }
 
-  const getUrl = async () => {
-    setLoading(true)
+  const handleGetUrl = async () => {
     console.log('Начинаю запрос получения урла...')
     try {
-      const response = await getFileUrlForId(testData.fileId)
+      const response = await getUrl(testData.fileId).unwrap()
       console.log(response)
     } catch (error: any) {
       console.log('Ошибочка вышла по ПОЛУЧЕНИЮ URL(а)...')
-    } finally {
-      setLoading(false)
     }
   }
 
-  const uploadFile = async () => {
-    setLoading(true)
+  const handleUploadFile = async () => {
     setUploadResult(null)
     console.log('Начинаю загрузку файла...')
     try {
@@ -33,36 +36,35 @@ const ApiTestCdn: React.FC = () => {
       const response = await fetch(imgUrl)
       const blob = await response.blob()
       const testFile = new File([blob], 'test-image.jpg', { type: 'image/jpeg' })
-      const result = await uploadFileToCdn(testFile, 'test-folder')
+      const result = await uploadFile({
+        file: testFile,
+        folder: 'test-folder',
+      }).unwrap()
       console.log(result)
       setUploadResult(result)
     } catch (error: any) {
       console.log('Ошибочка вышла по ЗАГРУЗКЕ...')
-    } finally {
-      setLoading(false)
     }
   }
 
   const testId = '1766481374909-eq55bffgaa5'
-  const deleteFile = async () => {
-    setLoading(true)
+  const handleDeleteFile = async () => {
     console.log('Начинаю удаление...')
     try {
-      const response = await deleteFileForId(testId)
+      const response = await deleteFile(testId).unwrap()
       console.log(response)
     } catch (error: any) {
       console.log('Ошибочка вышла по УДАЛЕНИЮ...')
-    } finally {
-      setLoading(false)
     }
   }
-
+  const isLoading = isLoadingDelete || isLoadingGetUrl || isLoadingUpload
   return (
     <div>
+      {isLoading && <div>Пока загрузочка...</div>}
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <button onClick={getUrl}>Проверь cdn getUrl</button>
-        <button onClick={uploadFile}>Проверь cdn , загрузи </button>
-        <button onClick={deleteFile}>Проверь cdn delete</button>
+        <button onClick={handleGetUrl}>Проверь cdn getUrl</button>
+        <button onClick={handleUploadFile}>Проверь cdn , загрузи </button>
+        <button onClick={handleDeleteFile}>Проверь cdn delete</button>
       </div>
       {uploadResult && (
         <img

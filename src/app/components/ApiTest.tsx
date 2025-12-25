@@ -6,6 +6,7 @@ const ApiTest: React.FC = () => {
   const { data: categories, isLoading, error, refetch } = useGetCategoriesQuery()
   const handleGetCategories = () => {
     refetch()
+    console.log(categories)
   }
   return (
     <div>
