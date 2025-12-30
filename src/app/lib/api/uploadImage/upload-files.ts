@@ -1,5 +1,5 @@
-import { ApiResponse } from '../lib/api/type'
-import { baseApi } from '../store/api/baseApi'
+import { baseApi } from '../../../store/api/baseApi'
+import { ApiResponse } from './type'
 
 //import { apiClient } from '../lib/api/client';
 export interface imgUpload {

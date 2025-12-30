@@ -4,7 +4,7 @@ import {
   useDeleteFileForIdMutation,
   useLazyGetFileUrlForIdQuery,
   useUploadFileToCdnMutation,
-} from '../api/upload-files'
+} from '../lib/api/uploadImage/upload-files'
 
 const ApiTestCdn: React.FC = () => {
   const [getUrl, { isLoading: isLoadingGetUrl }] = useLazyGetFileUrlForIdQuery()
