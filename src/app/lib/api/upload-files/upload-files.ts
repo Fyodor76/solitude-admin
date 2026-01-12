@@ -1,4 +1,4 @@
-import { baseApi } from '../../../store/api/baseApi'
+import { baseApi } from '../baseApi'
 import { ApiResponse } from './type'
 
 export interface imgUpload {
