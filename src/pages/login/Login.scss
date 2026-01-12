@@ -1,0 +1,40 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 19px;
+
+  .login-card {
+    border-radius: 4px;
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 18px;
+  }
+
+  .btns-container {
+    display: flex;
+    align-items: center;
+    gap: 58px;
+  }
+
+  .title {
+    color: #495057;
+  }
+
+  .card-title {
+    text-align: center;
+    padding-bottom: 22px;
+    color: #666666;
+  }
+
+  .links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #007bff;
+  }
+}

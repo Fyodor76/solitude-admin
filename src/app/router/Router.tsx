@@ -1,32 +1,53 @@
-import { RouteObject } from "react-router-dom";
-import App from "../App";
-import RouterErrorElement from "./RouterErrorElement";
-import MainPage from "../components/MainPage";
-//import ProtectedRouter from "./ProtectedRouter";
+import { RouteObject } from 'react-router-dom'
+
+import MainPage from '../../components/MainPage'
+import { AuthLayout } from '../../layouts/auth-layout'
+import { Forgot } from '../../pages/forgot'
+import Login from '../../pages/login/Login'
+import { Registration } from '../../pages/registration'
+import App from '../App'
+import ProtectedRouter from './ProtectedRouter'
+import RouterErrorElement from './RouterErrorElement'
 
 export const Router: RouteObject[] = [
   {
     path: '/',
-    element: <App />, //обёртка
+    element: <App />,
     errorElement: <RouterErrorElement />,
 
     children: [
       {
-        index: true, // главная
+        index: true,
         element: (
-        /*  <ProtectedRouter>*/
+          <ProtectedRouter>
             <MainPage />
-         /* </ProtectedRouter>*/
+          </ProtectedRouter>
         ),
-      }
-      /*{
-        path: "authorisation",
-         element:  <div style={{ padding: '50px' }}>Страница авторизации (в разработке)</div>
       },
       {
-        path: 'registration',
-        // element: <Registration/>
-      },*/
+        path: '/login',
+        element: (
+          <AuthLayout>
+            <Login />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: '/registration',
+        element: (
+          <AuthLayout>
+            <Registration />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: '/forgot',
+        element: (
+          <AuthLayout>
+            <Forgot />
+          </AuthLayout>
+        ),
+      },
     ],
   },
-];
+]

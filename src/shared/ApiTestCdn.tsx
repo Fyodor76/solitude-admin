@@ -1,6 +1,6 @@
+import { useImageState } from '@/app/api/upload-files/useImageState'
 import React, { useState } from 'react'
 
-import { useImageState } from '../lib/api/upload-files/useImageState'
 
 const ApiTestCdn: React.FC = () => {
   const { uploadImage, deleteImage, getImageUrlById, isLoading, images } = useImageState()

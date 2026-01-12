@@ -1,12 +1,9 @@
-import { Outlet } from 'react-router-dom';
-import './styles/global.scss';
+import { Outlet } from 'react-router-dom'
+
+import './styles/global.scss'
 
 function App() {
-  return (
-    <div>
-      <Outlet />
-    </div>
-  );
+  return <Outlet />
 }
 
-export default App;
+export default App
