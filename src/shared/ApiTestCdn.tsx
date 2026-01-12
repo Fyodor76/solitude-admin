@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { deleteFileForId, getFileUrlForId, uploadFileToCdn } from '../api/upload-files'
+import { deleteFileForId, getFileUrlForId, uploadFileToCdn } from '../lib/api/upload-files'
 
 const ApiTestCdn: React.FC = () => {
   const [loading, setLoading] = useState(false)

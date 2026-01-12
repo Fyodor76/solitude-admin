@@ -1,5 +1,5 @@
-import { apiClient } from '../lib/api/client'
-import { ApiResponse } from '../lib/api/type'
+import { apiClient } from '../../app/api/client'
+import { ApiResponse } from '../../app/api/type'
 
 export interface imgUpload {
   fileId: string
@@ -11,7 +11,7 @@ export const getFileUrlForId = async (fileId: string): Promise<ApiResponse<imgUp
     const respons = await apiClient.get(`/cdn/url/${fileId}`)
     return respons
   } catch (error) {
-    console.error('❌ Ошибка получения URL:', error)
+    console.error('Ошибка получения URL:', error)
     throw error
   }
 }
@@ -21,7 +21,7 @@ export const deleteFileForId = async (fileId: string): Promise<ApiResponse<imgUp
     const respons = await apiClient.delete(`/cdn/${fileId}`)
     return respons
   } catch (error) {
-    console.error('❌ Ошибка удаления файла:', error)
+    console.error('Ошибка удаления файла:', error)
     throw error
   }
 }
@@ -43,7 +43,7 @@ export const uploadFileToCdn = async (
     })
     return respons
   } catch (error) {
-    console.error('❌ Ошибка загрузки файла:', error)
+    console.error('Ошибка загрузки файла:', error)
     throw error
   }
 }
