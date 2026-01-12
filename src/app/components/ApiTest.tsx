@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { useGetCategoriesQuery } from './ui/getCategories'
+import { useGetCategoriesQuery } from '../lib/api/test-api-get-categoris/getCategories'
 
 const ApiTest: React.FC = () => {
   const { data: categories, isLoading, error, refetch } = useGetCategoriesQuery()

@@ -11,6 +11,8 @@ export const useImageState = () => {
   const deleteImg = useDeleteImage()
   const getUrl = useGetFileUrlById()
 
+  const isLoading = upload.isLoading || deleteImg.isLoading || getUrl.isLoading
+
   const uploadImage = async (file: File, folder?: string) => {
     try {
       const result = await upload.uploadImage(file, folder)
@@ -50,6 +52,7 @@ export const useImageState = () => {
   }
   return {
     images,
+    isLoading,
     setImages,
     uploadImage,
     deleteImage,

@@ -1,4 +1,4 @@
-import { baseApi } from '../../store/api/baseApi'
+import { baseApi } from '../../../store/api/baseApi'
 
 interface Category {
   id: string
