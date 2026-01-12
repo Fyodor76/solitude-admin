@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 
 import {
-  useDeleteFileForIdMutation,
-  useLazyGetFileUrlForIdQuery,
-  useUploadFileToCdnMutation,
-} from '../lib/api/uploadImage/upload-files'
+  useDeleteFileByIdMutation,
+  useLazyGetFileUrlByIdQuery,
+  useUploadImageMutation,
+} from '../lib/api/upload-files/upload-files'
 
 const ApiTestCdn: React.FC = () => {
-  const [getUrl, { isLoading: isLoadingGetUrl }] = useLazyGetFileUrlForIdQuery()
-  const [uploadFile, { isLoading: isLoadingUpload }] = useUploadFileToCdnMutation()
-  const [deleteFile, { isLoading: isLoadingDelete }] = useDeleteFileForIdMutation()
+  const [getUrl, { isLoading: isLoadingGetUrl }] = useLazyGetFileUrlByIdQuery()
+  const [uploadFile, { isLoading: isLoadingUpload }] = useUploadImageMutation()
+  const [deleteFile, { isLoading: isLoadingDelete }] = useDeleteFileByIdMutation()
 
   const [uploadResult, setUploadResult] = useState<any>(null)
 
