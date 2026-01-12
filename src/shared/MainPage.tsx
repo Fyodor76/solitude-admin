@@ -1,6 +1,3 @@
-import ApiTest from './ApiTest'
-import ApiTestCdn from './ApiTestCdn'
-import TestTodos from './TestTodos'
 import PublicIcon from './ui/public-icon/PublicIcon'
 
 const MainPage = () => {
@@ -11,9 +8,6 @@ const MainPage = () => {
         <PublicIcon name="apple-touch-icon" />
       </h1>
       <h1>Главная страница</h1>
-      <ApiTest />
-      <ApiTestCdn />
-      <TestTodos />
     </div>
   )
 }
