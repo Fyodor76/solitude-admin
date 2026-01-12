@@ -1,4 +1,4 @@
-import { useLazyGetFileUrlByIdQuery } from './upload-files'
+import { useLazyGetFileUrlByIdQuery } from './uploadFiles'
 
 export const useGetFileUrlById = () => {
   const [trigger, query] = useLazyGetFileUrlByIdQuery()

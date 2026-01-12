@@ -1,4 +1,4 @@
-import { useDeleteFileByIdMutation, useUploadImageMutation } from './upload-files'
+import { useDeleteFileByIdMutation, useUploadImageMutation } from './uploadFiles'
 
 export const useUploadImage = () => {
   const [uploadMutation, mutation] = useUploadImageMutation()

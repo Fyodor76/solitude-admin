@@ -1,4 +1,4 @@
-import PublicIcon from './ui/public-icon/PublicIcon'
+import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
 
 const MainPage = () => {
   return (

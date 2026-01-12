@@ -1,9 +1,8 @@
 import { useState } from 'react'
 
-import { imgUpload } from './upload-files'
-import { useDeleteImage } from './useMutationImage'
-import { useUploadImage } from './useMutationImage'
-import { useGetFileUrlById } from './useQueryImage'
+import { imgUpload } from '../api/upload-files/uploadFiles'
+import { useDeleteImage, useUploadImage } from '../api/upload-files/useMutationImage'
+import { useGetFileUrlById } from '../api/upload-files/useQueryImage'
 
 export const useImageState = () => {
   const [images, setImages] = useState<imgUpload[]>([])

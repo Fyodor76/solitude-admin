@@ -1,5 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+export interface ApiResponse<T, M> {
+  success: boolean
+  data: T
+  meta: M
+  message?: string
+}
+
 const baseUrl = import.meta.env.VITE_API_URL
 
 const baseQuery = fetchBaseQuery({

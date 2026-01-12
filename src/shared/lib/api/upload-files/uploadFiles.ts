@@ -1,5 +1,4 @@
-import { baseApi } from '../baseApi'
-import { ApiResponse } from './type'
+import { ApiResponse, baseApi } from '../baseApi'
 
 export interface imgUpload {
   fileId: string

@@ -1,4 +1,4 @@
-import MainPage from '@/shared/MainPage'
+import { MainPage } from '@/pages/main'
 import { RouteObject } from 'react-router-dom'
 
 import { AuthLayout } from '../../layouts/auth-layout'
