@@ -47,6 +47,25 @@ const baseQueryWithErrorHandling: BaseQueryFn<
       error: httpError,
     }
   }
+  // Дополнительная проверка: если сервер вернул успешный ответ, но с success: false
+  // или если это какая-то другая неожиданная структура
+  if (result.data && typeof result.data === 'object') {
+    const data = result.data as any
+
+    // Проверяем, если сервер вернул success: false в ответе
+    if (data.success === false) {
+      const httpError: HttpErrorResponse = {
+        statusCode: data.statusCode || 400,
+        timestamp: new Date().toISOString(),
+        path: getRequestPath(args, baseUrl),
+        error: data.message || data.error || 'Операция не выполнена',
+      }
+      logErrorToConsole(httpError, { status: data.statusCode || 400, data: result.data } as any)
+      return {
+        error: httpError,
+      }
+    }
+  }
   return result
 }
 
