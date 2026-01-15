@@ -43,6 +43,7 @@ export const uploadFiles = baseApi.injectEndpoints({
         body: { folder },
         headers: {
           'Content-Type': 'application/json',
+          accept: 'application/json',
         },
       }),
       invalidatesTags: (result, error, { fileId }) => [{ type: 'File', id: fileId }],
