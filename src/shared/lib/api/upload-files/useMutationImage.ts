@@ -10,7 +10,7 @@ export const useUploadImage = () => {
 export const useDeleteImage = () => {
   const [deleteMutation, mutation] = useDeleteFileByIdMutation()
   return {
-    deleteImage: (fileId: string) => deleteMutation(fileId).unwrap(),
+    deleteImage: (fileId: string, folder: string) => deleteMutation({ fileId, folder }).unwrap(),
     ...mutation,
   }
 }

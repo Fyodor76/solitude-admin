@@ -1,4 +1,3 @@
-import CheckBaseApi from '@/shared/lib/api/CheckBaseApi'
 import TestApiError from '@/shared/lib/api/TestApiError'
 
 import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
@@ -10,7 +9,6 @@ const MainPage = () => {
         MainPage
         <PublicIcon name="apple-touch-icon" />
         <TestApiError />
-        <CheckBaseApi />
       </h1>
       <h1>Главная страница</h1>
     </div>
