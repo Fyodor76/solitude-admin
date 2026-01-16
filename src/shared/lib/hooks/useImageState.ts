@@ -7,15 +7,14 @@ import { useGetFileUrlById } from '../api/upload-files/useQueryImage'
 
 export const useImageState = () => {
   const [images, setImages] = useState<imgUpload[]>([])
-  const upload = useUploadImage()
-  const deleteImg = useDeleteImage()
-  const getUrl = useGetFileUrlById()
+  const { uploadImg, isLoading: isUploadLoading, error: uploadError } = useUploadImage()
+  const { deleteImg, isLoading: isDeleteLoading, error: deleteError } = useDeleteImage()
+  const { getUrlById, isLoading: isGetUrlLoading, error: getUrlError } = useGetFileUrlById()
 
-  const isLoading = upload.isLoading || deleteImg.isLoading || getUrl.isLoading
-  const error = (upload.error || deleteImg.error || getUrl.error) as HttpErrorResponse | null
+  const error = (uploadError || deleteError || getUrlError) as HttpErrorResponse | null
 
   const uploadImage = async (file: File, folder?: string) => {
-    const result = await upload.uploadImage(file, folder)
+    const result = await uploadImg(file, folder)
     const newImage: imgUpload = {
       fileId: result.data.fileId,
       url: result.data.url,
@@ -25,13 +24,13 @@ export const useImageState = () => {
   }
 
   const deleteImage = async (fileId: string, folder: string) => {
-    const result = await deleteImg.deleteImage(fileId, folder)
+    const result = await deleteImg(fileId, folder)
     setImages(prev => prev.filter(img => img.fileId !== fileId))
     return result
   }
 
   const getImageUrlById = async (fileId: string, folder?: string) => {
-    const result = await getUrl.getUrlById({ fileId, folder })
+    const result = await getUrlById({ fileId, folder })
     if (result.error) {
       throw result.error
     }
@@ -44,7 +43,9 @@ export const useImageState = () => {
   return {
     images,
     error,
-    isLoading,
+    isUploadLoading,
+    isGetUrlLoading,
+    isDeleteLoading,
     setImages,
     uploadImage,
     deleteImage,

@@ -3,7 +3,15 @@ import React, { useState } from 'react'
 import { useImageState } from '../hooks/useImageState'
 
 const TestApiError: React.FC = () => {
-  const { getImageUrlById, uploadImage, deleteImage, error, isLoading } = useImageState()
+  const {
+    getImageUrlById,
+    uploadImage,
+    deleteImage,
+    error,
+    isUploadLoading,
+    isDeleteLoading,
+    isGetUrlLoading,
+  } = useImageState()
   const [result, setResult] = useState<string>('')
   const fileId = '1768473405500-vu65snh7mqp' //'1768465458736-11699lntrug' //'1701234567890-abc123def456'
   const badFileId = 'hghghghghghgh'
@@ -78,7 +86,7 @@ const TestApiError: React.FC = () => {
           !!!! Тест:удаление
         </button>
       </div>
-      {isLoading && <span>Загружаю</span>}
+      {isUploadLoading || isDeleteLoading || (isGetUrlLoading && <span>Загружаю</span>)}
       {result && <span> {result}</span>}
       {error && (
         <div style={{ display: 'flex', flexDirection: 'column', fontSize: '18px' }}>
