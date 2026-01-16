@@ -29,13 +29,15 @@ export const useErrorHandler = () => {
       code: getErrorCode(error),
       details: error,
     }
-    console.error('=== ОШИБКА ===', appError)
-    console.error('Время:', appError.timestamp)
-    console.error('Источник:', appError.source)
-    console.log('Тип:', appError.type)
-    console.error('Сообщение:', appError.message)
-    if (appError.code) console.log('Код ошибки:', appError.code)
-    console.error('Детали:', appError.details)
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`[Error in ${where}]`, {
+        type: appError.type,
+        message: appError.message,
+        code: appError.code,
+      })
+    }
+
     return appError
   }
 
@@ -43,8 +45,8 @@ export const useErrorHandler = () => {
     try {
       return await fn()
     } catch (error) {
-      logError(error, where)
-      throw error
+      const structuredError = logError(error, where)
+      throw structuredError
     }
   }
   return {
