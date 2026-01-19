@@ -1,3 +1,5 @@
+import { TestCrash } from '@/TestCrash'
+
 import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
 
 const MainPage = () => {
@@ -5,6 +7,7 @@ const MainPage = () => {
     <div>
       <h1 className="text-h1">
         MainPage
+        <TestCrash />
         <PublicIcon name="apple-touch-icon" />
       </h1>
       <h1>Главная страница</h1>
