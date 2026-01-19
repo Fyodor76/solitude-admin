@@ -1,21 +1,13 @@
 import React, { useState } from 'react'
 
-import { useImageState } from '../hooks/useImageState'
+import { useImageState } from '../hooks/useImage'
 
 const TestApiError: React.FC = () => {
-  const {
-    getImageUrlById,
-    uploadImage,
-    deleteImage,
-    error,
-    isUploadLoading,
-    isDeleteLoading,
-    isGetUrlLoading,
-  } = useImageState()
+  const { getImageUrlById, uploadImage, deleteImage, errors, loading } = useImageState()
   const [result, setResult] = useState<string>('')
   const fileId = '1768473405500-vu65snh7mqp' //'1768465458736-11699lntrug' //'1701234567890-abc123def456'
   const badFileId = 'hghghghghghgh'
-
+  const error = errors.upload || errors.delete || errors.getUrl
   const testGetUrlSuccess = async () => {
     setResult('Начинаю запрашивать Url')
     try {
@@ -86,7 +78,7 @@ const TestApiError: React.FC = () => {
           !!!! Тест:удаление
         </button>
       </div>
-      {isUploadLoading || isDeleteLoading || (isGetUrlLoading && <span>Загружаю</span>)}
+      {loading.upload || loading.delete || (loading.getUrl && <span>Загружаю</span>)}
       {result && <span> {result}</span>}
       {error && (
         <div style={{ display: 'flex', flexDirection: 'column', fontSize: '18px' }}>

@@ -11,8 +11,6 @@ export const useImageState = () => {
   const { deleteImg, isLoading: isDeleteLoading, error: deleteError } = useDeleteImage()
   const { getUrlById, isLoading: isGetUrlLoading, error: getUrlError } = useGetFileUrlById()
 
-  const error = (uploadError || deleteError || getUrlError) as HttpErrorResponse | null
-
   const uploadImage = async (file: File, folder?: string) => {
     const result = await uploadImg(file, folder)
     const newImage: imgUpload = {
@@ -42,10 +40,16 @@ export const useImageState = () => {
 
   return {
     images,
-    error,
-    isUploadLoading,
-    isGetUrlLoading,
-    isDeleteLoading,
+    errors: {
+      upload: uploadError as HttpErrorResponse | null,
+      delete: deleteError as HttpErrorResponse | null,
+      getUrl: getUrlError as HttpErrorResponse | null,
+    },
+    loading: {
+      upload: isUploadLoading,
+      getUrl: isGetUrlLoading,
+      delete: isDeleteLoading,
+    },
     setImages,
     uploadImage,
     deleteImage,

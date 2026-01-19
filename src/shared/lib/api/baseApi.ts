@@ -7,10 +7,10 @@ import {
 } from '@reduxjs/toolkit/query/react'
 
 export interface HttpErrorResponse {
-  statusCode: number // HTTP статус код: 400, 404, 500 и т.д.
-  timestamp: string // ISO дата-время
-  path: string // URL запроса
-  error: string // Сообщение об ошибке
+  statusCode: number
+  timestamp: string
+  path: string
+  error: string
 }
 export interface ApiResponse<T, M> {
   success: boolean
