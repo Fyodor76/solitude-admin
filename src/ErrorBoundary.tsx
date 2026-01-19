@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Component, ReactNode } from 'react'
 
 interface Props {
@@ -26,7 +25,26 @@ class ErrorBoundary extends Component<Props, State> {
   }
   render(): ReactNode {
     if (this.state.hasError) {
-      return <div></div>
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <h2>Что то пошло не так ...</h2>
+          <button
+            onClick={() => {
+              this.setState({ hasError: false })
+            }}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#2196f3',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            Попробовать снова
+          </button>
+        </div>
+      )
     }
     return this.props.children
   }
