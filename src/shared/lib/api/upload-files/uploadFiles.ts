@@ -38,7 +38,7 @@ export const uploadFiles = baseApi.injectEndpoints({
       { fileId: string; folder: string }
     >({
       query: ({ fileId, folder }) => ({
-        url: `/cdn/${fileId.replace(/\s+/g, '')}`,
+        url: `/cdn/${fileId}`,
         method: 'DELETE',
         body: { folder },
         headers: {
