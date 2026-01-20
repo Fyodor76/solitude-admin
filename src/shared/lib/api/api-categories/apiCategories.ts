@@ -1,42 +1,5 @@
 import { ApiResponse, baseApi } from '../baseApi'
-
-export interface CategoryMenuItem {
-  id: string
-  name: string
-  slug: string
-  children?: CategoryMenuItem[]
-  description: string
-  parentId: null | string
-  imageId: string | null
-  isActive: boolean
-  sortOrder: number
-  type: 'category'
-  createdAt: string
-  updatedAt: string
-}
-export interface CategoryRequest {
-  name: string
-  slug: string
-  description: string
-  parentId: null | string
-  imageId: string | null
-  sortOrder: number
-  type: string
-}
-
-export interface CollectionItem {
-  id: string
-  name: string
-  slug: string
-  description: string
-  parentId: string | null
-  imageId: string | null
-  isActive: boolean
-  sortOrder: number
-  type: 'collection'
-  createdAt: string
-  updatedAt: string
-}
+import { CategoryMenuItem, CategoryRequest, CollectionItem, DeleteCategoryResponse } from './types'
 
 export const apiCategories = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -48,6 +11,7 @@ export const apiCategories = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Category', id: 'ALL_CATEGORIES' }],
     }),
+
     getCategories: builder.query<ApiResponse<CategoryMenuItem[], any>, void>({
       query: () => ({
         url: `/categories`,
@@ -55,6 +19,7 @@ export const apiCategories = baseApi.injectEndpoints({
       }),
       providesTags: [{ type: 'Category', id: 'ALL_CATEGORIES' }],
     }),
+
     getCollections: builder.query<ApiResponse<CollectionItem[], any>, void>({
       query: () => ({
         url: `/categories/collections`,
@@ -62,12 +27,53 @@ export const apiCategories = baseApi.injectEndpoints({
       }),
       providesTags: [{ type: 'Collection', id: 'ALL_COLLECTIONS' }],
     }),
+
     getCategoryById: builder.query<ApiResponse<CategoryMenuItem, any>, string>({
       query: (id: string) => ({
         url: `/categories/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => (result ? [{ type: 'Category', id }] : []),
+      providesTags: (result, error, id) => [{ type: 'Category', id }],
+    }),
+    updateCategoryById: builder.mutation<
+      ApiResponse<CategoryMenuItem, any>,
+      { id: string; data: Partial<CategoryRequest> }
+    >({
+      query: ({ id, data }) => ({
+        url: `/categories/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Category', id },
+        { type: 'Category', id: 'ALL_CATEGORIES' },
+      ],
+    }),
+    deleteCategory: builder.mutation<ApiResponse<DeleteCategoryResponse, any>, string>({
+      query: (id: string) => ({
+        url: `/categories/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Category', id },
+        { type: 'Category', id: 'ALL_CATEGORIES' },
+      ],
+    }),
+    getCategoryBySlug: builder.query<ApiResponse<CategoryMenuItem, any>, string>({
+      query: (slug: string) => ({
+        url: `/categories/slug/${slug}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, slug) =>
+        result?.data?.id ? [{ type: 'Category', id: result.data.id }] : [],
+    }),
+
+    getChildCategories: builder.query<ApiResponse<CategoryMenuItem[], any>, string>({
+      query: (id: string) => ({
+        url: `/categories/${id}/children`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, id) => [{ type: 'Category', id: `CHILDREN_OF_${id}` }],
     }),
   }),
 })
