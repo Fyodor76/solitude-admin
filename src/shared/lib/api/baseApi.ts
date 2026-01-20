@@ -67,6 +67,6 @@ const getErrorMessage = (error: FetchBaseQueryError): string => {
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithErrorHandling,
-  tagTypes: ['File', 'Category'],
+  tagTypes: ['File', 'Category', 'Collection'],
   endpoints: () => ({}),
 })
