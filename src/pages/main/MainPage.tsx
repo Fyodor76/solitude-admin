@@ -1,5 +1,4 @@
-import TestApiCategories from '@/shared/lib/api/api-categories/TestApiCategories'
-import TestApiError from '@/shared/lib/api/TestApiError'
+import { TestCrash } from '@/TestCrash'
 
 import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
 
@@ -8,9 +7,8 @@ const MainPage = () => {
     <div>
       <h1 className="text-h1">
         MainPage
+        <TestCrash />
         <PublicIcon name="apple-touch-icon" />
-        <TestApiCategories />
-        <TestApiError />
       </h1>
       <h1>Главная страница</h1>
     </div>
