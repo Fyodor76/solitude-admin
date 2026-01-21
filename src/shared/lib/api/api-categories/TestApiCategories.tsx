@@ -17,10 +17,12 @@ const TestApiCategories = () => {
   const testSlug = 'test-slug-nadya1768980105143'
   const idPoloByDelete = 'a800a583-3e54-4ad6-b535-89d2c6da3378' //по этому id, name:'Поло' удаление не произошло из за того, что в ней есть товары.
   const idUpdate = 'a8f8dd1f-22e9-45cd-bf94-eff8b1f64f6b'
+  const parentId = 'cb5e9494-6c01-4079-bd72-d0f802797f74'
   const [create] = useCreateCategoryMutation()
   const [deleteCategory] = useDeleteCategoryMutation()
   const [deactivate] = useDeactivateCategoryMutation()
   const [update] = useUpdateCategoryByIdMutation()
+  const { data: children } = useGetChildCategoriesQuery(parentId)
   const { data: categories, isLoading: isGetCatLoading } = useGetCategoriesQuery()
   const { data: category } = useGetCategoryByIdQuery(testId)
   const { data: categoryBySlug } = useGetCategoryBySlugQuery(testSlug)
@@ -51,7 +53,7 @@ const TestApiCategories = () => {
 
   const deleteCat = async () => {
     try {
-      const result = await deleteCategory(testId)
+      const result = await deleteCategory('9b554218-f27d-4d97-a7d9-bafeb1eaec4f')
       console.log('Удаление категории произошло', result)
     } catch (error) {
       console.error('Удаление не получилось(((')
@@ -69,7 +71,7 @@ const TestApiCategories = () => {
 
   const updateCategory = async () => {
     try {
-      const result = await update({
+      const newChild = await update({
         id: idUpdate,
         data: {
           description: 'existing-description',
@@ -81,9 +83,25 @@ const TestApiCategories = () => {
           type: 'category',
         },
       }).unwrap()
-      console.log('Обновилось!', result)
+      console.log('✅ Child категория:', newChild.data)
     } catch (error) {
       console.error(' Ошибка обновления:', error)
+    }
+  }
+  const createChild = async () => {
+    try {
+      const newCategory = await create({
+        name: 'Child к моей тестовой категории',
+        slug: 'test-slug-nadya' + Date.now(),
+        description: 'тестовое описание',
+        parentId: parentId,
+        imageId: null,
+        sortOrder: 0,
+        type: 'category',
+      }).unwrap()
+      console.log('Новая категория:', newCategory)
+    } catch (error) {
+      console.error('Ошибка создания категории...', error)
     }
   }
   return (
@@ -155,6 +173,26 @@ const TestApiCategories = () => {
       >
         Обновить категорию
       </button>
+
+      <button
+        style={{ fontSize: '18px', border: '2px solid black', color: 'red', width: '50%' }}
+        onClick={createChild}
+      >
+        Создать child к категории
+      </button>
+
+      {children?.data && (
+        <div>
+          <p style={{ color: 'red' }}> Показываю детей категории по id </p>
+          <ul>
+            {children.data.map(child => (
+              <li key={child.id}>
+                {child.name},{child.id}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
