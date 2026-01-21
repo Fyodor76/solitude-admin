@@ -75,5 +75,26 @@ export const apiCategories = baseApi.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: 'Category', id: `CHILDREN_OF_${id}` }],
     }),
+    deactivateCategory: builder.mutation<ApiResponse<CategoryMenuItem, any>, string>({
+      query: (id: string) => ({
+        url: `/categories/${id}/deactivate`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Category', id },
+        { type: 'Category', id: 'ALL_CATEGORIES' },
+      ],
+    }),
   }),
 })
+export const {
+  useCreateCategoryMutation,
+  useGetCategoriesQuery,
+  useGetCollectionsQuery,
+  useGetCategoryByIdQuery,
+  useUpdateCategoryByIdMutation,
+  useDeleteCategoryMutation,
+  useGetCategoryBySlugQuery,
+  useGetChildCategoriesQuery,
+  useDeactivateCategoryMutation,
+} = apiCategories
