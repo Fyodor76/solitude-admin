@@ -1,5 +1,7 @@
 import React, { Component, ReactNode } from 'react'
 
+import './errorBoundary.scss'
+
 interface Props {
   children: ReactNode
 }
@@ -26,23 +28,22 @@ class ErrorBoundary extends Component<Props, State> {
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <h2>Что то пошло не так ...</h2>
-          <button
-            onClick={() => {
-              this.setState({ hasError: false })
-            }}
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#2196f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-            }}
-          >
-            Попробовать снова
-          </button>
+        <div className="error-wrapper">
+          <div className="error-container">
+            <div className="error-main">
+              <h2 className="error-main-h2">OOPS!</h2>
+              <p>YOU LOST IN SPACE</p>
+              <button
+                className="error-main-button"
+                onClick={() => {
+                  this.setState({ hasError: false })
+                }}
+              >
+                GO HOME
+              </button>
+            </div>
+            <div className="error-image"></div>
+          </div>
         </div>
       )
     }
