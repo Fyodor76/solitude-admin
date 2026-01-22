@@ -1,3 +1,4 @@
+import { TestCrash } from '@/TestCrash'
 import TestApiCategories from '@/shared/lib/api/api-categories/TestApiCategories'
 import TestApiError from '@/shared/lib/api/TestApiError'
 
@@ -8,6 +9,7 @@ const MainPage = () => {
     <div>
       <h1 className="text-h1">
         MainPage
+        <TestCrash />
         <PublicIcon name="apple-touch-icon" />
         <TestApiCategories />
         <TestApiError />
