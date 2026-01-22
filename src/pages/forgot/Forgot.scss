@@ -1,0 +1,42 @@
+.forgot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 19px;
+
+  .title {
+    color: #495057;
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 18px;
+  }
+
+  .btns-container {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 18px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .card-title {
+    text-align: center;
+    color: #666666;
+    max-width: 266px;
+    padding-bottom: 22px;
+  }
+
+  .links-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #007bff;
+  }
+}
