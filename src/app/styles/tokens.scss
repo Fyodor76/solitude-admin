@@ -1,0 +1,102 @@
+:root {
+  --font-primary: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-secondary: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  /*breakpoints:*/
+  --breakpoint-phone: 0px;
+  --breakpoint-phablet: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-projectors: 1440px;
+  /*h1:*/
+  --h1-h6-font-weight: 700; /*c h1 до h6*/
+  --h1-h6-font-family: var(--font-secondary); /*c h1 до h6*/
+  --h1-h6-margin-top: 0; /*c h1 до h6*/
+
+  --h1-font-size-phone: 3.2rem;
+  --h1-line-height-phone: 1.25;
+  --h1-margin-bottom-phone: 1.6rem;
+
+  --h1-font-size-tablet: 4.8rem;
+  --h1-line-height-tablet: 1.17;
+  --h1-margin-bottom-tablet: 2rem;
+
+  /*h2:*/
+
+  --h2-h6-margin-bottom: 1.6rem; /*c h2 до h6*/
+
+  --h2-font-size-phone: 2.8rem;
+  --h2-line-height-phone: 1.43;
+
+  --h2-font-size-tablet: 4rem;
+  --h2-line-height-tablet: 1.2;
+
+  /*h3:*/
+
+  --h3-font-size-phone: 2.4rem;
+  --h3-line-height-phone: 1.33;
+
+  --h3-font-size-tablet: 3.2rem;
+  --h3-line-height-tablet: 1.25;
+
+  /*h4:*/
+  --h4-font-size-phone: 2rem;
+  --h4-line-height-phone: 1.4;
+
+  --h4-font-size-tablet: 2.4rem;
+  --h4-line-height-tablet: 1.33;
+
+  /*h5:*/
+  --h5-font-size-phone: 1.8rem;
+  --h5-line-height-phone: 1.33;
+
+  --h5-font-size-tablet: 2rem;
+  --h5-line-height-tablet: 1.4;
+
+  /*h6:*/
+  --h6-font-size: 1.6rem;
+  --h6-line-height: 1.5;
+
+  /*lead:*/
+  --lead-font-weight: 700;
+  --lead-font-family: var(--font-secondary);
+  --lead-margin-top: 0;
+
+  --lead-font-size-phone: 4rem;
+  --lead-line-height-phone: 1.2;
+  --lead-margin-bottom-phone: 1.6rem;
+
+  --lead-font-size-tablet: 6.4rem;
+  --lead-line-height-tablet: 1.13;
+  --lead-margin-bottom-tablet: 2rem;
+
+  /*p1:*/
+
+  --p1-p4-font-weight: 400; /* c p1 по p4*/
+  --p1-p4-font-family: var(--font-primary);
+  --p1-p4-margin-top: 0;
+
+  --p1-font-size: 1.6rem;
+  --p1-line-height: 1.5;
+  --p1-p2-margin-bottom: 2.4rem;
+
+  /*p2:*/
+  --p2-font-size: 1.4rem;
+  --p2-line-height: 1.43;
+
+  /*p3:*/
+  --p3-font-size: 1.2rem;
+  --p3-line-height: 1.33;
+  --p3-p4-margin-bottom: 1.6rem; /* c p3 до p4*/
+
+  /*p4:*/
+  --p4-font-size: 1rem;
+  --p4-line-height: 1.2;
+
+  /*btn:*/
+  --btn-font-weight: 700;
+  --btn-font-size: 1.2rem;
+  --btn-line-height: 1.33;
+  --btn-font-family: var(--font-secondary);
+}
