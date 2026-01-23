@@ -31,7 +31,27 @@ const Sidebar = ({
   if (!isOpen) {
     return null
   }
-  return <div className="sidebar-overlay" onClick={closeOnOutsideClick ? onClose : undefined}></div>
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-header">
+        <img src="public/images/image.png" alt="логотип" className="sadebar-logo" />
+        <a href="/" className="sidebar-brand">
+          AdminLTE 3
+        </a>
+      </div>
+      <div className="sidebar-container">
+        <div className="user-panel">
+          <img src="public/images/user.jpg" alt="user-name" className="user-avatar" />
+          <div className="user-container">
+            <a className="user-name" href="">
+              Alexander Pierce
+            </a>
+          </div>
+        </div>
+        {/*<div className="sidebar-overlay" onClick={closeOnOutsideClick ? onClose : undefined}></div>*/}
+      </div>
+    </aside>
+  )
 }
 
 export default Sidebar
