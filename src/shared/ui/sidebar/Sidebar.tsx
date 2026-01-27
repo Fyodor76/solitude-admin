@@ -7,6 +7,8 @@ export interface MenuItem {
   text: string
   href?: string
   icon?: React.ReactNode
+  hasArrow?: boolean
+  subItems?: MenuItem[]
   onClick?: () => void
 }
 export interface SidebarProps {
@@ -31,26 +33,73 @@ const Sidebar = ({
   if (!isOpen) {
     return null
   }
+
+  const handleCloseEsc = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && isOpen) {
+      onClose()
+    }
+  }
   return (
-    <aside className="sidebar">
-      <div className="sidebar-header">
-        <img src="public/images/image.png" alt="логотип" className="sadebar-logo" />
-        <a href="/" className="sidebar-brand">
-          AdminLTE 3
-        </a>
-      </div>
-      <div className="sidebar-container">
-        <div className="user-panel">
-          <img src="public/images/user.jpg" alt="user-name" className="user-avatar" />
-          <div className="user-container">
-            <a className="user-name" href="">
-              Alexander Pierce
-            </a>
-          </div>
+    <div
+      className={`sidebar-overlay ${isOpen ? 'active' : ''}`}
+      onClick={closeOnOutsideClick ? onClose : undefined}
+    >
+      <aside
+        className={`sidebar sidebar-${position} ${isOpen ? 'open' : ''}`}
+        style={{ width }}
+        onKeyDown={handleCloseEsc}
+        tabIndex={-1}
+      >
+        <div className="sidebar-header">
+          <img src="public/images/image.png" alt="логотип" className="sadebar-logo" />
+          <a href="/" className="sidebar-brand">
+            AdminLTE 3
+          </a>
         </div>
-        {/*<div className="sidebar-overlay" onClick={closeOnOutsideClick ? onClose : undefined}></div>*/}
-      </div>
-    </aside>
+        <div className="sidebar-container">
+          <div className="user-panel">
+            <img src="public/images/user.jpg" alt="user-avatar" className="user-avatar" />
+            <div className="user-container">
+              <a className="user-name" href="#profile">
+                Alexander Pierce
+              </a>
+            </div>
+          </div>
+          <div className="sidebar-search">
+            <input type="search" placeholder="Search" className="input-search" />
+            <button className="button-search">
+              <img src="public/images/search.png" alt="search" />
+            </button>
+          </div>
+          <nav className="sidebar-nav">
+            <ul className="sidebar-menu">
+              {menuItems.map(item => (
+                <li className="siderbar-menu-item" key={item.id}>
+                  {item.href ? (
+                    <a href={item.href} className="sidebar-menu-link">
+                      {item.icon && <span className="menu-item-icon">{item.icon}</span>}
+                      <span className="menu-item-text">{item.text}</span>
+                      {item.hasArrow && (
+                        <img
+                          src="public/images/arrow.png"
+                          alt="arrow"
+                          className="menu-item-arrow"
+                        />
+                      )}
+                    </a>
+                  ) : (
+                    <div className="sidebar-menu-title">
+                      {item.icon && <span className="menu-title-icon">{item.icon}</span>}
+                      <span className="menu-title-text">{item.text}</span>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      </aside>
+    </div>
   )
 }
 
