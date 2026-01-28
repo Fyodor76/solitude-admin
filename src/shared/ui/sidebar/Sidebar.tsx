@@ -65,7 +65,7 @@ const Sidebar = ({
           </div>
           <div className="sidebar-search-container">
             <div className="sidebar-search">
-              <input type="search" placeholder="Search" className="input-search" />
+              <input type="search" placeholder="   Search" className="input-search" />
             </div>
             <button className="button-search">
               <img src="public/images/search.png" alt="search" />

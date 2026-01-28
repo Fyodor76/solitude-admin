@@ -8,7 +8,6 @@
   position: relative;
 
   &-header {
-    width: 250px;
     height: 57px;
     border-bottom: 1px solid #4b545c;
     opacity: 1;
@@ -27,15 +26,12 @@
     }
     .sidebar-brand {
       opacity: 1;
-      top: 15px;
-      left: 61.8px;
       font-family: 'Source Sans 3';
       font-weight: 300;
       font-style: Light;
       font-size: 20px;
       line-height: 30px;
       letter-spacing: 0%;
-      vertical-align: middle;
       color: #ffffff;
       display: flex;
       margin-left: 12px;
@@ -44,14 +40,14 @@
   }
   &-container {
     opacity: 1;
-    padding: 16px 20px;
 
     .user-panel {
       opacity: 1;
-
+      padding: 16px 20px;
       border-bottom-width: 1px;
       border-bottom: 1px solid #4f5962;
       display: flex;
+      margin-bottom: 16px;
 
       .user-avatar {
         width: 34px;
@@ -77,10 +73,9 @@
     .sidebar-search-container {
       display: flex;
       margin-bottom: 16px;
+      justify-content: center;
       .sidebar-search {
-        flex: 1;
-        height: 36px;
-        padding: 0 12px;
+        display: flex;
         opacity: 1;
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
@@ -88,33 +83,31 @@
         background: #3f474e;
         border: 1px solid #56606a;
         .input-search {
-          width: 163px;
-          height: 20px;
           opacity: 1;
-          top: 8px;
-          left: 12px;
-          font-family: Source Sans Pro;
+          font-family: 'Source Sans 3';
           font-weight: 400;
-          font-style: Regular;
           font-size: 16px;
           line-height: 100%;
           letter-spacing: 0%;
-          vertical-align: middle;
-          background: #939ba2;
+          background: #3f474e;
+
+          &::placeholder {
+            color: #939ba2;
+          }
         }
       }
       .button-search {
-        width: 46;
-        height: 38;
-
+        width: 46px;
+        height: 38px;
         opacity: 1;
-        top: 83px;
-        left: 196px;
         border-top-right-radius: 4px;
         border-bottom-right-radius: 4px;
         border-width: 1px;
         background: #3f474e;
         border: 1px solid #56606a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
     }
   }
