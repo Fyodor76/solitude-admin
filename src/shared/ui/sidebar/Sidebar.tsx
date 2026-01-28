@@ -1,6 +1,6 @@
 import React from 'react'
 
-import './Sidebar.css'
+import './sidebar.scss'
 
 export interface MenuItem {
   id: string
@@ -50,12 +50,10 @@ const Sidebar = ({
         onKeyDown={handleCloseEsc}
         tabIndex={-1}
       >
-        <div className="sidebar-header">
-          <img src="public/images/image.png" alt="логотип" className="sadebar-logo" />
-          <a href="/" className="sidebar-brand">
-            AdminLTE 3
-          </a>
-        </div>
+        <a href="/" className="sidebar-header">
+          <img src="public/images/image.png" alt="логотип" className="sidebar-logo" />
+          <span className="sidebar-brand">AdminLTE 3</span>
+        </a>
         <div className="sidebar-container">
           <div className="user-panel">
             <img src="public/images/user.jpg" alt="user-avatar" className="user-avatar" />
@@ -65,8 +63,10 @@ const Sidebar = ({
               </a>
             </div>
           </div>
-          <div className="sidebar-search">
-            <input type="search" placeholder="Search" className="input-search" />
+          <div className="sidebar-search-container">
+            <div className="sidebar-search">
+              <input type="search" placeholder="Search" className="input-search" />
+            </div>
             <button className="button-search">
               <img src="public/images/search.png" alt="search" />
             </button>
