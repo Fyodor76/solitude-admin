@@ -74,7 +74,7 @@ const Sidebar = ({
           <nav className="sidebar-nav">
             <ul className="sidebar-menu">
               {menuItems.map(item => (
-                <li className="siderbar-menu-item" key={item.id}>
+                <li className="sidebar-menu-item" key={item.id}>
                   {item.href ? (
                     <a href={item.href} className="sidebar-menu-link">
                       {item.icon && <span className="menu-item-icon">{item.icon}</span>}
