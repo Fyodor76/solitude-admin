@@ -14,13 +14,6 @@ const MainPage = () => {
         <PublicIcon name="apple-touch-icon" />
         {/*<TestApiCategories />*/}
         {/*<TestApiError />*/}
-        <Sidebar
-          isOpen={true}
-          onClose={function (): void {
-            throw new Error('Function not implemented.')
-          }}
-          menuItems={[]}
-        />
       </h1>
       <h1>Главная страница</h1>
     </div>

@@ -76,6 +76,7 @@
       justify-content: center;
       .sidebar-search {
         display: flex;
+        width: 80%;
         opacity: 1;
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
@@ -109,6 +110,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+    }
+    .sidebar-nav {
+      display: flex;
+      justify-content: center;
+      .sidebar-menu {
+        display: flex;
+        flex-direction: column;
+        width: 95%;
+        align-items: center;
+        gap: 20px;
+        .sidebar-menu-item {
+          display: flex;
+          width: 90%;
+          .sidebar-menu-link {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+          }
+        }
       }
     }
   }

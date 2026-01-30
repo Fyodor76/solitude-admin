@@ -6,7 +6,7 @@ export interface MenuItem {
   id: string
   text: string
   href?: string
-  icon?: React.ReactNode
+  icon?: React.ReactNode | string
   hasArrow?: boolean
   subItems?: MenuItem[]
   onClick?: () => void
@@ -39,6 +39,7 @@ const Sidebar = ({
       onClose()
     }
   }
+
   return (
     <div
       className={`sidebar-overlay ${isOpen ? 'active' : ''}`}
@@ -49,6 +50,7 @@ const Sidebar = ({
         style={{ width }}
         onKeyDown={handleCloseEsc}
         tabIndex={-1}
+        onClick={e => e.stopPropagation()}
       >
         <a href="/" className="sidebar-header">
           <img src="public/images/image.png" alt="логотип" className="sidebar-logo" />
