@@ -65,14 +65,14 @@ const Sidebar = ({
               </a>
             </div>
           </div>
-          <div className="sidebar-search-container">
+          {/* <div className="sidebar-search-container">
             <div className="sidebar-search">
               <input type="search" placeholder="   Search" className="input-search" />
             </div>
             <button className="button-search">
               <img src="public/images/search.png" alt="search" />
             </button>
-          </div>
+  </div>*/}
           <nav className="sidebar-nav">
             <ul className="sidebar-menu">
               {menuItems.map(item => (
