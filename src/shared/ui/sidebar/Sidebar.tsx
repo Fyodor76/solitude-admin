@@ -79,7 +79,11 @@ const Sidebar = ({
                 <li className="sidebar-menu-item" key={item.id}>
                   {item.href ? (
                     <a href={item.href} className="sidebar-menu-link">
-                      {item.icon && <span className="menu-item-icon">{item.icon}</span>}
+                      {item.icon && (
+                        <span className="menu-item-icon">
+                          <img src={item.icon as string} alt={item.text} />
+                        </span>
+                      )}
                       <span className="menu-item-text">{item.text}</span>
                       {item.hasArrow && (
                         <img
