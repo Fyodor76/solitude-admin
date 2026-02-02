@@ -1,12 +1,13 @@
 import React from 'react'
 
+import { IconName } from '../icons/iconSet'
 import './sidebar.scss'
 
 export interface MenuItem {
   id: string
   text: string
   href?: string
-  icon?: React.ReactNode | string
+  icon?: IconName
   hasArrow?: boolean
   subItems?: MenuItem[]
   onClick?: () => void
