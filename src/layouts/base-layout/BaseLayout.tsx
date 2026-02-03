@@ -8,7 +8,7 @@ interface BaseLayoutProps {
 }
 
 export const BaseLayout = ({ children }: BaseLayoutProps) => {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
 
   const onClose = () => {
     setIsOpen(false)
@@ -21,49 +21,49 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       id: 'dashboard',
       text: 'Dashboard',
       href: '#',
-      icon: 'public/images/dashboard2.png',
+      icon: 'dashboards',
       hasArrow: true,
     },
     {
       id: 'widgets',
       text: 'Widgets',
       href: '#',
-      icon: 'public/images/widgets2.png',
+      icon: 'widgets',
       hasArrow: true,
     },
     {
       id: 'layout-options',
       text: 'Layout Options',
       href: '#',
-      icon: 'public/images/layout-options2.png',
+      icon: 'layoutOptions',
       hasArrow: true,
     },
     {
       id: 'charts',
       text: 'Charts',
       href: '#',
-      icon: 'public/images/charts.png',
+      icon: 'charts',
       hasArrow: true,
     },
     {
       id: 'ui-elements',
       text: 'UI Elements',
       href: '#',
-      icon: 'public/images/ui-elements.png',
+      icon: 'uiElements',
       hasArrow: true,
     },
     {
       id: 'forms',
       text: 'Forms',
       href: '#',
-      icon: 'public/images/forms.png',
+      icon: 'forms',
       hasArrow: true,
     },
     {
       id: 'tables',
       text: 'Tables',
       href: '#',
-      icon: 'public/images/tables.png',
+      icon: 'tables',
       hasArrow: true,
     },
   ]

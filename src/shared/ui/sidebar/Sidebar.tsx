@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
+import Icon from '../icons/Icon'
 import { IconName } from '../icons/iconSet'
 import './sidebar.scss'
 
@@ -18,8 +19,17 @@ export interface SidebarProps {
   menuItems: MenuItem[]
   position?: 'left' | 'right'
   width?: string
-  title?: string
   closeOnOutsideClick?: boolean
+  logo?: {
+    imageUrl: string
+    altText?: string
+    title?: string
+  }
+  user?: {
+    href: string
+    name: string
+    logo?: string
+  }
 }
 
 const Sidebar = ({
@@ -28,17 +38,40 @@ const Sidebar = ({
   menuItems,
   position = 'left',
   width = '280px',
-  title,
   closeOnOutsideClick = true,
+  logo = {
+    imageUrl: 'public/images/image.png',
+    altText: 'логотип',
+    title: 'AdminLTE 3',
+  },
+  user = {
+    href: '#profile',
+    name: 'Alexander Pierce',
+    logo: 'public/images/user.jpg',
+  },
 }: SidebarProps) => {
-  if (!isOpen) {
-    return null
-  }
-
-  const handleCloseEsc = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape' && isOpen) {
-      onClose()
+  useEffect(() => {
+    const handleCloseEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose()
+      }
     }
+    document.addEventListener('keydown', handleCloseEsc)
+    return () => {
+      document.removeEventListener('keydown', handleCloseEsc)
+    }
+  }, [isOpen, onClose])
+
+  const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
+
+  const toggleSubMenuItem = (menuItemId: string) => {
+    const newOpenSubMenuItem = new Set(openSubMenuItem)
+    if (newOpenSubMenuItem.has(menuItemId)) {
+      newOpenSubMenuItem.delete(menuItemId)
+    } else {
+      newOpenSubMenuItem.add(menuItemId)
+    }
+    setOpenSubMenuItem(newOpenSubMenuItem)
   }
 
   return (
@@ -49,59 +82,134 @@ const Sidebar = ({
       <aside
         className={`sidebar sidebar-${position} ${isOpen ? 'open' : ''}`}
         style={{ width }}
-        onKeyDown={handleCloseEsc}
-        tabIndex={-1}
         onClick={e => e.stopPropagation()}
       >
         <a href="/" className="sidebar-header">
-          <img src="public/images/image.png" alt="логотип" className="sidebar-logo" />
-          <span className="sidebar-brand">AdminLTE 3</span>
+          <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
+          {logo.title && <span className="sidebar-brand">{logo.title}</span>}
         </a>
         <div className="sidebar-container">
           <div className="user-panel">
-            <img src="public/images/user.jpg" alt="user-avatar" className="user-avatar" />
+            <img src={user.logo} alt="user-avatar" className="user-avatar" />
             <div className="user-container">
-              <a className="user-name" href="#profile">
-                Alexander Pierce
+              <a className="user-name" href={user.href}>
+                {user.name}
               </a>
             </div>
           </div>
-          {/* <div className="sidebar-search-container">
-            <div className="sidebar-search">
-              <input type="search" placeholder="   Search" className="input-search" />
-            </div>
-            <button className="button-search">
-              <img src="public/images/search.png" alt="search" />
-            </button>
-  </div>*/}
+
           <nav className="sidebar-nav">
             <ul className="sidebar-menu">
-              {menuItems.map(item => (
-                <li className="sidebar-menu-item" key={item.id}>
-                  {item.href ? (
-                    <a href={item.href} className="sidebar-menu-link">
-                      {item.icon && (
-                        <span className="menu-item-icon">
-                          <img src={item.icon as string} alt={item.text} />
-                        </span>
-                      )}
-                      <span className="menu-item-text">{item.text}</span>
-                      {item.hasArrow && (
-                        <img
-                          src="public/images/arrow.png"
-                          alt="arrow"
-                          className="menu-item-arrow"
-                        />
-                      )}
-                    </a>
-                  ) : (
-                    <div className="sidebar-menu-title">
-                      {item.icon && <span className="menu-title-icon">{item.icon}</span>}
-                      <span className="menu-title-text">{item.text}</span>
-                    </div>
-                  )}
-                </li>
-              ))}
+              {menuItems.map(item => {
+                const hasSubItems = item.subItems && item.subItems.length > 0
+                const isOpenSubItem = openSubMenuItem.has(item.id)
+
+                return (
+                  <li className="sidebar-menu-item" key={item.id}>
+                    {item.href ? (
+                      <a
+                        href={item.href}
+                        className="sidebar-menu-link"
+                        onClick={e => {
+                          if (hasSubItems) {
+                            e.preventDefault()
+                            toggleSubMenuItem(item.id)
+                          } else if (item.onClick) {
+                            item.onClick()
+                          }
+                        }}
+                      >
+                        {item.icon && (
+                          <span className="menu-item-icon">
+                            <Icon name={item.icon} color="#ffffff" />
+                          </span>
+                        )}
+
+                        <span className="menu-item-text">{item.text}</span>
+
+                        {/* Стрелочка для подменю - ВНУТРИ ссылки */}
+                        {hasSubItems && (
+                          <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
+                            <Icon name="arrow" color="#ffffff" />
+                          </span>
+                        )}
+
+                        {/* Простая стрелочка без подменю - ВНУТРИ ссылки */}
+                        {!hasSubItems && item.hasArrow && (
+                          <span className="menu-item-arrow-simple">
+                            <Icon name="arrow" color="#ffffff" />
+                          </span>
+                        )}
+                      </a>
+                    ) : (
+                      // Если нет href, то используем div с обработчиком
+                      <div
+                        className="sidebar-menu-title"
+                        onClick={() => {
+                          if (hasSubItems) {
+                            toggleSubMenuItem(item.id)
+                          } else if (item.onClick) {
+                            item.onClick()
+                          }
+                        }}
+                      >
+                        {item.icon && (
+                          <span className="menu-title-icon">
+                            <Icon name={item.icon} color="#ffffff" />
+                          </span>
+                        )}
+
+                        <span className="menu-title-text">{item.text}</span>
+
+                        {hasSubItems && (
+                          <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
+                            <Icon name="arrow" color="#ffffff" />
+                          </span>
+                        )}
+
+                        {!hasSubItems && item.hasArrow && (
+                          <span className="menu-item-arrow-simple">
+                            <Icon name="arrow" color="#ffffff" />
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Подменю */}
+                    {hasSubItems && isOpenSubItem && item.subItems && (
+                      <ul className="sidebar-submenu">
+                        {item.subItems.map(subItem => (
+                          <li className="sidebar-submenu-item" key={subItem.id}>
+                            {subItem.href ? (
+                              <a
+                                href={subItem.href}
+                                className="sidebar-submenu-link"
+                                onClick={subItem.onClick}
+                              >
+                                {subItem.icon && (
+                                  <span className="submenu-item-icon">
+                                    <Icon name={subItem.icon} color="#ffffff" />
+                                  </span>
+                                )}
+                                <span className="submenu-item-text">{subItem.text}</span>
+                              </a>
+                            ) : (
+                              <div className="sidebar-submenu-title" onClick={subItem.onClick}>
+                                {subItem.icon && (
+                                  <span className="submenu-title-icon">
+                                    <Icon name={subItem.icon} color="#ffffff" />
+                                  </span>
+                                )}
+                                <span className="submenu-title-text">{subItem.text}</span>
+                              </div>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </nav>
         </div>
