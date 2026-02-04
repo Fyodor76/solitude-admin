@@ -120,7 +120,7 @@ const Sidebar = ({
                     >
                       {item.icon && (
                         <span className="menu-item-icon">
-                          <Icon name={item.icon} color="#ffffff" />
+                          <Icon name={item.icon} />
                         </span>
                       )}
 

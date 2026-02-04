@@ -12,11 +12,8 @@ interface IconProps {
   onClick?: () => void
 }
 
-const Icon = ({ name, width, height, color = '#000000', className, onClick }: IconProps) => {
+const Icon = ({ name, width, height, color = '#ffffff', className, onClick }: IconProps) => {
   const icon = iconSet[name]
-  const enhancedIcon = React.cloneElement(icon, {
-    style: { fill: color },
-  })
 
   const style: React.CSSProperties = {
     display: 'inline-flex',
@@ -35,7 +32,7 @@ const Icon = ({ name, width, height, color = '#000000', className, onClick }: Ic
       role={onClick ? 'button' : 'img'}
       aria-label={name}
     >
-      {enhancedIcon}
+      {icon}
     </span>
   )
 }

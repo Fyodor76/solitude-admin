@@ -23,6 +23,18 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       href: '#',
       icon: 'dashboards',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
     {
       id: 'widgets',
@@ -30,13 +42,28 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       href: '#',
       icon: 'widgets',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
+
     {
       id: 'layout-options',
       text: 'Layout Options',
       href: '#',
       icon: 'layoutOptions',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
     {
       id: 'charts',
@@ -44,6 +71,13 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       href: '#',
       icon: 'charts',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
     {
       id: 'ui-elements',
@@ -51,6 +85,13 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       href: '#',
       icon: 'uiElements',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
     {
       id: 'forms',
@@ -58,6 +99,13 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       href: '#',
       icon: 'forms',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
     {
       id: 'tables',
@@ -65,6 +113,13 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       href: '#',
       icon: 'tables',
       hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
     },
   ]
   return (

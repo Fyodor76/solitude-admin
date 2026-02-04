@@ -10,7 +10,28 @@ export type IconName =
 
 export const iconSet = {
   arrow: (
-    <svg
+    <svg width="6" height="10" viewBox="0 0 6 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line
+        x1="1"
+        y1="1"
+        x2="5"
+        y2="5"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <line
+        x1="1"
+        y1="9"
+        x2="5"
+        y2="5"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+    </svg>
+
+    /*<svg
       width="14"
       height="21"
       viewBox="0 0 14 21"
@@ -23,7 +44,7 @@ export const iconSet = {
         d="M7.5,-0.5 C8.83333,-0.5 10.1667,-0.5 11.5,-0.5C12.4731,1.06831 12.6397,2.73498 12,4.5C10.3149,6.01748 8.81489,7.68415 7.5,9.5C8.81489,11.3159 10.3149,12.9825 12,14.5C12.7484,16.8401 12.2484,18.8401 10.5,20.5C9.83333,20.5 9.16667,20.5 8.5,20.5C5.83333,17.1667 2.83333,14.1667 -0.5,11.5C-0.5,10.1667 -0.5,8.83333 -0.5,7.5C2.5,5.16667 5.16667,2.5 7.5,-0.5Z"
         fill="currentColor"
       />
-    </svg>
+    </svg>*/
   ),
   charts: (
     <svg
@@ -31,7 +52,7 @@ export const iconSet = {
       height="36"
       viewBox="0 0 38 36"
       fill="none"
-      stroke="currentColor"
+      // stroke="currentColor"
       strokeWidth="1"
       xmlns="http://www.w3.org/2000/svg"
     >
@@ -44,26 +65,55 @@ export const iconSet = {
     </svg>
   ),
   dashboards: (
-    <svg
-      width="40"
-      height="31"
-      viewBox="0 0 40 31"
-      fill="currentColor"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M12.5,-0.5 C16.8333,-0.5 21.1667,-0.5 25.5,-0.5C32.2276,2.56146 36.8943,7.56146 39.5,14.5C39.5,17.8333 39.5,21.1667 39.5,24.5C38.5139,26.4261 37.5139,28.4261 36.5,30.5C25.1667,30.5 13.8333,30.5 2.5,30.5C1.30766,28.8869 0.307663,27.2202 -0.5,25.5C-0.5,21.5 -0.5,17.5 -0.5,13.5C1.74343,6.9222 6.07676,2.25553 12.5,-0.5Z" />
+    /*<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" strokeDasharray="2 2" />
 
-      <path d="M18.5,4.5 C20.0481,4.82124 20.7148,5.82124 20.5,7.5C17.7524,7.59829 17.0857,6.59829 18.5,4.5Z" />
+      
+      <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="1" />
 
-      <path d="M23.5,6.5 C24.5862,6.61998 25.2528,7.28665 25.5,8.5C24.3661,12.5683 23.0328,16.5683 21.5,20.5C23.2701,21.8196 23.6034,23.3196 22.5,25C20.1902,25.4966 17.8568,25.6633 15.5,25.5C14.9232,22.4503 16.0899,20.4503 19,19.5C20.8035,15.2556 22.3035,10.9223 23.5,6.5Z" />
+    
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
 
-      <path d="M8.5,8.5 C11.3881,9.53954 11.7214,10.8729 9.5,12.5C7.35765,11.5629 7.02431,10.2296 8.5,8.5Z" />
+      <path d="M12 6L12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 12L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
 
-      <path d="M28.5,8.5 C30.4759,9.42714 30.8092,10.7605 29.5,12.5C28.5713,11.3112 28.238,9.97782 28.5,8.5Z" />
+   
+      <path d="M6 12H7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M17 12H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 6V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 17V18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>*/
 
-      <path d="M5.5,19.5 C7.85187,20.5426 8.01854,21.8759 6,23.5C4.23173,22.3181 4.06507,20.9848 5.5,19.5Z" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Круг спидометра */}
+      <circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
 
-      <path d="M31.5,19.5 C34.8606,20.2032 35.1939,21.5365 32.5,23.5C30.3576,22.5629 30.0243,21.2296 31.5,19.5Z" />
+      {/* Центр спидометра */}
+      <circle cx="12" cy="12" r="2" fill="currentColor" />
+
+      {/* Деления */}
+      <path d="M12 2V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M2 12H4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M20 12H22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M12 20V22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+
+      {/* Стрелочка спидометра */}
+      <path d="M12 12L16 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M12 12L15 15"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   ),
   forms: (
@@ -110,7 +160,6 @@ export const iconSet = {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Внешняя рамка таблицы */}
       <path
         d="M 0.5,-0.5 C 11.5,-0.5 22.5,-0.5 33.5,-0.5C 33.8333,0.5 34.5,1.16667 35.5,1.5C 35.5,10.5 35.5,19.5 35.5,28.5C 34.5,28.8333 33.8333,29.5 33.5,30.5C 22.5,30.5 11.5,30.5 0.5,30.5C 0.5,29.8333 0.166667,29.5 -0.5,29.5C -0.5,19.8333 -0.5,10.1667 -0.5,0.5C 0.166667,0.5 0.5,0.166667 0.5,-0.5 Z"
         stroke="currentColor" //
@@ -118,7 +167,6 @@ export const iconSet = {
         fill="none"
       />
 
-      {/* Первая ячейка */}
       <path
         d="M 4.5,8.5 C 7.83333,8.5 11.1667,8.5 14.5,8.5C 14.5,10.5 14.5,12.5 14.5,14.5C 11.1667,14.5 7.83333,14.5 4.5,14.5C 4.5,12.5 4.5,10.5 4.5,8.5 Z"
         fill="none"
@@ -126,7 +174,6 @@ export const iconSet = {
         strokeWidth="1"
       />
 
-      {/* Вторая ячейка */}
       <path
         d="M 19.5,8.5 C 22.8333,8.5 26.1667,8.5 29.5,8.5C 29.5,10.5 29.5,12.5 29.5,14.5C 26.1667,14.5 22.8333,14.5 19.5,14.5C 19.5,12.5 19.5,10.5 19.5,8.5 Z"
         fill="none"
@@ -134,7 +181,6 @@ export const iconSet = {
         strokeWidth="1"
       />
 
-      {/* Третья ячейка */}
       <path
         d="M 4.5,19.5 C 7.83333,19.5 11.1667,19.5 14.5,19.5C 14.5,21.5 14.5,23.5 14.5,25.5C 11.1667,25.5 7.83333,25.5 4.5,25.5C 4.5,23.5 4.5,21.5 4.5,19.5 Z"
         fill="none"
@@ -142,7 +188,6 @@ export const iconSet = {
         strokeWidth="1"
       />
 
-      {/* Четвертая ячейка */}
       <path
         d="M 19.5,19.5 C 22.8333,19.5 26.1667,19.5 29.5,19.5C 29.5,21.5 29.5,23.5 29.5,25.5C 26.1667,25.5 22.8333,25.5 19.5,25.5C 19.5,23.5 19.5,21.5 19.5,19.5 Z"
         fill="none"
