@@ -121,6 +121,88 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
         },
       ],
     },
+    {
+      id: 'examples',
+      text: 'EXAMPLES',
+      hasArrow: false,
+    },
+    {
+      id: 'calendar',
+      text: 'Calendar',
+      icon: 'calendar',
+      href: '#',
+      hasArrow: false,
+    },
+    {
+      id: 'gallery',
+      text: 'Gallery',
+      icon: 'gallery',
+      href: '#',
+      hasArrow: false,
+    },
+    {
+      id: 'kanbanBoard',
+      text: 'Kanban Board',
+      icon: 'kanbanBoard',
+      href: '#',
+      hasArrow: false,
+    },
+    {
+      id: 'mailbox',
+      text: 'Mailbox',
+      icon: 'mailbox',
+      href: '#',
+      hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
+    },
+    {
+      id: 'pages',
+      text: 'Pages',
+      icon: 'pages',
+      href: '#',
+      hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
+    },
+    {
+      id: 'extras',
+      text: 'Extras',
+      icon: 'extras',
+      href: '#',
+      hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
+    },
+    {
+      id: 'search',
+      text: 'Search',
+      icon: 'search',
+      href: '#',
+      hasArrow: true,
+      subItems: [
+        {
+          id: 'all-products',
+          text: 'All Products',
+          href: '/products',
+        },
+      ],
+    },
   ]
   return (
     <div>
