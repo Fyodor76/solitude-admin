@@ -1,4 +1,6 @@
-export const configLogin = {
+import { ConfigLoginType } from '../types'
+
+export const configLogin: ConfigLoginType = {
   title: 'Admin Solitude',
   innerTitle: 'Sign in to start your session',
   subtitle: '',
@@ -8,11 +10,13 @@ export const configLogin = {
       className: 'input-container',
       fields: [
         {
+          name: 'email',
           typeField: 'input',
           size: 'large',
           placeholder: 'Email',
         },
         {
+          name: 'password',
           typeField: 'input',
           size: 'large',
           placeholder: 'Password',
