@@ -82,6 +82,7 @@
       opacity: 1;
       overflow-y: auto;
       overflow-x: hidden;
+      margin-bottom: 10px;
 
       scrollbar-width: none;
       -ms-overflow-style: none;
@@ -208,6 +209,11 @@
 
                 .icon {
                   color: #ffffff;
+                  svg[stroke='#fbc913'],
+                  svg[stroke='#ff0000'],
+                  svg[stroke='#2b00ff'] {
+                    fill: transparent !important;
+                  }
 
                   &-svg {
                     color: #999;

@@ -4,6 +4,16 @@ import Icon from '../icons/Icon'
 import { IconName } from '../icons/iconSet'
 import './sidebar.scss'
 
+export interface LogoSidebarType {
+  imageUrl: string
+  altText?: string
+  title?: string
+}
+export interface UseSidebarType {
+  href: string
+  name: string
+  logo?: string
+}
 export interface MenuItem {
   id: string
   text: string
@@ -20,16 +30,8 @@ export interface SidebarProps {
   position?: 'left' | 'right'
   width?: string
   closeOnOutsideClick?: boolean
-  logo?: {
-    imageUrl: string
-    altText?: string
-    title?: string
-  }
-  user?: {
-    href: string
-    name: string
-    logo?: string
-  }
+  logo?: LogoSidebarType | null
+  user?: UseSidebarType | null
 }
 
 const Sidebar = ({
@@ -84,20 +86,24 @@ const Sidebar = ({
         style={{ width }}
         onClick={e => e.stopPropagation()}
       >
-        <a href="/" className="sidebar-header">
-          <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
-          {logo.title && <span className="sidebar-brand">{logo.title}</span>}
-        </a>
-        <div className="sidebar-container">
-          <div className="user-panel">
-            <img src={user.logo} alt="user-avatar" className="user-avatar" />
-            <div className="user-container">
-              <a className="user-name" href={user.href}>
-                {user.name}
-              </a>
-            </div>
-          </div>
+        {logo && (
+          <a href="/" className="sidebar-header">
+            <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
+            {logo.title && <span className="sidebar-brand">{logo.title}</span>}
+          </a>
+        )}
 
+        <div className="sidebar-container">
+          {user && (
+            <div className="user-panel">
+              <img src={user.logo} alt="user-avatar" className="user-avatar" />
+              <div className="user-container">
+                <a className="user-name" href={user.href}>
+                  {user.name}
+                </a>
+              </div>
+            </div>
+          )}
           <nav className="sidebar-nav">
             <ul className="sidebar-menu">
               {menuItems.map(item => {
@@ -126,7 +132,6 @@ const Sidebar = ({
 
                       <span className="menu-item-text">{item.text}</span>
 
-                      {/* Стрелочка для подменю - ВНУТРИ ссылки */}
                       {hasSubItems && (
                         <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
                           <Icon name="arrow" color="#ffffff" />
@@ -135,7 +140,7 @@ const Sidebar = ({
                     </a>
 
                     {hasSubItems && isOpenSubItem && item.subItems && (
-                      <ul className="sidebar-submenu">
+                      <ul className={`sidebar-submenu ${isOpenSubItem ? 'open' : ''}`}>
                         {item.subItems.map(subItem => (
                           <li className="sidebar-submenu-item" key={subItem.id}>
                             <a
