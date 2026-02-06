@@ -1,0 +1,35 @@
+.headerSidebar {
+  display: flex;
+  cursor: pointer;
+  padding: 8px;
+
+  .burger-dots {
+    display: flex;
+    gap: 5px;
+    .dot {
+      width: 4px;
+      height: 4px;
+      background-color: #8c8c8c;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    &:hover .dot {
+      background-color: #1890ff;
+    }
+
+    &.open {
+      .dot {
+        background-color: #1890ff;
+
+        &:nth-child(1) {
+          transform: translateX(4px);
+        }
+
+        &:nth-child(3) {
+          transform: translateX(-4px);
+        }
+      }
+    }
+  }
+}
