@@ -25,8 +25,8 @@ const Login = () => {
       <h2 className="source-sans-3-regular title">{configLogin.title}</h2>
       <Card>
         <CustomForm
-          configForm={configLogin}
           formData={form}
+          configForm={configLogin}
           onChange={handleChange}
           onFinish={onLoginFinish}
         />

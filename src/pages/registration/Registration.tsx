@@ -22,9 +22,9 @@ const Registration = () => {
       <h2 className="source-sans-3-regular title">{configRegistrations.title}</h2>
       <Card>
         <CustomForm
+          formData={form}
           configForm={configRegistrations}
           onChange={handleChange}
-          formData={form}
           onFinish={onRegistrationFinish}
         />
       </Card>

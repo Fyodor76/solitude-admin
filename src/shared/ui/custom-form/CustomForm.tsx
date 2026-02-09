@@ -8,16 +8,16 @@ import '../custom-form/CustomForm.scss'
 import { configFormType } from './types'
 
 interface CustomFormProps<T extends Record<string, string>> {
+  formData: T
   configForm: configFormType
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
-  formData: T
   onFinish: () => void
 }
 
 export const CustomForm = <T extends Record<string, string>>({
+  formData,
   configForm,
   onChange,
-  formData,
   onFinish,
 }: CustomFormProps<T>) => {
   return (

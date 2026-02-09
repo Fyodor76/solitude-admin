@@ -20,9 +20,9 @@ const Forgot = () => {
       <h2 className="source-sans-3-regular title">{configForgot.title}</h2>
       <Card>
         <CustomForm
+          formData={form}
           configForm={configForgot}
           onChange={handleChange}
-          formData={form}
           onFinish={onForgotFinish}
         />
       </Card>
