@@ -11,17 +11,18 @@ import Sidebar from './Sidebar'
 const HeaderSidebar = () => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const onClose = () => {
-    setIsOpen(false)
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen)
   }
-  const onOpen = () => {
+  const openSiderbar = () => {
     setIsOpen(true)
   }
+
   return (
     <div>
       <div className="headerSidebar">
         {' '}
-        <Button onClick={onOpen} className="open-sidebar">
+        <Button onClick={toggleSidebar} className="open-sidebar">
           <motion.div
             className={`burger-dots ${isOpen ? 'open' : ''}`}
             animate={{ rotate: isOpen ? 180 : 0 }}
@@ -33,7 +34,7 @@ const HeaderSidebar = () => {
           </motion.div>
         </Button>
       </div>
-      <Sidebar menuItems={menuSidebar} onClose={onClose} isOpen={isOpen} />
+      <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
     </div>
   )
 }

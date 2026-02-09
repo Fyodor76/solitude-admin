@@ -21,10 +21,11 @@ export interface MenuItem {
 }
 export interface SidebarProps {
   isOpen: boolean
-  onClose: () => void
+  toggleSidebar: () => void
   menuItems: MenuItem[]
   position?: 'left' | 'right'
   width?: string
+
   closeOnOutsideClick?: boolean
   logo?: LogoSidebarType | null
   user?: UseSidebarType | null
