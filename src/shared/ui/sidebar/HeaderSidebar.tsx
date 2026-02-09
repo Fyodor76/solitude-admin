@@ -4,6 +4,7 @@ import { Button } from 'antd'
 import { motion } from 'framer-motion'
 
 import { menuSidebar } from '@/app/constans/menuSiderbar'
+import Portal from '@/app/portal/Portal'
 
 import './headerSidebar.scss'
 import Sidebar from './Sidebar'
@@ -14,12 +15,9 @@ const HeaderSidebar = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
   }
-  const openSiderbar = () => {
-    setIsOpen(true)
-  }
 
   return (
-    <div>
+    <div id="header-sidebar">
       <div className="headerSidebar">
         {' '}
         <Button onClick={toggleSidebar} className="open-sidebar">
@@ -34,7 +32,9 @@ const HeaderSidebar = () => {
           </motion.div>
         </Button>
       </div>
-      <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
+      <Portal containerId="header-sidebar">
+        <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
+      </Portal>
     </div>
   )
 }

@@ -37,8 +37,10 @@ const Sidebar = ({
   }, [isOpen, toggleSidebar])
 
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
+
   const sidebarWidth = parseInt(width) || 280
   const collapsedWidth = 70
+
   const toggleSubMenuItem = (menuItemId: string) => {
     const newOpenSubMenuItem = new Set(openSubMenuItem)
     if (newOpenSubMenuItem.has(menuItemId)) {
@@ -51,7 +53,6 @@ const Sidebar = ({
 
   const sidebarVariants: Variants = {
     collapsed: {
-      x: 0,
       width: collapsedWidth,
       transition: {
         type: 'spring',
