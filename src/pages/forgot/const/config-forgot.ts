@@ -1,4 +1,6 @@
-export const configForgot = {
+import { ConfigForgotType } from '../types'
+
+export const configForgot: ConfigForgotType = {
   title: 'Admin Solitude',
   innerTitle: 'You forgot your password? Here you can easily retrieve a new password.',
   subtitle: '',
@@ -8,6 +10,7 @@ export const configForgot = {
       className: 'input-container',
       fields: [
         {
+          name: 'email',
           typeField: 'input',
           size: 'large',
           placeholder: 'Email',
@@ -22,7 +25,7 @@ export const configForgot = {
           children: 'Request new password',
           type: 'primary',
           size: 'middle',
-          block: 'true',
+          block: true,
         },
       ],
     },

@@ -1,4 +1,6 @@
-export const configRegistrations = {
+import { ConfigRegistrationsType } from '../types'
+
+export const configRegistrations: ConfigRegistrationsType = {
   title: 'Admin Solitude',
   innerTitle: 'Register a new membership',
   subtitle: '',
@@ -8,21 +10,25 @@ export const configRegistrations = {
       className: 'input-container',
       fields: [
         {
+          name: 'name',
           typeField: 'input',
           size: 'large',
           placeholder: 'Full name',
         },
         {
+          name: 'email',
           typeField: 'input',
           size: 'large',
           placeholder: 'Email',
         },
         {
+          name: 'password',
           typeField: 'input',
           size: 'large',
           placeholder: 'Password',
         },
         {
+          name: 'repeat_password',
           typeField: 'input',
           size: 'large',
           placeholder: 'Retype password',

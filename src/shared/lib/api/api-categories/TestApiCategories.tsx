@@ -39,7 +39,6 @@ const TestApiCategories = () => {
         sortOrder: 0,
         type: 'category',
       }).unwrap()
-      console.log('Новая категория:', newCategory)
     } catch (error) {
       console.error('Ошибка создания категории...', error)
     }
@@ -47,14 +46,12 @@ const TestApiCategories = () => {
 
   const getAllCategories = () => {
     const result = categories?.data
-    console.log(result)
   }
   getAllCategories()
 
   const deleteCat = async () => {
     try {
       const result = await deleteCategory('9b554218-f27d-4d97-a7d9-bafeb1eaec4f')
-      console.log('Удаление категории произошло', result)
     } catch (error) {
       console.error('Удаление не получилось(((')
     }
@@ -63,7 +60,6 @@ const TestApiCategories = () => {
   const deactivateCategory = async () => {
     try {
       const result = await deactivate(idPoloByDelete)
-      console.log('Категория деактивирована:', result.data)
     } catch (error) {
       console.error(' Ошибка деактивации:', error)
     }
@@ -83,7 +79,6 @@ const TestApiCategories = () => {
           type: 'category',
         },
       }).unwrap()
-      console.log('✅ Child категория:', newChild.data)
     } catch (error) {
       console.error(' Ошибка обновления:', error)
     }
@@ -99,7 +94,6 @@ const TestApiCategories = () => {
         sortOrder: 0,
         type: 'category',
       }).unwrap()
-      console.log('Новая категория:', newCategory)
     } catch (error) {
       console.error('Ошибка создания категории...', error)
     }

@@ -14,7 +14,6 @@ const TestApiError: React.FC = () => {
       const result = await getImageUrlById(fileId, 'test-folder')
       setResult(`Url:${result}`)
     } catch (error: any) {
-      console.log('Ошибка в catch:', error)
       setResult(`Ошибка: ${error.message || JSON.stringify(error)}`)
     }
   }
@@ -29,7 +28,6 @@ const TestApiError: React.FC = () => {
       const testFile = new File([blob], 'test-dot.png', { type: 'image/png' })
       const result = await uploadImage(testFile, 'test-folder')
       setResult('Успешно загрузилось изображение!')
-      console.log(result)
       return result
     } catch (error) {
       console.error('Ошибка загрузки', error)
@@ -51,7 +49,6 @@ const TestApiError: React.FC = () => {
     setResult('Начинаю удалять...')
     try {
       const result = await deleteImage(fileIdDelete, 'test-folder')
-      console.log('Результат удаления:', result)
       if (result.success) {
         setResult('Успех!')
       } else {
