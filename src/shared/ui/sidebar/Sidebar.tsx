@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react'
 
-import { motion, Variants } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+
+import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../icons/Icon'
 import './sidebar.scss'
@@ -38,9 +40,6 @@ const Sidebar = ({
 
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
-  const sidebarWidth = parseInt(width) || 280
-  const collapsedWidth = 70
-
   const toggleSubMenuItem = (menuItemId: string) => {
     const newOpenSubMenuItem = new Set(openSubMenuItem)
     if (newOpenSubMenuItem.has(menuItemId)) {
@@ -49,30 +48,6 @@ const Sidebar = ({
       newOpenSubMenuItem.add(menuItemId)
     }
     setOpenSubMenuItem(newOpenSubMenuItem)
-  }
-
-  const sidebarVariants: Variants = {
-    collapsed: {
-      width: collapsedWidth,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-      },
-    },
-    open: {
-      width: sidebarWidth,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 30,
-      },
-    },
-  }
-
-  const overlayVariants: Variants = {
-    closed: { opacity: 0 },
-    open: { opacity: 1 },
   }
 
   return (
@@ -122,10 +97,11 @@ const Sidebar = ({
                 const isOpenSubItem = openSubMenuItem.has(item.id)
 
                 return (
-                  <li className="sidebar-menu-item" key={item.id}>
+                  <li className="sidebar-menu-item " key={item.id}>
                     <a
                       href={hasSubItems ? '#' : item.href || '#'}
-                      className="sidebar-menu-link"
+                      className={`sidebar-menu-link ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
+                      data-collapsed={!isOpen}
                       onClick={e => {
                         if (hasSubItems) {
                           if (isOpen) {
@@ -137,39 +113,54 @@ const Sidebar = ({
                         }
                       }}
                     >
-                      {item.icon && (
-                        <span className="menu-item-icon">
-                          <Icon name={item.icon} />
-                        </span>
-                      )}
-                      {isOpen && <span className="menu-item-text">{item.text}</span>}
+                      <div className="icon-and-text">
+                        {item.icon && (
+                          <span className="menu-item-icon">
+                            <Icon name={item.icon} />
+                          </span>
+                        )}
+                        {isOpen && (
+                          <span
+                            className={`menu-item-text ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
+                          >
+                            {item.text}
+                          </span>
+                        )}
+                      </div>
                       {hasSubItems && isOpen && (
                         <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
-                          <Icon name="arrow" color="#ffffff" />
+                          <Icon name="arrow" color={`${isOpenSubItem ? '#1072d5' : '#ffffff'}`} />
                         </span>
                       )}
                     </a>
-
-                    {hasSubItems && isOpenSubItem && isOpen && item.subItems && (
-                      <ul className={`sidebar-submenu ${isOpenSubItem ? 'open' : ''}`}>
-                        {item.subItems.map(subItem => (
-                          <li className="sidebar-submenu-item" key={subItem.id}>
-                            <a
-                              href={subItem.href || '#'}
-                              className="sidebar-submenu-link"
-                              onClick={subItem.onClick}
-                            >
-                              {subItem.icon && (
-                                <span className="submenu-item-icon">
-                                  <Icon name={subItem.icon} color="#ffffff" />
-                                </span>
-                              )}
-                              <span className="submenu-item-text">{subItem.text}</span>
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                    <AnimatePresence>
+                      {hasSubItems && isOpenSubItem && isOpen && item.subItems && (
+                        <motion.ul
+                          variants={subMenuVariant}
+                          initial="close"
+                          animate="open"
+                          exit="close"
+                          className={`sidebar-submenu ${isOpenSubItem ? 'open' : ''}`}
+                        >
+                          {item.subItems.map(subItem => (
+                            <li className="sidebar-submenu-item" key={subItem.id}>
+                              <a
+                                href={subItem.href || '#'}
+                                className="sidebar-submenu-link"
+                                onClick={subItem.onClick}
+                              >
+                                {subItem.icon && (
+                                  <span className="submenu-item-icon">
+                                    <Icon name={subItem.icon} color="#ffffff" />
+                                  </span>
+                                )}
+                                <span className="submenu-item-text">{subItem.text}</span>
+                              </a>
+                            </li>
+                          ))}
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
                   </li>
                 )
               })}

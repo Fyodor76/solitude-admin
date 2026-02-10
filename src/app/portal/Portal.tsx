@@ -4,7 +4,7 @@ import ReactDom from 'react-dom'
 
 interface PortalProps {
   containerId?: string
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const Portal: React.FC<PortalProps> = ({ containerId = 'portal-root', children }) => {
@@ -23,8 +23,15 @@ const Portal: React.FC<PortalProps> = ({ containerId = 'portal-root', children }
     const portalContainer = setupContainer()
     setContainer(portalContainer)
     return () => {
-      if (portalContainer?.childNodes?.length === 0) {
-        document.body.removeChild(portalContainer)
+      if (portalContainer && document.body.contains(portalContainer)) {
+        requestAnimationFrame(() => {
+          // Проверяем после того как React удалил детей
+          if (portalContainer && portalContainer.childNodes.length === 0) {
+            if (document.body.contains(portalContainer)) {
+              document.body.removeChild(portalContainer)
+            }
+          }
+        })
       }
     }
   }, [containerId])

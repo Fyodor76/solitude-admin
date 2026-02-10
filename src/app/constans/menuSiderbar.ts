@@ -1,4 +1,4 @@
-import { MenuItem } from '@/shared/ui/sidebar/Sidebar'
+import { MenuItem } from '@/shared/ui/sidebar/sidebarType'
 
 export const menuSidebar: MenuItem[] = [
   {
@@ -12,11 +12,13 @@ export const menuSidebar: MenuItem[] = [
         id: 'all-products1',
         text: 'All Products',
         href: '/products',
+        icon: 'doc',
       },
       {
         id: 'all-products2',
         text: 'All Products',
         href: '/products',
+        icon: 'doc',
       },
     ],
   },
@@ -31,6 +33,7 @@ export const menuSidebar: MenuItem[] = [
         id: 'all-products3',
         text: 'All Products',
         href: '/products',
+        icon: 'doc',
       },
     ],
   },
