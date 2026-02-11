@@ -81,10 +81,10 @@ const Sidebar = ({
           {user && (
             <div className="user-panel">
               <img src={user.logo} alt="user-avatar" className="user-avatar" />
-              {isOpen && (
+              {isOpen && user.name && (
                 <div className="user-container">
-                  <a className="user-name" href={user.href}>
-                    {user.name}
+                  <a className="user-name " href={user.href}>
+                    {user.name || ''}
                   </a>
                 </div>
               )}
