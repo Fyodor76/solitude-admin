@@ -18,9 +18,8 @@
   }
 }
 .sidebar {
-  margin-top: 60px;
   width: 250px;
-  height: calc(100vh - 60px);
+  height: 100vh;
   box-shadow: 0px 14px 28px 0px #00000040;
   display: flex;
   flex-direction: column;
@@ -31,7 +30,7 @@
   transition: transform 0.3s ease;
 
   overflow: hidden;
-  z-index: 1001;
+  z-index: 1000;
 
   &.sidebar-left {
     left: 0;
