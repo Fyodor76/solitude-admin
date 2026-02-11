@@ -5,7 +5,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 999;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -22,15 +22,15 @@
   height: 100vh;
   box-shadow: 0px 14px 28px 0px #00000040;
   display: flex;
+  position: relative;
   flex-direction: column;
   background: #343a40;
-  position: fixed;
   top: 0;
   bottom: 0;
   transition: transform 0.3s ease;
 
   overflow: hidden;
-  z-index: 1000;
+  z-index: 1002;
 
   &.sidebar-left {
     left: 0;
