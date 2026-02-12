@@ -28,6 +28,12 @@ const Sidebar = ({
     logo: defaultUserLogo,
   },
 }: SidebarProps) => {
+  const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    if (!isOpen) {
+      setOpenSubMenuItem(new Set())
+    }
+  }, [isOpen])
   useEffect(() => {
     const handleCloseEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -39,8 +45,6 @@ const Sidebar = ({
       document.removeEventListener('keydown', handleCloseEsc)
     }
   }, [isOpen, toggleSidebar])
-
-  const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
   const toggleSubMenuItem = (menuItemId: string) => {
     const newOpenSubMenuItem = new Set(openSubMenuItem)
@@ -106,12 +110,16 @@ const Sidebar = ({
                       data-collapsed={!isOpen}
                       onClick={e => {
                         if (hasSubItems) {
-                          if (isOpen) {
-                            e.preventDefault()
+                          e.preventDefault()
+                          if (!isOpen) {
+                            toggleSidebar()
+                            toggleSubMenuItem(item.id)
+                          } else {
                             toggleSubMenuItem(item.id)
                           }
-                        } else if (item.onClick) {
-                          item.onClick()
+                          if (item.onClick) {
+                            item.onClick()
+                          }
                         }
                       }}
                     >
