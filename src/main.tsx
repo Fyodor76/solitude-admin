@@ -5,8 +5,8 @@ import { Provider } from 'react-redux'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import { store } from '././app/store/index'
+import ErrorBoundary from './app/components/error-boundary/AppErrorBoundary'
 import { Router } from './app/router/Router'
-import ErrorBoundary from './AppErrorBoundary'
 
 const router = createBrowserRouter(Router)
 
