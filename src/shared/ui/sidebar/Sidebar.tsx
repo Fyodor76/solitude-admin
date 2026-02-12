@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 
 import { AnimatePresence, motion } from 'framer-motion'
 
+import defaultLogo from '@/app/assets/images/image.png'
+import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../icons/Icon'
@@ -16,14 +18,14 @@ const Sidebar = ({
   width = '280px',
   closeOnOutsideClick = true,
   logo = {
-    imageUrl: 'public/images/image.png',
+    imageUrl: defaultLogo,
     altText: 'логотип',
     title: 'AdminLTE 3',
   },
   user = {
     href: '#profile',
     name: 'Alexander Pierce',
-    logo: 'public/images/user.jpg',
+    logo: defaultUserLogo,
   },
 }: SidebarProps) => {
   useEffect(() => {
