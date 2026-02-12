@@ -321,6 +321,7 @@
                 padding: 8px;
                 color: var(--color-grey-text);
                 gap: 10px;
+                white-space: nowrap;
 
                 &:hover {
                   background-color: var(--color-grey-background-3);
