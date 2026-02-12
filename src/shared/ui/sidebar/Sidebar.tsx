@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 
 import { AnimatePresence, motion } from 'framer-motion'
 
+import defaultLogo from '@/app/assets/images/image.png'
+import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../icons/Icon'
@@ -16,16 +18,22 @@ const Sidebar = ({
   width = '280px',
   closeOnOutsideClick = true,
   logo = {
-    imageUrl: 'public/images/image.png',
+    imageUrl: defaultLogo,
     altText: 'логотип',
     title: 'AdminLTE 3',
   },
   user = {
     href: '#profile',
     name: 'Alexander Pierce',
-    logo: 'public/images/user.jpg',
+    logo: defaultUserLogo,
   },
 }: SidebarProps) => {
+  const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    if (!isOpen) {
+      setOpenSubMenuItem(new Set())
+    }
+  }, [isOpen])
   useEffect(() => {
     const handleCloseEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -37,8 +45,6 @@ const Sidebar = ({
       document.removeEventListener('keydown', handleCloseEsc)
     }
   }, [isOpen, toggleSidebar])
-
-  const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
   const toggleSubMenuItem = (menuItemId: string) => {
     const newOpenSubMenuItem = new Set(openSubMenuItem)
@@ -104,12 +110,16 @@ const Sidebar = ({
                       data-collapsed={!isOpen}
                       onClick={e => {
                         if (hasSubItems) {
-                          if (isOpen) {
-                            e.preventDefault()
+                          e.preventDefault()
+                          if (!isOpen) {
+                            toggleSidebar()
+                            toggleSubMenuItem(item.id)
+                          } else {
                             toggleSubMenuItem(item.id)
                           }
-                        } else if (item.onClick) {
-                          item.onClick()
+                          if (item.onClick) {
+                            item.onClick()
+                          }
                         }
                       }}
                     >
