@@ -3,7 +3,6 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 import './breadcrumbs.scss'
-import BreadcrumbsSchema from './BreadcrumbsSchema'
 
 export interface BreadcrumbsItemProps {
   label: string
@@ -13,16 +12,13 @@ export interface BreadcrumbsItemProps {
 export interface BreadcrumbsItemsProps {
   items: BreadcrumbsItemProps[]
   baseUrl: string
-  includeSchema: boolean
 }
 export const BreadcrumbsItems = ({
   items,
   baseUrl = 'https://solitude-store.ru',
-  includeSchema = true,
 }: BreadcrumbsItemsProps) => {
   return (
     <>
-      {includeSchema && <BreadcrumbsSchema baseUrl={baseUrl} items={items} />}
       <nav aria-label="Breadcrumbs" className="breadcrumbs">
         <ol>
           {items.map((item, index) => {
