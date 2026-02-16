@@ -1,6 +1,7 @@
 import { Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
+import Breadcrumbs from '../breadcrumbs/Breadcrumbs'
 import './Header.scss'
 
 export const Header = () => {
@@ -12,7 +13,10 @@ export const Header = () => {
 
   return (
     <div className="header">
-      <Button onClick={handleLogout}>Выйти</Button>
+      <Button onClick={handleLogout} className="header-btn">
+        Выйти
+      </Button>
+      <Breadcrumbs />
     </div>
   )
 }

@@ -2,6 +2,9 @@
   min-height: 60px;
   background-color: pink;
   display: flex;
-  justify-content: end;
-  align-items: center;
+  flex-direction: column;
+  align-items: end;
+  .header-btn {
+    width: 10%;
+  }
 }
