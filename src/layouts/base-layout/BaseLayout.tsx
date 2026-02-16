@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 
-import Breadcrumbs from '@/shared/ui/breadcrumbs/Breadcrumbs'
+import BreadcrumbsItems from '@/shared/ui/breadcrumbs/BreadcrumbsItems'
+import { useBreadcrumbs } from '@/shared/ui/breadcrumbs/useBreadcrumbs'
 import { Header } from '@/shared/ui/header'
 
 interface BaseLayoutProps {
@@ -8,10 +9,15 @@ interface BaseLayoutProps {
 }
 
 export const BaseLayout = ({ children }: BaseLayoutProps) => {
+  const breadcrumbs = useBreadcrumbs()
   return (
     <div>
       <Header />
-      <Breadcrumbs />
+      <BreadcrumbsItems
+        items={breadcrumbs}
+        baseUrl="https://solitude-store.ru"
+        includeSchema={true}
+      />
       <div>{children}</div>
     </div>
   )

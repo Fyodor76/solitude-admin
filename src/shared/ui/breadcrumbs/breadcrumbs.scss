@@ -1,5 +1,27 @@
 .breadcrumbs {
   display: flex;
-  color: rgb(70, 59, 59);
-  font-family: 'Source Sun 3';
+  font-family: 'Source Sans 3';
+  background-color: #f4f6f9;
+  font-size: 16px;
+  color: #6c757d;
+  padding: 20px 8px 20px 8px;
+  justify-content: flex-end;
+
+  .inactive {
+    .link {
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+
+      &:hover {
+        color: #3b82f6;
+      }
+    }
+  }
+  .active {
+    .text {
+      font-weight: 400;
+      cursor: default;
+    }
+  }
 }
