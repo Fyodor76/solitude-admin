@@ -6,22 +6,26 @@
   color: #6c757d;
   padding: 12px 8px 12px 8px;
   justify-content: flex-end;
+  .list {
+    display: flex;
+    gap: 5px;
+    .inactive {
+      .link {
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: underline;
 
-  .inactive {
-    .link {
-      text-decoration: none;
-      transition: all 0.2s ease;
-      cursor: pointer;
-
-      &:hover {
-        color: #3b82f6;
+        &:hover {
+          color: #3b82f6;
+        }
       }
     }
-  }
-  .active {
-    .text {
-      font-weight: 400;
-      cursor: default;
+    .active {
+      .text {
+        font-weight: 400;
+        cursor: default;
+      }
     }
   }
 }

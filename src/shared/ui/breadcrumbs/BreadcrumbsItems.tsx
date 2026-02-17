@@ -20,7 +20,7 @@ export const BreadcrumbsItems = ({
   return (
     <>
       <nav aria-label="Breadcrumbs" className="breadcrumbs">
-        <ol>
+        <ol className="list">
           {items.map((item, index) => {
             const isLast = items.length - 1 === index
             return (
@@ -32,7 +32,7 @@ export const BreadcrumbsItems = ({
                 ) : (
                   <span className="text">{item.label}</span>
                 )}
-                {!isLast && <span className="separator">/</span>}
+                {!isLast && <span className="separator"> /</span>}
               </li>
             )
           })}
