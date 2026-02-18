@@ -4,6 +4,8 @@
   display: flex;
   flex-direction: column;
   align-items: end;
+  z-index: 1002;
+  position: relative;
   .header-btn {
     width: 10%;
   }
