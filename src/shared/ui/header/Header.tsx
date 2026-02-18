@@ -1,6 +1,7 @@
 import { Button } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
+import Breadcrumbs from '../breadcrumbs/Breadcrumbs'
 import HeaderSidebar from '../sidebar/HeaderSidebar'
 import './Header.scss'
 
@@ -16,6 +17,11 @@ export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
   }
 
   return (
+    <div className="header">
+      <Button onClick={handleLogout} className="header-btn">
+        Выйти
+      </Button>
+      <Breadcrumbs />
     <div className="header" style={{ display: 'flex', justifyContent: 'space-between' }}>
       <HeaderSidebar toggleSidebar={toggleSidebar} isOpen={isOpen} />
       <Button onClick={handleLogout}>Выйти</Button>

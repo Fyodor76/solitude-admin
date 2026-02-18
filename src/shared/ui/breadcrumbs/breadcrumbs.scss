@@ -1,0 +1,31 @@
+.breadcrumbs {
+  width: 100%;
+  display: flex;
+  font-family: 'Source Sans 3';
+  font-size: 16px;
+  color: #6c757d;
+  padding: 12px 8px 12px 8px;
+  justify-content: flex-end;
+  .list {
+    display: flex;
+    gap: 5px;
+    .inactive {
+      .link {
+        text-decoration: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: underline;
+
+        &:hover {
+          color: #3b82f6;
+        }
+      }
+    }
+    .active {
+      .text {
+        font-weight: 400;
+        cursor: default;
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react'
 
 import { Header } from '@/shared/ui/header'
+import { Link } from 'react-router-dom'
 import Sidebar from '@/shared/ui/sidebar/Sidebar'
 
 import { menuSidebar } from '@/app/constans/menuSiderbar'
@@ -16,6 +17,14 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
     setIsOpen(!isOpen)
   }
   return (
+    <div>
+      <Header />
+      <Link to="/catalog">
+        <h1 style={{ textAlign: 'center', color: 'green' }}>
+          Перейти в каталог(протестируем работу breadcrumbs)
+        </h1>
+      </Link>
+      <div>{children}</div>
     <div className="wrapper" style={{ display: 'flex' }}>
       <div>
         <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
