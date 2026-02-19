@@ -32,7 +32,7 @@ export const BreadcrumbsItems = ({
                 ) : (
                   <span className="text">{item.label}</span>
                 )}
-                {!isLast && <span className="separator"> /</span>}
+                {!isLast && <span className="separator"> ›</span>}
               </li>
             )
           })}

@@ -1,33 +1,44 @@
 .breadcrumbs-container {
   width: 100%;
   display: flex;
+  background-color: var(--color-grey-background-breadcrumbs);
+
+  animation: gentleAppear 0.4s ease forwards;
   .breadcrumbs {
     width: 100%;
     display: flex;
-    font-family: 'Source Sans 3';
-    font-size: 16px;
-    color: #6c757d;
-    padding: 12px 8px 12px 8px;
+    padding: 8px;
 
     .list {
       display: flex;
       gap: 5px;
+      font-style: italic;
+
       .inactive {
         .link {
-          text-decoration: none;
           transition: all 0.2s ease;
           cursor: pointer;
           text-decoration: underline;
+          color: var(--color-grey-5);
+          font-family: 'Source Sans 3';
+          font-size: 14px;
+          font-weight: 300;
+          color: var(--color-grey-2);
 
           &:hover {
-            color: #3b82f6;
+            color: var(--color-blue);
+            transform: translateY(-1px);
           }
         }
       }
       .active {
         .text {
-          font-weight: 400;
           cursor: default;
+          color: var(--color-grey-header);
+
+          font-family: 'Source Sans 3';
+          font-size: 14px;
+          font-weight: 300;
         }
       }
     }
