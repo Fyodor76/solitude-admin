@@ -5,9 +5,10 @@ import { useBreadcrumbs } from './useBreadcrumbs'
 
 const Breadcrumbs = () => {
   const breadcrumbs = useBreadcrumbs()
+  const apiUrl = import.meta.env.VITE_API_URL
   return (
     <div>
-      <BreadcrumbsItems items={breadcrumbs} baseUrl="https://solitude-store.ru" />
+      <BreadcrumbsItems items={breadcrumbs} baseUrl={apiUrl} />
     </div>
   )
 }

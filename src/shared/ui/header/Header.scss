@@ -1,12 +1,78 @@
 .header {
   min-height: 60px;
-  background-color: pink;
+  background-color: var(--color-white);
+  border-bottom: 1px solid var(--color-grey-header-border);
   display: flex;
   flex-direction: column;
   align-items: end;
   z-index: 1002;
   position: relative;
-  .header-btn {
-    width: 10%;
+
+  &-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 10px 0;
+    .btn-container {
+      display: flex;
+      .links {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        gap: 12px;
+
+        .link-message,
+        .link-notify {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+
+          svg path {
+            fill: none;
+          }
+          &:hover svg path {
+            stroke: var(--color-blue) !important;
+          }
+
+          .badge {
+            position: absolute;
+            top: -5px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            background-color: var(--color-blue);
+            color: var(--color-white);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            animation: badgeAppear 0.3s ease;
+          }
+        }
+      }
+      .btn-logout {
+        border: none;
+        box-shadow: none;
+        &:hover,
+        &:focus {
+          border: none;
+        }
+
+        svg path {
+          fill: none;
+        }
+        &:hover svg path {
+          stroke: var(--color-blue) !important;
+        }
+      }
+    }
   }
 }
