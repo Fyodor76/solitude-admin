@@ -18,13 +18,16 @@ export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
 
   return (
     <>
-      <div className="header" style={{ display: 'flex' }}>
-        <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+      <div className="header">
+        <div className="header-container">
           <HeaderSidebar toggleSidebar={toggleSidebar} isOpen={isOpen} />
-
-          <Button onClick={handleLogout}>Выйти</Button>
+          <div className="btn-logout-container">
+            <Button onClick={handleLogout} className="btn-logout">
+              Выйти
+            </Button>
+          </div>
         </div>
-        <div>
+        <div className="breadcrumbs-container">
           <Breadcrumbs />
         </div>
       </div>

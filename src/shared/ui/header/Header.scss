@@ -6,7 +6,15 @@
   align-items: end;
   z-index: 1002;
   position: relative;
-  .header-btn {
-    width: 10%;
+
+  &-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+
+    .btn-logout-container {
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
   }
 }
