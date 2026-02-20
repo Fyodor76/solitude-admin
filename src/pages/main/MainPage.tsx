@@ -4,9 +4,9 @@ import Sidebar from '@/shared/ui/sidebar/Sidebar'
 import { TestCrash } from '@/TestCrash'
 import { Link } from 'react-router-dom'
 
+import Categories from '@/app/components/сategories/Categories'
+
 import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
-import CatalogPage from '../test/CatalogPage'
-import TshortsPage from '../test/TshortsPage'
 
 const MainPage = () => {
   return (

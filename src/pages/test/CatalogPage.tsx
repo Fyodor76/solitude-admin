@@ -14,7 +14,9 @@ const CatalogPage = () => {
       }}
     >
       <h1>Каталог товаров</h1>
+
       <p>Ты на странице /catalog</p>
+
       <ul>
         <li>
           <Link to="/catalog/tshorts" style={{ textDecoration: 'underline' }}>
