@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { CategoryMenuItem } from '@/shared/lib/api/api-categories/types'
 
 import { CategoryToAntTree } from './type'
@@ -26,16 +28,32 @@ export const buildCategoriesTree = (categoriesItems: CategoryMenuItem[]) => {
   return tree
 }
 
-export const transformToAntTree = (tree: CategoryMenuItem[]): CategoryToAntTree[] => {
+export const transformToAntTree = (
+  tree: CategoryMenuItem[],
+  callbacks: { onEdit: (id: string) => void; onDelete: (id: string) => void }
+) => {
   return tree.map(el => {
     const newObj: CategoryToAntTree = {
       key: el.id,
-      title: el.name,
+      title: (
+        <div>
+          <span>{el.name}</span>
+          <button onClick={() => callbacks.onEdit(el.id)}>✏️</button>
+          <button onClick={() => callbacks.onDelete(el.id)}>🗑️</button>
+        </div>
+      ),
       children: [],
     }
     if (el.children && el.children.length > 0) {
-      newObj.children = transformToAntTree(el.children)
+      newObj.children = transformToAntTree(el.children, callbacks)
     }
     return newObj
   })
+}
+
+export const handleEdit = (categoryId: string) => {
+  console.log(
+    'Сейчас должно открыться модальное окно для редактирования категории с id:',
+    categoryId
+  )
 }

@@ -1,5 +1,7 @@
+import React from 'react'
+
 export interface CategoryToAntTree {
   key: string
-  title: string
+  title: React.ReactNode
   children?: CategoryToAntTree[]
 }
