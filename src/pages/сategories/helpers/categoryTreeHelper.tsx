@@ -50,10 +50,3 @@ export const transformToAntTree = (
     return newObj
   })
 }
-
-export const handleEdit = (categoryId: string) => {
-  console.log(
-    'Сейчас должно открыться модальное окно для редактирования категории с id:',
-    categoryId
-  )
-}

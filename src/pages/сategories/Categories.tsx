@@ -3,18 +3,22 @@ import React, { useEffect, useState } from 'react'
 import {
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
+  useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/api-categories/apiCategories'
 import { useGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
+import EditCategoryModal from '@/shared/ui/modal/EditCategoryModal'
+import { useModal } from '@/shared/ui/modal/useModal'
 import { Tree } from 'antd'
 
-import { handleEdit } from './helpers/categoryTreeHelper'
 import { buildCategoriesTree, transformToAntTree } from './helpers/categoryTreeHelper'
 import { CategoryToAntTree } from './types/type'
 
 const Categories = () => {
+  const editModal = useModal()
   const { data: categoriesData, isLoading, error, refetch } = useGetCategoriesQuery()
   const [deleteCategory] = useDeleteCategoryMutation()
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
+  const [editInput, setEditInput] = useState('')
 
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
 
@@ -24,6 +28,8 @@ const Categories = () => {
       skip: !deleteCategoryId,
     }
   )
+  const [updateCategory] = useUpdateCategoryByIdMutation()
+
   useEffect(() => {
     if (categoriesData) {
       const sympleTree = buildCategoriesTree(categoriesData.data)
@@ -61,6 +67,24 @@ const Categories = () => {
       delCategory(deleteCategoryId)
     }
   }, [products, deleteCategoryId])
+
+  const handleEdit = (categoryId: string) => {
+    const category = categoriesData?.data.find(cat => cat.id === categoryId)
+    if (category) {
+      setEditInput(category.name)
+      editModal.onOpen(category)
+    }
+  }
+
+  const handleUpdateCategory = async (id: string, newName: string) => {
+    try {
+      await updateCategory({ id, data: { name: newName } }).unwrap()
+      refetch()
+    } catch (error) {
+      console.log('Ошибка редактирования категории!', error)
+    }
+  }
+
   return (
     <>
       {deleteCategoryId && productsLoading && (
@@ -81,6 +105,14 @@ const Categories = () => {
         {error && <span>Ошибочка вышла...</span>}
         {categoriesData && <Tree treeData={categories} defaultExpandAll showLine></Tree>}
       </div>
+      <EditCategoryModal
+        isOpen={editModal.isOpen}
+        onClose={editModal.onClose}
+        category={editModal.content}
+        onSave={handleUpdateCategory}
+        value={editInput}
+        onChange={e => setEditInput(e.target.value)}
+      />
     </>
   )
 }
