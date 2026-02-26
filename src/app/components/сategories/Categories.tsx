@@ -16,55 +16,14 @@ const Categories = () => {
   const [deleteCategory] = useDeleteCategoryMutation()
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
 
-  const { data: products } = useGetProductsByCategoryIdQuery(selectedCategoryId ?? '', {
-    skip: !selectedCategoryId,
-  })
-
-  const handleDelete = async (categoryId: string) => {
-    const isConfirmed = window.confirm('Удалить эту категорию?')
-    if (!isConfirmed) return
-
-    // ШАГ 1: Если это первое нажатие - загружаем товары
-    if (selectedCategoryId !== categoryId) {
-      setSelectedCategoryId(categoryId)
-      alert('Проверяем товары... Нажмите Удалить еще раз через 1 секунду')
-
-      // Ждем 1 секунду, чтобы товары загрузились
-      setTimeout(() => {
-        handleDelete(categoryId) // вызываем эту же функцию снова!
-      }, 1000)
-      return
+  const { data: products, isLoading: productsLoading } = useGetProductsByCategoryIdQuery(
+    deleteCategoryId ?? '',
+    {
+      skip: !deleteCategoryId,
     }
-
-    // ШАГ 2: Второй вызов функции (через секунду)
-    // Проверяем, загрузились ли товары
-    if (!products) {
-      alert('Товары еще грузятся, подождите еще секунду')
-      setTimeout(() => {
-        handleDelete(categoryId) // снова вызываем
-      }, 1000)
-      return
-    }
-
-    // ШАГ 3: Проверяем товары
-    if (products.data && products.data.length > 0) {
-      alert('Сначала удалите все товары в этой категории')
-      setSelectedCategoryId(null) // сбрасываем
-      return
-    }
-
-    // ШАГ 4: Удаляем
-    try {
-      await deleteCategory(categoryId).unwrap()
-      refetch()
-      alert('Категория успешно удалена!')
-      setSelectedCategoryId(null)
-    } catch (error) {
-      console.log('Ошибка удаления категории!', error)
-    }
-  }
+  )
   useEffect(() => {
     if (categoriesData) {
       const sympleTree = buildCategoriesTree(categoriesData.data)
@@ -73,12 +32,56 @@ const Categories = () => {
     }
   }, [categoriesData])
 
+  const handleDelete = async (categoryId: string) => {
+    const isConfirmed = window.confirm('Удалить эту категорию?')
+    if (!isConfirmed) return
+    setDeleteCategoryId(categoryId)
+  }
+
+  useEffect(() => {
+    if (!deleteCategoryId || !products) {
+      return
+    }
+    if (products.data && products.data.length > 0) {
+      alert('Сначала удалите все товары в этой категории')
+      setDeleteCategoryId(null)
+    } else {
+      const delCategory = async (id: string) => {
+        try {
+          await deleteCategory(id).unwrap()
+          refetch()
+          alert('Категория успешно удалена!')
+        } catch (error) {
+          console.log('Ошибка удаления категории!', error)
+        } finally {
+          setDeleteCategoryId(null)
+        }
+      }
+
+      delCategory(deleteCategoryId)
+    }
+  }, [products, deleteCategoryId])
   return (
-    <div className="allCategories">
-      {isLoading && <span>Загрузка...</span>}
-      {error && <span>Ошибочка вышла...</span>}
-      {categoriesData && <Tree treeData={categories} defaultExpandAll showLine></Tree>}
-    </div>
+    <>
+      {deleteCategoryId && productsLoading && (
+        <div
+          style={{
+            padding: '10px',
+            background: '#f0f5ff',
+            color: '#1890ff',
+            borderRadius: '4px',
+            margin: '10px 0',
+          }}
+        >
+          ⏳ Проверяем наличие товаров в категории...
+        </div>
+      )}
+      <div className="allCategories">
+        {isLoading && <span>Загрузка...</span>}
+        {error && <span>Ошибочка вышла...</span>}
+        {categoriesData && <Tree treeData={categories} defaultExpandAll showLine></Tree>}
+      </div>
+    </>
   )
 }
 
