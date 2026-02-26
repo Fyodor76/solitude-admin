@@ -1,5 +1,5 @@
+import { Product } from '../../../../app/types/typesProduct'
 import { ApiResponse, baseApi } from '../baseApi'
-import { Product } from './types'
 
 export const apiProducts = baseApi.injectEndpoints({
   endpoints: builder => ({

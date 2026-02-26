@@ -1,10 +1,10 @@
 import { ReactNode, useState } from 'react'
 
+import Categories from '@/pages/сategories/Categories'
 import { Header } from '@/shared/ui/header'
 import Sidebar from '@/shared/ui/sidebar/Sidebar'
 import { Link } from 'react-router-dom'
 
-import Categories from '@/app/components/сategories/Categories'
 import { menuSidebar } from '@/app/constans/menuSiderbar'
 
 interface BaseLayoutProps {

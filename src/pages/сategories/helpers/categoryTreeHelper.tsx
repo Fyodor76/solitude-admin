@@ -2,7 +2,7 @@ import React from 'react'
 
 import { CategoryMenuItem } from '@/shared/lib/api/api-categories/types'
 
-import { CategoryToAntTree } from './type'
+import { CategoryToAntTree } from '../types/type'
 
 export const buildCategoriesTree = (categoriesItems: CategoryMenuItem[]) => {
   const categories: Record<string, CategoryMenuItem & { children: CategoryMenuItem[] }> = {}

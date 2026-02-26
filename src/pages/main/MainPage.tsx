@@ -1,10 +1,9 @@
+import Categories from '@/pages/сategories/Categories'
 import TestApiCategories from '@/shared/lib/api/api-categories/TestApiCategories'
 import TestApiError from '@/shared/lib/api/TestApiError'
 import Sidebar from '@/shared/ui/sidebar/Sidebar'
 import { TestCrash } from '@/TestCrash'
 import { Link } from 'react-router-dom'
-
-import Categories from '@/app/components/сategories/Categories'
 
 import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
 

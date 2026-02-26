@@ -7,9 +7,9 @@ import {
 import { useGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
 import { Tree } from 'antd'
 
-import { handleEdit } from './categoryHelper'
-import { buildCategoriesTree, transformToAntTree } from './categoryHelper'
-import { CategoryToAntTree } from './type'
+import { handleEdit } from './helpers/categoryTreeHelper'
+import { buildCategoriesTree, transformToAntTree } from './helpers/categoryTreeHelper'
+import { CategoryToAntTree } from './types/type'
 
 const Categories = () => {
   const { data: categoriesData, isLoading, error, refetch } = useGetCategoriesQuery()
