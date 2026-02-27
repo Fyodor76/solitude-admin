@@ -17,9 +17,8 @@ export interface CategoryRequest {
   slug: string
   description: string
   parentId: null | string
-  imageId: string | null
+  imageId?: string | null
   sortOrder: number
-  type: string
 }
 
 export interface CollectionItem {

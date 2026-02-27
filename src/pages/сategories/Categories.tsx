@@ -13,12 +13,28 @@ import { Tree } from 'antd'
 import { buildCategoriesTree, transformToAntTree } from './helpers/categoryTreeHelper'
 import { CategoryToAntTree } from './types/type'
 
+export interface InputFormData {
+  name: string
+  slug: string
+  description: string
+  sortOrder: number
+  parentId: string | null
+  imageId?: string | null
+}
+
 const Categories = () => {
   const editModal = useModal()
   const { data: categoriesData, isLoading, error, refetch } = useGetCategoriesQuery()
   const [deleteCategory] = useDeleteCategoryMutation()
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
-  const [editInput, setEditInput] = useState('')
+  const [editInput, setEditInput] = useState<InputFormData>({
+    name: '',
+    slug: '',
+    description: '',
+
+    sortOrder: 0,
+    parentId: '',
+  })
 
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
 
@@ -71,14 +87,22 @@ const Categories = () => {
   const handleEdit = (categoryId: string) => {
     const category = categoriesData?.data.find(cat => cat.id === categoryId)
     if (category) {
-      setEditInput(category.name)
+      setEditInput({
+        name: category.name,
+        slug: category.slug,
+        description: category.description,
+
+        sortOrder: category.sortOrder,
+        parentId: category.parentId,
+        imageId: category.imageId,
+      })
       editModal.onOpen(category)
     }
   }
 
-  const handleUpdateCategory = async (id: string, newName: string) => {
+  const handleUpdateCategory = async (id: string, editInput: InputFormData) => {
     try {
-      await updateCategory({ id, data: { name: newName } }).unwrap()
+      await updateCategory({ id, data: editInput }).unwrap()
       refetch()
     } catch (error) {
       console.log('Ошибка редактирования категории!', error)
@@ -111,7 +135,7 @@ const Categories = () => {
         category={editModal.content}
         onSave={handleUpdateCategory}
         value={editInput}
-        onChange={e => setEditInput(e.target.value)}
+        setEditInput={setEditInput}
       />
     </>
   )
