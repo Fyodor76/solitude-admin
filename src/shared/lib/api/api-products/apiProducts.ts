@@ -1,4 +1,4 @@
-import { Product } from '../../../../app/types/typesProduct'
+import { Product } from '../../../../app/types/product'
 import { ApiResponse, baseApi } from '../baseApi'
 
 export const apiProducts = baseApi.injectEndpoints({

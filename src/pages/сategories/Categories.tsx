@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 
+import EditCategoryModal from '@/pages/сategories/modal/EditCategoryModal'
 import {
+  useCreateCategoryMutation,
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/api-categories/apiCategories'
 import { useGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
-import EditCategoryModal from '@/shared/ui/modal/EditCategoryModal'
-import { useModal } from '@/shared/ui/modal/useModal'
+import { useModal } from '@/shared/lib/hooks/useModal'
 import { Tree } from 'antd'
 
 import { buildCategoriesTree, transformToAntTree } from './helpers/categoryTreeHelper'
@@ -22,9 +23,19 @@ export interface InputFormData {
   imageId?: string | null
 }
 
+export interface InputCreateData {
+  name: string
+  slug: string
+  description: string
+  parentId: string | null
+  imageId: string | null
+  sortOrder: number
+  type: string
+}
+
 const Categories = () => {
   const editModal = useModal()
-  const { data: categoriesData, isLoading, error, refetch } = useGetCategoriesQuery()
+  const { data: categoriesData, isLoading, error } = useGetCategoriesQuery()
   const [deleteCategory] = useDeleteCategoryMutation()
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
   const [editInput, setEditInput] = useState<InputFormData>({
@@ -33,7 +44,17 @@ const Categories = () => {
     description: '',
 
     sortOrder: 0,
-    parentId: '',
+    parentId: null,
+  })
+
+  const [createInput, setCreateInput] = useState<InputCreateData>({
+    name: 'Test-name',
+    slug: 't-shirts',
+    description: 'Test description',
+    parentId: null,
+    imageId: '123-test',
+    sortOrder: 0,
+    type: 'category',
   })
 
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
@@ -45,6 +66,8 @@ const Categories = () => {
     }
   )
   const [updateCategory] = useUpdateCategoryByIdMutation()
+  const [createCategory] = useCreateCategoryMutation()
+  const [mode, setMode] = useState('edit')
 
   useEffect(() => {
     if (categoriesData) {
@@ -71,7 +94,7 @@ const Categories = () => {
       const delCategory = async (id: string) => {
         try {
           await deleteCategory(id).unwrap()
-          refetch()
+
           alert('Категория успешно удалена!')
         } catch (error) {
           console.log('Ошибка удаления категории!', error)
@@ -96,16 +119,36 @@ const Categories = () => {
         parentId: category.parentId,
         imageId: category.imageId,
       })
+      console.log(`id категории : ${category.name} такое: ${category.id}`)
       editModal.onOpen(category)
     }
   }
 
   const handleUpdateCategory = async (id: string, editInput: InputFormData) => {
+    console.log('📤 Отправляю на сервер:', {
+      id,
+      data: {
+        ...editInput,
+        parentId: editInput.parentId, // Посмотрим что тут
+        typeOfParentId: typeof editInput.parentId,
+      },
+    })
     try {
       await updateCategory({ id, data: editInput }).unwrap()
-      refetch()
     } catch (error) {
       console.log('Ошибка редактирования категории!', error)
+    }
+  }
+
+  const handleCreateCategory = () => {
+    editModal.onOpen()
+    setMode('create')
+  }
+  const createNewCategory = async () => {
+    try {
+      await createCategory(createInput).unwrap()
+    } catch (error) {
+      console.log('Ошибка создания категории!', error)
     }
   }
 
@@ -127,15 +170,21 @@ const Categories = () => {
       <div className="allCategories">
         {isLoading && <span>Загрузка...</span>}
         {error && <span>Ошибочка вышла...</span>}
+        <button onClick={handleCreateCategory}>➕ Добавить категорию</button>
         {categoriesData && <Tree treeData={categories} defaultExpandAll showLine></Tree>}
       </div>
       <EditCategoryModal
         isOpen={editModal.isOpen}
-        onClose={editModal.onClose}
+        mode={mode}
         category={editModal.content}
-        onSave={handleUpdateCategory}
-        value={editInput}
+        valueEdit={editInput}
+        valueCreate={createInput}
+        onClose={editModal.onClose}
         setEditInput={setEditInput}
+        onSaveEdit={handleUpdateCategory}
+        onSaveCreate={createNewCategory}
+        setCreateInput={setCreateInput}
+        setMode={setMode}
       />
     </>
   )

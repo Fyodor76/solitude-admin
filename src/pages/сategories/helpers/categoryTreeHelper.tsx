@@ -32,7 +32,14 @@ export const transformToAntTree = (
   tree: CategoryMenuItem[],
   callbacks: { onEdit: (id: string) => void; onDelete: (id: string) => void }
 ) => {
+  console.log('🔄 transformToAntTree получил:', tree)
   return tree.map(el => {
+    console.log(`📦 Обрабатываем: ${el.name}`, {
+      id: el.id,
+      name: el.name,
+      childrenCount: el.children?.length || 0,
+      hasChildren: el.children && el.children.length > 0,
+    })
     const newObj: CategoryToAntTree = {
       key: el.id,
       title: (
@@ -45,7 +52,13 @@ export const transformToAntTree = (
       children: [],
     }
     if (el.children && el.children.length > 0) {
+      console.log(
+        `🌳 У ${el.name} есть дети:`,
+        el.children.map(c => c.name)
+      )
       newObj.children = transformToAntTree(el.children, callbacks)
+    } else {
+      console.log(`🍃 У ${el.name} нет детей`)
     }
     return newObj
   })
