@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import EditCategoryModal from '@/pages/сategories/modal/EditCategoryModal'
 import {
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
@@ -12,6 +11,7 @@ import { useModal } from '@/shared/lib/hooks/useModal'
 import { Tree } from 'antd'
 
 import { buildCategoriesTree, transformToAntTree } from './helpers/categoryTreeHelper'
+import EditCategoryModal from './modal/EditCategoryModal'
 import { CategoryToAntTree } from './types/type'
 
 export interface InputFormData {
