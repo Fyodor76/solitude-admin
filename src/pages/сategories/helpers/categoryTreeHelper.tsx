@@ -1,11 +1,31 @@
 import React from 'react'
 
-import { CategoryMenuItem } from '@/shared/lib/api/api-categories/types'
+import { CategoriesTree, CategoryMenuItem } from '@/shared/lib/api/api-categories/types'
 
 import { CategoryToAntTree } from '../types/type'
 
-export const buildCategoriesTree = (categoriesItems: CategoryMenuItem[]) => {
-  const categories: Record<string, CategoryMenuItem & { children: CategoryMenuItem[] }> = {}
+export const buildCategoriesTree = (categoriesItems: CategoriesTree[]) => {
+  console.log(
+    '🏗️ buildCategoriesTree получил:',
+    categoriesItems.map(c => ({
+      id: c.id,
+      name: c.name,
+      parentId: c.parentId,
+    }))
+  )
+
+  // Проверка всех parentId
+  console.log('🔍 Проверка связей:')
+  categoriesItems.forEach(cat => {
+    if (cat.parentId) {
+      const parentExists = categoriesItems.some(p => p.id === cat.parentId)
+      console.log(
+        `  ${cat.name} (${cat.id}) -> parentId: ${cat.parentId} - ${parentExists ? '✅ родитель найден' : '❌ родитель НЕ найден'}`
+      )
+    }
+  })
+
+  const categories: Record<string, CategoriesTree & { children: CategoriesTree[] }> = {}
 
   categoriesItems.forEach(category => {
     categories[category.id] = {
@@ -14,32 +34,46 @@ export const buildCategoriesTree = (categoriesItems: CategoryMenuItem[]) => {
     }
   })
 
-  const tree: CategoryMenuItem[] = []
+  const tree: CategoriesTree[] = []
 
   categoriesItems.forEach(category => {
     if (category.parentId === null) {
       tree.push(categories[category.id])
+      console.log(`📌 Корневая: ${category.name}`)
     } else {
       if (categories[category.parentId]) {
         categories[category.parentId].children.push(categories[category.id])
+        console.log(`🔗 ${category.name} стала дочерней для ${categories[category.parentId].name}`)
+      } else {
+        // ВАЖНО: логируем, если родитель не найден!
+        console.warn(
+          `❌ ОШИБКА: ${category.name} (id: ${category.id}) ссылается на parentId ${category.parentId}, но такой категории нет в данных!`
+        )
+        // Временно добавляем как корневую, чтобы не потерять
+        tree.push(categories[category.id])
+        console.log(`📌 Временно добавлена как корневая: ${category.name}`)
       }
     }
   })
+
+  console.log(
+    '🌳 Итоговое дерево (с детьми):',
+    tree.map(t => ({
+      name: t.name,
+      id: t.id,
+      childrenCount: t.children?.length || 0,
+      children: t.children?.map(c => ({ name: c.name, id: c.id })),
+    }))
+  )
+
   return tree
 }
 
 export const transformToAntTree = (
-  tree: CategoryMenuItem[],
+  tree: CategoriesTree[],
   callbacks: { onEdit: (id: string) => void; onDelete: (id: string) => void }
 ) => {
-  console.log('🔄 transformToAntTree получил:', tree)
   return tree.map(el => {
-    console.log(`📦 Обрабатываем: ${el.name}`, {
-      id: el.id,
-      name: el.name,
-      childrenCount: el.children?.length || 0,
-      hasChildren: el.children && el.children.length > 0,
-    })
     const newObj: CategoryToAntTree = {
       key: el.id,
       title: (
@@ -51,15 +85,12 @@ export const transformToAntTree = (
       ),
       children: [],
     }
+
     if (el.children && el.children.length > 0) {
-      console.log(
-        `🌳 У ${el.name} есть дети:`,
-        el.children.map(c => c.name)
-      )
       newObj.children = transformToAntTree(el.children, callbacks)
     } else {
-      console.log(`🍃 У ${el.name} нет детей`)
     }
+
     return newObj
   })
 }

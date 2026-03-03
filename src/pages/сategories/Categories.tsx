@@ -4,6 +4,7 @@ import {
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
+  useGetCategoriesTreeQuery,
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/api-categories/apiCategories'
 import { useGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
@@ -35,7 +36,8 @@ export interface InputCreateData {
 
 const Categories = () => {
   const editModal = useModal()
-  const { data: categoriesData, isLoading, error } = useGetCategoriesQuery()
+  const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
+
   const [deleteCategory] = useDeleteCategoryMutation()
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
   const [editInput, setEditInput] = useState<InputFormData>({
@@ -70,12 +72,14 @@ const Categories = () => {
   const [mode, setMode] = useState('edit')
 
   useEffect(() => {
-    if (categoriesData) {
-      const sympleTree = buildCategoriesTree(categoriesData.data)
+    if (categoriesTreeData?.data) {
+      console.log(' Массив категорий:', categoriesTreeData.data)
+
+      const sympleTree = categoriesTreeData.data
       const antTree = transformToAntTree(sympleTree, { onEdit: handleEdit, onDelete: handleDelete })
       setCategories(antTree)
     }
-  }, [categoriesData])
+  }, [categoriesTreeData])
 
   const handleDelete = async (categoryId: string) => {
     const isConfirmed = window.confirm('Удалить эту категорию?')
@@ -94,7 +98,7 @@ const Categories = () => {
       const delCategory = async (id: string) => {
         try {
           await deleteCategory(id).unwrap()
-
+          refetch()
           alert('Категория успешно удалена!')
         } catch (error) {
           console.log('Ошибка удаления категории!', error)
@@ -108,16 +112,16 @@ const Categories = () => {
   }, [products, deleteCategoryId])
 
   const handleEdit = (categoryId: string) => {
-    const category = categoriesData?.data.find(cat => cat.id === categoryId)
+    const category = categoriesTreeData?.data.find(cat => cat.id === categoryId)
     if (category) {
+      const categoryData = category.entity
       setEditInput({
-        name: category.name,
-        slug: category.slug,
-        description: category.description,
-
-        sortOrder: category.sortOrder,
-        parentId: category.parentId,
-        imageId: category.imageId,
+        name: categoryData.name,
+        slug: categoryData.slug,
+        description: categoryData.description,
+        sortOrder: categoryData.sortOrder,
+        parentId: categoryData.parentId ?? null,
+        imageId: categoryData.imageId ?? null,
       })
       console.log(`id категории : ${category.name} такое: ${category.id}`)
       editModal.onOpen(category)
@@ -125,16 +129,9 @@ const Categories = () => {
   }
 
   const handleUpdateCategory = async (id: string, editInput: InputFormData) => {
-    console.log('📤 Отправляю на сервер:', {
-      id,
-      data: {
-        ...editInput,
-        parentId: editInput.parentId, // Посмотрим что тут
-        typeOfParentId: typeof editInput.parentId,
-      },
-    })
     try {
       await updateCategory({ id, data: editInput }).unwrap()
+      refetch()
     } catch (error) {
       console.log('Ошибка редактирования категории!', error)
     }
@@ -147,6 +144,8 @@ const Categories = () => {
   const createNewCategory = async () => {
     try {
       await createCategory(createInput).unwrap()
+      console.log('✅ Категория создана, обновляем данные...')
+      refetch()
     } catch (error) {
       console.log('Ошибка создания категории!', error)
     }
@@ -171,7 +170,11 @@ const Categories = () => {
         {isLoading && <span>Загрузка...</span>}
         {error && <span>Ошибочка вышла...</span>}
         <button onClick={handleCreateCategory}>➕ Добавить категорию</button>
-        {categoriesData && <Tree treeData={categories} defaultExpandAll showLine></Tree>}
+        {categories.length > 0 ? (
+          <Tree treeData={categories} defaultExpandAll showLine></Tree>
+        ) : (
+          !isLoading && <span>Нет категорий для отображения</span>
+        )}
       </div>
       <EditCategoryModal
         isOpen={editModal.isOpen}

@@ -2,7 +2,6 @@ export interface CategoryMenuItem {
   id: string
   name: string
   slug: string
-  children?: CategoryMenuItem[]
   description: string
   parentId: null | string
   imageId: string | null
@@ -11,6 +10,11 @@ export interface CategoryMenuItem {
   type: 'category'
   createdAt: string
   updatedAt: string
+  children?: CategoryMenuItem[]
+}
+export interface CategoriesTree extends CategoryMenuItem {
+  children?: CategoriesTree[]
+  entity: CategoryMenuItem
 }
 export interface CategoryRequest {
   name: string

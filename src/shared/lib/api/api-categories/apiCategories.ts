@@ -1,5 +1,11 @@
 import { ApiResponse, baseApi } from '../baseApi'
-import { CategoryMenuItem, CategoryRequest, CollectionItem, DeleteCategoryResponse } from './types'
+import {
+  CategoriesTree,
+  CategoryMenuItem,
+  CategoryRequest,
+  CollectionItem,
+  DeleteCategoryResponse,
+} from './types'
 
 export const apiCategories = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -9,7 +15,7 @@ export const apiCategories = baseApi.injectEndpoints({
         method: 'POST',
         body: newCategory,
       }),
-      invalidatesTags: [{ type: 'Category', id: 'ALL_CATEGORIES' }],
+      invalidatesTags: [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }],
     }),
 
     getCategories: builder.query<ApiResponse<CategoryMenuItem[], any>, void>({
@@ -17,7 +23,23 @@ export const apiCategories = baseApi.injectEndpoints({
         url: `/categories`,
         method: 'GET',
       }),
-      providesTags: [{ type: 'Category', id: 'ALL_CATEGORIES' }],
+      providesTags: result => {
+        const tags = [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }]
+
+        if (result?.data) {
+          return [...result.data.map(({ id }) => ({ type: 'Category' as const, id })), ...tags]
+        }
+
+        return tags
+      },
+    }),
+
+    getCategoriesTree: builder.query<ApiResponse<CategoriesTree[], any>, void>({
+      query: () => ({
+        url: `/categories/tree`,
+        method: 'GET',
+      }),
+      providesTags: result => [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }],
     }),
 
     getCollections: builder.query<ApiResponse<CollectionItem[], any>, void>({
@@ -97,4 +119,5 @@ export const {
   useGetCategoryBySlugQuery,
   useGetChildCategoriesQuery,
   useDeactivateCategoryMutation,
+  useGetCategoriesTreeQuery,
 } = apiCategories
