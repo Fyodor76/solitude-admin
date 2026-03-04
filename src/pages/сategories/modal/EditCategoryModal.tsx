@@ -1,17 +1,18 @@
 import React from 'react'
 
 import { InputCreateData, InputFormData } from '@/pages/сategories/Categories'
-import { CategoryMenuItem } from '@/shared/lib/api/api-categories/types'
-import { Modal } from 'antd'
+import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { Modal, Select } from 'antd'
 
 import './modal.scss'
 
 interface EditCategoryModalProps {
   isOpen: boolean
-  category: CategoryMenuItem
+  category: BaseCategoryTree
   mode: string
   valueEdit: InputFormData
   valueCreate: InputCreateData
+  allCategories: BaseCategoryTree[]
   onClose: () => void
   onSaveEdit: (id: string, data: InputFormData) => void
   onSaveCreate: () => void
@@ -26,6 +27,7 @@ const EditCategoryModal = ({
   valueEdit,
   valueCreate,
   mode,
+  allCategories,
   onClose,
   onSaveEdit,
   onSaveCreate,
@@ -49,18 +51,18 @@ const EditCategoryModal = ({
     }
   }
 
+  const checkCategory = (catId: string, allCategories: BaseCategoryTree[]) => {
+    return allCategories.find(cat => cat.id === catId)
+  }
+
   const handleInputChange = (field: keyof InputFormData) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const target = e.target
-      const value =
-        target instanceof HTMLInputElement && target.type === 'checkbox'
-          ? target.checked
-          : target.value
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const value = e.target.value
 
       setEditInput(prev => {
         return {
           ...prev,
-          [field]: value,
+          [field]: field === 'parentId' && value === '' ? null : value,
         }
       })
     }
@@ -104,7 +106,11 @@ const EditCategoryModal = ({
             value={valueEdit.sortOrder}
             onChange={handleInputChange('sortOrder')}
           />
-          <span>родительская категория</span>
+          <Select placeholder="Выберете родительскую категорию">
+            {allCategories.filter(cat => (
+              <Option>{cat.name}</Option>
+            ))}
+          </Select>
           <input
             type="text"
             value={valueEdit.parentId || ''}
@@ -116,8 +122,6 @@ const EditCategoryModal = ({
             value={valueEdit.imageId || ''}
             onChange={handleInputChange('imageId')}
           />
-          {/* <span>активизация</span>*/}
-          {/*<input type="checkbox" checked={value.isActive} onChange={handleInputChange('isActive')} />*/}
         </div>
       )}
       {isCreate && (

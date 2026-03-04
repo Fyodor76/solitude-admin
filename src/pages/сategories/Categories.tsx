@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react'
 import {
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
-  useGetCategoriesQuery,
   useGetCategoriesTreeQuery,
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/api-categories/apiCategories'
+import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { Tree } from 'antd'
 
-import { buildCategoriesTree, transformToAntTree } from './helpers/categoryTreeHelper'
+import { transformToAntTree } from './helpers/categoryTreeHelper'
 import EditCategoryModal from './modal/EditCategoryModal'
 import { CategoryToAntTree } from './types/type'
 
@@ -73,8 +73,6 @@ const Categories = () => {
 
   useEffect(() => {
     if (categoriesTreeData?.data) {
-      console.log(' Массив категорий:', categoriesTreeData.data)
-
       const sympleTree = categoriesTreeData.data
       const antTree = transformToAntTree(sympleTree, { onEdit: handleEdit, onDelete: handleDelete })
       setCategories(antTree)
@@ -111,20 +109,52 @@ const Categories = () => {
     }
   }, [products, deleteCategoryId])
 
+  const findCategoryById = (
+    categories: BaseCategoryTree[],
+    id: string
+  ): BaseCategoryTree | null => {
+    for (let el of categories) {
+      if (el.id === id) {
+        return el
+      }
+      if (el.children) {
+        const result: BaseCategoryTree | null = findCategoryById(el.children, id)
+        if (result) {
+          return result
+        }
+      }
+    }
+    return null
+  }
+
+  const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
+    let result: BaseCategoryTree[] = []
+    for (let cat of categories) {
+      result.push(cat)
+      if (cat.children?.length) {
+        result = [...result, ...getAllCategories(cat.children)]
+      }
+    }
+    return result
+  }
+
+  const allCategories = categoriesTreeData?.data ? getAllCategories(categoriesTreeData.data) : []
+
   const handleEdit = (categoryId: string) => {
-    const category = categoriesTreeData?.data.find(cat => cat.id === categoryId)
-    if (category) {
-      const categoryData = category.entity
-      setEditInput({
-        name: categoryData.name,
-        slug: categoryData.slug,
-        description: categoryData.description,
-        sortOrder: categoryData.sortOrder,
-        parentId: categoryData.parentId ?? null,
-        imageId: categoryData.imageId ?? null,
-      })
-      console.log(`id категории : ${category.name} такое: ${category.id}`)
-      editModal.onOpen(category)
+    const categories = categoriesTreeData?.data
+    if (categories) {
+      const category = findCategoryById(categories, categoryId)
+      if (category) {
+        setEditInput({
+          name: category.name,
+          slug: category.slug,
+          description: category.description,
+          sortOrder: category.sortOrder,
+          parentId: category.entity ? category.entity.parentId : null,
+          imageId: category.imageId ?? null,
+        })
+        editModal.onOpen(category)
+      }
     }
   }
 
@@ -182,6 +212,7 @@ const Categories = () => {
         category={editModal.content}
         valueEdit={editInput}
         valueCreate={createInput}
+        allCategories={allCategories}
         onClose={editModal.onClose}
         setEditInput={setEditInput}
         onSaveEdit={handleUpdateCategory}

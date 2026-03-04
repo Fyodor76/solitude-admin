@@ -1,6 +1,6 @@
 import { ApiResponse, baseApi } from '../baseApi'
 import {
-  CategoriesTree,
+  BaseCategoryTree,
   CategoryMenuItem,
   CategoryRequest,
   CollectionItem,
@@ -34,7 +34,7 @@ export const apiCategories = baseApi.injectEndpoints({
       },
     }),
 
-    getCategoriesTree: builder.query<ApiResponse<CategoriesTree[], any>, void>({
+    getCategoriesTree: builder.query<ApiResponse<BaseCategoryTree[], any>, void>({
       query: () => ({
         url: `/categories/tree`,
         method: 'GET',

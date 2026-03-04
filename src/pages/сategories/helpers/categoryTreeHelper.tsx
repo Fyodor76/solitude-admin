@@ -1,10 +1,11 @@
 import React from 'react'
 
-import { CategoriesTree, CategoryMenuItem } from '@/shared/lib/api/api-categories/types'
+import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 
 import { CategoryToAntTree } from '../types/type'
 
-export const buildCategoriesTree = (categoriesItems: CategoriesTree[]) => {
+{
+  /*export const buildCategoriesTree = (categoriesItems: CategoriesTree[]) => {
   console.log(
     '🏗️ buildCategoriesTree получил:',
     categoriesItems.map(c => ({
@@ -68,9 +69,10 @@ export const buildCategoriesTree = (categoriesItems: CategoriesTree[]) => {
 
   return tree
 }
-
+*/
+}
 export const transformToAntTree = (
-  tree: CategoriesTree[],
+  tree: BaseCategoryTree[],
   callbacks: { onEdit: (id: string) => void; onDelete: (id: string) => void }
 ) => {
   return tree.map(el => {
@@ -83,14 +85,8 @@ export const transformToAntTree = (
           <button onClick={() => callbacks.onDelete(el.id)}>🗑️</button>
         </div>
       ),
-      children: [],
+      children: el.children?.length > 0 ? transformToAntTree(el.children, callbacks) : [],
     }
-
-    if (el.children && el.children.length > 0) {
-      newObj.children = transformToAntTree(el.children, callbacks)
-    } else {
-    }
-
     return newObj
   })
 }
