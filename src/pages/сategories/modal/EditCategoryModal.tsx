@@ -60,7 +60,21 @@ const EditCategoryModal = ({
         console.log(info.file, info.fileList)
       }
       if (info.file.status === 'done') {
-        setCdnData(info.file.response.data)
+        const response = info.file.response?.data
+        if (response?.fileId) {
+          setCdnData(response)
+        }
+        if (isEdit) {
+          setEditInput(prev => ({
+            ...prev,
+            imageId: response.fileId,
+          }))
+        } else {
+          setCreateInput(prev => ({
+            ...prev,
+            imageId: response.fileId,
+          }))
+        }
         message.success(`${info.file.name} Файл загружен successfully`)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
@@ -179,7 +193,7 @@ const EditCategoryModal = ({
           </Select>
           <span>Изображение категории</span>
           <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Скачать</Button>
+            <Button icon={<UploadOutlined />}>Загрузить</Button>
           </Upload>
           {cdnData && <img src={cdnData.url} />}
         </div>
@@ -202,18 +216,13 @@ const EditCategoryModal = ({
             value={valueCreate.parentId || ''}
             onChange={handleInputCreateChange('parentId')}
           />
-          <span>id изображения</span>
-          <input
-            type="text"
-            value={valueCreate.imageId || ''}
-            onChange={handleInputCreateChange('imageId')}
-          />
+          <span>Изображение категории</span>
+          <Upload {...props}>
+            <Button icon={<UploadOutlined />}>Загрузить</Button>
+          </Upload>
+          {cdnData && <img src={cdnData.url} />}
           <span>тип</span>
-          <input
-            type="text"
-            value={valueCreate.type}
-            onChange={handleInputCreateChange('imageId')}
-          />
+          <input type="text" value={valueCreate.type} onChange={handleInputCreateChange('type')} />
         </div>
       )}
     </Modal>
