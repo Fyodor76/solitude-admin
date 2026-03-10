@@ -1,7 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { InputCreateData, InputFormData } from '@/pages/сategories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
+import { UploadOutlined } from '@ant-design/icons'
+import { Button, message, Upload, UploadProps } from 'antd'
 import { Modal, Select } from 'antd'
 
 import './modal.scss'
@@ -38,6 +41,33 @@ const EditCategoryModal = ({
   const isCreate = mode === 'create'
   const isEdit = mode === 'edit'
   const currentId = isEdit ? category?.id : undefined
+
+  const [cdnData, setCdnData] = useState<imgUpload | null>(null)
+
+  const API_URL = import.meta.env.VITE_API_URL
+
+  const props: UploadProps = {
+    name: 'file',
+    action: `${API_URL}/cdn/upload`,
+    data: {
+      folder: 'products',
+    },
+    headers: {
+      authorization: 'authorization-text',
+    },
+    onChange(info) {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList)
+      }
+      if (info.file.status === 'done') {
+        setCdnData(info.file.response.data)
+        message.success(`${info.file.name} Файл загружен successfully`)
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`)
+      }
+    },
+  }
+
   const handleInputCreateChange = (field: keyof InputCreateData) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const target = e.target
@@ -147,12 +177,11 @@ const EditCategoryModal = ({
                 </Select.Option>
               ))}
           </Select>
-          <span>id изображения</span>
-          <input
-            type="text"
-            value={valueEdit.imageId || ''}
-            onChange={handleInputChange('imageId')}
-          />
+          <span>Изображение категории</span>
+          <Upload {...props}>
+            <Button icon={<UploadOutlined />}>Скачать</Button>
+          </Upload>
+          {cdnData && <img src={cdnData.url} />}
         </div>
       )}
       {isCreate && (

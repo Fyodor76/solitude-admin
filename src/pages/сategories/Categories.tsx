@@ -129,10 +129,10 @@ const Categories = () => {
 
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
-    for (let cat of categories) {
-      result.push(cat)
-      if (cat.children?.length) {
-        result = [...result, ...getAllCategories(cat.children)]
+    for (const category of categories) {
+      result.push(category)
+      if (category.children?.length) {
+        result = [...result, ...getAllCategories(category.children)]
       }
     }
     return result
