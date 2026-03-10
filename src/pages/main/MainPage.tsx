@@ -1,3 +1,6 @@
+import { useEffect, useState } from 'react'
+import React from 'react'
+
 import Categories from '@/pages/сategories/Categories'
 import TestApiCategories from '@/shared/lib/api/api-categories/TestApiCategories'
 import TestApiError from '@/shared/lib/api/TestApiError'

@@ -75,7 +75,7 @@ const Categories = () => {
     if (categoriesTreeData?.data) {
       const sympleTree = categoriesTreeData.data
       const antTree = transformToAntTree(sympleTree, { onEdit: handleEdit, onDelete: handleDelete })
-      setCategories(antTree)
+      setCategories([...antTree])
     }
   }, [categoriesTreeData])
 
@@ -161,6 +161,7 @@ const Categories = () => {
   const handleUpdateCategory = async (id: string, editInput: InputFormData) => {
     try {
       await updateCategory({ id, data: editInput }).unwrap()
+      console.log('✅ Сервер ответил "успешно"')
       refetch()
     } catch (error) {
       console.log('Ошибка редактирования категории!', error)

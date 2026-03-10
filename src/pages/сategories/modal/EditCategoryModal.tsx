@@ -37,7 +37,7 @@ const EditCategoryModal = ({
 }: EditCategoryModalProps) => {
   const isCreate = mode === 'create'
   const isEdit = mode === 'edit'
-
+  const currentId = isEdit ? category?.id : undefined
   const handleInputCreateChange = (field: keyof InputCreateData) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const target = e.target
@@ -54,6 +54,32 @@ const EditCategoryModal = ({
   const checkCategory = (catId: string, allCategories: BaseCategoryTree[]) => {
     return allCategories.find(cat => cat.id === catId)
   }
+  const checkChild = (categoryId: string, allCategories: BaseCategoryTree[]) => {
+    let result: BaseCategoryTree[] = []
+    const childCategories = allCategories.filter(cat => cat.entity?.parentId === categoryId)
+    result = [...childCategories]
+    childCategories.forEach(cat => {
+      const children = checkChild(cat.id, allCategories)
+      result = [...result, ...children]
+    })
+    return result
+  }
+
+  const filterSelect = (allCategories: BaseCategoryTree[], currentId?: string) => {
+    if (!currentId) return allCategories
+    const thisCategory = checkCategory(currentId, allCategories)
+    if (thisCategory) {
+      const childThisCategory = checkChild(thisCategory?.id, allCategories)
+      const getChildIds = childThisCategory.map(el => el.id)
+      const select = isEdit
+        ? allCategories.filter(cat => cat.id !== thisCategory.id && !getChildIds.includes(cat.id))
+        : allCategories
+      return select
+    } else {
+      return null
+    }
+  }
+  const select = filterSelect(allCategories, currentId)
 
   const handleInputChange = (field: keyof InputFormData) => {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -66,6 +92,12 @@ const EditCategoryModal = ({
         }
       })
     }
+  }
+  const handleSelectChange = (value: string, option?: any) => {
+    setEditInput(prev => ({
+      ...prev,
+      parentId: value === '' ? null : value,
+    }))
   }
 
   const handleSaveEdit = () => {
@@ -81,6 +113,7 @@ const EditCategoryModal = ({
     setMode('edit')
     onClose()
   }
+
   return (
     <Modal
       open={isOpen}
@@ -106,16 +139,14 @@ const EditCategoryModal = ({
             value={valueEdit.sortOrder}
             onChange={handleInputChange('sortOrder')}
           />
-          <Select placeholder="Выберете родительскую категорию">
-            {allCategories.filter(cat => (
-              <Option>{cat.name}</Option>
-            ))}
+          <Select placeholder="Выберете родительскую категорию" onChange={handleSelectChange}>
+            {select &&
+              select.map(cat => (
+                <Select.Option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </Select.Option>
+              ))}
           </Select>
-          <input
-            type="text"
-            value={valueEdit.parentId || ''}
-            onChange={handleInputChange('parentId')}
-          />
           <span>id изображения</span>
           <input
             type="text"
