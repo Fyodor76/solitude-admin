@@ -15,9 +15,14 @@ export function useModal<T = any>(initialState = false): UseModalReturn<T> {
   const [content, setContent] = useState<T | null>(null)
 
   const onOpen = useCallback((newContent?: T) => {
+    console.log('1️⃣ onOpen вызван с content:', newContent)
+    console.log('2️⃣ Текущий content ДО:', content)
     requestAnimationFrame(() => {
+      console.log('3️⃣ requestAnimationFrame выполняется')
+      console.log('4️⃣ Устанавливаем content:', newContent ?? null)
       setContent(newContent ?? null)
       setIsOpen(true)
+      console.log('5️⃣ После setContent, новое значение будет в следующем рендере')
     })
   }, [])
 

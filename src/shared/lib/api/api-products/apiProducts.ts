@@ -15,4 +15,4 @@ export const apiProducts = baseApi.injectEndpoints({
   }),
 })
 
-export const { useGetProductsByCategoryIdQuery } = apiProducts
+export const { useGetProductsByCategoryIdQuery, useLazyGetProductsByCategoryIdQuery } = apiProducts

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { InputCreateData, InputFormData } from '@/pages/сategories/Categories'
+import { CreateFormData, EditFormData } from '@/pages/сategories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { UploadOutlined } from '@ant-design/icons'
@@ -13,14 +13,14 @@ interface EditCategoryModalProps {
   isOpen: boolean
   category: BaseCategoryTree
   mode: string
-  valueEdit: InputFormData
-  valueCreate: InputCreateData
+  valueEdit: EditFormData
+  valueCreate: CreateFormData
   allCategories: BaseCategoryTree[]
   onClose: () => void
-  onSaveEdit: (id: string, data: InputFormData) => void
+  onSaveEdit: (id: string, data: EditFormData) => void
   onSaveCreate: () => void
-  setEditInput: React.Dispatch<React.SetStateAction<InputFormData>>
-  setCreateInput: React.Dispatch<React.SetStateAction<InputCreateData>>
+  setEditFormDataModal: React.Dispatch<React.SetStateAction<EditFormData>>
+  setCreateFormDataModal: React.Dispatch<React.SetStateAction<CreateFormData>>
   setMode: React.Dispatch<React.SetStateAction<string>>
 }
 
@@ -34,8 +34,8 @@ const EditCategoryModal = ({
   onClose,
   onSaveEdit,
   onSaveCreate,
-  setEditInput,
-  setCreateInput,
+  setEditFormDataModal,
+  setCreateFormDataModal,
   setMode,
 }: EditCategoryModalProps) => {
   const isCreate = mode === 'create'
@@ -43,9 +43,10 @@ const EditCategoryModal = ({
   const currentId = isEdit ? category?.id : undefined
 
   const [cdnData, setCdnData] = useState<imgUpload | null>(null)
-
+  console.log(cdnData)
   const API_URL = import.meta.env.VITE_API_URL
-
+  const CDN_URL = import.meta.env.VITE_CDN_URL
+  const imageUrl = isEdit && valueEdit.imageId ? `${CDN_URL}/${valueEdit.imageId}` : null
   const props: UploadProps = {
     name: 'file',
     action: `${API_URL}/cdn/upload`,
@@ -59,34 +60,22 @@ const EditCategoryModal = ({
       if (info.file.status !== 'uploading') {
         console.log(info.file, info.fileList)
       }
+
       if (info.file.status === 'done') {
-        const response = info.file.response?.data
-        if (response?.fileId) {
-          setCdnData(response)
-        }
-        if (isEdit) {
-          setEditInput(prev => ({
-            ...prev,
-            imageId: response.fileId,
-          }))
-        } else {
-          setCreateInput(prev => ({
-            ...prev,
-            imageId: response.fileId,
-          }))
-        }
+        setCdnData(info.file.response?.data)
+
         message.success(`${info.file.name} Файл загружен successfully`)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }
     },
   }
-
-  const handleInputCreateChange = (field: keyof InputCreateData) => {
+  const currentUrl = cdnData?.url || imageUrl
+  const handleInputCreateChange = (field: keyof CreateFormData) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
       const target = e.target
       const value = target.value
-      setCreateInput(prev => {
+      setCreateFormDataModal(prev => {
         return {
           ...prev,
           [field]: value,
@@ -125,11 +114,11 @@ const EditCategoryModal = ({
   }
   const select = filterSelect(allCategories, currentId)
 
-  const handleInputChange = (field: keyof InputFormData) => {
+  const handleInputChange = (field: keyof EditFormData) => {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const value = e.target.value
 
-      setEditInput(prev => {
+      setEditFormDataModal(prev => {
         return {
           ...prev,
           [field]: field === 'parentId' && value === '' ? null : value,
@@ -138,14 +127,18 @@ const EditCategoryModal = ({
     }
   }
   const handleSelectChange = (value: string, option?: any) => {
-    setEditInput(prev => ({
+    setEditFormDataModal(prev => ({
       ...prev,
       parentId: value === '' ? null : value,
     }))
   }
 
   const handleSaveEdit = () => {
-    onSaveEdit(category.id, valueEdit)
+    const updateValueEdit = {
+      ...valueEdit,
+      imageId: cdnData?.fileId || valueEdit.imageId,
+    }
+    onSaveEdit(category.id, updateValueEdit)
   }
 
   const handleSaveCreate = () => {
@@ -195,7 +188,11 @@ const EditCategoryModal = ({
           <Upload {...props}>
             <Button icon={<UploadOutlined />}>Загрузить</Button>
           </Upload>
-          {cdnData && <img src={cdnData.url} />}
+          {currentUrl && (
+            <>
+              <img src={currentUrl} />
+            </>
+          )}
         </div>
       )}
       {isCreate && (

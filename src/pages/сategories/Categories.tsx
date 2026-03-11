@@ -7,7 +7,7 @@ import {
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/api-categories/apiCategories'
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
-import { useGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
+import { useLazyGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { Tree } from 'antd'
 
@@ -15,16 +15,16 @@ import { transformToAntTree } from './helpers/categoryTreeHelper'
 import EditCategoryModal from './modal/EditCategoryModal'
 import { CategoryToAntTree } from './types/type'
 
-export interface InputFormData {
+export interface EditFormData {
   name: string
   slug: string
   description: string
   sortOrder: number
   parentId: string | null
-  imageId?: string | null
+  imageId: string | null
 }
 
-export interface InputCreateData {
+export interface CreateFormData {
   name: string
   slug: string
   description: string
@@ -36,39 +36,31 @@ export interface InputCreateData {
 
 const Categories = () => {
   const editModal = useModal()
-  const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
 
-  const [deleteCategory] = useDeleteCategoryMutation()
-  const [categories, setCategories] = useState<CategoryToAntTree[]>([])
-  const [editInput, setEditInput] = useState<InputFormData>({
+  const InitialDataCreat = {
     name: '',
     slug: '',
     description: '',
-
-    sortOrder: 0,
     parentId: null,
-  })
-
-  const [createInput, setCreateInput] = useState<InputCreateData>({
-    name: 'Test-name',
-    slug: 't-shirts',
-    description: 'Test description',
-    parentId: null,
-    imageId: '123-test',
+    imageId: '',
     sortOrder: 0,
-    type: 'category',
-  })
-
-  const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
-
-  const { data: products, isLoading: productsLoading } = useGetProductsByCategoryIdQuery(
-    deleteCategoryId ?? '',
-    {
-      skip: !deleteCategoryId,
-    }
-  )
+    type: '',
+  }
+  const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
   const [updateCategory] = useUpdateCategoryByIdMutation()
   const [createCategory] = useCreateCategoryMutation()
+  const [deleteCategory] = useDeleteCategoryMutation()
+  const [triggerGetProducts] = useLazyGetProductsByCategoryIdQuery()
+  const [categories, setCategories] = useState<CategoryToAntTree[]>([])
+  const [editFormDataModal, setEditFormDataModal] = useState<EditFormData>({
+    name: '',
+    slug: '',
+    description: '',
+    sortOrder: 0,
+    parentId: null,
+    imageId: '',
+  })
+  const [createFormDataModal, setCreateFormDataModal] = useState<CreateFormData>(InitialDataCreat)
   const [mode, setMode] = useState('edit')
 
   useEffect(() => {
@@ -82,32 +74,19 @@ const Categories = () => {
   const handleDelete = async (categoryId: string) => {
     const isConfirmed = window.confirm('Удалить эту категорию?')
     if (!isConfirmed) return
-    setDeleteCategoryId(categoryId)
-  }
-
-  useEffect(() => {
-    if (!deleteCategoryId || !products) {
-      return
-    }
-    if (products.data && products.data.length > 0) {
+    const products = await triggerGetProducts(categoryId).unwrap()
+    if (products?.data && products?.data.length > 0) {
       alert('Сначала удалите все товары в этой категории')
-      setDeleteCategoryId(null)
     } else {
-      const delCategory = async (id: string) => {
-        try {
-          await deleteCategory(id).unwrap()
-          refetch()
-          alert('Категория успешно удалена!')
-        } catch (error) {
-          console.log('Ошибка удаления категории!', error)
-        } finally {
-          setDeleteCategoryId(null)
-        }
+      try {
+        await deleteCategory(categoryId).unwrap()
+        refetch()
+        alert('Категория успешно удалена!')
+      } catch (error) {
+        console.log('Ошибка удаления категории!', error)
       }
-
-      delCategory(deleteCategoryId)
     }
-  }, [products, deleteCategoryId])
+  }
 
   const findCategoryById = (
     categories: BaseCategoryTree[],
@@ -145,7 +124,9 @@ const Categories = () => {
     if (categories) {
       const category = findCategoryById(categories, categoryId)
       if (category) {
-        setEditInput({
+        console.log('🟢 Категория из БД:', category) // 👈 ЕСТЬ ЛИ imageId?
+        console.log('🟢 imageId из БД:', category.imageId)
+        setEditFormDataModal({
           name: category.name,
           slug: category.slug,
           description: category.description,
@@ -158,9 +139,12 @@ const Categories = () => {
     }
   }
 
-  const handleUpdateCategory = async (id: string, editInput: InputFormData) => {
+  const handleUpdateCategory = async (id: string, editInput: EditFormData) => {
+    console.log('📤 ОТПРАВКА НА СЕРВЕР (edit):', editInput) // 👈 СМОТРИТЕ СЮДА!
+    console.log('📤 imageId:', editInput.imageId) // Есть ли значение?
     try {
-      await updateCategory({ id, data: editInput }).unwrap()
+      const response = await updateCategory({ id, data: editInput }).unwrap()
+      console.log('✅ Ответ сервера:', response) // Что вернул сервер?
       console.log('✅ Сервер ответил "успешно"')
       refetch()
     } catch (error) {
@@ -174,7 +158,7 @@ const Categories = () => {
   }
   const createNewCategory = async () => {
     try {
-      await createCategory(createInput).unwrap()
+      await createCategory(createFormDataModal).unwrap()
       console.log('✅ Категория создана, обновляем данные...')
       refetch()
     } catch (error) {
@@ -184,19 +168,6 @@ const Categories = () => {
 
   return (
     <>
-      {deleteCategoryId && productsLoading && (
-        <div
-          style={{
-            padding: '10px',
-            background: '#f0f5ff',
-            color: '#1890ff',
-            borderRadius: '4px',
-            margin: '10px 0',
-          }}
-        >
-          ⏳ Проверяем наличие товаров в категории...
-        </div>
-      )}
       <div className="allCategories">
         {isLoading && <span>Загрузка...</span>}
         {error && <span>Ошибочка вышла...</span>}
@@ -211,14 +182,14 @@ const Categories = () => {
         isOpen={editModal.isOpen}
         mode={mode}
         category={editModal.content}
-        valueEdit={editInput}
-        valueCreate={createInput}
+        valueEdit={editFormDataModal}
+        valueCreate={createFormDataModal}
         allCategories={allCategories}
         onClose={editModal.onClose}
-        setEditInput={setEditInput}
+        setEditFormDataModal={setEditFormDataModal}
         onSaveEdit={handleUpdateCategory}
         onSaveCreate={createNewCategory}
-        setCreateInput={setCreateInput}
+        setCreateFormDataModal={setCreateFormDataModal}
         setMode={setMode}
       />
     </>
