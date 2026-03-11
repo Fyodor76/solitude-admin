@@ -1,4 +1,7 @@
+import { BaseLayout } from '@/layouts/base-layout'
 import { MainPage } from '@/pages/main'
+import CatalogPage from '@/pages/test/CatalogPage'
+import TshortsPage from '@/pages/test/TshortsPage'
 import { RouteObject } from 'react-router-dom'
 
 import { Forgot } from '../../pages/forgot'
@@ -46,6 +49,22 @@ export const Router: RouteObject[] = [
           <PublicRouter>
             <Forgot />
           </PublicRouter>
+        ),
+      },
+      {
+        path: '/catalog',
+        element: (
+          <BaseLayout>
+            <CatalogPage />
+          </BaseLayout>
+        ),
+      },
+      {
+        path: '/catalog/tshorts',
+        element: (
+          <BaseLayout>
+            <TshortsPage />
+          </BaseLayout>
         ),
       },
     ],
