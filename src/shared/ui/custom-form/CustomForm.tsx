@@ -30,6 +30,7 @@ export const CustomForm = <T extends Record<string, string>>({
             <div key={fieldIndex}>
               {field.typeField === 'input' && (
                 <Input
+                  type={field.type}
                   size={field.size}
                   placeholder={field.placeholder}
                   name={field.name}

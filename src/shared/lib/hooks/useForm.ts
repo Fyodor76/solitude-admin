@@ -7,5 +7,9 @@ export const useForm = <T extends Record<string, string>>(initialState: T) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  return { form, handleChange }
+  const clearAllFormFields = () => {
+    setForm(initialState)
+  }
+
+  return { form, handleChange, clearAllFormFields }
 }

@@ -5,6 +5,7 @@ interface InputField {
   typeField: 'input'
   size?: 'small' | 'middle' | 'large'
   placeholder?: string
+  type?: string
 }
 
 interface BtnField {

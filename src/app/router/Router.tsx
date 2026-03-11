@@ -1,12 +1,12 @@
 import { MainPage } from '@/pages/main'
 import { RouteObject } from 'react-router-dom'
 
-import { AuthLayout } from '../../layouts/auth-layout'
 import { Forgot } from '../../pages/forgot'
 import Login from '../../pages/login/Login'
 import { Registration } from '../../pages/registration'
 import App from '../App'
 import ProtectedRouter from './ProtectedRouter'
+import PublicRouter from './PublickRouter'
 import RouterErrorElement from './RouterErrorElement'
 
 export const Router: RouteObject[] = [
@@ -27,25 +27,25 @@ export const Router: RouteObject[] = [
       {
         path: '/login',
         element: (
-          <AuthLayout>
+          <PublicRouter>
             <Login />
-          </AuthLayout>
+          </PublicRouter>
         ),
       },
       {
         path: '/registration',
         element: (
-          <AuthLayout>
+          <PublicRouter>
             <Registration />
-          </AuthLayout>
+          </PublicRouter>
         ),
       },
       {
         path: '/forgot',
         element: (
-          <AuthLayout>
+          <PublicRouter>
             <Forgot />
-          </AuthLayout>
+          </PublicRouter>
         ),
       },
     ],

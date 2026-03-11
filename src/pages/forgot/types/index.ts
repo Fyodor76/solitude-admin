@@ -12,6 +12,7 @@ export type ConfigForgotType = {
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
       ]
     },

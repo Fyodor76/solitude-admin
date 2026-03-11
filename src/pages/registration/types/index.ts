@@ -12,24 +12,28 @@ export type ConfigRegistrationsType = {
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
         {
           name: string
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
         {
           name: string
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
         {
           name: string
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
       ]
     },

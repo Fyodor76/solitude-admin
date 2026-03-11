@@ -6,10 +6,11 @@ interface ProtectedRouterProps {
   children: React.ReactNode
 }
 const ProtectedRouter = ({ children }: ProtectedRouterProps) => {
-  // const isAuth = localStorage.getItem('isAuth')
-  // if (!isAuth) {
-  //   return <Navigate to="/login" replace />
-  // }
+  const isAuth = localStorage.getItem('access')
+
+  if (!isAuth) {
+    return <Navigate to="/login" replace />
+  }
   return <BaseLayout>{children}</BaseLayout>
 }
 
