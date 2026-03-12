@@ -7,21 +7,23 @@ import { UploadOutlined } from '@ant-design/icons'
 import { Button, message, Upload, UploadProps } from 'antd'
 import { Modal, Select } from 'antd'
 
-import './modal.scss'
+import './EditCategoryModal.scss'
 
 interface EditCategoryModalProps {
   isOpen: boolean
   category: BaseCategoryTree
-  mode: string
   valueEdit: EditFormData
   valueCreate: CreateFormData
   allCategories: BaseCategoryTree[]
+  edit: string
+  create: string
+  mode: string
+  setMode: React.Dispatch<React.SetStateAction<string>>
   onClose: () => void
   onSaveEdit: (id: string, data: EditFormData) => void
-  onSaveCreate: () => void
+  onSaveCreate: (data: CreateFormData) => void
   setEditFormDataModal: React.Dispatch<React.SetStateAction<EditFormData>>
   setCreateFormDataModal: React.Dispatch<React.SetStateAction<CreateFormData>>
-  setMode: React.Dispatch<React.SetStateAction<string>>
 }
 
 const EditCategoryModal = ({
@@ -29,21 +31,26 @@ const EditCategoryModal = ({
   category,
   valueEdit,
   valueCreate,
-  mode,
   allCategories,
+  edit,
+  create,
+  mode,
+  setMode,
   onClose,
   onSaveEdit,
   onSaveCreate,
   setEditFormDataModal,
   setCreateFormDataModal,
-  setMode,
 }: EditCategoryModalProps) => {
-  const isCreate = mode === 'create'
-  const isEdit = mode === 'edit'
+  const isCreate = mode === create
+  const isEdit = mode === edit
   const currentId = isEdit ? category?.id : undefined
 
   const [cdnData, setCdnData] = useState<imgUpload | null>(null)
-  console.log(cdnData)
+  const [imgError, setImgError] = useState(false)
+  const handleImageError = () => {
+    setImgError(true)
+  }
   const API_URL = import.meta.env.VITE_API_URL
   const CDN_URL = import.meta.env.VITE_CDN_URL
   const imageUrl = isEdit && valueEdit.imageId ? `${CDN_URL}/${valueEdit.imageId}` : null
@@ -61,9 +68,24 @@ const EditCategoryModal = ({
         console.log(info.file, info.fileList)
       }
 
+      if (info.fileList.length === 0) {
+        if (isEdit) {
+          setEditFormDataModal(prev => ({
+            ...prev,
+            imageId: null,
+          }))
+        } else {
+          setCreateFormDataModal(prev => ({
+            ...prev,
+            imageId: null,
+          }))
+        }
+        setCdnData(null)
+        return
+      }
       if (info.file.status === 'done') {
         setCdnData(info.file.response?.data)
-
+        setImgError(false)
         message.success(`${info.file.name} Файл загружен successfully`)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
@@ -71,18 +93,6 @@ const EditCategoryModal = ({
     },
   }
   const currentUrl = cdnData?.url || imageUrl
-  const handleInputCreateChange = (field: keyof CreateFormData) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      const target = e.target
-      const value = target.value
-      setCreateFormDataModal(prev => {
-        return {
-          ...prev,
-          [field]: value,
-        }
-      })
-    }
-  }
 
   const checkCategory = (catId: string, allCategories: BaseCategoryTree[]) => {
     return allCategories.find(cat => cat.id === catId)
@@ -114,23 +124,25 @@ const EditCategoryModal = ({
   }
   const select = filterSelect(allCategories, currentId)
 
-  const handleInputChange = (field: keyof EditFormData) => {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = e.target.value
-
-      setEditFormDataModal(prev => {
-        return {
-          ...prev,
-          [field]: field === 'parentId' && value === '' ? null : value,
-        }
-      })
+  const handleInputAndSelectChange = (field: keyof EditFormData | keyof CreateFormData) => {
+    return (valueOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const value = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
+      if (isEdit) {
+        setEditFormDataModal(prev => {
+          return {
+            ...prev,
+            [field]: field === 'parentId' && value === '' ? null : value,
+          }
+        })
+      } else {
+        setCreateFormDataModal(prev => {
+          return {
+            ...prev,
+            [field]: value,
+          }
+        })
+      }
     }
-  }
-  const handleSelectChange = (value: string, option?: any) => {
-    setEditFormDataModal(prev => ({
-      ...prev,
-      parentId: value === '' ? null : value,
-    }))
   }
 
   const handleSaveEdit = () => {
@@ -142,12 +154,13 @@ const EditCategoryModal = ({
   }
 
   const handleSaveCreate = () => {
-    onSaveCreate()
+    onSaveCreate(valueCreate)
   }
 
   const handleSave = () => {
     isEdit ? handleSaveEdit() : handleSaveCreate()
-    setMode('edit')
+    setMode(edit)
+    setCdnData(null)
     onClose()
   }
 
@@ -158,70 +171,77 @@ const EditCategoryModal = ({
       onOk={() => handleSave()}
       title="Редактировать категорию"
     >
-      {isEdit && (
-        <div className="editModal">
-          <span>название</span>
-          <input type="text" value={valueEdit.name} onChange={handleInputChange('name')} />
-          <span>описание</span>{' '}
-          <input
-            type="text"
-            value={valueEdit.description}
-            onChange={handleInputChange('description')}
-          />
-          <span>url</span>{' '}
-          <input type="text" value={valueEdit.slug} onChange={handleInputChange('slug')} />
-          <span>номер заказа</span>
-          <input
-            type="number"
-            value={valueEdit.sortOrder}
-            onChange={handleInputChange('sortOrder')}
-          />
-          <Select placeholder="Выберете родительскую категорию" onChange={handleSelectChange}>
-            {select &&
-              select.map(cat => (
-                <Select.Option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </Select.Option>
-              ))}
-          </Select>
-          <span>Изображение категории</span>
-          <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Загрузить</Button>
-          </Upload>
-          {currentUrl && (
-            <>
-              <img src={currentUrl} />
-            </>
-          )}
-        </div>
-      )}
-      {isCreate && (
-        <div className="editModal">
-          <span>название</span>
-          <input type="text" value={valueCreate.name} onChange={handleInputCreateChange('name')} />
-          <span>url</span>{' '}
-          <input type="text" value={valueCreate.slug} onChange={handleInputCreateChange('slug')} />
-          <span>описание</span>{' '}
-          <input
-            type="text"
-            value={valueCreate.description}
-            onChange={handleInputCreateChange('description')}
-          />
-          <span>родительская категория</span>
-          <input
-            type="text"
-            value={valueCreate.parentId || ''}
-            onChange={handleInputCreateChange('parentId')}
-          />
-          <span>Изображение категории</span>
-          <Upload {...props}>
-            <Button icon={<UploadOutlined />}>Загрузить</Button>
-          </Upload>
-          {cdnData && <img src={cdnData.url} />}
-          <span>тип</span>
-          <input type="text" value={valueCreate.type} onChange={handleInputCreateChange('type')} />
-        </div>
-      )}
+      <div className="editModal">
+        <span>Название</span>
+        <input
+          type="text"
+          value={isEdit ? valueEdit.name : valueCreate.name}
+          onChange={handleInputAndSelectChange('name')}
+        />
+        <span>Описание</span>{' '}
+        <input
+          type="text"
+          value={isEdit ? valueEdit.description : valueCreate.description}
+          onChange={handleInputAndSelectChange('description')}
+        />
+        <span>Адрес</span>{' '}
+        <input
+          type="text"
+          value={isEdit ? valueEdit.slug : valueCreate.slug}
+          onChange={handleInputAndSelectChange('slug')}
+        />
+        <span>Номер заказа</span>
+        <input
+          type="number"
+          value={isEdit ? valueEdit.sortOrder : valueCreate.sortOrder}
+          onChange={handleInputAndSelectChange('sortOrder')}
+        />
+        <Select
+          value={isEdit ? valueEdit.parentId : valueCreate.parentId}
+          placeholder="Выберете родительскую категорию"
+          onChange={handleInputAndSelectChange('parentId')}
+          allowClear
+        >
+          {select &&
+            select.map(cat => (
+              <Select.Option key={cat.id} value={cat.id}>
+                {cat.name}
+              </Select.Option>
+            ))}
+        </Select>
+        <span>Изображение категории</span>
+        <Upload {...props}>
+          <Button icon={<UploadOutlined />}>Загрузить</Button>
+        </Upload>
+        {currentUrl && !imgError && (
+          <>
+            <img onError={handleImageError} src={currentUrl} />
+          </>
+        )}
+        {isCreate && (
+          <>
+            <span>тип</span>
+            <input
+              type="text"
+              value={valueCreate.type}
+              onChange={handleInputAndSelectChange('type')}
+            />
+          </>
+        )}
+        {imgError && (
+          <div
+            style={{
+              color: 'red',
+              padding: '10px',
+              border: '1px solid #ffccc7',
+              background: '#fff2f0',
+              marginTop: 10,
+            }}
+          >
+            ⚠️ Изображение не найдено (тестовый режим)
+          </div>
+        )}
+      </div>
     </Modal>
   )
 }

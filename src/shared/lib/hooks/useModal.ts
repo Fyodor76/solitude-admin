@@ -5,6 +5,8 @@ import { useCallback, useState } from 'react'
 interface UseModalReturn<T = any> {
   isOpen: boolean
   content: T | null
+  mode: string
+  setMode: React.Dispatch<React.SetStateAction<string>>
   onOpen: (content?: T) => void
   onClose: () => void
   onToggle: (content?: T) => void
@@ -13,16 +15,12 @@ interface UseModalReturn<T = any> {
 export function useModal<T = any>(initialState = false): UseModalReturn<T> {
   const [isOpen, setIsOpen] = useState(initialState)
   const [content, setContent] = useState<T | null>(null)
+  const [mode, setMode] = useState('edit')
 
   const onOpen = useCallback((newContent?: T) => {
-    console.log('1️⃣ onOpen вызван с content:', newContent)
-    console.log('2️⃣ Текущий content ДО:', content)
     requestAnimationFrame(() => {
-      console.log('3️⃣ requestAnimationFrame выполняется')
-      console.log('4️⃣ Устанавливаем content:', newContent ?? null)
       setContent(newContent ?? null)
       setIsOpen(true)
-      console.log('5️⃣ После setContent, новое значение будет в следующем рендере')
     })
   }, [])
 
@@ -39,6 +37,8 @@ export function useModal<T = any>(initialState = false): UseModalReturn<T> {
   return {
     isOpen,
     content,
+    mode,
+    setMode,
     onOpen,
     onClose,
     onToggle,

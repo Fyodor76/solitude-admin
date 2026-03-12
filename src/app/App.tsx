@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 
-import AppErrorBoundary from '@/app/components/error-boundary/AppErrorBoundary'
+import AppErrorBoundary from '@/app/components/error-boundary/ErrorBoundary'
 
 import './styles/global.scss'
 

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 
 import {
-  useCreateCategoryMutation,
-  useDeleteCategoryMutation,
   useGetCategoriesTreeQuery,
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/api-categories/apiCategories'
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
-import { useLazyGetProductsByCategoryIdQuery } from '@/shared/lib/api/api-products/apiProducts'
 import { useModal } from '@/shared/lib/hooks/useModal'
+import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
 import { Tree } from 'antd'
 
 import { transformToAntTree } from './helpers/categoryTreeHelper'
@@ -33,10 +31,13 @@ export interface CreateFormData {
   sortOrder: number
   type: string
 }
-
+const MODES = {
+  EDIT: 'edit',
+  CREATE: 'create',
+}
 const Categories = () => {
   const editModal = useModal()
-
+  const { createNewCategory, handleDelete } = useServerActions()
   const InitialDataCreat = {
     name: '',
     slug: '',
@@ -48,9 +49,7 @@ const Categories = () => {
   }
   const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
   const [updateCategory] = useUpdateCategoryByIdMutation()
-  const [createCategory] = useCreateCategoryMutation()
-  const [deleteCategory] = useDeleteCategoryMutation()
-  const [triggerGetProducts] = useLazyGetProductsByCategoryIdQuery()
+
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
   const [editFormDataModal, setEditFormDataModal] = useState<EditFormData>({
     name: '',
@@ -61,7 +60,6 @@ const Categories = () => {
     imageId: '',
   })
   const [createFormDataModal, setCreateFormDataModal] = useState<CreateFormData>(InitialDataCreat)
-  const [mode, setMode] = useState('edit')
 
   useEffect(() => {
     if (categoriesTreeData?.data) {
@@ -70,23 +68,6 @@ const Categories = () => {
       setCategories([...antTree])
     }
   }, [categoriesTreeData])
-
-  const handleDelete = async (categoryId: string) => {
-    const isConfirmed = window.confirm('Удалить эту категорию?')
-    if (!isConfirmed) return
-    const products = await triggerGetProducts(categoryId).unwrap()
-    if (products?.data && products?.data.length > 0) {
-      alert('Сначала удалите все товары в этой категории')
-    } else {
-      try {
-        await deleteCategory(categoryId).unwrap()
-        refetch()
-        alert('Категория успешно удалена!')
-      } catch (error) {
-        console.log('Ошибка удаления категории!', error)
-      }
-    }
-  }
 
   const findCategoryById = (
     categories: BaseCategoryTree[],
@@ -124,8 +105,6 @@ const Categories = () => {
     if (categories) {
       const category = findCategoryById(categories, categoryId)
       if (category) {
-        console.log('🟢 Категория из БД:', category) // 👈 ЕСТЬ ЛИ imageId?
-        console.log('🟢 imageId из БД:', category.imageId)
         setEditFormDataModal({
           name: category.name,
           slug: category.slug,
@@ -140,12 +119,9 @@ const Categories = () => {
   }
 
   const handleUpdateCategory = async (id: string, editInput: EditFormData) => {
-    console.log('📤 ОТПРАВКА НА СЕРВЕР (edit):', editInput) // 👈 СМОТРИТЕ СЮДА!
-    console.log('📤 imageId:', editInput.imageId) // Есть ли значение?
+    console.log('handleUpdateCategory получил:', editInput) // 👈 проверьте imageId
     try {
-      const response = await updateCategory({ id, data: editInput }).unwrap()
-      console.log('✅ Ответ сервера:', response) // Что вернул сервер?
-      console.log('✅ Сервер ответил "успешно"')
+      await updateCategory({ id, data: editInput }).unwrap()
       refetch()
     } catch (error) {
       console.log('Ошибка редактирования категории!', error)
@@ -154,16 +130,7 @@ const Categories = () => {
 
   const handleCreateCategory = () => {
     editModal.onOpen()
-    setMode('create')
-  }
-  const createNewCategory = async () => {
-    try {
-      await createCategory(createFormDataModal).unwrap()
-      console.log('✅ Категория создана, обновляем данные...')
-      refetch()
-    } catch (error) {
-      console.log('Ошибка создания категории!', error)
-    }
+    editModal.setMode(MODES.CREATE)
   }
 
   return (
@@ -180,17 +147,19 @@ const Categories = () => {
       </div>
       <EditCategoryModal
         isOpen={editModal.isOpen}
-        mode={mode}
         category={editModal.content}
         valueEdit={editFormDataModal}
         valueCreate={createFormDataModal}
         allCategories={allCategories}
+        mode={editModal.mode}
+        edit={MODES.EDIT}
+        create={MODES.CREATE}
+        setMode={editModal.setMode}
         onClose={editModal.onClose}
         setEditFormDataModal={setEditFormDataModal}
         onSaveEdit={handleUpdateCategory}
         onSaveCreate={createNewCategory}
         setCreateFormDataModal={setCreateFormDataModal}
-        setMode={setMode}
       />
     </>
   )
