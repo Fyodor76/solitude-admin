@@ -11,12 +11,13 @@ export const useServerActions = () => {
   const [deleteCategory] = useDeleteCategoryMutation()
   const [triggerGetProducts] = useLazyGetProductsByCategoryIdQuery()
 
-  const createNewCategory = async (createFormDataModal: CreateFormData) => {
+  const createNewCategory = async (createFormDataModal: CreateFormData): Promise<void> => {
     try {
       await createCategory(createFormDataModal).unwrap()
       console.log('✅ Категория создана, обновляем данные...')
     } catch (error) {
       console.log('Ошибка создания категории!', error)
+      throw error
     }
   }
 

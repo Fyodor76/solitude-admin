@@ -31,6 +31,15 @@ export interface CreateFormData {
   sortOrder: number
   type: string
 }
+export const InitialDataCreat = {
+  name: '',
+  slug: '',
+  description: '',
+  parentId: null,
+  imageId: '',
+  sortOrder: 0,
+  type: '',
+}
 const MODES = {
   EDIT: 'edit',
   CREATE: 'create',
@@ -38,15 +47,7 @@ const MODES = {
 const Categories = () => {
   const editModal = useModal()
   const { createNewCategory, handleDelete } = useServerActions()
-  const InitialDataCreat = {
-    name: '',
-    slug: '',
-    description: '',
-    parentId: null,
-    imageId: '',
-    sortOrder: 0,
-    type: '',
-  }
+
   const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
   const [updateCategory] = useUpdateCategoryByIdMutation()
 
@@ -119,7 +120,7 @@ const Categories = () => {
   }
 
   const handleUpdateCategory = async (id: string, editInput: EditFormData) => {
-    console.log('handleUpdateCategory получил:', editInput) // 👈 проверьте imageId
+    console.log('handleUpdateCategory получил:', editInput)
     try {
       await updateCategory({ id, data: editInput }).unwrap()
       refetch()
@@ -129,8 +130,8 @@ const Categories = () => {
   }
 
   const handleCreateCategory = () => {
-    editModal.onOpen()
     editModal.setMode(MODES.CREATE)
+    editModal.onOpen()
   }
 
   return (

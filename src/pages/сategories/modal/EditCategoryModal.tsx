@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-import { CreateFormData, EditFormData } from '@/pages/сategories/Categories'
+import { CreateFormData, EditFormData, InitialDataCreat } from '@/pages/сategories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, message, Upload, UploadProps } from 'antd'
 import { Modal, Select } from 'antd'
+import { input } from 'framer-motion/client'
 
 import './EditCategoryModal.scss'
 
@@ -85,6 +86,18 @@ const EditCategoryModal = ({
       }
       if (info.file.status === 'done') {
         setCdnData(info.file.response?.data)
+        if (isEdit) {
+          setEditFormDataModal(prev => ({
+            ...prev,
+            imageId: info.file.response?.data.fileId || null,
+          }))
+        } else {
+          setCreateFormDataModal(prev => ({
+            ...prev,
+            imageId: info.file.response?.data.fileId || null,
+          }))
+        }
+
         setImgError(false)
         message.success(`${info.file.name} Файл загружен successfully`)
       } else if (info.file.status === 'error') {
@@ -153,23 +166,34 @@ const EditCategoryModal = ({
     onSaveEdit(category.id, updateValueEdit)
   }
 
-  const handleSaveCreate = () => {
-    onSaveCreate(valueCreate)
+  const handleSaveCreate = async () => {
+    await onSaveCreate(valueCreate)
+    setCreateFormDataModal(InitialDataCreat)
   }
 
-  const handleSave = () => {
-    isEdit ? handleSaveEdit() : handleSaveCreate()
-    setMode(edit)
-    setCdnData(null)
-    onClose()
+  const handleSave = async () => {
+    try {
+      if (isEdit) {
+        await handleSaveEdit()
+      } else {
+        await handleSaveCreate()
+      }
+      setMode(edit)
+      setCdnData(null)
+      onClose()
+    } catch (error) {
+      console.error('Ошибка при сохранении:', error)
+    }
   }
 
   return (
     <Modal
       open={isOpen}
       onCancel={onClose}
-      onOk={() => handleSave()}
-      title="Редактировать категорию"
+      onOk={async () => {
+        await handleSave()
+      }}
+      title={isEdit ? 'Редактировать категорию' : 'Создать новую категорию'}
     >
       <div className="editModal">
         <span>Название</span>
@@ -210,7 +234,10 @@ const EditCategoryModal = ({
             ))}
         </Select>
         <span>Изображение категории</span>
-        <Upload {...props}>
+        <Upload
+          {...props}
+          key={isEdit ? `edit-${category?.id}` : 'create'} // 👈 ВОТ ЭТО РЕШЕНИЕ!
+        >
           <Button icon={<UploadOutlined />}>Загрузить</Button>
         </Upload>
         {currentUrl && !imgError && (
