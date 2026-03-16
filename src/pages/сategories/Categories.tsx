@@ -9,58 +9,31 @@ import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
 import { Tree } from 'antd'
 
+import { InitialFormData, MODES } from './const/constans'
 import { transformToAntTree } from './helpers/categoryTreeHelper'
 import EditCategoryModal from './modal/EditCategoryModal'
 import { CategoryToAntTree } from './types/type'
 
-export interface EditFormData {
+export interface FormData {
   name: string
   slug: string
   description: string
-  sortOrder: number
   parentId: string | null
   imageId: string | null
+  sortOrder: number
+  type?: string
 }
 
-export interface CreateFormData {
-  name: string
-  slug: string
-  description: string
-  parentId: string | null
-  imageId: string | null
-  sortOrder: number
-  type: string
-}
-export const InitialDataCreat = {
-  name: '',
-  slug: '',
-  description: '',
-  parentId: null,
-  imageId: '',
-  sortOrder: 0,
-  type: '',
-}
-const MODES = {
-  EDIT: 'edit',
-  CREATE: 'create',
-}
 const Categories = () => {
   const editModal = useModal()
+
   const { createNewCategory, handleDelete } = useServerActions()
 
   const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
   const [updateCategory] = useUpdateCategoryByIdMutation()
 
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
-  const [editFormDataModal, setEditFormDataModal] = useState<EditFormData>({
-    name: '',
-    slug: '',
-    description: '',
-    sortOrder: 0,
-    parentId: null,
-    imageId: '',
-  })
-  const [createFormDataModal, setCreateFormDataModal] = useState<CreateFormData>(InitialDataCreat)
+  const [formDataModal, setFormDataModal] = useState<FormData>(InitialFormData)
 
   useEffect(() => {
     if (categoriesTreeData?.data) {
@@ -106,7 +79,7 @@ const Categories = () => {
     if (categories) {
       const category = findCategoryById(categories, categoryId)
       if (category) {
-        setEditFormDataModal({
+        setFormDataModal({
           name: category.name,
           slug: category.slug,
           description: category.description,
@@ -119,7 +92,7 @@ const Categories = () => {
     }
   }
 
-  const handleUpdateCategory = async (id: string, editInput: EditFormData) => {
+  const handleUpdateCategory = async (id: string, editInput: FormData) => {
     console.log('handleUpdateCategory получил:', editInput)
     try {
       await updateCategory({ id, data: editInput }).unwrap()
@@ -130,6 +103,7 @@ const Categories = () => {
   }
 
   const handleCreateCategory = () => {
+    setFormDataModal(InitialFormData)
     editModal.setMode(MODES.CREATE)
     editModal.onOpen()
   }
@@ -149,18 +123,16 @@ const Categories = () => {
       <EditCategoryModal
         isOpen={editModal.isOpen}
         category={editModal.content}
-        valueEdit={editFormDataModal}
-        valueCreate={createFormDataModal}
+        value={formDataModal}
         allCategories={allCategories}
         mode={editModal.mode}
         edit={MODES.EDIT}
         create={MODES.CREATE}
         setMode={editModal.setMode}
         onClose={editModal.onClose}
-        setEditFormDataModal={setEditFormDataModal}
+        setFormDataModal={setFormDataModal}
         onSaveEdit={handleUpdateCategory}
         onSaveCreate={createNewCategory}
-        setCreateFormDataModal={setCreateFormDataModal}
       />
     </>
   )

@@ -1,4 +1,4 @@
-import { CreateFormData } from '@/pages/сategories/Categories'
+import { FormData } from '@/pages/сategories/Categories'
 
 import {
   useCreateCategoryMutation,
@@ -13,9 +13,9 @@ export const useServerActions = () => {
   const [triggerGetProducts] = useLazyGetProductsByCategoryIdQuery()
   const [deleteFileById] = useDeleteFileByIdMutation()
 
-  const createNewCategory = async (createFormDataModal: CreateFormData): Promise<void> => {
+  const createNewCategory = async (formDataModal: FormData): Promise<void> => {
     try {
-      await createCategory(createFormDataModal).unwrap()
+      await createCategory(formDataModal).unwrap()
       console.log('✅ Категория создана, обновляем данные...')
     } catch (error) {
       console.log('Ошибка создания категории!', error)
@@ -45,7 +45,7 @@ export const useServerActions = () => {
 
       await deleteCategory(categoryId).unwrap()
       console.log('✅ Категория успешно удалена, ID:', categoryId)
-      console.log('📝 Проверьте сеть вкладку Network для подтверждения запросов')
+
       alert(' Категория успешно удалена!')
     } catch (error) {
       console.log(' Ошибка удаления категории!', error)
