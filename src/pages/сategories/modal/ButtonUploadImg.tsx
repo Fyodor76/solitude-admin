@@ -7,7 +7,7 @@ import { Button, message, Upload, UploadProps } from 'antd'
 
 import { API_URL } from '@/app/constans/url'
 
-import type { FormData } from '../Categories'
+import type { FormData } from '../types/type'
 
 interface ButtonUploadImgProps {
   category: BaseCategoryTree

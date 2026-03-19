@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 
-import { FormData } from '@/pages/сategories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { Modal, Select } from 'antd'
@@ -8,6 +7,8 @@ import { Modal, Select } from 'antd'
 import { CDN_URL } from '@/app/constans/url'
 
 import { InitialFormData } from '../const/constans'
+import { mapFormToRequest } from '../mappers/categoryMappers'
+import { FormData } from '../types/type'
 import ButtonUploadImg from './ButtonUploadImg'
 import './EditCategoryModal.scss'
 
@@ -97,12 +98,8 @@ const EditCategoryModal = ({
   }
 
   const handleSaveEdit = () => {
-    const updateValueEdit = {
-      ...value,
-      sortOrder: Number(value.sortOrder),
-      imageId: cdnData?.fileId || value.imageId,
-    }
-    onSaveEdit(category.id, updateValueEdit)
+    const updateData = mapFormToRequest(value, cdnData)
+    onSaveEdit(category.id, updateData)
   }
 
   const handleSaveCreate = async () => {

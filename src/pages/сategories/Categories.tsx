@@ -11,18 +11,10 @@ import { Tree } from 'antd'
 
 import { InitialFormData, MODES } from './const/constans'
 import { transformToAntTree } from './helpers/categoryTreeHelper'
+import { mapTreeToForm } from './mappers/categoryMappers'
 import EditCategoryModal from './modal/EditCategoryModal'
 import { CategoryToAntTree } from './types/type'
-
-export interface FormData {
-  name: string
-  slug: string
-  description: string
-  parentId: string | null
-  imageId: string | null
-  sortOrder: number
-  type?: string
-}
+import { FormData } from './types/type'
 
 const Categories = () => {
   const editModal = useModal()
@@ -79,14 +71,7 @@ const Categories = () => {
     if (categories) {
       const category = findCategoryById(categories, categoryId)
       if (category) {
-        setFormDataModal({
-          name: category.name,
-          slug: category.slug,
-          description: category.description,
-          sortOrder: category.sortOrder,
-          parentId: category.entity ? category.entity.parentId : null,
-          imageId: category.imageId ?? null,
-        })
+        setFormDataModal(mapTreeToForm(category))
         editModal.onOpen(category)
       }
     }
