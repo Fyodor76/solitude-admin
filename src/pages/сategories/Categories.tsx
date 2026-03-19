@@ -7,6 +7,7 @@ import {
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
+import Icon from '@/shared/ui/icons/Icon'
 import { Tree } from 'antd'
 
 import { InitialFormData, MODES } from './const/constans'
@@ -98,7 +99,11 @@ const Categories = () => {
       <div className="allCategories">
         {isLoading && <span>Загрузка...</span>}
         {error && <span>Ошибочка вышла...</span>}
-        <button onClick={handleCreateCategory}>➕ Добавить категорию</button>
+
+        <button style={{ display: 'flex', alignItems: 'center' }} onClick={handleCreateCategory}>
+          <Icon name="add"></Icon>
+          Добавить категорию
+        </button>
         {categories.length > 0 ? (
           <Tree treeData={categories} defaultExpandAll showLine></Tree>
         ) : (
