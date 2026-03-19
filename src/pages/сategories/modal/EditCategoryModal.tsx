@@ -99,6 +99,7 @@ const EditCategoryModal = ({
   const handleSaveEdit = () => {
     const updateValueEdit = {
       ...value,
+      sortOrder: Number(value.sortOrder),
       imageId: cdnData?.fileId || value.imageId,
     }
     onSaveEdit(category.id, updateValueEdit)
