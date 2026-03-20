@@ -2,7 +2,7 @@ import { ConfigLoginType } from '../types'
 
 export const configLogin: ConfigLoginType = {
   title: 'Admin Solitude',
-  innerTitle: 'Sign in to start your session',
+  innerTitle: 'Авторизация',
   subtitle: '',
   className: '',
   sections: [
@@ -13,26 +13,33 @@ export const configLogin: ConfigLoginType = {
           name: 'email',
           typeField: 'input',
           size: 'large',
-          placeholder: 'Email',
+          placeholder: 'Логин',
+          type: 'email',
         },
         {
           name: 'password',
           typeField: 'input',
           size: 'large',
-          placeholder: 'Password',
+          placeholder: 'Пароль',
+          type: 'password',
         },
       ],
     },
     {
       className: 'btns-container',
       fields: [
+        // {
+        //   typeField: 'checkbox',
+        //   children: 'Remember Me',
+        // },
         {
-          typeField: 'checkbox',
-          children: 'Remember Me',
+          typeField: 'link',
+          children: 'Зарегистрироваться',
+          link: '/registration',
         },
         {
           typeField: 'button',
-          children: 'Sign In',
+          children: 'Авторизоваться',
           type: 'primary',
           size: 'large',
         },
@@ -41,16 +48,11 @@ export const configLogin: ConfigLoginType = {
     {
       className: 'links-container',
       fields: [
-        {
-          typeField: 'link',
-          children: 'I forgot my password',
-          link: '/forgot',
-        },
-        {
-          typeField: 'link',
-          children: ' Register a new membership',
-          link: '/registration',
-        },
+        // {
+        //   typeField: 'link',
+        //   children: 'I forgot my password',
+        //   link: '/forgot',
+        // },
       ],
     },
   ],

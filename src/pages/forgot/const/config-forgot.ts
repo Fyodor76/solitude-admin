@@ -14,6 +14,7 @@ export const configForgot: ConfigForgotType = {
           typeField: 'input',
           size: 'large',
           placeholder: 'Email',
+          type: 'email',
         },
       ],
     },

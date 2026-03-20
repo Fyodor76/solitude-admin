@@ -7,38 +7,47 @@ export type ConfigRegistrationsType = {
     {
       className: string
       fields: [
+        // {
+        //   name: string
+        //   typeField: 'input'
+        //   size: 'large'
+        //   placeholder: string
+        //   type: string
+        // },
         {
           name: string
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
         {
           name: string
           typeField: 'input'
           size: 'large'
           placeholder: string
+          type: string
         },
-        {
-          name: string
-          typeField: 'input'
-          size: 'large'
-          placeholder: string
-        },
-        {
-          name: string
-          typeField: 'input'
-          size: 'large'
-          placeholder: string
-        },
+        // {
+        //   name: string
+        //   typeField: 'input'
+        //   size: 'large'
+        //   placeholder: string
+        //   type: string
+        // },
       ]
     },
     {
       className: string
       fields: [
+        // {
+        //   typeField: 'checkbox'
+        //   children: string
+        // },
         {
-          typeField: 'checkbox'
+          typeField: 'link'
           children: string
+          link: string
         },
         {
           typeField: 'button'
@@ -50,13 +59,7 @@ export type ConfigRegistrationsType = {
     },
     {
       className: string
-      fields: [
-        {
-          typeField: 'link'
-          children: string
-          link: string
-        },
-      ]
+      fields: []
     },
   ]
 }

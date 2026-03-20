@@ -1,3 +1,4 @@
+import { useLogoutMutation } from '@/shared/lib/api/auth/auth'
 import { Button } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -11,11 +12,23 @@ interface HeaderProps {
   toggleSidebar: () => void
 }
 export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
+  const [logout, { isLoading }] = useLogoutMutation()
+
   const navigate = useNavigate()
   const messages = 5
   const notification = 3
-  const handleLogout = () => {
-    navigate('/login')
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap()
+
+      localStorage.removeItem('access')
+      localStorage.removeItem('refresh')
+
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   return (
@@ -34,7 +47,7 @@ export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
                 {notification > 0 && <span className="badge">{notification}</span>}
               </Link>
             </div>
-            <Button onClick={handleLogout} className="btn-logout">
+            <Button loading={isLoading} onClick={handleLogout} className="btn-logout">
               <Icon name="logout"></Icon>
             </Button>
           </div>
