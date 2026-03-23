@@ -1,5 +1,6 @@
 import { ReactNode, useState } from 'react'
 
+import Categories from '@/pages/сategories/Categories'
 import { Header } from '@/shared/ui/header'
 import Sidebar from '@/shared/ui/sidebar/Sidebar'
 import { Link } from 'react-router-dom'
@@ -23,6 +24,8 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       </div>
       <div className="main-page" style={{ minWidth: '0', flex: '1' }}>
         <Header toggleSidebar={toggleSidebar} isOpen={isOpen} />
+        <h1>Категории товаров</h1>
+        <Categories />
         <Link to="/catalog">
           <h1 style={{ textAlign: 'center', color: 'green' }}>
             Перейти в каталог(протестируем работу breadcrumbs)

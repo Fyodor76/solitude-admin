@@ -330,27 +330,27 @@ export const iconSet = {
         id="Stroke 1"
         d="M21.791 12.1208H9.75"
         stroke="#00000080"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         fill="none"
       />
       <path
         id="Stroke 3"
         d="M18.8643 9.20483L21.7923 12.1208L18.8643 15.0368"
         stroke="#00000080"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         fill="none"
       />
       <path
         id="Stroke 4"
         d="M16.3597 7.63C16.0297 4.05 14.6897 2.75 9.35974 2.75C2.25874 2.75 2.25874 5.06 2.25874 12C2.25874 18.94 2.25874 21.25 9.35974 21.25C14.6897 21.25 16.0297 19.95 16.3597 16.37"
         stroke="#00000080"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         fill="none"
       />
     </svg>
@@ -360,23 +360,23 @@ export const iconSet = {
       <path
         d="M4.99951 16.55V19.9C4.99922 20.3102 5.11905 20.7114 5.34418 21.0542C5.56931 21.397 5.88994 21.6665 6.26642 21.8292C6.6429 21.9919 7.05875 22.0408 7.46271 21.9698C7.86666 21.8989 8.24103 21.7113 8.53955 21.4301L11.1495 18.9701H12.0195C17.5395 18.9701 22.0195 15.1701 22.0195 10.4701C22.0195 5.77009 17.5395 1.97009 12.0195 1.97009C6.49953 1.97009 2.01953 5.78009 2.01953 10.4701C2.042 11.6389 2.32261 12.7882 2.84125 13.8358C3.35989 14.8835 4.10373 15.8035 5.01953 16.53L4.99951 16.55Z"
         stroke="#00000080"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M17 9.5H7"
         stroke="#00000080"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M13 12.5H7"
         stroke="#00000080"
-        stroke-width="1.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   ),
@@ -393,6 +393,80 @@ export const iconSet = {
     >
       <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" />
       <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" />
+    </svg>
+  ),
+  add: (
+    <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M24 32L24 16"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M42 27L42 21"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M6 27L6 21"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14 6H8C6.89543 6 6 6.89543 6 8V14"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M34 6H40C41.1046 6 42 6.89543 42 8V14"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M34 42H40C41.1046 42 42 41.1046 42 40V34"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M14 42H8C6.89543 42 6 41.1046 6 40V34"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M27 6H21"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M32 24L16 24"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+      <path
+        d="M27 42H21"
+        stroke="#000000"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     </svg>
   ),
 }
