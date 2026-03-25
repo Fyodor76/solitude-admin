@@ -1,6 +1,5 @@
 export const InitialFormData = {
   name: '',
-  slug: '',
   description: '',
   parentId: null,
   imageId: null,

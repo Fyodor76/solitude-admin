@@ -1,4 +1,4 @@
-import { FormData } from '@/pages/сategories/Categories'
+import { FormData } from '@/pages/сategories/types/type'
 
 import {
   useCreateCategoryMutation,

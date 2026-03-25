@@ -6,7 +6,7 @@ import { FormData } from '../types/type'
 export const mapTreeToForm = (category: BaseCategoryTree): FormData => {
   return {
     name: category.name,
-    slug: category.slug,
+
     description: category.description,
     sortOrder: category.sortOrder,
     parentId: category.entity?.parentId ?? null,
@@ -17,7 +17,7 @@ export const mapTreeToForm = (category: BaseCategoryTree): FormData => {
 export const mapFormToRequest = (formData: FormData, cdnData?: imgUpload | null) => {
   return {
     name: formData.name,
-    slug: formData.slug,
+
     description: formData.description,
     sortOrder: Number(formData.sortOrder),
     parentId: formData.parentId,

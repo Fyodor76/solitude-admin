@@ -8,7 +8,7 @@ export interface CategoryToAntTree {
 
 export interface FormData {
   name: string
-  slug: string
+  slug?: string
   description: string
   parentId: string | null
   imageId: string | null

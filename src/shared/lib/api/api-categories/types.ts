@@ -2,7 +2,7 @@ export interface CategoryMenuItem {
   //плоский список get запрос на полученик узловых категоий
   id: string
   name: string
-  slug: string
+  slug?: string
   description: string
   parentId: string | null
   imageId: string | null
@@ -17,7 +17,7 @@ export interface BaseCategoryTree {
   //дерево плюс дети[]
   id: string
   name: string
-  slug: string
+  slug?: string
   description: string
   imageId: string | null
   isActive: boolean
@@ -29,7 +29,7 @@ export interface BaseCategoryTree {
 
 export interface CategoryRequest {
   name: string
-  slug: string
+  slug?: string
   description: string
   parentId: null | string
   imageId?: string | null

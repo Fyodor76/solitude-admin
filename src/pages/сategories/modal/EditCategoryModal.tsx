@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
@@ -86,8 +86,21 @@ const EditCategoryModal = ({
 
   const handleInputAndSelectChange = (field: keyof FormData) => {
     return (valueOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
+      let value = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
 
+      let finalValue: string | number | null = value
+
+      if (field === 'sortOrder') {
+        const numValue = parseInt(value, 10)
+
+        if (!isNaN(numValue) && numValue < 0) {
+          finalValue = 0
+        } else if (!isNaN(numValue)) {
+          finalValue = numValue
+        } else {
+          finalValue = 0
+        }
+      }
       setFormDataModal(prev => {
         return {
           ...prev,
@@ -140,13 +153,16 @@ const EditCategoryModal = ({
           value={value.description}
           onChange={handleInputAndSelectChange('description')}
         />
-        <span>Адрес</span>{' '}
-        <input type="text" value={value.slug} onChange={handleInputAndSelectChange('slug')} />
         <span>Порядок сортировки</span>
         <input
           type="number"
           value={value.sortOrder}
-          onChange={handleInputAndSelectChange('sortOrder')}
+          onChange={e => {
+            handleInputAndSelectChange('sortOrder')(e)
+          }}
+          onWheel={e => e.preventDefault()}
+          min="0"
+          step="1"
         />
         <Select
           value={value.parentId}
