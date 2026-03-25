@@ -53,7 +53,11 @@ const EditCategoryModal = ({
 
   const imageUrl = isEdit && value.imageId ? `${CDN_URL}/${value.imageId}` : null
   const currentUrl = cdnData?.url || imageUrl
-
+  const handleClose = () => {
+    setCdnData(null)
+    setImgError(false)
+    onClose()
+  }
   const checkCategory = (catId: string, allCategories: BaseCategoryTree[]) => {
     return allCategories.find(cat => cat.id === catId)
   }
@@ -104,7 +108,7 @@ const EditCategoryModal = ({
       setFormDataModal(prev => {
         return {
           ...prev,
-          [field]: field === 'parentId' && value === '' ? null : value,
+          [field]: field === 'parentId' && finalValue === '' ? null : finalValue,
         }
       })
     }
@@ -116,7 +120,8 @@ const EditCategoryModal = ({
   }
 
   const handleSaveCreate = async () => {
-    await onSaveCreate(value)
+    const createData = mapFormToRequest(value, cdnData)
+    await onSaveCreate(createData)
     setFormDataModal(InitialFormData)
   }
 
@@ -138,7 +143,7 @@ const EditCategoryModal = ({
   return (
     <Modal
       open={isOpen}
-      onCancel={onClose}
+      onCancel={handleClose}
       onOk={async () => {
         await handleSave()
       }}
