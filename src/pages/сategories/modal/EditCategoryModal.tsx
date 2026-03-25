@@ -160,7 +160,6 @@ const EditCategoryModal = ({
           onChange={e => {
             handleInputAndSelectChange('sortOrder')(e)
           }}
-          onWheel={e => e.preventDefault()}
           min="0"
           step="1"
         />
