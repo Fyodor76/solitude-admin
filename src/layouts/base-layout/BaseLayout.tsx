@@ -19,9 +19,8 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
   }
   return (
     <div className="wrapper" style={{ display: 'flex' }}>
-      <div>
-        <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
-      </div>
+      <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
+
       <div className="main-page" style={{ minWidth: '0', flex: '1' }}>
         <Header toggleSidebar={toggleSidebar} isOpen={isOpen} />
         <h1>Категории товаров</h1>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
@@ -88,27 +88,41 @@ const EditCategoryModal = ({
   }
   const select = filterSelect(allCategories, currentId)
 
-  const handleInputAndSelectChange = (field: keyof FormData) => {
-    return (valueOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleStringAndSelectChange = (field: keyof FormData) => {
+    return (
+      valueOrEvent: string | null | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+      if (valueOrEvent === null) {
+        setFormDataModal(prev => ({
+          ...prev,
+          [field]: null,
+        }))
+        return
+      }
       let value = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
 
-      let finalValue: string | number | null = value
-
-      if (field === 'sortOrder') {
-        const numValue = parseInt(value, 10)
-
-        if (!isNaN(numValue) && numValue < 0) {
-          finalValue = 0
-        } else if (!isNaN(numValue)) {
-          finalValue = numValue
-        } else {
-          finalValue = 0
-        }
-      }
       setFormDataModal(prev => {
         return {
           ...prev,
-          [field]: field === 'parentId' && finalValue === '' ? null : finalValue,
+          [field]: field === 'parentId' && value === '' ? null : value,
+        }
+      })
+    }
+  }
+
+  const handleNumberChange = (field: keyof FormData) => {
+    return (value: React.ChangeEvent<HTMLInputElement>) => {
+      let stringValue = value.target.value
+      let numValue = parseInt(stringValue, 10)
+
+      if (isNaN(numValue) || numValue < 0) {
+        numValue = 0
+      }
+
+      setFormDataModal(prev => {
+        return {
+          ...prev,
+          [field]: numValue,
         }
       })
     }
@@ -151,27 +165,25 @@ const EditCategoryModal = ({
     >
       <div className="editModal">
         <span>Название</span>
-        <input type="text" value={value.name} onChange={handleInputAndSelectChange('name')} />
+        <input type="text" value={value.name} onChange={handleStringAndSelectChange('name')} />
         <span>Описание</span>{' '}
         <input
           type="text"
           value={value.description}
-          onChange={handleInputAndSelectChange('description')}
+          onChange={handleStringAndSelectChange('description')}
         />
         <span>Порядок сортировки</span>
         <input
           type="number"
           value={value.sortOrder}
-          onChange={e => {
-            handleInputAndSelectChange('sortOrder')(e)
-          }}
+          onChange={handleNumberChange('sortOrder')}
           min="0"
           step="1"
         />
         <Select
           value={value.parentId}
           placeholder="Выберете родительскую категорию"
-          onChange={handleInputAndSelectChange('parentId')}
+          onChange={handleStringAndSelectChange('parentId')}
           allowClear
         >
           {select &&
@@ -197,7 +209,7 @@ const EditCategoryModal = ({
         {isCreate && (
           <>
             <span>тип</span>
-            <input type="text" value={value.type} onChange={handleInputAndSelectChange('type')} />
+            <input type="text" value={value.type} onChange={handleStringAndSelectChange('type')} />
           </>
         )}
         {imgError && (
