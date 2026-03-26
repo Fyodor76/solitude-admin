@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
+import { Button } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import defaultLogo from '@/app/assets/images/image.png'
@@ -69,19 +70,56 @@ const Sidebar = ({
         ></motion.div>
       )}
       <motion.aside
-        className={`sidebar sidebar-${position}`}
+        className={`sidebar sidebar-${position} ${!isOpen ? 'collapsed' : ''}`}
         style={{ width }}
         variants={sidebarVariants}
         initial={isOpen ? 'open' : 'collapsed'}
         animate={isOpen ? 'open' : 'collapsed'}
         onClick={e => e.stopPropagation()}
       >
-        {logo && (
-          <a href="/" className="sidebar-header">
-            <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
-            {isOpen && logo.title && <span className="sidebar-brand">{logo.title}</span>}
-          </a>
-        )}
+        <div className="sidebar-header-container">
+          {logo && (
+            <a href="/" className="sidebar-header">
+              <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
+              {isOpen && logo.title && <span className="sidebar-brand">{logo.title}</span>}
+            </a>
+          )}
+          <div className="header-sidebar-container">
+            <motion.div
+              id="header-sidebar"
+              className={isOpen ? 'sidebar-open' : ''}
+              transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 30,
+              }}
+            >
+              <div className="headerSidebar">
+                <motion.div
+                  className={`burger-arrow ${isOpen ? 'open' : ''}`}
+                  animate={{
+                    rotate: isOpen ? 180 : 0,
+                  }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30,
+                  }}
+                >
+                  <Button
+                    onClick={toggleSidebar}
+                    className="open-sidebar"
+                    type="text"
+                    shape="circle"
+                  >
+                    <Icon name="arrow" />
+                  </Button>
+                </motion.div>
+              </div>
+              {/*<Portal containerId="header-sidebar"></Portal>*/}
+            </motion.div>
+          </div>
+        </div>
 
         <div className="sidebar-container">
           {user && (

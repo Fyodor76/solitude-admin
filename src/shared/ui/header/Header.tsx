@@ -11,7 +11,7 @@ interface HeaderProps {
   isOpen: boolean
   toggleSidebar: () => void
 }
-export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
+export const Header = () => {
   const [logout, { isLoading }] = useLogoutMutation()
 
   const navigate = useNavigate()
@@ -35,7 +35,7 @@ export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
     <>
       <div className="header">
         <div className="header-container">
-          <HeaderSidebar toggleSidebar={toggleSidebar} isOpen={isOpen} />
+          <HeaderSidebar />
           <div className="btn-container">
             <div className="links">
               <Link to="#" className="link-message">

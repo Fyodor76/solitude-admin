@@ -21,7 +21,7 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
     <div className="wrapper" style={{ display: 'flex' }}>
       <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
 
-      <div className="main-page" style={{ minWidth: '0', flex: '1' }}>
+      <div className="main-page" style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}>
         <Header toggleSidebar={toggleSidebar} isOpen={isOpen} />
         <h1>Категории товаров</h1>
         <Categories />
