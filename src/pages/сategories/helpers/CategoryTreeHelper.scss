@@ -1,0 +1,16 @@
+.ant-tree-treenode {
+  width: 100%;
+  .ant-tree-node-content-wrapper {
+    width: 100%;
+
+    .category {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+
+      .btn-category {
+        display: flex;
+      }
+    }
+  }
+}

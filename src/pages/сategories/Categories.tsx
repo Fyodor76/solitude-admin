@@ -7,9 +7,9 @@ import {
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
-import Icon from '@/shared/ui/icons/Icon'
 import { Tree } from 'antd'
 
+import './Categories.scss'
 import { InitialFormData, MODES } from './const/constans'
 import { transformToAntTree } from './helpers/categoryTreeHelper'
 import { mapTreeToForm } from './mappers/categoryMappers'
@@ -31,7 +31,11 @@ const Categories = () => {
   useEffect(() => {
     if (categoriesTreeData?.data) {
       const sympleTree = categoriesTreeData.data
-      const antTree = transformToAntTree(sympleTree, { onEdit: handleEdit, onDelete: handleDelete })
+      const antTree = transformToAntTree(sympleTree, {
+        onEdit: handleEdit,
+        onDelete: handleDelete,
+        onCreate: handleCreateCategory,
+      })
       setCategories([...antTree])
     }
   }, [categoriesTreeData])
@@ -100,10 +104,6 @@ const Categories = () => {
         {isLoading && <span>Загрузка...</span>}
         {error && <span>Ошибочка вышла...</span>}
 
-        <button style={{ display: 'flex', alignItems: 'center' }} onClick={handleCreateCategory}>
-          <Icon name="add"></Icon>
-          Добавить категорию
-        </button>
         {categories.length > 0 ? (
           <Tree treeData={categories} defaultExpandAll showLine></Tree>
         ) : (
