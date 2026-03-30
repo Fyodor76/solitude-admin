@@ -45,16 +45,16 @@ const EditCategoryModal = ({
   const isEdit = mode === edit
   const currentId = isEdit ? category?.id : undefined
 
-  const [cdnData, setCdnData] = useState<imgUpload | null>(null)
+  const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
   const [imgError, setImgError] = useState(false)
   const handleImageError = () => {
     setImgError(true)
   }
 
   const imageUrl = isEdit && value.imageId ? `${CDN_URL}/${value.imageId}` : null
-  const currentUrl = cdnData?.url || imageUrl
+  const currentUrl = uploadImg?.url || imageUrl
   const handleClose = () => {
-    setCdnData(null)
+    setUploadImg(null)
     setImgError(false)
     onClose()
   }
@@ -129,12 +129,12 @@ const EditCategoryModal = ({
   }
 
   const handleSaveEdit = () => {
-    const updateData = mapFormToRequest(value, cdnData)
+    const updateData = mapFormToRequest(value, uploadImg)
     onSaveEdit(category.id, updateData)
   }
 
   const handleSaveCreate = async () => {
-    const createData = mapFormToRequest(value, cdnData)
+    const createData = mapFormToRequest(value, uploadImg)
     await onSaveCreate(createData)
     setFormDataModal(InitialFormData)
   }
@@ -147,7 +147,7 @@ const EditCategoryModal = ({
         await handleSaveCreate()
       }
       setMode(edit)
-      setCdnData(null)
+      setUploadImg(null)
       onClose()
     } catch (error) {
       console.error('Ошибка при сохранении:', error)
@@ -198,7 +198,7 @@ const EditCategoryModal = ({
           category={category}
           isEdit={isEdit}
           setFormDataModal={setFormDataModal}
-          setCdnData={setCdnData}
+          setUploadImg={setUploadImg}
           setImgError={setImgError}
         />
         {currentUrl && !imgError && (

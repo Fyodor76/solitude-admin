@@ -13,7 +13,7 @@ interface ButtonUploadImgProps {
   category: BaseCategoryTree
   isEdit: boolean
   setFormDataModal: React.Dispatch<React.SetStateAction<FormData>>
-  setCdnData: React.Dispatch<React.SetStateAction<imgUpload | null>>
+  setUploadImg: React.Dispatch<React.SetStateAction<imgUpload | null>>
   setImgError: React.Dispatch<React.SetStateAction<boolean>>
 }
 
@@ -21,7 +21,7 @@ const ButtonUploadImg = ({
   category,
   isEdit,
   setFormDataModal,
-  setCdnData,
+  setUploadImg,
   setImgError,
 }: ButtonUploadImgProps) => {
   const props: UploadProps = {
@@ -43,11 +43,11 @@ const ButtonUploadImg = ({
           ...prev,
           imageId: null,
         }))
-        setCdnData(null)
+        setUploadImg(null)
         return
       }
       if (info.file.status === 'done') {
-        setCdnData(info.file.response?.data)
+        setUploadImg(info.file.response?.data)
         if (isEdit) {
           setFormDataModal(prev => ({
             ...prev,
