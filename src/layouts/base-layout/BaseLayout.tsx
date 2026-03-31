@@ -22,8 +22,16 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
       <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
 
       <div className="main-page" style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}>
-        <Header toggleSidebar={toggleSidebar} isOpen={isOpen} />
-        <h1>Категории товаров</h1>
+        <Header />
+        <h1
+          style={{
+            fontFamily: 'var(--font-primary)',
+            color: ' var(--color-grey-background)',
+            fontSize: 'light',
+          }}
+        >
+          Категории товаров
+        </h1>
         <Categories />
         <Link to="/catalog">
           <h1 style={{ textAlign: 'center', color: 'green' }}>

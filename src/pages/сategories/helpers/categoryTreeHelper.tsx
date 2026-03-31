@@ -27,12 +27,17 @@ export const transformToAntTree = (
         <div className="category">
           <span>{el.name}</span>
           <div className="btn-category">
-            <button onClick={() => callbacks.onEdit(el.id)}>✏️</button>
-            <button onClick={() => callbacks.onDelete(el.id, el.imageId ?? undefined, folder)}>
-              🗑️
+            <button className="btn-edit" onClick={() => callbacks.onEdit(el.id)}>
+              <Icon name="editing" color="#1a1a1a"></Icon>
             </button>
-            <button onClick={() => callbacks.onCreate()}>
-              <Icon name="add"></Icon>
+            <button
+              className="btn-delete"
+              onClick={() => callbacks.onDelete(el.id, el.imageId ?? undefined, folder)}
+            >
+              <Icon name="delete" color="#1a1a1a"></Icon>
+            </button>
+            <button className="btn-add" onClick={() => callbacks.onCreate()}>
+              <Icon color="#1a1a1a" name="add"></Icon>
             </button>
           </div>
         </div>

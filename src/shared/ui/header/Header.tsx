@@ -7,10 +7,6 @@ import Icon from '../icons/Icon'
 import HeaderSidebar from '../sidebar/HeaderSidebar'
 import './Header.scss'
 
-interface HeaderProps {
-  isOpen: boolean
-  toggleSidebar: () => void
-}
 export const Header = () => {
   const [logout, { isLoading }] = useLogoutMutation()
 

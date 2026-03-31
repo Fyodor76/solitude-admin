@@ -23,10 +23,10 @@ const Icon = ({ name, width, height, color = '#ffffff', className, onClick }: Ic
     ...(width && { width }),
     ...(height && { height }),
   }
-
+  const dynamicClass = color !== '#ffffff' ? 'icon--dynamic-color' : ''
   return (
     <span
-      className={`icon ${className || ''}`.trim()}
+      className={`icon ${dynamicClass} ${className || ''}`.trim()}
       style={style}
       onClick={onClick}
       role={onClick ? 'button' : 'img'}

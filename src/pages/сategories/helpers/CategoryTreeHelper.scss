@@ -10,6 +10,21 @@
 
       .btn-category {
         display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        position: relative;
+        z-index: 1000;
+        .btn-edit,
+        .btn-add,
+        .btn-delete {
+          position: relative;
+          z-index: 1001;
+          transition: box-shadow 0.2s ease !important;
+          &:hover {
+            box-shadow: var(--color-black-shadow-2) !important;
+          }
+        }
       }
     }
   }

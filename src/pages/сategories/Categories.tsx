@@ -7,6 +7,7 @@ import {
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
+import { DownOutlined } from '@ant-design/icons'
 import { Tree } from 'antd'
 
 import './Categories.scss'
@@ -105,7 +106,13 @@ const Categories = () => {
         {error && <span>Ошибочка вышла...</span>}
 
         {categories.length > 0 ? (
-          <Tree treeData={categories} defaultExpandAll showLine></Tree>
+          <Tree
+            switcherIcon={<DownOutlined />}
+            treeData={categories}
+            defaultExpandAll
+            showLine
+            virtual={categories.length > 100}
+          ></Tree>
         ) : (
           !isLoading && <span>Нет категорий для отображения</span>
         )}

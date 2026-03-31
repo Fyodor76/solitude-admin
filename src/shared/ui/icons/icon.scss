@@ -12,7 +12,16 @@
       fill: #d8d3d3;
     }
   }
+  &--dynamic-color {
+    svg {
+      fill: currentColor;
 
+      path,
+      g {
+        fill: currentColor;
+      }
+    }
+  }
   &[role='button'] {
     cursor: pointer;
 
