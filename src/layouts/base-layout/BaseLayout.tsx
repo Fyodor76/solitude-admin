@@ -23,15 +23,18 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
 
       <div className="main-page" style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}>
         <Header />
-        <h1
+        <h2
           style={{
             fontFamily: 'var(--font-primary)',
             color: ' var(--color-grey-background)',
-            fontSize: 'light',
+            fontSize: '24px',
+            fontWeight: 'normal',
+            textAlign: 'center',
+            marginBottom: '20px',
           }}
         >
           Категории товаров
-        </h1>
+        </h2>
         <Categories />
         <Link to="/catalog">
           <h1 style={{ textAlign: 'center', color: 'green' }}>

@@ -1,12 +1,19 @@
 .ant-tree-treenode {
   width: 100%;
+  margin-bottom: 8px !important;
   .ant-tree-node-content-wrapper {
     width: 100%;
-
+    padding: 0 !important;
     .category {
       display: flex;
       width: 100%;
       justify-content: space-between;
+      min-width: 0;
+      border: 1px solid var(--color-blue);
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: #ffffff;
+      transition: all 0.2s ease;
 
       .btn-category {
         display: flex;
@@ -15,17 +22,47 @@
         gap: 20px;
         position: relative;
         z-index: 1000;
+        flex-shrink: 0;
+        width: auto;
+        min-width: 120px;
         .btn-edit,
         .btn-add,
         .btn-delete {
           position: relative;
           z-index: 1001;
           transition: box-shadow 0.2s ease !important;
+
           &:hover {
             box-shadow: var(--color-black-shadow-2) !important;
           }
         }
       }
     }
+  }
+}
+
+.ant-tree {
+  .ant-tree-indent-unit::before {
+    background-color: var(--color-blue) !important;
+  }
+
+  .ant-tree-switcher {
+    .ant-tree-switcher-icon {
+      color: var(--color-blue) !important;
+    }
+
+    &::after {
+      border-color: var(--color-blue) !important;
+    }
+  }
+}
+
+.ant-tree-show-line {
+  .ant-tree-indent-unit::before {
+    background-color: var(--color-blue) !important;
+  }
+
+  .ant-tree-switcher::after {
+    border-color: var(--color-blue) !important;
   }
 }

@@ -4,6 +4,7 @@ import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import Icon from '@/shared/ui/icons/Icon'
 
 import { CategoryToAntTree } from '../types/type'
+import CategoryTitle from './CategoryTitle'
 import './CategoryTreeHelper.scss'
 
 export const transformToAntTree = (
@@ -24,23 +25,12 @@ export const transformToAntTree = (
     const newObj: CategoryToAntTree = {
       key: el.id,
       title: (
-        <div className="category">
-          <span>{el.name}</span>
-          <div className="btn-category">
-            <button className="btn-edit" onClick={() => callbacks.onEdit(el.id)}>
-              <Icon name="editing" color="#1a1a1a"></Icon>
-            </button>
-            <button
-              className="btn-delete"
-              onClick={() => callbacks.onDelete(el.id, el.imageId ?? undefined, folder)}
-            >
-              <Icon name="delete" color="#1a1a1a"></Icon>
-            </button>
-            <button className="btn-add" onClick={() => callbacks.onCreate()}>
-              <Icon color="#1a1a1a" name="add"></Icon>
-            </button>
-          </div>
-        </div>
+        <CategoryTitle
+          name={el.name}
+          onEdit={() => callbacks.onEdit(el.id)}
+          onDelete={() => callbacks.onDelete(el.id, el.imageId ?? undefined, folder)}
+          onCreate={callbacks.onCreate}
+        />
       ),
       children: el.children?.length > 0 ? transformToAntTree(el.children, callbacks, folder) : [],
     }

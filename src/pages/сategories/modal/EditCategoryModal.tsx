@@ -140,10 +140,19 @@ const EditCategoryModal = ({
   }
 
   const handleSave = async () => {
+    console.log('=== handleSave ===')
+    console.log('mode:', mode)
+    console.log('isEdit:', isEdit)
+    console.log('isCreate:', isCreate)
+    console.log('category:', category)
+    console.log('value:', value)
     try {
       if (isEdit) {
+        console.log('Вызов handleSaveEdit для категории:', category?.id)
         await handleSaveEdit()
       } else {
+        console.log('Вызов handleSaveCreate')
+
         await handleSaveCreate()
       }
       setMode(edit)
@@ -165,22 +174,30 @@ const EditCategoryModal = ({
     >
       <div className="editModal">
         <span>Название</span>
-        <input type="text" value={value.name} onChange={handleStringAndSelectChange('name')} />
+        <input
+          type="text"
+          id="category-name"
+          value={value.name}
+          onChange={handleStringAndSelectChange('name')}
+        />
         <span>Описание</span>{' '}
         <input
           type="text"
+          id="category-description"
           value={value.description}
           onChange={handleStringAndSelectChange('description')}
         />
         <span>Порядок сортировки</span>
         <input
           type="number"
+          id="category-sort-order"
           value={value.sortOrder}
           onChange={handleNumberChange('sortOrder')}
           min="0"
           step="1"
         />
         <Select
+          id="category-parent"
           value={value.parentId}
           placeholder="Выберете родительскую категорию"
           onChange={handleStringAndSelectChange('parentId')}
@@ -209,7 +226,12 @@ const EditCategoryModal = ({
         {isCreate && (
           <>
             <span>тип</span>
-            <input type="text" value={value.type} onChange={handleStringAndSelectChange('type')} />
+            <input
+              id="category-type"
+              type="text"
+              value={value.type}
+              onChange={handleStringAndSelectChange('type')}
+            />
           </>
         )}
         {imgError && (

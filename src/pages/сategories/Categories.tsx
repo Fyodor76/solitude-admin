@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   useGetCategoriesTreeQuery,
@@ -28,19 +28,6 @@ const Categories = () => {
 
   const [categories, setCategories] = useState<CategoryToAntTree[]>([])
   const [formDataModal, setFormDataModal] = useState<FormData>(InitialFormData)
-
-  useEffect(() => {
-    if (categoriesTreeData?.data) {
-      const sympleTree = categoriesTreeData.data
-      const antTree = transformToAntTree(sympleTree, {
-        onEdit: handleEdit,
-        onDelete: handleDelete,
-        onCreate: handleCreateCategory,
-      })
-      setCategories([...antTree])
-    }
-  }, [categoriesTreeData])
-
   const findCategoryById = (
     categories: BaseCategoryTree[],
     id: string
@@ -70,18 +57,24 @@ const Categories = () => {
     return result
   }
 
-  const allCategories = categoriesTreeData?.data ? getAllCategories(categoriesTreeData.data) : []
-
-  const handleEdit = (categoryId: string) => {
-    const categories = categoriesTreeData?.data
-    if (categories) {
-      const category = findCategoryById(categories, categoryId)
-      if (category) {
-        setFormDataModal(mapTreeToForm(category))
-        editModal.onOpen(category)
+  const handleEdit = useCallback(
+    (categoryId: string) => {
+      const categories = categoriesTreeData?.data
+      if (categories) {
+        const category = findCategoryById(categories, categoryId)
+        if (category) {
+          setFormDataModal(mapTreeToForm(category))
+          editModal.onOpen(category)
+        }
       }
-    }
-  }
+    },
+    [categoriesTreeData, editModal]
+  )
+  const handleCreateCategory = useCallback(() => {
+    setFormDataModal(InitialFormData)
+    editModal.setMode(MODES.CREATE)
+    editModal.onOpen()
+  }, [editModal])
 
   const handleUpdateCategory = async (id: string, editInput: FormData) => {
     console.log('handleUpdateCategory получил:', editInput)
@@ -93,11 +86,23 @@ const Categories = () => {
     }
   }
 
-  const handleCreateCategory = () => {
-    setFormDataModal(InitialFormData)
-    editModal.setMode(MODES.CREATE)
-    editModal.onOpen()
-  }
+  const computedCategories = useMemo(() => {
+    if (!categoriesTreeData?.data) return []
+    return transformToAntTree(categoriesTreeData.data, {
+      onEdit: handleEdit,
+      onDelete: handleDelete,
+      onCreate: handleCreateCategory,
+    })
+  }, [categoriesTreeData])
+
+  useEffect(() => {
+    setCategories(computedCategories)
+  }, [computedCategories])
+
+  const allCategories = useMemo(() => {
+    if (!categoriesTreeData?.data) return []
+    return getAllCategories(categoriesTreeData.data)
+  }, [categoriesTreeData])
 
   return (
     <>
@@ -112,6 +117,7 @@ const Categories = () => {
             defaultExpandAll
             showLine
             virtual={categories.length > 100}
+            motion={null}
           ></Tree>
         ) : (
           !isLoading && <span>Нет категорий для отображения</span>
@@ -135,4 +141,4 @@ const Categories = () => {
   )
 }
 
-export default Categories
+export default React.memo(Categories)
