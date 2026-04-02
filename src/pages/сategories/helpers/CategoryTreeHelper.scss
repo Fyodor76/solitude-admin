@@ -1,13 +1,16 @@
 .ant-tree-treenode {
   width: 100%;
   margin-bottom: 8px !important;
+
   .ant-tree-node-content-wrapper {
     width: 100%;
     padding: 0 !important;
+
     .category {
       display: flex;
       width: 100%;
       justify-content: space-between;
+      align-items: center;
       min-width: 0;
       border: 1px solid var(--color-blue);
       border-radius: 8px;
@@ -25,6 +28,7 @@
         flex-shrink: 0;
         width: auto;
         min-width: 120px;
+
         .btn-edit,
         .btn-add,
         .btn-delete {
@@ -41,28 +45,47 @@
   }
 }
 
-.ant-tree {
-  .ant-tree-indent-unit::before {
-    background-color: var(--color-blue) !important;
+// ===== ВСЕ ЛИНИИ И ПАЛОЧКИ (ГОЛУБЫЕ) =====
+
+.ant-tree-show-line .ant-tree-indent-unit::before {
+  border-inline-end: 1px solid var(--color-blue) !important;
+}
+
+.ant-tree-show-line .ant-tree-indent-unit::before {
+  border-right: 1px solid var(--color-blue) !important;
+}
+
+.ant-tree .ant-tree-switcher {
+  .ant-tree-switcher-icon {
+    color: var(--color-blue) !important;
   }
 
-  .ant-tree-switcher {
-    .ant-tree-switcher-icon {
-      color: var(--color-blue) !important;
-    }
-
-    &::after {
-      border-color: var(--color-blue) !important;
-    }
+  &::after {
+    border-color: var(--color-blue) !important;
   }
 }
 
-.ant-tree-show-line {
-  .ant-tree-indent-unit::before {
-    background-color: var(--color-blue) !important;
+.ant-tree .ant-tree-switcher-leaf-line {
+  &::before,
+  &::after {
+    border-color: var(--color-blue) !important;
   }
+}
 
+.ant-tree .ant-tree-node-content-wrapper::before {
+  border-bottom-color: var(--color-blue) !important;
+  border-bottom-width: 1px !important;
+}
+
+.ant-tree-show-line {
   .ant-tree-switcher::after {
     border-color: var(--color-blue) !important;
+  }
+
+  .ant-tree-switcher-leaf-line {
+    &::before,
+    &::after {
+      border-color: var(--color-blue) !important;
+    }
   }
 }

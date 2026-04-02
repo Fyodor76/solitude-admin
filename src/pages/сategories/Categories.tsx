@@ -7,8 +7,9 @@ import {
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
+import Icon from '@/shared/ui/icons/Icon'
 import { DownOutlined } from '@ant-design/icons'
-import { Tree } from 'antd'
+import { Button, Tree } from 'antd'
 
 import './Categories.scss'
 import { InitialFormData, MODES } from './const/constans'
@@ -105,7 +106,13 @@ const Categories = () => {
   }, [categoriesTreeData])
 
   return (
-    <>
+    <div className="containerCategories">
+      <div className="titleCategories">
+        <h2 className="title-h2">Категории товаров</h2>
+        <Button onClick={handleCreateCategory} className="btn-title-add">
+          <Icon name="add"></Icon> Добавить категорию
+        </Button>
+      </div>
       <div className="allCategories">
         {isLoading && <span>Загрузка...</span>}
         {error && <span>Ошибочка вышла...</span>}
@@ -137,7 +144,7 @@ const Categories = () => {
         onSaveEdit={handleUpdateCategory}
         onSaveCreate={createNewCategory}
       />
-    </>
+    </div>
   )
 }
 
