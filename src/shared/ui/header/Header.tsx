@@ -2,9 +2,9 @@ import { useLogoutMutation } from '@/shared/lib/api/auth/auth'
 import { Button } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 
+import HeaderSidebar from '../../../app/components/sidebar/HeaderSidebar'
 import Breadcrumbs from '../breadcrumbs/Breadcrumbs'
 import Icon from '../icons/Icon'
-import HeaderSidebar from '../sidebar/HeaderSidebar'
 import './Header.scss'
 
 export const Header = () => {

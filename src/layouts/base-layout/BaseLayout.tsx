@@ -2,9 +2,9 @@ import { ReactNode, useState } from 'react'
 
 import Categories from '@/pages/сategories/Categories'
 import { Header } from '@/shared/ui/header'
-import Sidebar from '@/shared/ui/sidebar/Sidebar'
 import { Link } from 'react-router-dom'
 
+import Sidebar from '@/app/components/sidebar/Sidebar'
 import { menuSidebar } from '@/app/constans/menuSiderbar'
 
 interface BaseLayoutProps {

@@ -119,6 +119,7 @@ const Categories = () => {
 
         {categories.length > 0 ? (
           <Tree
+            blockNode
             switcherIcon={<DownOutlined />}
             treeData={categories}
             defaultExpandAll={false}

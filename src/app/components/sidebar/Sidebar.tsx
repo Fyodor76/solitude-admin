@@ -7,7 +7,7 @@ import defaultLogo from '@/app/assets/images/image.png'
 import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
-import Icon from '../icons/Icon'
+import Icon from '../../../shared/ui/icons/Icon'
 import './sidebar.scss'
 import { SidebarProps } from './sidebarType'
 

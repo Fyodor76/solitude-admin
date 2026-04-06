@@ -4,7 +4,7 @@ import { Button } from 'antd'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
-import Icon from '../icons/Icon'
+import Icon from '../../../shared/ui/icons/Icon'
 import './headerSidebar.scss'
 
 /*interface HeaderSidebarProps {

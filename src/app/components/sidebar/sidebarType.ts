@@ -1,4 +1,4 @@
-import { IconName } from '../icons/iconSet'
+import { IconName } from '../../../shared/ui/icons/iconSet'
 
 export interface LogoSidebarType {
   imageUrl: string
