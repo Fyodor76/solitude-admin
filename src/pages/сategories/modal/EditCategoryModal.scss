@@ -1,4 +1,29 @@
-.editModal {
-  display: flex;
-  flex-direction: column;
+:where(.css-dev-only-do-not-override-xbngoj).ant-modal-css-var {
+  font-family: var(--font-primary) !important;
+
+  .categoryModal {
+    .ant-modal-title {
+      text-align: center !important;
+    }
+
+    .mainTitle {
+      font-size: 20px !important;
+      color: var(--color-grey-2);
+    }
+
+    .editModal {
+      display: flex;
+      flex-direction: column;
+
+      &-title {
+        font-size: 14px;
+        color: var(--color-grey-3);
+      }
+
+      .ant-input {
+        margin-bottom: 10px;
+        color: var(--color-grey-2);
+      }
+    }
+  }
 }

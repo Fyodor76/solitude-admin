@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
-import { Modal, Select } from 'antd'
+import { Input, Modal, Select } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -165,30 +165,35 @@ const EditCategoryModal = ({
 
   return (
     <Modal
+      className="categoryModal"
       open={isOpen}
       onCancel={handleClose}
       onOk={async () => {
         await handleSave()
       }}
-      title={isEdit ? 'Редактировать категорию' : 'Создать новую категорию'}
+      title={
+        <span className="mainTitle">
+          {isEdit ? 'Редактировать категорию' : 'Создать новую категорию'}
+        </span>
+      }
     >
       <div className="editModal">
-        <span>Название</span>
-        <input
+        <span className="editModal-title">Название</span>
+        <Input
           type="text"
           id="category-name"
           value={value.name}
           onChange={handleStringAndSelectChange('name')}
         />
-        <span>Описание</span>{' '}
-        <input
+        <span className="editModal-title">Описание</span>{' '}
+        <Input
           type="text"
           id="category-description"
           value={value.description}
           onChange={handleStringAndSelectChange('description')}
         />
-        <span>Порядок сортировки</span>
-        <input
+        <span className="editModal-title">Порядок сортировки</span>
+        <Input
           type="number"
           id="category-sort-order"
           value={value.sortOrder}
@@ -196,6 +201,7 @@ const EditCategoryModal = ({
           min="0"
           step="1"
         />
+        <span className="editModal-title">Назначить родительскую категорию</span>
         <Select
           id="category-parent"
           value={value.parentId}
@@ -210,7 +216,7 @@ const EditCategoryModal = ({
               </Select.Option>
             ))}
         </Select>
-        <span>Изображение категории</span>
+        <span className="editModal-title">Изображение категории</span>
         <ButtonUploadImg
           category={category}
           isEdit={isEdit}
@@ -225,8 +231,8 @@ const EditCategoryModal = ({
         )}
         {isCreate && (
           <>
-            <span>тип</span>
-            <input
+            <span className="editModal-title">тип</span>
+            <Input
               id="category-type"
               type="text"
               value={value.type}
