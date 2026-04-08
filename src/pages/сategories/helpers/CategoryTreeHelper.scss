@@ -1,74 +1,18 @@
-:global {
-  // Принудительная фиксация ширины для всех элементов дерева (КРОМЕ индентов)
-  .ant-tree,
-  .ant-tree-list,
-  .ant-tree-list-holder,
-  .ant-tree-list-holder-inner {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  // Для узлов - другая логика
-  .ant-tree-treenode {
-    width: 100% !important;
-    display: flex !important;
-    flex-wrap: nowrap !important;
-  }
-
-  // Инденты НЕ должны иметь width: 100%
-  .ant-tree-indent {
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-  }
-
-  .ant-tree-indent-unit {
-    width: 24px !important; // Фиксированная ширина
-    flex-shrink: 0 !important;
-  }
-
-  // Контент wrapper занимает оставшееся место
-  .ant-tree-node-content-wrapper {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-    width: auto !important; // Убираем 100%
-  }
-
-  .ant-tree-title {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  // Отключаем все transition, которые могут вызывать дерганье
-  .ant-tree-treenode,
-  .ant-tree-node-content-wrapper,
-  .ant-tree-title,
-  .category {
-    transition: none !important;
-  }
-
-  // Фиксируем высоту строки, чтобы не было скачков
-  .ant-tree-treenode {
-    line-height: 24px !important;
-  }
-
-  .ant-tree-node-content-wrapper {
-    min-height: 24px !important;
-  }
-}
-//сои стили
 .ant-tree-treenode {
   width: 100%;
   margin-bottom: 8px !important;
   flex-shrink: 0 !important;
-  display: flex !important; // Добавьте
-  flex-wrap: nowrap !important; // Добавьте
+  display: flex !important;
+  flex-wrap: nowrap !important;
 
   .ant-tree-node-content-wrapper {
-    width: auto !important; // Меняем с 100% на auto
+    width: auto !important;
     padding: 0 !important;
-    flex: 1 1 auto !important; // Меняем с 1 на 1 1 auto
-
+    flex: 1 1 auto !important;
+    border-top: 1px solid var(--color-blue);
+    border-left: 1px solid var(--color-blue);
     min-width: 0 !important;
+
     .ant-tree-title {
       width: 100% !important;
       display: block !important;
@@ -80,8 +24,7 @@
       justify-content: space-between;
       align-items: center;
 
-      border: 1px solid var(--color-blue);
-      border-radius: 8px;
+      //border-radius: 8px;
       padding: 8px 12px;
       background: #ffffff;
 
@@ -117,129 +60,5 @@
         }
       }
     }
-  }
-}
-
-// Предотвращаем дерганье при анимации
-:global {
-  .ant-tree .ant-tree-treenode-switcher-open,
-  .ant-tree .ant-tree-treenode-switcher-close {
-    transition: none !important;
-  }
-
-  // Фиксируем ширину контейнера дерева
-  .ant-tree-list-holder-inner {
-    width: 100% !important;
-  }
-
-  .ant-tree {
-    width: 100%;
-
-    .ant-tree-list {
-      width: 100%;
-
-      .ant-tree-list-holder {
-        width: 100%;
-      }
-    }
-  }
-}
-
-// ===== ВСЕ ЛИНИИ И ПАЛОЧКИ (ГОЛУБЫЕ) =====
-
-.ant-tree-show-line .ant-tree-indent-unit::before {
-  border-inline-end: 1px solid var(--color-blue) !important;
-}
-
-.ant-tree-show-line .ant-tree-indent-unit::before {
-  border-right: 1px solid var(--color-blue) !important;
-}
-
-.ant-tree .ant-tree-switcher {
-  .ant-tree-switcher-icon {
-    color: var(--color-blue) !important;
-  }
-
-  &::after {
-    border-color: var(--color-blue) !important;
-  }
-}
-
-.ant-tree .ant-tree-switcher-leaf-line {
-  &::before,
-  &::after {
-    border-color: var(--color-blue) !important;
-  }
-}
-
-.ant-tree .ant-tree-node-content-wrapper::before {
-  border-bottom-color: var(--color-blue) !important;
-  border-bottom-width: 1px !important;
-}
-
-.ant-tree-show-line {
-  .ant-tree-switcher::after {
-    border-color: var(--color-blue) !important;
-  }
-
-  .ant-tree-switcher-leaf-line {
-    &::before,
-    &::after {
-      border-color: var(--color-blue) !important;
-    }
-  }
-}
-
-// ДОБАВЬТЕ ЭТО В САМЫЙ КОНЕЦ файла со стилями дерева
-:global {
-  // Полное отключение анимаций Ant Design
-  .ant-tree * {
-    transition: none !important;
-    animation: none !important;
-  }
-
-  // Принудительная фиксация ширины для всего
-  .ant-tree,
-  .ant-tree-list,
-  .ant-tree-list-holder,
-  .ant-tree-list-holder-inner {
-    width: 100% !important;
-    min-width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  // Фиксируем каждый узел
-  .ant-tree-treenode {
-    width: 100% !important;
-    min-width: 100% !important;
-    display: flex !important;
-    flex-wrap: nowrap !important;
-
-    // Убираем любые изменения ширины при hover/active
-    &:hover,
-    &:active,
-    &:focus {
-      width: 100% !important;
-      min-width: 100% !important;
-    }
-  }
-
-  // Фиксируем контент wrapper
-  .ant-tree-node-content-wrapper {
-    flex: 1 !important;
-    width: auto !important;
-    min-width: 0 !important;
-    display: inline-flex !important;
-  }
-
-  // Запрещаем inline стили, которые может добавлять Ant
-  .ant-tree-title {
-    display: block !important;
-    width: 100% !important;
-  }
-
-  // Блокируем пересчет ширины при сворачивании/разворачивании
-  .ant-tree-list-holder-inner {
-    transform: none !important;
   }
 }

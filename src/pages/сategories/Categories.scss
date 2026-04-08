@@ -24,9 +24,10 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    min-width: 0; // Добавьте
-    overflow-x: hidden; // Добавьте
+    min-width: 0;
+    overflow-x: hidden;
     flex: 1;
+    // border: 1px solid var(--color-blue);
 
     :global {
       .ant-tree {
@@ -47,7 +48,6 @@
         width: 100%;
       }
 
-      // Предотвращаем скачок ширины при анимации
       .ant-tree-treenode {
         width: 100%;
         transition: none !important;
@@ -57,5 +57,142 @@
         transition: none !important;
       }
     }
+  }
+}
+// Вместо display: none, просто убираем ширину и фон
+.ant-tree-switcher {
+  width: 16px !important; // Минимальная ширина для иконки
+  min-width: 16px !important;
+  max-width: 16px !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  // Убираем лишние линии
+  &::before,
+  &::after {
+    display: none !important;
+  }
+
+  // Стили для дочерних элементов (создаем "коробку")
+  .ant-tree-child-tree {
+    position: relative;
+
+    // Добавляем общую рамку для всех дочерних элементов
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 1px;
+      background-color: var(--color-blue);
+      pointer-events: none;
+    }
+  }
+
+  // Для каждого дочернего узла
+  .ant-tree-treenode {
+    position: relative;
+
+    // Нижняя граница для каждого дочернего элемента (кроме последнего)
+    &:not(:last-child) > .ant-tree-node-content-wrapper .category {
+      border-bottom: 1px solid var(--color-blue);
+    }
+
+    // Для последнего дочернего элемента - скругляем углы
+    &:last-child > .ant-tree-node-content-wrapper .category {
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+
+    // Для первого дочернего элемента
+    &:first-child > .ant-tree-node-content-wrapper .category {
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+  }
+
+  // Стили для категорий внутри "коробки"
+  .ant-tree-child-tree .category {
+    border-left: 1px solid var(--color-blue) !important;
+    border-right: 1px solid var(--color-blue) !important;
+
+    // Убираем лишние границы
+    &:not(:first-child) {
+      border-top: none !important;
+    }
+  }
+
+  // Для вложенности второго уровня
+  .ant-tree-child-tree .ant-tree-child-tree {
+    margin-left: 24px;
+
+    &::before {
+      left: 0;
+    }
+  }
+}
+
+// Если нужно убрать линию, которая соединяет стрелку
+.ant-tree-switcher-leaf-line {
+  display: none !important;
+}
+// Стили для дочерних элементов (создаем "коробку")
+.ant-tree-child-tree {
+  position: relative;
+
+  // Добавляем общую рамку для всех дочерних элементов
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: var(--color-blue);
+    pointer-events: none;
+  }
+}
+
+// Для каждого дочернего узла
+.ant-tree-treenode {
+  position: relative;
+
+  // Нижняя граница для каждого дочернего элемента (кроме последнего)
+  &:not(:last-child) > .ant-tree-node-content-wrapper .category {
+    border-bottom: 1px solid var(--color-blue);
+  }
+
+  // Для последнего дочернего элемента - скругляем углы
+  &:last-child > .ant-tree-node-content-wrapper .category {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+
+  // Для первого дочернего элемента
+  &:first-child > .ant-tree-node-content-wrapper .category {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+}
+
+// Стили для категорий внутри "коробки"
+.ant-tree-child-tree .category {
+  border-left: 1px solid var(--color-blue) !important;
+  border-right: 1px solid var(--color-blue) !important;
+
+  // Убираем лишние границы
+  &:not(:first-child) {
+    border-top: none !important;
+  }
+}
+
+// Для вложенности второго уровня
+.ant-tree-child-tree .ant-tree-child-tree {
+  margin-left: 24px;
+
+  &::before {
+    left: 0;
   }
 }

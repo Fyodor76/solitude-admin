@@ -123,7 +123,7 @@ const Categories = () => {
             switcherIcon={<DownOutlined />}
             treeData={categories}
             defaultExpandAll={false}
-            showLine
+            //showLine
             virtual={categories.length > 100}
             motion={null}
           ></Tree>
