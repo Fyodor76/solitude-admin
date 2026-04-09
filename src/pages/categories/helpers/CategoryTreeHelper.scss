@@ -1,64 +1,144 @@
-.ant-tree-treenode {
+.category-tree {
+  --tree-line-color: #e2e8f0;
+  --tree-indent: 28px;
+  --tree-row-height: 48px;
+
   width: 100%;
-  // flex-shrink: 0 !important;
-  display: flex !important;
-  // flex-wrap: nowrap !important;
+  background: var(--color-white);
+}
+
+.category-tree-node {
   position: relative;
+  min-width: 0;
+}
 
-  border-left: none !important;
-  margin-bottom: 0px !important;
+.category-tree-node__row {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  min-height: var(--tree-row-height);
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-grey-8);
+}
 
-  .ant-tree-node-content-wrapper {
-    width: auto !important;
-    padding: 0 !important;
-    //  flex: 1 1 auto !important;
-    border-top: 1px solid var(--color-blue);
-    border-radius: 0px !important;
-    min-width: 0 !important;
+.category-tree-node__toggle,
+.category-tree-node__toggle-placeholder {
+  display: inline-flex;
+  position: relative;
+  width: var(--tree-indent);
+  min-width: var(--tree-indent);
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-grey-3);
+  background: transparent;
+}
 
-    .ant-tree-title {
-      width: 100% !important;
-      display: block !important;
-    }
-    .category {
-      display: flex;
-      width: 100%;
-      min-width: 0;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      background: #ffffff;
+.category-tree-node__toggle {
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
 
-      > span {
-        flex: 1;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
+  &:hover {
+    color: var(--color-blue);
+  }
+}
 
-      .btn-category {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 20px;
-        position: relative;
-        z-index: 1000;
-        flex-shrink: 0;
-        width: auto;
-        min-width: 120px;
+.category-tree-node__toggle-placeholder {
+  pointer-events: none;
+}
 
-        .btn-edit,
-        .btn-add,
-        .btn-delete {
-          position: relative;
-          z-index: 1001;
-          transition: box-shadow 0.2s ease !important;
+.category-tree-node__children {
+  position: relative;
+  margin-left: var(--tree-indent);
+}
 
-          &:hover {
-            box-shadow: var(--color-black-shadow-2) !important;
-          }
-        }
+.category-tree-node__children
+  > .category-tree-node
+  > .category-tree-node__row
+  > .category-tree-node__toggle,
+.category-tree-node__children
+  > .category-tree-node
+  > .category-tree-node__row
+  > .category-tree-node__toggle-placeholder {
+  border-left: 1px solid var(--tree-line-color);
+}
+
+.category-tree-node__children
+  > .category-tree-node
+  > .category-tree-node__row
+  > .category-tree-node__toggle--collapsed {
+  border-top: 1px solid var(--tree-line-color);
+}
+
+.category-tree-node__children
+  > .category-tree-node
+  > .category-tree-node__row
+  > .category-tree-node__toggle--expanded::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  bottom: 0;
+  width: 1px;
+  height: calc(var(--tree-row-height) / 2);
+  background: var(--color-white);
+  pointer-events: none;
+}
+
+.category {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 12px 0 0;
+  background: var(--color-white);
+
+  .category-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .category-icon {
+    flex-shrink: 0;
+    color: var(--color-grey-3);
+    font-size: 16px;
+  }
+
+  .category-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .btn-category {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: auto;
+    min-width: 110px;
+
+    .btn-edit,
+    .btn-add,
+    .btn-delete {
+      position: relative;
+      z-index: 1;
+      transition: box-shadow 0.2s ease !important;
+
+      &:hover {
+        box-shadow: var(--color-black-shadow-2) !important;
       }
     }
   }

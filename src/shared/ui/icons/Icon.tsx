@@ -14,7 +14,6 @@ interface IconProps {
 
 const Icon = React.memo(
   ({ name, width, height, color = '#ffffff', className, onClick }: IconProps) => {
-    console.log(`Icon ${name} rendered`) // ← добавить лог
     const icon = iconSet[name]
 
     const style: React.CSSProperties = {
@@ -25,7 +24,9 @@ const Icon = React.memo(
       ...(width && { width }),
       ...(height && { height }),
     }
+
     const dynamicClass = color !== '#ffffff' ? 'icon--dynamic-color' : ''
+
     return (
       <span
         className={`icon ${dynamicClass} ${className || ''}`.trim()}
@@ -39,5 +40,7 @@ const Icon = React.memo(
     )
   }
 )
+
 Icon.displayName = 'Icon'
+
 export default Icon

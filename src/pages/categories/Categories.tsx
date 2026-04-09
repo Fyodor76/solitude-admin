@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import {
   useGetCategoriesTreeQuery,
@@ -8,15 +8,13 @@ import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
 import Icon from '@/shared/ui/icons/Icon'
-import { DownOutlined } from '@ant-design/icons'
-import { Button, Tree } from 'antd'
+import { Button } from 'antd'
 
 import './Categories.scss'
 import { InitialFormData, MODES } from './const/constans'
-import { transformToAntTree } from './helpers/categoryTreeHelper'
+import CategoryTree from './helpers/CategoryTree'
 import { mapTreeToForm } from './mappers/categoryMappers'
 import EditCategoryModal from './modal/EditCategoryModal'
-import { CategoryToAntTree } from './types/type'
 import { FormData } from './types/type'
 
 const Categories = () => {
@@ -27,7 +25,6 @@ const Categories = () => {
   const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
   const [updateCategory] = useUpdateCategoryByIdMutation()
 
-  const [categories, setCategories] = useState<CategoryToAntTree[]>([])
   const [formDataModal, setFormDataModal] = useState<FormData>(InitialFormData)
   const findCategoryById = (
     categories: BaseCategoryTree[],
@@ -87,18 +84,7 @@ const Categories = () => {
     }
   }
 
-  const computedCategories = useMemo(() => {
-    if (!categoriesTreeData?.data) return []
-    return transformToAntTree(categoriesTreeData.data, {
-      onEdit: handleEdit,
-      onDelete: handleDelete,
-      onCreate: handleCreateCategory,
-    })
-  }, [categoriesTreeData])
-
-  useEffect(() => {
-    setCategories(computedCategories)
-  }, [computedCategories])
+  const categories = useMemo(() => categoriesTreeData?.data ?? [], [categoriesTreeData])
 
   const allCategories = useMemo(() => {
     if (!categoriesTreeData?.data) return []
@@ -118,15 +104,12 @@ const Categories = () => {
         {error && <span>Ошибочка вышла...</span>}
 
         {categories.length > 0 ? (
-          <Tree
-            blockNode
-            switcherIcon={<DownOutlined />}
-            treeData={categories}
-            defaultExpandAll={false}
-            //showLine
-            virtual={categories.length > 100}
-            motion={null}
-          ></Tree>
+          <CategoryTree
+            categories={categories}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onCreate={handleCreateCategory}
+          />
         ) : (
           !isLoading && <span>Нет категорий для отображения</span>
         )}
