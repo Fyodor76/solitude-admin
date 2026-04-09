@@ -1,0 +1,85 @@
+.containerCategories {
+  display: flex;
+  flex-direction: column;
+
+  margin-left: 10px;
+  margin-right: 10px;
+  border-right: 1px solid var(--color-blue);
+  border-bottom: 1px solid var(--color-blue);
+
+  .titleCategories {
+    display: flex;
+    margin: 10px;
+    justify-content: space-between;
+    align-items: center;
+
+    .title-h2 {
+      font-family: var(--font-primary);
+      color: var(--color-grey-background);
+      font-size: 24px;
+      font-weight: normal;
+    }
+    .btn-title-add {
+      background-color: var(--color-blue);
+      color: var(--color-white);
+      font-family: var(--font-primary);
+    }
+  }
+  .allCategories {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+
+    flex: 1;
+    // border: 1px solid var(--color-blue);
+
+    :global {
+      .ant-tree {
+        width: 100%;
+        background: transparent;
+        overflow-x: hidden;
+      }
+
+      .ant-tree-list {
+        width: 100%;
+      }
+
+      .ant-tree-list-holder {
+        width: 100%;
+      }
+
+      .ant-tree-list-holder-inner {
+        width: 100%;
+      }
+
+      .ant-tree-treenode {
+        width: 100%;
+        transition: none !important;
+      }
+
+      .ant-tree-node-content-wrapper {
+        transition: none !important;
+        border-radius: unset !important;
+      }
+
+      // Корректируем отступы для вложенных узлов, чтобы они были "внутри" границы
+      .ant-tree-treenode .ant-tree-treenode {
+        margin-left: 24px; // Отступ для дочерних элементов
+      }
+    }
+  }
+}
+// Вместо display: none, просто убираем ширину и фон
+.ant-tree-switcher {
+  width: 16px !important; // Минимальная ширина для иконки
+  min-width: 16px !important;
+  max-width: 16px !important;
+  background: transparent !important;
+  border-left: 1px solid var(--color-blue);
+  border-top: 1px solid var(--color-blue);
+  margin: 0 !important;
+  padding: 0 !important;
+  align-self: stretch !important; // Растягиваем на всю высоту
+  height: auto !important;
+}

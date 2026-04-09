@@ -1,16 +1,19 @@
 .ant-tree-treenode {
   width: 100%;
-  margin-bottom: 8px !important;
-  flex-shrink: 0 !important;
+  // flex-shrink: 0 !important;
   display: flex !important;
-  flex-wrap: nowrap !important;
+  // flex-wrap: nowrap !important;
+  position: relative;
+
+  border-left: none !important;
+  margin-bottom: 0px !important;
 
   .ant-tree-node-content-wrapper {
     width: auto !important;
     padding: 0 !important;
-    flex: 1 1 auto !important;
+    //  flex: 1 1 auto !important;
     border-top: 1px solid var(--color-blue);
-    border-left: 1px solid var(--color-blue);
+    border-radius: 0px !important;
     min-width: 0 !important;
 
     .ant-tree-title {
@@ -23,8 +26,6 @@
       min-width: 0;
       justify-content: space-between;
       align-items: center;
-
-      //border-radius: 8px;
       padding: 8px 12px;
       background: #ffffff;
 
