@@ -22,6 +22,5 @@ export const collectExpandableIds = (tree: BaseCategoryTree[]): string[] => {
       ids.push(...collectExpandableIds(category.children))
     }
   })
-
   return ids
 }
