@@ -6,11 +6,13 @@ import { Input, Modal, Select } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
-import { InitialFormData } from '../const/constans'
-import { mapFormToRequest } from '../mappers/categoryMappers'
+import { CATEGORY_TYPES, InitialFormData } from '../const/constans'
+import { mapFormToRequest, mapToСategoriesOptions } from '../mappers/categoryMappers'
 import { FormData } from '../types/type'
 import ButtonUploadImg from './ButtonUploadImg'
 import './EditCategoryModal.scss'
+
+const categoryTypeOptions = mapToСategoriesOptions()
 
 interface EditCategoryModalProps {
   isOpen: boolean
@@ -232,12 +234,13 @@ const EditCategoryModal = ({
         {isCreate && (
           <>
             <span className="editModal-title">тип</span>
-            <Input
-              id="category-type"
-              type="text"
-              value={value.type}
-              onChange={handleStringAndSelectChange('type')}
-            />
+            <Select value={value.type} onChange={handleStringAndSelectChange('type')}>
+              {categoryTypeOptions.map(option => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
           </>
         )}
         {imgError && (

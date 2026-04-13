@@ -68,11 +68,21 @@ const Categories = () => {
     },
     [categoriesTreeData, editModal]
   )
-  const handleCreateCategory = useCallback(() => {
-    setFormDataModal(InitialFormData)
-    editModal.setMode(MODES.CREATE)
-    editModal.onOpen()
-  }, [editModal])
+  const handleCreateCategory = useCallback(
+    (id?: string) => {
+      if (id) {
+        setFormDataModal({
+          ...InitialFormData,
+          parentId: id,
+        })
+      } else {
+        setFormDataModal(InitialFormData)
+      }
+      editModal.setMode(MODES.CREATE)
+      editModal.onOpen()
+    },
+    [editModal]
+  )
 
   const handleUpdateCategory = async (id: string, editInput: FormData) => {
     console.log('handleUpdateCategory получил:', editInput)
@@ -95,7 +105,7 @@ const Categories = () => {
     <div className="containerCategories">
       <div className="titleCategories">
         <h2 className="title-h2">Категории товаров</h2>
-        <Button onClick={handleCreateCategory} className="btn-title-add">
+        <Button onClick={() => handleCreateCategory()} className="btn-title-add">
           <Icon name="add"></Icon> Добавить категорию
         </Button>
       </div>

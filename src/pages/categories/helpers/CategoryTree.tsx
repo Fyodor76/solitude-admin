@@ -11,7 +11,7 @@ interface CategoryTreeProps {
   categories: BaseCategoryTree[]
   onEdit: (id: string) => void
   onDelete: (id: string, imageId?: string, folder?: string) => void
-  onCreate: () => void
+  onCreate: (id?: string) => void
 }
 
 interface CategoryTreeNodeProps extends Omit<CategoryTreeProps, 'categories'> {
@@ -70,7 +70,7 @@ const CategoryTreeNode = ({
           name={category.name}
           onEdit={() => onEdit(category.id)}
           onDelete={() => onDelete(category.id, category.imageId ?? undefined, 'products')}
-          onCreate={onCreate}
+          onCreate={() => onCreate(category.id)}
         />
       </div>
 

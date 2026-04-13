@@ -11,3 +11,9 @@ export const MODES = {
   EDIT: 'edit',
   CREATE: 'create',
 }
+
+export const CATEGORY_TYPES = {
+  CATEGORY: 'category',
+  PRODUCT: 'product',
+  COLLECTION: 'collection',
+}

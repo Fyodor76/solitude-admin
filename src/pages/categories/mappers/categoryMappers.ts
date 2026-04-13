@@ -1,6 +1,8 @@
 import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
+import { Select } from 'antd'
 
+import { CATEGORY_TYPES } from '../const/constans'
 import { FormData } from '../types/type'
 
 export const mapTreeToForm = (category: BaseCategoryTree): FormData => {
@@ -22,4 +24,12 @@ export const mapFormToRequest = (formData: FormData, cdnData?: imgUpload | null)
     parentId: formData.parentId,
     imageId: cdnData?.fileId || formData.imageId,
   }
+}
+
+export const mapToСategoriesOptions = () => {
+  return [
+    { value: CATEGORY_TYPES.CATEGORY, label: 'Категория' },
+    { value: CATEGORY_TYPES.COLLECTION, label: 'Коллекция' },
+    { value: CATEGORY_TYPES.PRODUCT, label: 'Продукт' },
+  ]
 }
