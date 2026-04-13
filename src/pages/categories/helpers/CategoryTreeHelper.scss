@@ -19,7 +19,7 @@
   min-width: 0;
   min-height: var(--tree-row-height);
   background: var(--color-white);
-  border-bottom: 1px solid var(--color-grey-8);
+  border-top: 1px solid var(--color-grey-8);
   // border-left: 1px solid var(--tree-line-color);
 }
 
@@ -55,6 +55,7 @@
   position: relative;
   margin-left: var(--tree-indent);
   border-left: 1px solid var(--color-grey-8);
+  border-top: 1px solid var(--color-grey-8);
 }
 
 .category-tree-node__children
