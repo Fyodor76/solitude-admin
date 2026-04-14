@@ -6,7 +6,7 @@ import { Input, Modal, Select } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
-import { CATEGORY_TYPES, InitialFormData } from '../const/constans'
+import { InitialFormData } from '../const/constans'
 import { mapFormToRequest, mapToСategoriesOptions } from '../mappers/categoryMappers'
 import { FormData } from '../types/type'
 import ButtonUploadImg from './ButtonUploadImg'
@@ -210,10 +210,16 @@ const EditCategoryModal = ({
           placeholder="Выберете родительскую категорию"
           onChange={handleStringAndSelectChange('parentId')}
           allowClear
+          showSearch={{
+            filterOption: (input, option) =>
+              String(option?.label ?? '')
+                .toLowerCase()
+                .includes(input.toLowerCase()),
+          }}
         >
           {select &&
             select.map(cat => (
-              <Select.Option key={cat.id} value={cat.id}>
+              <Select.Option key={cat.id} value={cat.id} label={cat.name}>
                 {cat.name}
               </Select.Option>
             ))}

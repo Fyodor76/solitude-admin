@@ -12,8 +12,8 @@ export const MODES = {
   CREATE: 'create',
 }
 
-export const CATEGORY_TYPES = {
-  CATEGORY: 'category',
-  PRODUCT: 'product',
-  COLLECTION: 'collection',
+export enum CategoryType {
+  CATEGORY = 'category',
+  PRODUCT = 'product',
+  COLLECTION = 'collection',
 }
