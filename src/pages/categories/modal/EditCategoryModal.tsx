@@ -210,6 +210,8 @@ const EditCategoryModal = ({
           placeholder="Выберете родительскую категорию"
           onChange={handleStringAndSelectChange('parentId')}
           allowClear
+          getPopupContainer={trigger => trigger.parentNode}
+          placement="bottomLeft"
           showSearch={{
             filterOption: (input, option) =>
               String(option?.label ?? '')
