@@ -13,9 +13,11 @@ import { Button } from 'antd'
 import './Categories.scss'
 import { InitialFormData, MODES } from './const/constans'
 import CategoryTree from './helpers/CategoryTree'
-import { mapTreeToForm } from './mappers/categoryMappers'
+import { mapToСategoriesOptions, mapTreeToForm } from './mappers/categoryMappers'
 import EditCategoryModal from './modal/EditCategoryModal'
 import { FormData } from './types/type'
+
+const categoryTypeOptions = mapToСategoriesOptions()
 
 const Categories = () => {
   const editModal = useModal()
@@ -62,6 +64,7 @@ const Categories = () => {
         const category = findCategoryById(categories, categoryId)
         if (category) {
           setFormDataModal(mapTreeToForm(category))
+          editModal.setMode(MODES.EDIT)
           editModal.onOpen(category)
         }
       }
@@ -74,9 +77,13 @@ const Categories = () => {
         setFormDataModal({
           ...InitialFormData,
           parentId: id,
+          type: categoryTypeOptions[0].value,
         })
       } else {
-        setFormDataModal(InitialFormData)
+        setFormDataModal({
+          ...InitialFormData,
+          type: categoryTypeOptions[0].value,
+        })
       }
       editModal.setMode(MODES.CREATE)
       editModal.onOpen()
@@ -137,6 +144,7 @@ const Categories = () => {
         setFormDataModal={setFormDataModal}
         onSaveEdit={handleUpdateCategory}
         onSaveCreate={createNewCategory}
+        categoryTypeOptions={categoryTypeOptions}
       />
     </div>
   )

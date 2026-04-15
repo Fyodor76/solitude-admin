@@ -14,6 +14,5 @@ export const MODES = {
 
 export enum CategoryType {
   CATEGORY = 'category',
-  PRODUCT = 'product',
   COLLECTION = 'collection',
 }

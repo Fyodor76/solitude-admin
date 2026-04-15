@@ -6,13 +6,11 @@ import { Input, Modal, Select } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
-import { InitialFormData } from '../const/constans'
-import { mapFormToRequest, mapToСategoriesOptions } from '../mappers/categoryMappers'
+import { CategoryType, InitialFormData } from '../const/constans'
+import { mapFormToRequest } from '../mappers/categoryMappers'
 import { FormData } from '../types/type'
 import ButtonUploadImg from './ButtonUploadImg'
 import './EditCategoryModal.scss'
-
-const categoryTypeOptions = mapToСategoriesOptions()
 
 interface EditCategoryModalProps {
   isOpen: boolean
@@ -22,6 +20,7 @@ interface EditCategoryModalProps {
   edit: string
   create: string
   mode: string
+  categoryTypeOptions: { value: CategoryType; label: string }[]
   setMode: React.Dispatch<React.SetStateAction<string>>
   onClose: () => void
   onSaveEdit: (id: string, data: FormData) => void
@@ -37,6 +36,7 @@ const EditCategoryModal = ({
   edit,
   create,
   mode,
+  categoryTypeOptions,
   setMode,
   onClose,
   onSaveEdit,
@@ -226,6 +226,22 @@ const EditCategoryModal = ({
               </Select.Option>
             ))}
         </Select>
+        {isCreate && (
+          <>
+            <span className="editModal-title">тип</span>
+            <Select
+              defaultValue={categoryTypeOptions[0].value}
+              value={value.type}
+              onChange={handleStringAndSelectChange('type')}
+            >
+              {categoryTypeOptions.map(option => (
+                <Select.Option key={option.value} value={option.value}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </>
+        )}
         <span className="editModal-title">Изображение категории</span>
         <ButtonUploadImg
           category={category}
@@ -237,18 +253,6 @@ const EditCategoryModal = ({
         {currentUrl && !imgError && (
           <>
             <img onError={handleImageError} src={currentUrl} />
-          </>
-        )}
-        {isCreate && (
-          <>
-            <span className="editModal-title">тип</span>
-            <Select value={value.type} onChange={handleStringAndSelectChange('type')}>
-              {categoryTypeOptions.map(option => (
-                <Select.Option key={option.value} value={option.value}>
-                  {option.label}
-                </Select.Option>
-              ))}
-            </Select>
           </>
         )}
         {imgError && (

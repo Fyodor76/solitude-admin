@@ -7,7 +7,6 @@ import { FormData } from '../types/type'
 export const mapTreeToForm = (category: BaseCategoryTree): FormData => {
   return {
     name: category.name,
-
     description: category.description,
     sortOrder: category.sortOrder,
     parentId: category.entity?.parentId ?? null,
@@ -29,6 +28,5 @@ export const mapToСategoriesOptions = () => {
   return [
     { value: CategoryType.CATEGORY, label: 'Категория' },
     { value: CategoryType.COLLECTION, label: 'Коллекция' },
-    { value: CategoryType.PRODUCT, label: 'Продукт' },
   ]
 }

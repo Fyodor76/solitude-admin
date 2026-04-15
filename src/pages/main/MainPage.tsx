@@ -8,6 +8,7 @@ const MainPage = () => {
       <h1 className="text-h1">
         {/*<TestCrash />*/}
         <PublicIcon name="apple-touch-icon" />
+        Главная страница (Main Page)
         {/*<TestApiCategories />*/}
         {/*<TestApiError />*/}
       </h1>

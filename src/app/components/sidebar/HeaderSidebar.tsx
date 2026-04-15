@@ -14,7 +14,7 @@ import './headerSidebar.scss'
 const HeaderSidebar = () => {
   return (
     <div className="link-text">
-      <Link to="#" className="text-home">
+      <Link to="/" className="text-home">
         Home
       </Link>
       <Link to="#" className="text-contact">

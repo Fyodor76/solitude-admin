@@ -23,13 +23,13 @@ export const BaseLayout = ({ children }: BaseLayoutProps) => {
 
       <div className="main-page" style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}>
         <Header />
-
-        <Categories />
+        {/*{' '}
         <Link to="/catalog">
           <h1 style={{ textAlign: 'center', color: 'green' }}>
             Перейти в каталог(протестируем работу breadcrumbs)
           </h1>
         </Link>
+  */}
         <div>{children}</div>
       </div>
     </div>

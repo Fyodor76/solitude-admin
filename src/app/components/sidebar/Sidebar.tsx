@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { Button } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 
 import defaultLogo from '@/app/assets/images/image.png'
 import defaultUserLogo from '@/app/assets/images/user.jpg'
@@ -134,6 +135,7 @@ const Sidebar = ({
               )}
             </div>
           )}
+
           <nav className="sidebar-nav">
             <ul className="sidebar-menu">
               {menuItems.map(item => {
