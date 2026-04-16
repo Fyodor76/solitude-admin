@@ -1,10 +1,10 @@
 export interface CategoryMenuItem {
+  //плоский список get запрос на полученик узловых категоий
   id: string
   name: string
   slug: string
-  children?: CategoryMenuItem[]
   description: string
-  parentId: null | string
+  parentId: string | null
   imageId: string | null
   isActive: boolean
   sortOrder: number
@@ -12,14 +12,28 @@ export interface CategoryMenuItem {
   createdAt: string
   updatedAt: string
 }
+
+export interface BaseCategoryTree {
+  //дерево плюс дети[]
+  id: string
+  name: string
+  slug: string
+  description: string
+  imageId: string | null
+  isActive: boolean
+  sortOrder: number
+  type: 'category'
+  children: BaseCategoryTree[] | []
+  entity?: CategoryMenuItem // только у детей
+}
+
 export interface CategoryRequest {
   name: string
   slug: string
   description: string
   parentId: null | string
-  imageId: string | null
+  imageId?: string | null
   sortOrder: number
-  type: string
 }
 
 export interface CollectionItem {
