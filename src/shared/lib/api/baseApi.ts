@@ -91,7 +91,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
 
   if (
     result.error?.status === 401 &&
-    !(typeof args === 'string' ? args : args.url).includes('/auth/refresh')
+    !(typeof args === 'string' ? args : args.url).includes('/auth')
   ) {
     const refreshToken = localStorage.getItem('refresh')
     const currentPath = typeof args === 'string' ? args : args.url || ''
@@ -101,14 +101,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
       localStorage.removeItem('refresh')
       window.location.href = '/login'
 
-      return {
-        error: {
-          statusCode: 401,
-          timestamp: new Date().toISOString(),
-          path: currentPath,
-          error: 'No refresh token',
-        },
-      }
+      return result.error
     }
 
     return new Promise((resolve, reject) => {
