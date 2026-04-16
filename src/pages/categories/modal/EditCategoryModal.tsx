@@ -142,12 +142,6 @@ const EditCategoryModal = ({
   }
 
   const handleSave = async () => {
-    console.log('=== handleSave ===')
-    console.log('mode:', mode)
-    console.log('isEdit:', isEdit)
-    console.log('isCreate:', isCreate)
-    console.log('category:', category)
-    console.log('value:', value)
     try {
       if (isEdit) {
         console.log('Вызов handleSaveEdit для категории:', category?.id)
@@ -205,6 +199,7 @@ const EditCategoryModal = ({
         />
         <span className="editModal-title">Назначить родительскую категорию</span>
         <Select
+          className="ant-input"
           id="category-parent"
           value={value.parentId}
           placeholder="Выберете родительскую категорию"
@@ -255,19 +250,7 @@ const EditCategoryModal = ({
             <img onError={handleImageError} src={currentUrl} />
           </>
         )}
-        {imgError && (
-          <div
-            style={{
-              color: 'red',
-              padding: '10px',
-              border: '1px solid #ffccc7',
-              background: '#fff2f0',
-              marginTop: 10,
-            }}
-          >
-            ⚠️ Изображение не найдено (тестовый режим)
-          </div>
-        )}
+        {imgError && <div className="img-error">⚠️ Изображение не найдено</div>}
       </div>
     </Modal>
   )

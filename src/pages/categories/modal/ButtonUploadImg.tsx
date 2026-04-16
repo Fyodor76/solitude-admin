@@ -64,7 +64,9 @@ const ButtonUploadImg = ({
   }
   return (
     <Upload {...props} key={isEdit ? `edit-${category?.id}` : 'create'}>
-      <Button icon={<UploadOutlined />}>Загрузить</Button>
+      <Button icon={<UploadOutlined />} className="ant-input">
+        Загрузить
+      </Button>
     </Upload>
   )
 }
