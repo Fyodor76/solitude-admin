@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   useGetCategoriesTreeQuery,
@@ -8,7 +8,7 @@ import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button } from 'antd'
+import { Button, Spin } from 'antd'
 
 import './Categories.scss'
 import { InitialFormData, MODES } from './const/constans'
@@ -28,6 +28,7 @@ const Categories = () => {
   const [updateCategory] = useUpdateCategoryByIdMutation()
 
   const [formDataModal, setFormDataModal] = useState<FormData>(InitialFormData)
+
   const findCategoryById = (
     categories: BaseCategoryTree[],
     id: string
@@ -117,10 +118,11 @@ const Categories = () => {
         </Button>
       </div>
       <div className="allCategories">
-        {isLoading && <span>Загрузка...</span>}
-        {error && <span>Ошибочка вышла...</span>}
-
-        {categories.length > 0 ? (
+        {isLoading ? (
+          <div className="spin-centered">
+            <Spin size="large" />
+          </div>
+        ) : categories.length > 0 ? (
           <CategoryTree
             categories={categories}
             onEdit={handleEdit}
@@ -128,7 +130,7 @@ const Categories = () => {
             onCreate={handleCreateCategory}
           />
         ) : (
-          !isLoading && <span>Нет категорий для отображения</span>
+          <div className="empty-state">Нет категорий для отображения</div>
         )}
       </div>
       <EditCategoryModal
