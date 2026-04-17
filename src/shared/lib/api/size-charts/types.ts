@@ -1,10 +1,5 @@
-export interface SizeParameter {
-  internationalSize: string
-  russianSize: string
-  lengthCm: number
-  chestCircumferenceCm: number
-  order: number
-}
+import { SizeParameter } from '../size-parameters/type'
+
 export interface SizeChartRequest {
   categoryId?: string
   name: string

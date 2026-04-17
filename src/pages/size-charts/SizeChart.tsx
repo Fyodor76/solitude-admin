@@ -15,7 +15,15 @@ const initialData = {
   imageId: 'test-id',
   productType: 'tshirt',
   metricsText: 'A - длина\nB - грудь',
-  sizeParameters: [],
+  sizeParameters: [
+    {
+      internationalSize: 'S',
+      russianSize: '44',
+      lengthCm: 68,
+      chestCircumferenceCm: 92,
+      order: 1,
+    },
+  ],
 }
 const SizeChart = () => {
   const [createSizeChart] = useCreateSizeChartMutation()

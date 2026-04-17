@@ -3,7 +3,7 @@ import { SizeChartResponse } from '@/app/types/size-chart'
 import { ApiResponse, baseApi } from '../baseApi'
 import { deleteSizeChartResponse, SizeChartRequest } from './types'
 
-export const apiSizeCharts = baseApi.injectEndpoints({
+export const SizeCharts = baseApi.injectEndpoints({
   endpoints: builder => ({
     createSizeChart: builder.mutation<ApiResponse<SizeChartResponse, any>, SizeChartRequest>({
       query: newSizeChart => ({
@@ -77,4 +77,4 @@ export const {
   useGetSizeChartByIdQuery,
   useGetSizeChartByProductTypeQuery,
   useUpdateSizeChartByIdMutation,
-} = apiSizeCharts
+} = SizeCharts
