@@ -1,5 +1,7 @@
+import { SizeChartResponse } from '@/app/types/size-chart'
+
 import { ApiResponse, baseApi } from '../baseApi'
-import { deleteSizeChartResponse, SizeChartRequest, SizeChartResponse } from './types'
+import { deleteSizeChartResponse, SizeChartRequest } from './types'
 
 export const apiSizeCharts = baseApi.injectEndpoints({
   endpoints: builder => ({
