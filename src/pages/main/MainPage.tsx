@@ -1,17 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react'
-
 import PublicIcon from '../../shared/ui/public-icon/PublicIcon'
+import SizeChart from '../size-charts/SizeChart'
 
 const MainPage = () => {
   return (
     <div>
       <h1 className="text-h1">
-        {/*<TestCrash />*/}
         <PublicIcon name="apple-touch-icon" />
         Главная страница (Main Page)
-        {/*<TestApiCategories />*/}
-        {/*<TestApiError />*/}
       </h1>
+      <SizeChart />
     </div>
   )
 }
