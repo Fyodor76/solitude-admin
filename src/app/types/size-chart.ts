@@ -1,4 +1,4 @@
-import { SizeParameter } from '@/shared/lib/api/size-charts/types'
+import { SizeParameter } from '@/shared/lib/api/size-parameters/type'
 
 export interface SizeChartResponse {
   id?: string

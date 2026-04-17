@@ -13,7 +13,7 @@ const initialData = {
   name: 'Тестовая таблица ',
   description: 'Тестовая таблица размеров',
   imageId: 'test-id',
-  productType: 'tshirt',
+  productType: 'switshorts',
   metricsText: 'A - длина\nB - грудь',
   sizeParameters: [
     {
