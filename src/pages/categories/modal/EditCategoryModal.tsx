@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { Input, Modal, Select } from 'antd'
 

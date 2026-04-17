@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { UploadOutlined } from '@ant-design/icons'
 import { Button, message, Upload, UploadProps } from 'antd'

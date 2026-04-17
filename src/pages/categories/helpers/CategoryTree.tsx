@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { DownOutlined, RightOutlined } from '@ant-design/icons'
 
 import CategoryTitle from './CategoryTitle'

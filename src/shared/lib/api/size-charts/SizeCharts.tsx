@@ -1,40 +1,5 @@
 import { ApiResponse, baseApi } from '../baseApi'
-
-interface SizeParameter {
-  internationalSize: string
-  russianSize: string
-  lengthCm: number
-  chestCircumferenceCm: number
-  order: number
-}
-interface SizeChartRequest {
-  categoryId?: string
-  name: string
-  description: string
-  imageId: string
-  productType: string
-  metricsText: string
-  sizeParameters: SizeParameter[]
-}
-
-interface SizeChartResponse {
-  id?: string
-  categoryId?: string
-  name: string
-  description: string
-  imageId: string
-  productType: string
-  metricsText: string
-  sizeParameters: (SizeParameter & {
-    id: string
-    sizeChartId?: string
-    createdAt: string
-    updatedAt: string
-  })[]
-}
-interface deleteSizeChartResponse {
-  message: string
-}
+import { deleteSizeChartResponse, SizeChartRequest, SizeChartResponse } from './types'
 
 export const apiSizeCharts = baseApi.injectEndpoints({
   endpoints: builder => ({

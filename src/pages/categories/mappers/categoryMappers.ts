@@ -1,4 +1,4 @@
-import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 
 import { CategoryType } from '../const/constans'

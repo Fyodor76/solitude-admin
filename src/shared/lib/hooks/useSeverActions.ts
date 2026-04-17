@@ -1,10 +1,7 @@
-import { FormData } from '@/pages/сategories/types/type'
+import { FormData } from '@/pages/categories/types/type'
 
-import {
-  useCreateCategoryMutation,
-  useDeleteCategoryMutation,
-} from '../api/api-categories/apiCategories'
-import { useLazyGetProductsByCategoryIdQuery } from '../api/api-products/apiProducts'
+import { useCreateCategoryMutation, useDeleteCategoryMutation } from '../api/categories/Categories'
+import { useLazyGetProductsByCategoryIdQuery } from '../api/products/Products'
 import { useDeleteFileByIdMutation } from '../api/upload-files/uploadFiles'
 
 export const useServerActions = () => {

@@ -1,4 +1,4 @@
-import { BaseCategoryTree } from '@/shared/lib/api/api-categories/types'
+import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 
 export const sortCategoryTree = (tree: BaseCategoryTree[]): BaseCategoryTree[] => {
   return [...tree]

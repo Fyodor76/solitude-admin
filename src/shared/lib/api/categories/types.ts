@@ -1,5 +1,4 @@
 export interface CategoryMenuItem {
-  //плоский список get запрос на полученик узловых категоий
   id: string
   name: string
   slug?: string
@@ -14,7 +13,6 @@ export interface CategoryMenuItem {
 }
 
 export interface BaseCategoryTree {
-  //дерево плюс дети[]
   id: string
   name: string
   slug?: string
@@ -24,7 +22,7 @@ export interface BaseCategoryTree {
   sortOrder: number
   type: 'category'
   children: BaseCategoryTree[] | []
-  entity?: CategoryMenuItem // только у детей
+  entity?: CategoryMenuItem
 }
 
 export interface CategoryRequest {
