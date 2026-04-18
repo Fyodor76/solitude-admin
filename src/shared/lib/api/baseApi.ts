@@ -91,7 +91,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
 
   if (
     result.error?.status === 401 &&
-    !(typeof args === 'string' ? args : args.url).includes('/auth')
+    !(typeof args === 'string' ? args : args.url).includes('/auth/refresh')
   ) {
     const refreshToken = localStorage.getItem('refresh')
     const currentPath = typeof args === 'string' ? args : args.url || ''
@@ -99,7 +99,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
     if (!refreshToken) {
       localStorage.removeItem('access')
       localStorage.removeItem('refresh')
-      window.location.href = '/login'
+
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
+      }
 
       return result.error
     }
