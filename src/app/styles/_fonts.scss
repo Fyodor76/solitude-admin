@@ -1,3 +1,27 @@
+@font-face {
+  font-family: 'Source Sans 3';
+  src: url('@/app/assets/fonts/SourceSans3-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  src: url('@/app/assets/fonts/SourceSans3-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  src: url('@/app/assets/fonts/SourceSans3-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 .source-sans-3-regular {
   font-family: 'Source Sans 3', sans-serif;
   font-optical-sizing: auto;

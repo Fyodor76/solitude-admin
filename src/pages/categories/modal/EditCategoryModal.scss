@@ -1,0 +1,37 @@
+:where(.css-dev-only-do-not-override-xbngoj).ant-modal-css-var {
+  font-family: var(--font-primary) !important;
+
+  .categoryModal {
+    .ant-modal-title {
+      text-align: center !important;
+    }
+
+    .mainTitle {
+      font-size: 20px !important;
+      color: var(--color-grey-2);
+    }
+
+    .editModal {
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+
+      &-title {
+        font-size: 14px;
+        color: var(--color-grey-3);
+      }
+
+      .ant-input {
+        color: var(--color-grey-2);
+        margin-bottom: 10px;
+      }
+      .img-error {
+        color: red;
+        padding: 10px;
+        border: 1px solid #ffccc7;
+        background: #fff2f0;
+        margin-top: 10;
+      }
+    }
+  }
+}

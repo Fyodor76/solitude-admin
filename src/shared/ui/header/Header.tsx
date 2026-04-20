@@ -2,16 +2,12 @@ import { useLogoutMutation } from '@/shared/lib/api/auth/auth'
 import { Button } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 
+import HeaderSidebar from '../../../app/components/sidebar/HeaderSidebar'
 import Breadcrumbs from '../breadcrumbs/Breadcrumbs'
 import Icon from '../icons/Icon'
-import HeaderSidebar from '../sidebar/HeaderSidebar'
 import './Header.scss'
 
-interface HeaderProps {
-  isOpen: boolean
-  toggleSidebar: () => void
-}
-export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
+export const Header = () => {
   const [logout, { isLoading }] = useLogoutMutation()
 
   const navigate = useNavigate()
@@ -35,7 +31,7 @@ export const Header = ({ toggleSidebar, isOpen }: HeaderProps) => {
     <>
       <div className="header">
         <div className="header-container">
-          <HeaderSidebar toggleSidebar={toggleSidebar} isOpen={isOpen} />
+          <HeaderSidebar />
           <div className="btn-container">
             <div className="links">
               <Link to="#" className="link-message">
