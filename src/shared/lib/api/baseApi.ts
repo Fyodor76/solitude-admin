@@ -99,16 +99,12 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
     if (!refreshToken) {
       localStorage.removeItem('access')
       localStorage.removeItem('refresh')
-      window.location.href = '/login'
 
-      return {
-        error: {
-          statusCode: 401,
-          timestamp: new Date().toISOString(),
-          path: currentPath,
-          error: 'No refresh token',
-        },
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
       }
+
+      return result.error
     }
 
     return new Promise((resolve, reject) => {

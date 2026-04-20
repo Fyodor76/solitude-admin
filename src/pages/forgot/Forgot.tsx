@@ -12,9 +12,7 @@ type FormForgotProps = {
 const Forgot = () => {
   const { form, handleChange } = useForm<FormForgotProps>({ email: '' })
 
-  const onForgotFinish = () => {
-    console.log('forgot')
-  }
+  const onForgotFinish = () => {}
   return (
     <div className="forgot-card">
       <h2 className="source-sans-3-regular title">{configForgot.title}</h2>

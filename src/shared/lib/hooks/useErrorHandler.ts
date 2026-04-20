@@ -49,6 +49,7 @@ export const useErrorHandler = () => {
       throw structuredError
     }
   }
+
   return {
     logError,
     catchErrors,
