@@ -1,11 +1,7 @@
+import { CategoryMenuItem } from '@/app/types/categories'
+
 import { ApiResponse, baseApi } from '../baseApi'
-import {
-  BaseCategoryTree,
-  CategoryMenuItem,
-  CategoryRequest,
-  CollectionItem,
-  DeleteCategoryResponse,
-} from './types'
+import { BaseCategoryTree, CategoryRequest, CollectionItem, DeleteCategoryResponse } from './types'
 
 export const apiCategories = baseApi.injectEndpoints({
   endpoints: builder => ({

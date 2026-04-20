@@ -67,8 +67,20 @@ export const SizeCharts = baseApi.injectEndpoints({
       }),
       providesTags: (result, error, productType) => [{ type: 'Size-chart', productType }],
     }),
+    getSizeChartsByCategories: builder.mutation<
+      ApiResponse<SizeChartResponse[], any>,
+      { categoriesIds: string[] }
+    >({
+      query: ({ categoriesIds }) => ({
+        url: `/size-charts/batch/by-categories`,
+        method: 'POST',
+        body: { categoriesIds },
+      }),
+      invalidatesTags: [{ type: 'Size-chart', id: 'ALL_SIZE-CHARTS' }],
+    }),
   }),
 })
+
 export const {
   useCreateSizeChartMutation,
   useDeleteSizeChartByIdMutation,
@@ -77,4 +89,5 @@ export const {
   useGetSizeChartByIdQuery,
   useGetSizeChartByProductTypeQuery,
   useUpdateSizeChartByIdMutation,
+  useGetSizeChartsByCategoriesMutation,
 } = SizeCharts
