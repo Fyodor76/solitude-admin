@@ -28,7 +28,7 @@ const ButtonUploadImg = ({
     name: 'file',
     action: `${API_URL}/cdn/upload`,
     data: {
-      folder: 'products',
+      folder: '',
     },
     headers: {
       authorization: 'authorization-text',

@@ -246,9 +246,7 @@ const EditCategoryModal = ({
           setImgError={setImgError}
         />
         {currentUrl && !imgError && (
-          <>
-            <img onError={handleImageError} src={currentUrl} />
-          </>
+          <img onError={handleImageError} src={currentUrl} alt="Category preview" />
         )}
         {imgError && <div className="img-error">⚠️ Изображение не найдено</div>}
       </div>
