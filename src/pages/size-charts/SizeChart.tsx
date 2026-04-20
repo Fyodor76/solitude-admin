@@ -7,7 +7,7 @@ import {
   useGetSizeChartByCategoryIdQuery,
 } from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
-import { Button, Select } from 'antd'
+import { Button, Select, Table } from 'antd'
 
 import './SizeChart.scss'
 
@@ -33,11 +33,21 @@ const SizeChart = () => {
 
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
   const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(initialData)
-  const { data: sizeChartByCategory, isFetching } = useGetSizeChartByCategoryIdQuery(
+  const { isFetching, currentData } = useGetSizeChartByCategoryIdQuery(
     formSizeChart.categoryId || '',
-    { skip: !formSizeChart.categoryId }
+    {
+      skip: !formSizeChart.categoryId,
+    }
   )
+  console.log(currentData?.data)
 
+  const data = currentData?.data?.sizeParameters
+  const columns = [
+    { title: 'Размер', dataIndex: 'internationalSize', key: 'internationalSize' },
+    { title: 'Российский размер', dataIndex: 'russianSize', key: 'russianSize' },
+    { title: 'Длина(см)', dataIndex: 'lengthCm', key: 'lengthCm' },
+    { title: 'Обхват груди(см)', dataIndex: 'chestCircumferenceCm', key: 'chestCircumferenceCm' },
+  ]
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
     for (const category of categories) {
@@ -102,15 +112,16 @@ const SizeChart = () => {
       {formSizeChart.categoryId && (
         <>
           {isFetching && <span> Загружаю таблицу! Ждите...</span>}
-          {!isFetching && sizeChartByCategory?.data?.id && (
+          {!isFetching && currentData?.data?.id && (
             <>
-              <h2> {sizeChartByCategory.data.name}</h2>
-              <span>{sizeChartByCategory.data.description}</span>
-              <span>{sizeChartByCategory.data.metricsText}</span>
-              <span>{sizeChartByCategory.data.imageId}</span>
+              <h2> {currentData.data.name}</h2>
+              <span>{currentData.data.description}</span>
+              <span>{currentData.data.metricsText}</span>
+              <span>{currentData.data.imageId}</span>
+              <Table columns={columns} dataSource={data} />
             </>
           )}
-          {!isFetching && !sizeChartByCategory?.data && (
+          {!isFetching && !currentData?.data.id && (
             <span>У данной категории еще нет таблицы размеров...</span>
           )}
         </>
