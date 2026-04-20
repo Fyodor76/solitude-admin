@@ -23,13 +23,17 @@ const Login = () => {
   })
 
   const onLoginFinish = async () => {
-    if (form.email === '' && form.password === '') return
-    const response = await login({ login: form.email, password: form.password }).unwrap()
+    try {
+      if (form.email === '' && form.password === '') return
+      const response = await login({ login: form.email, password: form.password }).unwrap()
 
-    localStorage.setItem('refresh', response.refreshToken)
-    localStorage.setItem('access', response.accessToken)
+      localStorage.setItem('refresh', response.refreshToken)
+      localStorage.setItem('access', response.accessToken)
 
-    navigate('/')
+      navigate('/')
+    } catch (error) {
+      console.log(error, 'error')
+    }
   }
 
   if (isLoading) {
