@@ -1,4 +1,5 @@
 import { BaseLayout } from '@/layouts/base-layout'
+import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
 import CatalogPage from '@/pages/test/CatalogPage'
 import TshortsPage from '@/pages/test/TshortsPage'
@@ -51,7 +52,7 @@ export const Router: RouteObject[] = [
           </PublicRouter>
         ),
       },
-      {
+      /* {
         path: '/catalog',
         element: (
           <BaseLayout>
@@ -64,6 +65,14 @@ export const Router: RouteObject[] = [
         element: (
           <BaseLayout>
             <TshortsPage />
+          </BaseLayout>
+        ),
+      },*/
+      {
+        path: '/categories',
+        element: (
+          <BaseLayout>
+            <Categories />
           </BaseLayout>
         ),
       },

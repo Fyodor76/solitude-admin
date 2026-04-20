@@ -12,28 +12,35 @@ interface IconProps {
   onClick?: () => void
 }
 
-const Icon = ({ name, width, height, color = '#ffffff', className, onClick }: IconProps) => {
-  const icon = iconSet[name]
+const Icon = React.memo(
+  ({ name, width, height, color = '#ffffff', className, onClick }: IconProps) => {
+    const icon = iconSet[name]
 
-  const style: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: color,
-    ...(width && { width }),
-    ...(height && { height }),
+    const style: React.CSSProperties = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: color,
+      ...(width && { width }),
+      ...(height && { height }),
+    }
+
+    const dynamicClass = color !== '#ffffff' ? 'icon--dynamic-color' : ''
+
+    return (
+      <span
+        className={`icon ${dynamicClass} ${className || ''}`.trim()}
+        style={style}
+        onClick={onClick}
+        role={onClick ? 'button' : 'img'}
+        aria-label={name}
+      >
+        {icon}
+      </span>
+    )
   }
+)
 
-  return (
-    <span
-      className={`icon ${className || ''}`.trim()}
-      style={style}
-      onClick={onClick}
-      role={onClick ? 'button' : 'img'}
-      aria-label={name}
-    >
-      {icon}
-    </span>
-  )
-}
+Icon.displayName = 'Icon'
+
 export default Icon
