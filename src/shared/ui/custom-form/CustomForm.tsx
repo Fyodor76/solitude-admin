@@ -1,9 +1,10 @@
-import { ChangeEvent } from 'react'
+import { ChangeEvent, FormEvent } from 'react'
 
-import { Button, Checkbox, Form, Input } from 'antd'
+import { Checkbox, Form, Input } from 'antd'
 import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 
+import { CustomButton } from '../custom-button/CustomButton'
 import '../custom-form/CustomForm.scss'
 import { configFormType } from './types'
 
@@ -20,8 +21,13 @@ export const CustomForm = <T extends Record<string, string>>({
   onChange,
   onFinish,
 }: CustomFormProps<T>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    onFinish()
+  }
+
   return (
-    <Form className={configForm.className}>
+    <Form className={configForm.className} onSubmitCapture={handleSubmit}>
       {configForm.innerTitle && <p className="card-title">{configForm.innerTitle}</p>}
 
       {configForm.sections.map((section, sectionIndex) => (
@@ -42,9 +48,14 @@ export const CustomForm = <T extends Record<string, string>>({
               {field.typeField === 'checkbox' && <Checkbox>{field.children}</Checkbox>}
 
               {field.typeField === 'button' && (
-                <Button size={field.size} type={field.type} block={field.block} onClick={onFinish}>
+                <CustomButton
+                  size={field.size}
+                  type={field.type}
+                  block={field.block}
+                  onClick={onFinish}
+                >
                   {field.children}
-                </Button>
+                </CustomButton>
               )}
 
               {field.typeField === 'link' && (

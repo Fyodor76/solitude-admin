@@ -1,5 +1,5 @@
 import { useLogoutMutation } from '@/shared/lib/api/auth/auth'
-import { Button } from 'antd'
+import { Button, ConfigProvider } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 
 import HeaderSidebar from '../../../app/components/sidebar/HeaderSidebar'
@@ -8,7 +8,7 @@ import Icon from '../icons/Icon'
 import './Header.scss'
 
 export const Header = () => {
-  const [logout, { isLoading }] = useLogoutMutation()
+  const [logout] = useLogoutMutation()
 
   const navigate = useNavigate()
   const messages = 5
@@ -43,9 +43,12 @@ export const Header = () => {
                 {notification > 0 && <span className="badge">{notification}</span>}
               </Link>
             </div>
-            <Button loading={isLoading} onClick={handleLogout} className="btn-logout">
-              <Icon name="logout"></Icon>
-            </Button>
+
+            <ConfigProvider wave={{ disabled: true }}>
+              <Button onClick={handleLogout} className="btn-logout">
+                <Icon name="logout"></Icon>
+              </Button>
+            </ConfigProvider>
           </div>
         </div>
         <div className="breadcrumbs-container">

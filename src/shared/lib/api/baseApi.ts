@@ -104,7 +104,14 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
         window.location.href = '/login'
       }
 
-      return result.error
+      return {
+        error: {
+          statusCode: 401,
+          timestamp: new Date().toISOString(),
+          path: currentPath,
+          error: getErrorMessage(result.error),
+        },
+      }
     }
 
     return new Promise((resolve, reject) => {
