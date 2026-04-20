@@ -10,6 +10,7 @@ export interface SizeChartRequest {
   sizeParameters: SizeParameter[]
 }
 
-export interface deleteSizeChartResponse {
+export interface deleteResponse {
+  id: string
   message: string
 }

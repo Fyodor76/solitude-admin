@@ -6,8 +6,3 @@ export interface SizeParameter {
   chestCircumferenceCm: number
   order: number
 }
-
-export interface deleteSizeParametersResponse {
-  id: string
-  message: string
-}

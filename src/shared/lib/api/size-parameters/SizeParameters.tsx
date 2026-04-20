@@ -1,5 +1,6 @@
 import { ApiResponse, baseApi } from '../baseApi'
-import { deleteSizeParametersResponse, SizeParameter } from './type'
+import { deleteResponse } from '../size-charts/types'
+import { SizeParameter } from './type'
 
 export const SizeParameters = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -26,6 +27,7 @@ export const SizeParameters = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Size-parameter' as const, id: 'ALL_SIZE-PARAMETER' }],
     }),
+
     getSizeParameterById: builder.query<ApiResponse<SizeParameter, any>, string>({
       query: id => ({
         url: `/size-parameters/${id}`,
@@ -33,10 +35,8 @@ export const SizeParameters = baseApi.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: 'Size-parameter', id }],
     }),
-    deleteSizeParameterById: builder.mutation<
-      ApiResponse<deleteSizeParametersResponse, any>,
-      string
-    >({
+
+    deleteSizeParameterById: builder.mutation<ApiResponse<deleteResponse, any>, string>({
       query: id => ({
         url: `/size-parameters/${id}`,
         method: 'DELETE',
@@ -46,6 +46,7 @@ export const SizeParameters = baseApi.injectEndpoints({
         { type: 'Size-parameter', id: 'ALL_SIZE-PARAMETER' },
       ],
     }),
+
     getAllSizeParameters: builder.query<ApiResponse<SizeParameter[], any>, void>({
       query: () => ({
         url: `/size-parameters`,
@@ -53,6 +54,7 @@ export const SizeParameters = baseApi.injectEndpoints({
       }),
       providesTags: [{ type: 'Size-parameter' as const, id: 'ALL_SIZE-PARAMETER' }],
     }),
+
     getSizeParametersBySizeChartId: builder.query<ApiResponse<SizeParameter[], any>, string>({
       query: sizeChartId => ({
         url: `/size-parameters/size-chart/${sizeChartId}`,
@@ -62,3 +64,11 @@ export const SizeParameters = baseApi.injectEndpoints({
     }),
   }),
 })
+export const {
+  useCreateSizeParameterBySizeChartIdMutation,
+  useCreateSizeParametersBySizeChartIdBulkMutation,
+  useDeleteSizeParameterByIdMutation,
+  useGetAllSizeParametersQuery,
+  useGetSizeParameterByIdQuery,
+  useGetSizeParametersBySizeChartIdQuery,
+} = SizeParameters

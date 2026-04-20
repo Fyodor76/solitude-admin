@@ -2,7 +2,10 @@ import React, { useMemo, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
-import { useCreateSizeChartMutation } from '@/shared/lib/api/size-charts/SizeCharts'
+import {
+  useCreateSizeChartMutation,
+  useGetSizeChartByCategoryIdQuery,
+} from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { Button, Select } from 'antd'
 
@@ -27,8 +30,13 @@ const initialData = {
 }
 const SizeChart = () => {
   const [createSizeChart] = useCreateSizeChartMutation()
+
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
   const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(initialData)
+  const { data: sizeChartByCategory, isFetching } = useGetSizeChartByCategoryIdQuery(
+    formSizeChart.categoryId || '',
+    { skip: !formSizeChart.categoryId }
+  )
 
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
@@ -91,6 +99,22 @@ const SizeChart = () => {
       <Button className="size-chart-btn" onClick={createNewSizeChart}>
         Создать таблицу размеров для категории
       </Button>
+      {formSizeChart.categoryId && (
+        <>
+          {isFetching && <span> Загружаю таблицу! Ждите...</span>}
+          {!isFetching && sizeChartByCategory?.data?.id && (
+            <>
+              <h2> {sizeChartByCategory.data.name}</h2>
+              <span>{sizeChartByCategory.data.description}</span>
+              <span>{sizeChartByCategory.data.metricsText}</span>
+              <span>{sizeChartByCategory.data.imageId}</span>
+            </>
+          )}
+          {!isFetching && !sizeChartByCategory?.data && (
+            <span>У данной категории еще нет таблицы размеров...</span>
+          )}
+        </>
+      )}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { SizeChartResponse } from '@/app/types/size-chart'
 
 import { ApiResponse, baseApi } from '../baseApi'
-import { deleteSizeChartResponse, SizeChartRequest } from './types'
+import { deleteResponse, SizeChartRequest } from './types'
 
 export const SizeCharts = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -41,7 +41,7 @@ export const SizeCharts = baseApi.injectEndpoints({
         { type: 'Size-chart', id: 'ALL_SIZE-CHARTS' },
       ],
     }),
-    deleteSizeChartById: builder.mutation<ApiResponse<deleteSizeChartResponse, any>, string>({
+    deleteSizeChartById: builder.mutation<ApiResponse<deleteResponse, any>, string>({
       query: id => ({
         url: `/size-charts/${id}`,
         method: 'DELETE',
