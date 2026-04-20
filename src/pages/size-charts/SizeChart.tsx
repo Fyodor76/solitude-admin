@@ -118,7 +118,7 @@ const SizeChart = () => {
               <span>{currentData.data.description}</span>
               <span>{currentData.data.metricsText}</span>
               <span>{currentData.data.imageId}</span>
-              <Table columns={columns} dataSource={data} />
+              <Table columns={columns} dataSource={data} rowKey="id" />
             </>
           )}
           {!isFetching && !currentData?.data.id && (
