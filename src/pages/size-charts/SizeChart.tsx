@@ -7,36 +7,22 @@ import {
   useGetSizeChartByCategoryIdQuery,
 } from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
+import { useCreateSizeParameterBySizeChartIdMutation } from '@/shared/lib/api/size-parameters/SizeParameters'
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
-import Icon from '@/shared/ui/icons/Icon'
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Input, Select, Space, Table } from 'antd'
-import { div } from 'framer-motion/client'
+import { PlusOutlined } from '@ant-design/icons'
+import { Button, Select, Space, Table } from 'antd'
 
+import SizeParameters from '../size-parameters/SizeParameters'
+import { initialData } from './const'
 import './SizeChart.scss'
 
-const initialData = {
-  categoryId: '',
-  name: 'Тестовая таблица ',
-  description: 'Тестовая таблица размеров',
-  imageId: 'test-id',
-  productType: 'switshorts',
-  metricsText: 'A - длина\nB - грудь',
-  sizeParameters: [
-    {
-      internationalSize: 'S',
-      russianSize: '44',
-      lengthCm: 68,
-      chestCircumferenceCm: 92,
-      order: 1,
-    },
-  ],
-}
 const SizeChart = () => {
   const [createSizeChart] = useCreateSizeChartMutation()
 
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
+  const [createNewParameter] = useCreateSizeParameterBySizeChartIdMutation()
   const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(initialData)
+  const [editParameter, setEditParameter] = useState<EditableSizeParameter[]>([])
   const { isFetching, currentData } = useGetSizeChartByCategoryIdQuery(
     formSizeChart.categoryId || '',
     {
@@ -44,95 +30,14 @@ const SizeChart = () => {
     }
   )
   console.log(currentData?.data)
-  const [editParameter, setEditParameter] = useState<EditableSizeParameter[]>([])
-  const data = currentData?.data?.sizeParameters
 
+  const dataParameters = currentData?.data?.sizeParameters
+  const sizeChartId = currentData?.data?.id
   useEffect(() => {
-    if (data) {
-      setEditParameter([...data])
+    if (dataParameters) {
+      setEditParameter([...dataParameters])
     }
   }, [currentData])
-
-  const columns = [
-    {
-      title: 'Размер',
-      dataIndex: 'internationalSize',
-      key: 'internationalSize',
-      render: (text: string, record: EditableSizeParameter, index: number) => (
-        <Input
-          value={text}
-          onChange={e => handleParameterChange(index, 'internationalSize', e.target.value)}
-        />
-      ),
-    },
-    {
-      title: 'Российский размер',
-      dataIndex: 'russianSize',
-      key: 'russianSize',
-      render: (text: string, record: EditableSizeParameter, index: number) => (
-        <Input
-          value={text}
-          onChange={e => handleParameterChange(index, 'russianSize', e.target.value)}
-        />
-      ),
-    },
-    {
-      title: 'Длина(см)',
-      dataIndex: 'lengthCm',
-      key: 'lengthCm',
-      render: (text: string, record: EditableSizeParameter, index: number) => (
-        <Input
-          value={text}
-          onChange={e => handleParameterChange(index, 'lengthCm', Number(e.target.value))}
-        />
-      ),
-    },
-    {
-      title: 'Обхват груди(см)',
-      dataIndex: 'chestCircumferenceCm',
-      key: 'chestCircumferenceCm',
-      render: (text: string, record: EditableSizeParameter, index: number) => (
-        <Input
-          value={text}
-          onChange={e =>
-            handleParameterChange(index, 'chestCircumferenceCm', Number(e.target.value))
-          }
-        />
-      ),
-    },
-    {
-      title: 'Порядок',
-      dataIndex: 'order',
-      key: 'order',
-      render: (text: number, record: EditableSizeParameter, index: number) => (
-        <Input
-          value={text}
-          onChange={e => handleParameterChange(index, 'order', Number(e.target.value))}
-        />
-      ),
-    },
-    {
-      title: 'Действия',
-      dataIndex: 'actions',
-      key: 'actions',
-      render: (_: any, record: EditableSizeParameter, index: number) => (
-        <Space>
-          <Button>
-            <Icon name="editing"></Icon>
-          </Button>
-          <Button>
-            <Icon name="delete"></Icon>
-          </Button>
-        </Space>
-      ),
-    },
-  ]
-
-  const handleParameterChange = (index: number, field: keyof EditableSizeParameter, value: any) => {
-    const updated = [...editParameter]
-    updated[index] = { ...updated[index], [field]: value }
-    setEditParameter(updated)
-  }
 
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
@@ -162,6 +67,41 @@ const SizeChart = () => {
       throw error
     }
   }
+
+  const createNewSizeParameter = async (data: SizeParameter, sizeChartId: string) => {
+    try {
+      const newParameter = await createNewParameter({
+        data: {
+          ...data,
+        },
+        sizeChartId: sizeChartId,
+      }).unwrap()
+
+      setEditParameter([...editParameter, newParameter.data])
+      console.log(newParameter)
+      return newParameter
+    } catch (error) {
+      console.log('Ошибка создания параметра таблицы !', error)
+      throw error
+    }
+  }
+  const handleAddSize = async () => {
+    if (!sizeChartId) {
+      console.error('Нет таблицы размеров')
+      return
+    }
+    const newSize: SizeParameter = {
+      internationalSize: '',
+      russianSize: '',
+      lengthCm: 0,
+      chestCircumferenceCm: 0,
+      order: (editParameter?.length || 0) + 1,
+    }
+    await createNewSizeParameter(newSize, sizeChartId)
+  }
+
+  const onSave = () => {}
+
   return (
     <div className="size-chart-wrapper">
       <span className="size-chart-title"> Тест страница для размеров</span>
@@ -201,12 +141,18 @@ const SizeChart = () => {
               <span>{currentData.data.description}</span>
               <span>{currentData.data.metricsText}</span>
               <span>{currentData.data.imageId}</span>
-              <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />
-              <Space style={{ marginTop: 16 }}>
-                <Button type="dashed" icon={<PlusOutlined />}>
+              <SizeParameters
+                dataParameters={dataParameters}
+                editParameter={editParameter}
+                setEditParameter={setEditParameter}
+              />
+              <Space style={{ marginTop: 16, marginBottom: 16 }}>
+                <Button onClick={handleAddSize} type="dashed" icon={<PlusOutlined />}>
                   Добавить размер
                 </Button>
-                <Button type="primary">Сохранить изменения</Button>
+                <Button onClick={onSave} type="primary">
+                  Сохранить изменения
+                </Button>
               </Space>
             </>
           )}
