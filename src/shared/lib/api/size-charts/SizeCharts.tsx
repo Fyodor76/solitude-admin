@@ -3,6 +3,9 @@ import { SizeChartResponse } from '@/app/types/size-chart'
 import { ApiResponse, baseApi } from '../baseApi'
 import { deleteResponse, SizeChartRequest } from './types'
 
+export interface ValueGetSizeChartsByCategories {
+  categoryIds: string[]
+}
 export const SizeCharts = baseApi.injectEndpoints({
   endpoints: builder => ({
     createSizeChart: builder.mutation<ApiResponse<SizeChartResponse, any>, SizeChartRequest>({
@@ -69,12 +72,12 @@ export const SizeCharts = baseApi.injectEndpoints({
     }),
     getSizeChartsByCategories: builder.mutation<
       ApiResponse<SizeChartResponse[], any>,
-      { categoriesIds: string[] }
+      ValueGetSizeChartsByCategories
     >({
-      query: ({ categoriesIds }) => ({
+      query: (categoryIds: ValueGetSizeChartsByCategories) => ({
         url: `/size-charts/batch/by-categories`,
         method: 'POST',
-        body: { categoriesIds },
+        body: categoryIds,
       }),
       invalidatesTags: [{ type: 'Size-chart', id: 'ALL_SIZE-CHARTS' }],
     }),

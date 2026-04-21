@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
@@ -7,7 +7,11 @@ import {
   useGetSizeChartByCategoryIdQuery,
 } from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
-import { Button, Select, Table } from 'antd'
+import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
+import Icon from '@/shared/ui/icons/Icon'
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Input, Select, Space, Table } from 'antd'
+import { div } from 'framer-motion/client'
 
 import './SizeChart.scss'
 
@@ -40,14 +44,96 @@ const SizeChart = () => {
     }
   )
   console.log(currentData?.data)
-
+  const [editParameter, setEditParameter] = useState<EditableSizeParameter[]>([])
   const data = currentData?.data?.sizeParameters
+
+  useEffect(() => {
+    if (data) {
+      setEditParameter([...data])
+    }
+  }, [currentData])
+
   const columns = [
-    { title: 'Размер', dataIndex: 'internationalSize', key: 'internationalSize' },
-    { title: 'Российский размер', dataIndex: 'russianSize', key: 'russianSize' },
-    { title: 'Длина(см)', dataIndex: 'lengthCm', key: 'lengthCm' },
-    { title: 'Обхват груди(см)', dataIndex: 'chestCircumferenceCm', key: 'chestCircumferenceCm' },
+    {
+      title: 'Размер',
+      dataIndex: 'internationalSize',
+      key: 'internationalSize',
+      render: (text: string, record: EditableSizeParameter, index: number) => (
+        <Input
+          value={text}
+          onChange={e => handleParameterChange(index, 'internationalSize', e.target.value)}
+        />
+      ),
+    },
+    {
+      title: 'Российский размер',
+      dataIndex: 'russianSize',
+      key: 'russianSize',
+      render: (text: string, record: EditableSizeParameter, index: number) => (
+        <Input
+          value={text}
+          onChange={e => handleParameterChange(index, 'russianSize', e.target.value)}
+        />
+      ),
+    },
+    {
+      title: 'Длина(см)',
+      dataIndex: 'lengthCm',
+      key: 'lengthCm',
+      render: (text: string, record: EditableSizeParameter, index: number) => (
+        <Input
+          value={text}
+          onChange={e => handleParameterChange(index, 'lengthCm', Number(e.target.value))}
+        />
+      ),
+    },
+    {
+      title: 'Обхват груди(см)',
+      dataIndex: 'chestCircumferenceCm',
+      key: 'chestCircumferenceCm',
+      render: (text: string, record: EditableSizeParameter, index: number) => (
+        <Input
+          value={text}
+          onChange={e =>
+            handleParameterChange(index, 'chestCircumferenceCm', Number(e.target.value))
+          }
+        />
+      ),
+    },
+    {
+      title: 'Порядок',
+      dataIndex: 'order',
+      key: 'order',
+      render: (text: number, record: EditableSizeParameter, index: number) => (
+        <Input
+          value={text}
+          onChange={e => handleParameterChange(index, 'order', Number(e.target.value))}
+        />
+      ),
+    },
+    {
+      title: 'Действия',
+      dataIndex: 'actions',
+      key: 'actions',
+      render: (_: any, record: EditableSizeParameter, index: number) => (
+        <Space>
+          <Button>
+            <Icon name="editing"></Icon>
+          </Button>
+          <Button>
+            <Icon name="delete"></Icon>
+          </Button>
+        </Space>
+      ),
+    },
   ]
+
+  const handleParameterChange = (index: number, field: keyof EditableSizeParameter, value: any) => {
+    const updated = [...editParameter]
+    updated[index] = { ...updated[index], [field]: value }
+    setEditParameter(updated)
+  }
+
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
     for (const category of categories) {
@@ -106,9 +192,6 @@ const SizeChart = () => {
         </span>
       )}
 
-      <Button className="size-chart-btn" onClick={createNewSizeChart}>
-        Создать таблицу размеров для категории
-      </Button>
       {formSizeChart.categoryId && (
         <>
           {isFetching && <span> Загружаю таблицу! Ждите...</span>}
@@ -118,11 +201,22 @@ const SizeChart = () => {
               <span>{currentData.data.description}</span>
               <span>{currentData.data.metricsText}</span>
               <span>{currentData.data.imageId}</span>
-              <Table columns={columns} dataSource={data} rowKey="id" />
+              <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />
+              <Space style={{ marginTop: 16 }}>
+                <Button type="dashed" icon={<PlusOutlined />}>
+                  Добавить размер
+                </Button>
+                <Button type="primary">Сохранить изменения</Button>
+              </Space>
             </>
           )}
           {!isFetching && !currentData?.data.id && (
-            <span>У данной категории еще нет таблицы размеров...</span>
+            <div>
+              <span>У данной категории еще нет таблицы размеров...</span>
+              <Button type="default" className="size-chart-btn" onClick={createNewSizeChart}>
+                Создать
+              </Button>
+            </div>
           )}
         </>
       )}
