@@ -71,13 +71,15 @@ async function refreshAccessToken(): Promise<string> {
 
   const { data } = await response.json()
 
-  const newAccessToken = data.accessToken || data.token || data.access_token
+  const newAccessToken = data.accessToken
+  const newRefreshToken = data.refreshToken
 
   if (!newAccessToken) {
     throw new Error('No access token in response')
   }
 
   localStorage.setItem('access', newAccessToken)
+  localStorage.setItem('refresh', newRefreshToken)
 
   return newAccessToken
 }
@@ -164,7 +166,19 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
             subscribers = []
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
-            window.location.href = '/login'
+
+            resolve({
+              error: {
+                statusCode: 401,
+                timestamp: new Date().toISOString(),
+                path: currentPath,
+                error: 'Session expired',
+              },
+            })
+
+            if (!window.location.pathname.includes('/login')) {
+              window.location.href = '/login'
+            }
           })
           .finally(() => {
             isRefreshing = false
