@@ -14,11 +14,11 @@ export const DEFAULT_MEASUREMENTS: Record<
   string,
   { lengthCm: number; chestCircumferenceCm: number }
 > = {
-  XS: { lengthCm: 64, chestCircumferenceCm: 84 - 88 },
-  S: { lengthCm: 68, chestCircumferenceCm: 88 - 92 },
-  M: { lengthCm: 70, chestCircumferenceCm: 92 - 96 },
-  L: { lengthCm: 72, chestCircumferenceCm: 96 - 100 },
-  XL: { lengthCm: 74, chestCircumferenceCm: 100 - 104 },
-  XXL: { lengthCm: 76, chestCircumferenceCm: 104 - 108 },
-  XXXL: { lengthCm: 78, chestCircumferenceCm: 108 - 112 },
+  XS: { lengthCm: 64, chestCircumferenceCm: 86 },
+  S: { lengthCm: 68, chestCircumferenceCm: 90 },
+  M: { lengthCm: 70, chestCircumferenceCm: 94 },
+  L: { lengthCm: 72, chestCircumferenceCm: 98 },
+  XL: { lengthCm: 74, chestCircumferenceCm: 102 },
+  XXL: { lengthCm: 76, chestCircumferenceCm: 106 },
+  XXXL: { lengthCm: 78, chestCircumferenceCm: 110 },
 }
