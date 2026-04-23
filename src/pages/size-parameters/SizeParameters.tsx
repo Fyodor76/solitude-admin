@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import Icon from '@/shared/ui/icons/Icon'
+import { PlusOutlined } from '@ant-design/icons'
 import { Button, Input, Select, Space, Table } from 'antd'
 
 import { ALL_RU_SIZES, ALL_SIZES } from './const'
@@ -11,24 +12,36 @@ interface SizeParametesProps {
   dataParameters?: SizeParameter[]
   editParameter: EditableSizeParameter[]
   selectedSizeToAdd?: string | null
+  changedRows: Record<string, boolean>
+  setChangedRows: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   setEditParameter: React.Dispatch<React.SetStateAction<EditableSizeParameter[]>>
   setSelectedSizeToAdd: React.Dispatch<React.SetStateAction<string | null>>
   deleteSize: (index: number) => void | Promise<void>
+  createNewSizeParameter: () => void | Promise<void>
 }
 
 const SizeParameters = ({
-  dataParameters,
+  changedRows,
   editParameter,
   selectedSizeToAdd,
+  setChangedRows,
   setEditParameter,
   setSelectedSizeToAdd,
   deleteSize,
+  createNewSizeParameter,
 }: SizeParametesProps) => {
   const handleParameterChange = (id: string, field: keyof EditableSizeParameter, value: any) => {
     const updated = editParameter.map(p =>
       p.id === id || p.tempId === id ? { ...p, [field]: value } : p
     )
     setEditParameter(updated)
+    setChangedRows(prev => ({ ...prev, [id]: true }))
+  }
+
+  const getRowClassName = (record: EditableSizeParameter) => {
+    const id = record.id || record.tempId
+
+    return id && changedRows[id] ? 'changed-row' : ''
   }
 
   const columns = [
@@ -129,17 +142,26 @@ const SizeParameters = ({
     return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
   })
   return (
-    <div>
-      <Table columns={columns} dataSource={sortedData} rowKey="id" pagination={false} />
-      <Select
-        placeholder="Выберете размер"
-        value={selectedSizeToAdd}
-        onChange={setSelectedSizeToAdd}
-        options={filterParameters.map(s => ({
-          label: `${s} (${ALL_RU_SIZES[s]} p.)`,
-          value: s,
-        }))}
-      ></Select>
+    <div className="tableAndAddParameter">
+      <div className="addParameter">
+        <Select
+          placeholder="Выберете размер, который хотите добавить"
+          value={selectedSizeToAdd}
+          onChange={setSelectedSizeToAdd}
+          options={filterParameters.map(s => ({
+            label: `${s} (${ALL_RU_SIZES[s]} p.)`,
+            value: s,
+          }))}
+        ></Select>
+        <Button onClick={createNewSizeParameter}>Добавить</Button>
+      </div>
+      <Table
+        columns={columns}
+        dataSource={sortedData}
+        rowKey="id"
+        pagination={false}
+        rowClassName={getRowClassName}
+      />
     </div>
   )
 }

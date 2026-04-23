@@ -13,7 +13,8 @@ import {
   useDeleteSizeParameterByIdMutation,
 } from '@/shared/lib/api/size-parameters/SizeParameters'
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
-import { PlusOutlined } from '@ant-design/icons'
+import Icon from '@/shared/ui/icons/Icon'
+import { EditOutlined } from '@ant-design/icons'
 import { Button, Select, Space } from 'antd'
 
 import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/const'
@@ -31,6 +32,7 @@ const SizeChart = () => {
   const [formSizeChartCreate, setFormSizeChartCreate] = useState<SizeChartRequest>(initialData)
   const [editParameter, setEditParameter] = useState<EditableSizeParameter[]>([])
   const [selectedSizeToAdd, setSelectedSizeToAdd] = useState<string | null>(null)
+  const [changedRows, setChangedRows] = useState<Record<string, boolean>>({})
   const { isFetching, currentData, refetch } = useGetSizeChartByCategoryIdQuery(
     formSizeChartCreate.categoryId || '',
     {
@@ -137,6 +139,11 @@ const SizeChart = () => {
       console.log('Ошибка удаления размера...', error)
     }
   }
+
+  const clearChanges = () => {
+    setChangedRows({})
+  }
+
   const onSaveAllChanges = async (data: Partial<SizeChartRequest>) => {
     if (!sizeChartId) {
       console.error('Нет таблицы для сохранения')
@@ -166,15 +173,16 @@ const SizeChart = () => {
         },
       }).unwrap()
       alert('✅ Изменения сохранены!')
+      clearChanges()
       refetch()
     } catch (error) {
-      console.log('Ошибка созханения изменений в таблице...')
+      console.log('Ошибка соханения изменений в таблице...')
     }
   }
 
   return (
     <div className="size-chart-wrapper">
-      <span className="size-chart-title"> Тест страница для размеров</span>
+      <span className="size-chart-title"> Управление размерами</span>
       <Select
         className="size-chart-select"
         value={formSizeChartCreate.categoryId || undefined}
@@ -196,37 +204,47 @@ const SizeChart = () => {
       </Select>
 
       {formSizeChartCreate.categoryId && (
-        <span>
+        <span className="changeCategoryName">
           {' '}
           Выбрано: {allCategories.find(cat => cat.id === formSizeChartCreate.categoryId)?.name}
         </span>
       )}
 
       {formSizeChartCreate.categoryId && (
-        <>
+        <div className="size-chart-table-container">
           {isFetching && <span> Загружаю таблицу! Ждите...</span>}
           {!isFetching && currentData?.data?.id && (
             <>
-              <h2> {currentData.data.name}</h2>
-              <span>{currentData.data.description}</span>
-              <span>{currentData.data.metricsText}</span>
-              <span>{currentData.data.imageId}</span>
-              <SizeParameters
-                dataParameters={dataParameters}
-                editParameter={editParameter}
-                selectedSizeToAdd={selectedSizeToAdd}
-                setSelectedSizeToAdd={setSelectedSizeToAdd}
-                setEditParameter={setEditParameter}
-                deleteSize={deleteSize}
-              />
-              <Space style={{ marginTop: 16, marginBottom: 16 }}>
-                <Button onClick={createNewSizeParameter} type="dashed" icon={<PlusOutlined />}>
-                  Добавить размер
-                </Button>
-                <Button onClick={() => onSaveAllChanges(currentData.data)} type="primary">
-                  Сохранить изменения
-                </Button>
-              </Space>
+              <span className="size-charts-parameters-title">Информация о таблице размеров</span>
+              <div className="size-charts-parameters">
+                <div className="btn-and-size-chart">
+                  <div className="size-chart">
+                    <span> Название: {currentData.data.name}</span>
+                    <span>Описание: {currentData.data.description}</span>
+                    <span>Замеры: {currentData.data.metricsText}</span>
+                    <span>{currentData.data.imageId}</span>
+                  </div>
+                  <Button>
+                    <Icon name="editing" width="18px"></Icon>
+                  </Button>
+                </div>
+                <SizeParameters
+                  dataParameters={dataParameters}
+                  editParameter={editParameter}
+                  selectedSizeToAdd={selectedSizeToAdd}
+                  changedRows={changedRows}
+                  setChangedRows={setChangedRows}
+                  setSelectedSizeToAdd={setSelectedSizeToAdd}
+                  setEditParameter={setEditParameter}
+                  deleteSize={deleteSize}
+                  createNewSizeParameter={createNewSizeParameter}
+                />
+                <Space style={{ marginTop: 16, marginBottom: 16 }}>
+                  <Button onClick={() => onSaveAllChanges(currentData.data)} type="primary">
+                    Сохранить изменения
+                  </Button>
+                </Space>
+              </div>
             </>
           )}
           {!isFetching && !currentData?.data.id && (
@@ -237,7 +255,7 @@ const SizeChart = () => {
               </Button>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   )

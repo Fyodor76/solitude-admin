@@ -1,0 +1,16 @@
+.tableAndAddParameter {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  .addParameter {
+    display: flex;
+    gap: 5px;
+  }
+  .changed-row {
+    background-color: var(--color-light-blue) !important;
+
+    td {
+      background-color: var(--color-light-blue) !important;
+    }
+  }
+}
