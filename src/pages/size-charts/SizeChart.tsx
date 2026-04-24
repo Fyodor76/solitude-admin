@@ -13,16 +13,18 @@ import {
   useDeleteSizeParameterByIdMutation,
 } from '@/shared/lib/api/size-parameters/SizeParameters'
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
+import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
-import { EditOutlined } from '@ant-design/icons'
 import { Button, Select, Space } from 'antd'
 
 import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/const'
 import SizeParameters from '../size-parameters/SizeParameters'
 import { initialData } from './const'
 import './SizeChart.scss'
+import SizeChartModal from './SizeChartModal'
 
 const SizeChart = () => {
+  const editModal = useModal()
   const [createSizeChart] = useCreateSizeChartMutation()
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
   const [createNewParameter] = useCreateSizeParameterBySizeChartIdMutation()
@@ -45,11 +47,28 @@ const SizeChart = () => {
   console.log(dataParameters)
 
   useEffect(() => {
-    if (dataParameters) {
-      setEditParameter([...dataParameters])
+    if (currentData?.data) {
+      setFormSizeChartCreate({
+        categoryId: currentData.data.categoryId,
+        name: currentData.data.name || '',
+        description: currentData.data.description || '',
+        imageId: currentData.data.imageId || '',
+        productType: currentData.data.productType || '',
+        metricsText: currentData.data.metricsText || 'A - длина\nB - грудь',
+        sizeParameters: currentData.data.sizeParameters || [],
+      })
+
+      if (currentData.data.sizeParameters) {
+        setEditParameter([...currentData.data.sizeParameters])
+      }
     }
   }, [currentData])
 
+  const handleEdit = () => {
+    if (formSizeChartCreate) {
+      editModal.onOpen(formSizeChartCreate)
+    }
+  }
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
     for (const category of categories) {
@@ -224,7 +243,7 @@ const SizeChart = () => {
                     <span>Замеры: {currentData.data.metricsText}</span>
                     <span>{currentData.data.imageId}</span>
                   </div>
-                  <Button>
+                  <Button onClick={handleEdit}>
                     <Icon name="editing" width="18px"></Icon>
                   </Button>
                 </div>
@@ -257,6 +276,13 @@ const SizeChart = () => {
           )}
         </div>
       )}
+      <SizeChartModal
+        isOpen={editModal.isOpen}
+        formSizeChartCreate={formSizeChartCreate}
+        setFormSizeChartCreate={setFormSizeChartCreate}
+        onClose={editModal.onClose}
+        saveAllChanges={onSaveAllChanges}
+      />
     </div>
   )
 }

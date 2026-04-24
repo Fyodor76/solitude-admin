@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import Icon from '@/shared/ui/icons/Icon'
-import { PlusOutlined } from '@ant-design/icons'
 import { Button, Input, Select, Space, Table } from 'antd'
 
 import { ALL_RU_SIZES, ALL_SIZES } from './const'
