@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
@@ -8,6 +8,7 @@ import { Button, message, Upload, UploadProps } from 'antd'
 import { API_URL } from '@/app/constans/url'
 
 interface BtnUploadImgForSizeChartProps {
+  isEdit: boolean
   formSizeChartCreate: SizeChartRequest
   setFormSizeChartCreate: React.Dispatch<React.SetStateAction<SizeChartRequest>>
   setUploadImg: React.Dispatch<React.SetStateAction<imgUpload | null>>
@@ -17,6 +18,7 @@ const BtnUploadImgForSizeChart = ({
   setFormSizeChartCreate,
   setUploadImg,
   formSizeChartCreate,
+  isEdit,
 }: BtnUploadImgForSizeChartProps) => {
   const props: UploadProps = {
     name: 'file',
@@ -55,7 +57,7 @@ const BtnUploadImgForSizeChart = ({
     },
   }
   return (
-    <Upload {...props} key={formSizeChartCreate.id} /* key={isEdit ? `edit-${.id}` : 'create'}*/>
+    <Upload {...props} key={isEdit ? `edit-${formSizeChartCreate.id}` : 'create'}>
       <Button icon={<UploadOutlined />} className="btn-upload-img-size">
         Загрузить
       </Button>

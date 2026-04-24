@@ -13,10 +13,14 @@ import {
   useDeleteSizeParameterByIdMutation,
 } from '@/shared/lib/api/size-parameters/SizeParameters'
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
+import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Select, Space } from 'antd'
 
+import { CDN_URL } from '@/app/constans/url'
+
+import { MODES } from '../categories/const/constans'
 import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/const'
 import SizeParameters from '../size-parameters/SizeParameters'
 import { initialData } from './const'
@@ -25,6 +29,7 @@ import SizeChartModal from './SizeChartModal'
 
 const SizeChart = () => {
   const editModal = useModal()
+
   const [createSizeChart] = useCreateSizeChartMutation()
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
   const [createNewParameter] = useCreateSizeParameterBySizeChartIdMutation()
@@ -41,6 +46,13 @@ const SizeChart = () => {
       skip: !formSizeChartCreate.categoryId,
     }
   )
+  const mode = editModal.mode
+  const isCreate = mode === MODES.CREATE
+  const isEdit = mode === MODES.EDIT
+  const imageUrl =
+    isEdit && formSizeChartCreate.imageId ? `${CDN_URL}/${formSizeChartCreate.imageId}` : null
+  console.log('imageUrl:', imageUrl)
+  const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
 
   const dataParameters = currentData?.data?.sizeParameters
   const sizeChartId = currentData?.data?.id
@@ -66,6 +78,7 @@ const SizeChart = () => {
 
   const handleEdit = () => {
     if (formSizeChartCreate) {
+      editModal.setMode(MODES.EDIT)
       editModal.onOpen(formSizeChartCreate)
     }
   }
@@ -84,14 +97,29 @@ const SizeChart = () => {
     return getAllCategories(categoriesTreeData.data)
   }, [categoriesTreeData])
 
-  const createNewSizeChart = async () => {
+  const handleCreateSizeChart = () => {
     if (!formSizeChartCreate.categoryId) {
       alert('Выберете категорию!')
       return
     }
+    setFormSizeChartCreate({
+      ...initialData,
+      categoryId: formSizeChartCreate.categoryId,
+      imageId: null,
+    })
+    editModal.setMode(MODES.CREATE)
+    editModal.onOpen()
+  }
+  const createNewSizeChart = async (data: SizeChartRequest) => {
     try {
-      await createSizeChart(formSizeChartCreate).unwrap()
+      const result = await createSizeChart(data).unwrap()
       console.log('✅ Таблица размеров создана, обновляем данные...')
+      refetch()
+      setFormSizeChartCreate({
+        ...initialData,
+        categoryId: formSizeChartCreate.categoryId,
+      })
+      return result
     } catch (error) {
       console.log('Ошибка создания таблицы категории!', error)
       throw error
@@ -206,12 +234,19 @@ const SizeChart = () => {
         className="size-chart-select"
         value={formSizeChartCreate.categoryId || undefined}
         placeholder="Выберете категорию"
-        onChange={value =>
+        onChange={value => {
           setFormSizeChartCreate({
-            ...formSizeChartCreate,
             categoryId: value,
+            name: '',
+            description: '',
+            imageId: '',
+            productType: '',
+            metricsText: 'A - длина\nB - грудь',
+            sizeParameters: [],
           })
-        }
+          setEditParameter([])
+          setSelectedSizeToAdd(null)
+        }}
         allowClear
       >
         {allCategories &&
@@ -241,7 +276,7 @@ const SizeChart = () => {
                     <span> Название: {currentData.data.name}</span>
                     <span>Описание: {currentData.data.description}</span>
                     <span>Замеры: {currentData.data.metricsText}</span>
-                    <span>{currentData.data.imageId}</span>
+                    {imageUrl && <img src={imageUrl} alt="Size-chart preview" />}
                   </div>
                   <Button onClick={handleEdit}>
                     <Icon name="editing" width="18px"></Icon>
@@ -269,7 +304,7 @@ const SizeChart = () => {
           {!isFetching && !currentData?.data.id && (
             <div>
               <span>У данной категории еще нет таблицы размеров...</span>
-              <Button type="default" className="size-chart-btn" onClick={createNewSizeChart}>
+              <Button type="default" className="size-chart-btn" onClick={handleCreateSizeChart}>
                 Создать
               </Button>
             </div>
@@ -277,11 +312,19 @@ const SizeChart = () => {
         </div>
       )}
       <SizeChartModal
+        mode={mode}
+        isCreated={isCreate}
+        isEdit={isEdit}
+        uploadImg={uploadImg}
         isOpen={editModal.isOpen}
         formSizeChartCreate={formSizeChartCreate}
+        imageUrl={imageUrl}
+        setUploadImg={setUploadImg}
         setFormSizeChartCreate={setFormSizeChartCreate}
         onClose={editModal.onClose}
         saveAllChanges={onSaveAllChanges}
+        setModes={editModal.setMode}
+        createNewSizeChart={createNewSizeChart}
       />
     </div>
   )

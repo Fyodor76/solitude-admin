@@ -2,7 +2,7 @@ export const initialData = {
   categoryId: '',
   name: '',
   description: '',
-  imageId: '',
+  imageId: null,
   productType: '',
   metricsText: 'A - длина\nB - грудь',
   sizeParameters: [],
