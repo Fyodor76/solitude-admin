@@ -100,7 +100,8 @@ const SizeParameters = ({
       render: (text: number, record: EditableSizeParameter, index: number) => (
         <Input
           type="number"
-          value={text || 0}
+          value={text}
+          placeholder="Например: 84-88 или 86"
           onChange={e => {
             const id = record.id || record.tempId
             if (id) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { ApiResponse } from '@/shared/lib/api/baseApi'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
@@ -13,20 +13,19 @@ interface SizeChartModalProps {
   isCreated: boolean
   isEdit: boolean
   uploadImg: imgUpload | null
-  formSizeChartCreate: SizeChartRequest
-  mode: string
+  formSizeChart: SizeChartRequest
+  // mode: string
   imageUrl: string | null
   setUploadImg: React.Dispatch<React.SetStateAction<imgUpload | null>>
   setModes: React.Dispatch<React.SetStateAction<string>>
-  setFormSizeChartCreate: React.Dispatch<React.SetStateAction<SizeChartRequest>>
+  setFormSizeChart: React.Dispatch<React.SetStateAction<SizeChartRequest>>
   saveAllChanges: (data: Partial<SizeChartRequest>) => Promise<void>
   onClose: () => void
   createNewSizeChart: (data: SizeChartRequest) => Promise<ApiResponse<SizeChartRequest, any>>
 }
 const SizeChartModal = ({
   isOpen,
-  formSizeChartCreate,
-  mode,
+  formSizeChart,
   isEdit,
   isCreated,
   uploadImg,
@@ -34,14 +33,14 @@ const SizeChartModal = ({
   setUploadImg,
   setModes,
   onClose,
-  setFormSizeChartCreate,
+  setFormSizeChart,
   saveAllChanges,
   createNewSizeChart,
 }: SizeChartModalProps) => {
   const currentUrl = uploadImg?.url || imageUrl
 
   const handleInputChange = (name: keyof SizeChartRequest, value: string | number) => {
-    setFormSizeChartCreate(prev => {
+    setFormSizeChart(prev => {
       return {
         ...prev,
         [name]: value,
@@ -52,9 +51,9 @@ const SizeChartModal = ({
   const onSave = async () => {
     try {
       if (isEdit) {
-        await saveAllChanges(formSizeChartCreate)
+        await saveAllChanges(formSizeChart)
       } else {
-        await createNewSizeChart(formSizeChartCreate)
+        await createNewSizeChart(formSizeChart)
       }
       setModes(MODES.EDIT)
       onClose()
@@ -69,34 +68,34 @@ const SizeChartModal = ({
       <Input
         type="text"
         id="size-chart-name"
-        value={formSizeChartCreate.name}
+        value={formSizeChart.name}
         onChange={e => handleInputChange('name', e.target.value)}
       ></Input>
       <span>Описание</span>
       <Input
         type="text"
         id="size-chart-description"
-        value={formSizeChartCreate.description}
+        value={formSizeChart.description}
         onChange={e => handleInputChange('description', e.target.value)}
       ></Input>
       <span>Замеры</span>
       <Input
         type="text"
         id="size-chart-metricsText"
-        value={formSizeChartCreate.metricsText}
+        value={formSizeChart.metricsText}
         onChange={e => handleInputChange('metricsText', e.target.value)}
       ></Input>
       <span>Тип</span>
       <Input
         type="text"
         id="size-chart-productType"
-        value={formSizeChartCreate.productType}
+        value={formSizeChart.productType}
         onChange={e => handleInputChange('productType', e.target.value)}
       ></Input>
       <BtnUploadImgForSizeChart
-        setFormSizeChartCreate={setFormSizeChartCreate}
+        setFormSizeChartCreate={setFormSizeChart}
         setUploadImg={setUploadImg}
-        formSizeChartCreate={formSizeChartCreate}
+        formSizeChartCreate={formSizeChart}
         isEdit={isEdit}
       />
       {currentUrl && <img className="imgSizeChart" src={currentUrl} alt="Category preview"></img>}
