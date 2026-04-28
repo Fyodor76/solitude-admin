@@ -38,15 +38,15 @@ const SizeChartModal = ({
   saveAllChanges,
   createNewSizeChart,
 }: SizeChartModalProps) => {
-  const handleInputChange = (field: keyof SizeChartRequest) => {
-    return (value: string) => {
-      setFormSizeChartCreate(prev => {
-        return {
-          ...prev,
-          [field]: value,
-        }
-      })
-    }
+  const currentUrl = uploadImg?.url || imageUrl
+
+  const handleInputChange = (name: keyof SizeChartRequest, value: string | number) => {
+    setFormSizeChartCreate(prev => {
+      return {
+        ...prev,
+        [name]: value,
+      }
+    })
   }
 
   const onSave = async () => {
@@ -70,28 +70,28 @@ const SizeChartModal = ({
         type="text"
         id="size-chart-name"
         value={formSizeChartCreate.name}
-        onChange={e => handleInputChange('name')(e.target.value)}
+        onChange={e => handleInputChange('name', e.target.value)}
       ></Input>
       <span>Описание</span>
       <Input
         type="text"
         id="size-chart-description"
         value={formSizeChartCreate.description}
-        onChange={e => handleInputChange('description')(e.target.value)}
+        onChange={e => handleInputChange('description', e.target.value)}
       ></Input>
       <span>Замеры</span>
       <Input
         type="text"
         id="size-chart-metricsText"
         value={formSizeChartCreate.metricsText}
-        onChange={e => handleInputChange('metricsText')(e.target.value)}
+        onChange={e => handleInputChange('metricsText', e.target.value)}
       ></Input>
       <span>Тип</span>
       <Input
         type="text"
         id="size-chart-productType"
         value={formSizeChartCreate.productType}
-        onChange={e => handleInputChange('productType')(e.target.value)}
+        onChange={e => handleInputChange('productType', e.target.value)}
       ></Input>
       <BtnUploadImgForSizeChart
         setFormSizeChartCreate={setFormSizeChartCreate}
@@ -99,6 +99,7 @@ const SizeChartModal = ({
         formSizeChartCreate={formSizeChartCreate}
         isEdit={isEdit}
       />
+      {currentUrl && <img className="imgSizeChart" src={currentUrl} alt="Category preview"></img>}
     </Modal>
   )
 }

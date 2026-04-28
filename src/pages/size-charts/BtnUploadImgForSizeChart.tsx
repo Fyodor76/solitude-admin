@@ -24,7 +24,7 @@ const BtnUploadImgForSizeChart = ({
     name: 'file',
     action: `${API_URL}/cdn/upload`,
     data: {
-      folder: '',
+      folder: 'products',
     },
     headers: {
       authorization: 'authorization-text',

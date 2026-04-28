@@ -51,7 +51,7 @@ const SizeChart = () => {
   const isEdit = mode === MODES.EDIT
   const imageUrl =
     isEdit && formSizeChartCreate.imageId ? `${CDN_URL}/${formSizeChartCreate.imageId}` : null
-  console.log('imageUrl:', imageUrl)
+
   const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
 
   const dataParameters = currentData?.data?.sizeParameters
@@ -105,7 +105,7 @@ const SizeChart = () => {
     setFormSizeChartCreate({
       ...initialData,
       categoryId: formSizeChartCreate.categoryId,
-      imageId: null,
+      imageId: currentData?.data.imageId || '' || null,
     })
     editModal.setMode(MODES.CREATE)
     editModal.onOpen()
@@ -116,8 +116,9 @@ const SizeChart = () => {
       console.log('✅ Таблица размеров создана, обновляем данные...')
       refetch()
       setFormSizeChartCreate({
-        ...initialData,
+        ...data,
         categoryId: formSizeChartCreate.categoryId,
+        imageId: formSizeChartCreate.imageId || uploadImg?.fileId || null,
       })
       return result
     } catch (error) {
