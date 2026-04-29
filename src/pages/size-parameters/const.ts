@@ -22,3 +22,13 @@ export const DEFAULT_MEASUREMENTS: Record<
   XXL: { lengthCm: 76, chestCircumferenceCm: 106 },
   XXXL: { lengthCm: 78, chestCircumferenceCm: 110 },
 }
+
+export const MIN_LENGTH = 20
+export const MAX_LENGTH = 150
+export const MIN_CHEST = 40
+export const MAX_CHEST = 200
+
+export const VALIDATION_MESSAGES = {
+  length: `Длина должна быть от ${MIN_LENGTH} до ${MAX_LENGTH} см`,
+  chest: `Обхват груди должен быть от ${MIN_CHEST} до ${MAX_CHEST} см`,
+}

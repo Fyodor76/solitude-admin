@@ -58,28 +58,14 @@ const SizeChart = () => {
 
   useEffect(() => {
     if (currentData?.data) {
-      setFormSizeChart({
-        categoryId: currentData.data.categoryId,
-        name: currentData.data.name || '',
-        description: currentData.data.description || '',
-        imageId: currentData.data.imageId || '',
-        productType: currentData.data.productType || '',
-        metricsText: currentData.data.metricsText || 'A - длина\nB - грудь',
-        sizeParameters: currentData.data.sizeParameters || [],
-      })
-
-      if (currentData.data.sizeParameters) {
-        setEditParameter([...currentData.data.sizeParameters])
-      }
+      setFormSizeChart(currentData.data)
+      setEditParameter([...(currentData?.data?.sizeParameters || [])])
+    } else {
+      setFormSizeChart(initialData)
+      setEditParameter([])
     }
   }, [currentData])
 
-  const handleEdit = () => {
-    if (formSizeChart) {
-      editModal.setMode(MODES.EDIT)
-      editModal.onOpen(formSizeChart)
-    }
-  }
   const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
     for (const category of categories) {
@@ -95,6 +81,12 @@ const SizeChart = () => {
     return getAllCategories(categoriesTreeData.data)
   }, [categoriesTreeData])
 
+  const handleEditSizeChart = () => {
+    if (formSizeChart) {
+      editModal.setMode(MODES.EDIT)
+      editModal.onOpen(formSizeChart)
+    }
+  }
   const handleCreateSizeChart = () => {
     if (!formSizeChart.categoryId) {
       alert('Выберете категорию!')
@@ -167,16 +159,16 @@ const SizeChart = () => {
     }
   }
 
-  const deleteSize = async (index: number) => {
-    const sizeToDelete = editParameter[index]
-    const isConfirmed = confirm(`Удалить размер "${sizeToDelete.internationalSize}"?`)
+  const deleteSize = async (id: string | undefined) => {
+    const sizeToDelete = editParameter.find(p => p.id === id)
+    const isConfirmed = confirm(`Удалить размер "${sizeToDelete?.internationalSize}"?`)
     if (!isConfirmed) return
 
     try {
-      if (sizeToDelete.id) await deleteSizeParameter(sizeToDelete.id).unwrap()
+      if (sizeToDelete?.id) await deleteSizeParameter(sizeToDelete.id).unwrap()
 
-      const newParameters = editParameter.filter((_, i) => {
-        return i !== index
+      const newParameters = editParameter.filter(p => {
+        return p.id !== id && p.tempId !== id
       })
       setEditParameter(reOrderParameter(newParameters))
       refetch()
@@ -220,7 +212,6 @@ const SizeChart = () => {
       }).unwrap()
       alert('✅ Изменения сохранены!')
       clearChanges()
-      refetch()
     } catch (error) {
       console.log('Ошибка соханения изменений в таблице...')
     }
@@ -235,13 +226,8 @@ const SizeChart = () => {
         placeholder="Выберете категорию"
         onChange={value => {
           setFormSizeChart({
+            ...initialData,
             categoryId: value,
-            name: '',
-            description: '',
-            imageId: '',
-            productType: '',
-            metricsText: 'A - длина\nB - грудь',
-            sizeParameters: [],
           })
           setEditParameter([])
           setSelectedSizeToAdd(null)
@@ -277,7 +263,7 @@ const SizeChart = () => {
                     <span>Замеры: {currentData.data.metricsText}</span>
                     {imageUrl && <img src={imageUrl} alt="Size-chart preview" />}
                   </div>
-                  <Button onClick={handleEdit}>
+                  <Button onClick={handleEditSizeChart}>
                     <Icon name="editing" width="18px"></Icon>
                   </Button>
                 </div>

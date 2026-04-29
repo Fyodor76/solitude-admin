@@ -4,7 +4,15 @@ import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-para
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input, Select, Space, Table } from 'antd'
 
-import { ALL_RU_SIZES, ALL_SIZES } from './const'
+import {
+  ALL_RU_SIZES,
+  ALL_SIZES,
+  MAX_CHEST,
+  MAX_LENGTH,
+  MIN_CHEST,
+  MIN_LENGTH,
+  VALIDATION_MESSAGES,
+} from './const'
 import './SizeParameters.scss'
 
 interface SizeParametesProps {
@@ -15,7 +23,7 @@ interface SizeParametesProps {
   setChangedRows: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   setEditParameter: React.Dispatch<React.SetStateAction<EditableSizeParameter[]>>
   setSelectedSizeToAdd: React.Dispatch<React.SetStateAction<string | null>>
-  deleteSize: (index: number) => void | Promise<void>
+  deleteSize: (id: string | undefined) => void | Promise<void>
   createNewSizeParameter: () => void | Promise<void>
 }
 
@@ -29,9 +37,30 @@ const SizeParameters = ({
   deleteSize,
   createNewSizeParameter,
 }: SizeParametesProps) => {
+  const isValidNumber = (value: number, min: number, max: number): boolean => {
+    return !isNaN(value) && value >= min && value <= max
+  }
+
   const handleParameterChange = (id: string, field: keyof EditableSizeParameter, value: any) => {
+    let isValid = true
+    const numValue = Number(value)
+
+    if (field === 'lengthCm') {
+      isValid = isValidNumber(numValue, MIN_LENGTH, MAX_LENGTH)
+      if (!isValid) alert(VALIDATION_MESSAGES.length)
+    }
+    if (field === 'chestCircumferenceCm') {
+      isValid = isValidNumber(numValue, MIN_CHEST, MAX_CHEST)
+      if (!isValid) alert(VALIDATION_MESSAGES.chest)
+    }
+
     const updated = editParameter.map(p =>
-      p.id === id || p.tempId === id ? { ...p, [field]: value } : p
+      p.id === id || p.tempId === id
+        ? {
+            ...p,
+            [field]: field === 'lengthCm' || field === 'chestCircumferenceCm' ? numValue : value,
+          }
+        : p
     )
     setEditParameter(updated)
     setChangedRows(prev => ({ ...prev, [id]: true }))
@@ -111,24 +140,14 @@ const SizeParameters = ({
         />
       ),
     },
-    /* {
-      title: 'Порядок',
-      dataIndex: 'order',
-      key: 'order',
-      render: (text: number, record: EditableSizeParameter, index: number) => (
-        <Input
-          value={text}
-          onChange={e => handleParameterChange(index, 'order', Number(e.target.value))}
-        />
-      ),
-    },*/
+
     {
       title: 'Действия',
       dataIndex: 'actions',
       key: 'actions',
       render: (_: any, record: EditableSizeParameter, index: number) => (
         <Space>
-          <Button onClick={() => deleteSize(index)}>
+          <Button onClick={() => deleteSize(record.id)}>
             <Icon name="delete" width="18px"></Icon>
           </Button>
         </Space>

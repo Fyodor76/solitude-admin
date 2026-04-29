@@ -3,10 +3,10 @@ import React from 'react'
 import { ApiResponse } from '@/shared/lib/api/baseApi'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
-import { Input, Modal } from 'antd'
+import UniversalUploadButton from '@/shared/ui/upload-image-btn/UniversalUploadButton'
+import { Input, message, Modal } from 'antd'
 
 import { MODES } from '../categories/const/constans'
-import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
 
 interface SizeChartModalProps {
   isOpen: boolean
@@ -92,11 +92,30 @@ const SizeChartModal = ({
         value={formSizeChart.productType}
         onChange={e => handleInputChange('productType', e.target.value)}
       ></Input>
-      <BtnUploadImgForSizeChart
+      {/*<BtnUploadImgForSizeChart
         setFormSizeChartCreate={setFormSizeChart}
         setUploadImg={setUploadImg}
         formSizeChartCreate={formSizeChart}
         isEdit={isEdit}
+      />*/}
+      <UniversalUploadButton
+        folder="products"
+        buttonText="Загрузить"
+        buttonClassName="btn-upload-img-size"
+        key={isEdit ? `edit-${formSizeChart.id}` : 'create'}
+        onFileRemoved={() => {
+          setUploadImg(null)
+          setFormSizeChart(prev => ({ ...prev, imageId: null }))
+        }}
+        onFileUploaded={(fileId, fileData) => {
+          setUploadImg(fileData)
+
+          setFormSizeChart(prev => ({
+            ...prev,
+            imageId: fileId || null,
+          }))
+          message.success('Файл загружен')
+        }}
       />
       {currentUrl && <img className="imgSizeChart" src={currentUrl} alt="Category preview"></img>}
     </Modal>
