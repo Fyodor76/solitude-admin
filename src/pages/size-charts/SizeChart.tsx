@@ -21,7 +21,14 @@ import { Button, Select, Space } from 'antd'
 import { CDN_URL } from '@/app/constans/url'
 
 import { MODES } from '../categories/const/constans'
-import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/const'
+import {
+  ALL_RU_SIZES,
+  DEFAULT_MEASUREMENTS,
+  MAX_CHEST,
+  MAX_LENGTH,
+  MIN_CHEST,
+  MIN_LENGTH,
+} from '../size-parameters/const'
 import SizeParameters from '../size-parameters/SizeParameters'
 import { initialData } from './const'
 import './SizeChart.scss'
@@ -151,7 +158,6 @@ const SizeChart = () => {
       }).unwrap()
       const newParameters = [...editParameter, result.data]
       setEditParameter(reOrderParameter(newParameters))
-      refetch()
       setSelectedSizeToAdd(null)
       console.log('Создала новый размер!')
     } catch (error) {
@@ -190,6 +196,18 @@ const SizeChart = () => {
     if (editParameter.length === 0) {
       alert('Нет данных для сохранения')
       return
+    }
+    const hasInvalid = editParameter.some(
+      p =>
+        p.lengthCm < MIN_LENGTH ||
+        p.lengthCm > MAX_LENGTH ||
+        p.chestCircumferenceCm < MIN_CHEST ||
+        p.chestCircumferenceCm > MAX_CHEST
+    )
+
+    if (hasInvalid) {
+      alert('Есть некорректные значения! Проверьте длину (20-150 см) и обхват груди (40-200 см)')
+      return // Не сохраняем, если есть ошибки
     }
     try {
       await updateSizeChart({

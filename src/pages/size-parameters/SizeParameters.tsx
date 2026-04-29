@@ -4,15 +4,7 @@ import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-para
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input, Select, Space, Table } from 'antd'
 
-import {
-  ALL_RU_SIZES,
-  ALL_SIZES,
-  MAX_CHEST,
-  MAX_LENGTH,
-  MIN_CHEST,
-  MIN_LENGTH,
-  VALIDATION_MESSAGES,
-} from './const'
+import { ALL_RU_SIZES, ALL_SIZES } from './const'
 import './SizeParameters.scss'
 
 interface SizeParametesProps {
@@ -42,18 +34,7 @@ const SizeParameters = ({
   }
 
   const handleParameterChange = (id: string, field: keyof EditableSizeParameter, value: any) => {
-    let isValid = true
     const numValue = Number(value)
-
-    if (field === 'lengthCm') {
-      isValid = isValidNumber(numValue, MIN_LENGTH, MAX_LENGTH)
-      if (!isValid) alert(VALIDATION_MESSAGES.length)
-    }
-    if (field === 'chestCircumferenceCm') {
-      isValid = isValidNumber(numValue, MIN_CHEST, MAX_CHEST)
-      if (!isValid) alert(VALIDATION_MESSAGES.chest)
-    }
-
     const updated = editParameter.map(p =>
       p.id === id || p.tempId === id
         ? {
