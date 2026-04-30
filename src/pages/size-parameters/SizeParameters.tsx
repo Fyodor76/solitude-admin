@@ -2,9 +2,9 @@ import React from 'react'
 
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, Input, Select, Space, Table } from 'antd'
+import { Button, Input, InputNumber, Select, Space, Table, Tooltip } from 'antd'
 
-import { ALL_RU_SIZES, ALL_SIZES } from './const'
+import { ALL_RU_SIZES, ALL_SIZES, MAX_CHEST, MAX_LENGTH, MIN_CHEST, MIN_LENGTH } from './const'
 import './SizeParameters.scss'
 
 interface SizeParametesProps {
@@ -58,49 +58,34 @@ const SizeParameters = ({
       title: 'Размер',
       dataIndex: 'internationalSize',
       key: 'internationalSize',
-      render: (text: string, record: EditableSizeParameter) => (
-        <Input
-          value={text || ''}
-          onChange={e => {
-            const id = record.id || record.tempId
-            if (id) {
-              handleParameterChange(id, 'internationalSize', e.target.value)
-            }
-          }}
-        />
-      ),
+      render: (text: string, record: EditableSizeParameter) => <span>{text}</span>,
     },
     {
       title: 'Российский размер',
       dataIndex: 'russianSize',
       key: 'russianSize',
-      render: (text: string, record: EditableSizeParameter) => (
-        <Input
-          value={text || ''}
-          onChange={e => {
-            const id = record.id || record.tempId
-            if (id) {
-              handleParameterChange(id, 'russianSize', e.target.value)
-            }
-          }}
-        />
-      ),
+      render: (text: string, record: EditableSizeParameter) => <span>{text}</span>,
     },
     {
       title: 'Длина(см)',
       dataIndex: 'lengthCm',
       key: 'lengthCm',
-      render: (text: string, record: EditableSizeParameter, index: number) => (
-        <Input
-          type="number"
-          value={text}
-          onChange={e => {
-            const id = record.id || record.tempId
-            if (id) {
-              handleParameterChange(id, 'lengthCm', Number(e.target.value))
-            }
-          }}
-        />
+      render: (text: number, record: EditableSizeParameter, index: number) => (
+        <Tooltip title={`Допустимые значения: ${MIN_LENGTH} - ${MAX_LENGTH} см`}>
+          <InputNumber
+            min={MIN_LENGTH}
+            max={MAX_LENGTH}
+            precision={0}
+            controls={true}
+            value={text}
+            onChange={e => {
+              const id = record.id || record.tempId
+              if (id) {
+                handleParameterChange(id, 'lengthCm', e)
+              }
+            }}
+          />
+        </Tooltip>
       ),
     },
     {
@@ -108,17 +93,22 @@ const SizeParameters = ({
       dataIndex: 'chestCircumferenceCm',
       key: 'chestCircumferenceCm',
       render: (text: number, record: EditableSizeParameter, index: number) => (
-        <Input
-          type="number"
-          value={text}
-          placeholder="Например: 84-88 или 86"
-          onChange={e => {
-            const id = record.id || record.tempId
-            if (id) {
-              handleParameterChange(id, 'chestCircumferenceCm', Number(e.target.value))
-            }
-          }}
-        />
+        <Tooltip title={`Допустимые значения: ${MIN_CHEST} - ${MAX_CHEST} см`}>
+          <InputNumber
+            min={MIN_CHEST}
+            max={MAX_CHEST}
+            precision={0}
+            controls={true}
+            value={text}
+            placeholder="Например: 84-88 или 86"
+            onChange={e => {
+              const id = record.id || record.tempId
+              if (id) {
+                handleParameterChange(id, 'chestCircumferenceCm', e || 0)
+              }
+            }}
+          />
+        </Tooltip>
       ),
     },
 
