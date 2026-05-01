@@ -92,7 +92,7 @@ const StorePreview = () => {
   const [path, setPath] = useState('/')
   const [draft, setDraft] = useState('/')
   const [iframeNonce, setIframeNonce] = useState(0)
-  const [heatmap, setHeatmap] = useState(false)
+  const [heatmap, setHeatmap] = useState(true)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const lastHeatmapPushRef = useRef<{ pageId: string; at: number } | null>(null)
 
