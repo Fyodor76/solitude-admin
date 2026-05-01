@@ -5,13 +5,9 @@ import {
   useGetTrackedPagesQuery,
   useLazyGetHeatmapClicksQuery,
 } from '@/shared/lib/api/page-analytics/pageAnalyticsApi'
-import { Button, Input, message, Space, Spin, Switch, Typography } from 'antd'
+import { Button, Input, Space, Spin, Switch, Typography } from 'antd'
 
 import './StorePreview.scss'
-
-function dbg(...args: unknown[]) {
-  console.log('[store-preview]', ...args)
-}
 
 const SITE_ORIGIN = 'https://solitude-store.ru'
 
@@ -89,30 +85,23 @@ function isIframeReadyPayload(data: unknown): data is { page_id: string; uri: st
   return typeof o.page_id === 'string'
 }
 
+/** Не дергать API/postMessage дважды подряд с тем же page_id (эффект вкл. + ready из iframe). */
+const HEATMAP_PUSH_DEBOUNCE_MS = 400
+
 const StorePreview = () => {
   const [path, setPath] = useState('/')
   const [draft, setDraft] = useState('/')
   const [iframeNonce, setIframeNonce] = useState(0)
   const [heatmap, setHeatmap] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const lastHeatmapPushRef = useRef<{ pageId: string; at: number } | null>(null)
 
-  const {
-    data: trackedPagesResponse,
-    isLoading: pagesLoading,
-    isError: pagesError,
-  } = useGetTrackedPagesQuery(200)
+  const { data: trackedPagesResponse, isLoading: pagesLoading } = useGetTrackedPagesQuery(200)
   const trackedPages = trackedPagesResponse?.data ?? []
 
   const [triggerHeatmapClicks] = useLazyGetHeatmapClicksQuery()
 
   const iframeSrc = useMemo(() => buildIframeSrc(path), [path])
-
-  useEffect(() => {
-    if (pagesError) {
-      dbg('tracked pages query error', pagesError)
-      message.warning('Не удалось загрузить список страниц из API')
-    }
-  }, [pagesError])
 
   const applyDraft = useCallback(() => {
     const n = normalizePath(draft)
@@ -127,27 +116,30 @@ const StorePreview = () => {
   }, [])
 
   const pushHeatmapToIframe = useCallback(
-    async (pageIdForFetch?: string) => {
+    async (pageIdForFetch?: string, force = false) => {
       const win = iframeRef.current?.contentWindow
       if (!win) {
-        dbg('pushHeatmap: no contentWindow')
         return
       }
       if (!heatmap) {
-        dbg('postMessage → iframe: heatmap OFF')
         win.postMessage({ isIframeInteraction: false }, '*')
         return
       }
       const pageId = pageIdForFetch ?? path
-      dbg('pushHeatmap: fetch clicks', { pageId })
+      if (!force) {
+        const now = Date.now()
+        const last = lastHeatmapPushRef.current
+        if (last && last.pageId === pageId && now - last.at < HEATMAP_PUSH_DEBOUNCE_MS) {
+          return
+        }
+      }
+      lastHeatmapPushRef.current = { pageId, at: Date.now() }
       try {
         const res = await triggerHeatmapClicks(pageId).unwrap()
         const clicks = res.data?.clicks ?? []
-        dbg('postMessage → iframe: clicks', { count: clicks.length })
         win.postMessage({ clicks, isIframeInteraction: true }, '*')
-      } catch (e) {
-        dbg('pushHeatmap: API error', e)
-        message.error(e instanceof Error ? e.message : 'Не удалось загрузить heatmap')
+      } catch {
+        /* ошибка уходит в глобальный RTK middleware / toast */
       }
     },
     [heatmap, path, triggerHeatmapClicks]
@@ -171,7 +163,6 @@ const StorePreview = () => {
         return
       }
       const pageId = normalizePath(event.data.page_id)
-      dbg('ready handler: schedule pushHeatmap', { pageId })
       if (readyTimer != null) {
         window.clearTimeout(readyTimer)
       }
@@ -193,15 +184,12 @@ const StorePreview = () => {
   useEffect(() => {
     const win = iframeRef.current?.contentWindow
     if (!win) {
-      dbg('heatmap effect: no iframe window')
       return
     }
     if (!heatmap) {
-      dbg('heatmap effect: OFF → postMessage iframe')
       win.postMessage({ isIframeInteraction: false }, '*')
       return
     }
-    dbg('heatmap effect: ON → schedule push')
     const t = window.setTimeout(() => {
       void pushHeatmapToIframe()
     }, 150)
@@ -222,13 +210,7 @@ const StorePreview = () => {
 
       <div className="storePreview__heatmapRow">
         <Space align="center">
-          <Switch
-            checked={heatmap}
-            onChange={v => {
-              dbg('Switch onChange', v)
-              setHeatmap(v)
-            }}
-          />
+          <Switch checked={heatmap} onChange={setHeatmap} />
           <Typography.Text>Heatmap (клики из API, слой heatmap.js во iframe)</Typography.Text>
         </Space>
       </div>
@@ -267,7 +249,9 @@ const StorePreview = () => {
         </Button>
         <Button onClick={() => setIframeNonce(n => n + 1)}>Обновить</Button>
         {heatmap ? (
-          <Button onClick={() => void pushHeatmapToIframe()}>Перезагрузить heatmap</Button>
+          <Button onClick={() => void pushHeatmapToIframe(undefined, true)}>
+            Перезагрузить heatmap
+          </Button>
         ) : null}
       </div>
 
