@@ -157,29 +157,17 @@ const StorePreview = () => {
     let readyTimer: number | null = null
 
     const onIframeReady = (event: MessageEvent) => {
-      dbg('← iframe message', {
-        origin: event.origin,
-        storeOriginOk: isStoreIframeDocumentOrigin(event.origin),
-        dataType: typeof event.data,
-      })
       if (!isStoreIframeDocumentOrigin(event.origin)) {
-        dbg('ready handler: skip bad origin', event.origin)
         return
       }
       const win = iframeRef.current?.contentWindow
       if (!win || event.source !== win) {
-        dbg('ready handler: skip source mismatch', {
-          hasWin: Boolean(win),
-          sameSource: event.source === win,
-        })
         return
       }
       if (!isIframeReadyPayload(event.data)) {
-        dbg('ready handler: skip not ready payload', event.data)
         return
       }
       if (!heatmap) {
-        dbg('ready handler: skip heatmap off')
         return
       }
       const pageId = normalizePath(event.data.page_id)
