@@ -11,6 +11,31 @@ import './StorePreview.scss'
 
 const SITE_ORIGIN = 'https://solitude-store.ru'
 
+/** Origin документа во iframe (apex / www / поддомен витрины). */
+function isStoreIframeDocumentOrigin(origin: string): boolean {
+  try {
+    const u = new URL(origin)
+    const base = new URL(SITE_ORIGIN)
+    if (u.protocol !== base.protocol) {
+      return false
+    }
+    const h = u.hostname
+    const bh = base.hostname
+    if (h === bh) {
+      return true
+    }
+    if (h === `www.${bh}` || bh === `www.${h}`) {
+      return true
+    }
+    if (h.endsWith(`.${bh}`)) {
+      return true
+    }
+    return false
+  } catch {
+    return false
+  }
+}
+
 function normalizePath(raw: string): string {
   const t = raw.trim()
   if (t === '') {
@@ -19,7 +44,7 @@ function normalizePath(raw: string): string {
   if (t.startsWith('http://') || t.startsWith('https://')) {
     try {
       const u = new URL(t)
-      if (u.origin === SITE_ORIGIN) {
+      if (isStoreIframeDocumentOrigin(u.origin)) {
         const combined = `${u.pathname}${u.search}${u.hash}`
         return combined === '' ? '/' : combined
       }
@@ -103,14 +128,14 @@ const StorePreview = () => {
         return
       }
       if (!heatmap) {
-        win.postMessage({ isIframeInteraction: false }, SITE_ORIGIN)
+        win.postMessage({ isIframeInteraction: false }, '*')
         return
       }
       const pageId = pageIdForFetch ?? path
       try {
         const res = await triggerHeatmapClicks(pageId).unwrap()
         const clicks = res.data?.clicks ?? []
-        win.postMessage({ clicks, isIframeInteraction: true }, SITE_ORIGIN)
+        win.postMessage({ clicks, isIframeInteraction: true }, '*')
       } catch (e) {
         message.error(e instanceof Error ? e.message : 'Не удалось загрузить heatmap')
       }
@@ -122,7 +147,7 @@ const StorePreview = () => {
     let readyTimer: number | null = null
 
     const onIframeReady = (event: MessageEvent) => {
-      if (event.origin !== SITE_ORIGIN) {
+      if (!isStoreIframeDocumentOrigin(event.origin)) {
         return
       }
       const win = iframeRef.current?.contentWindow
@@ -160,7 +185,7 @@ const StorePreview = () => {
       return
     }
     if (!heatmap) {
-      win.postMessage({ isIframeInteraction: false }, SITE_ORIGIN)
+      win.postMessage({ isIframeInteraction: false }, '*')
       return
     }
     const t = window.setTimeout(() => {
