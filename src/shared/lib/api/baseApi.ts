@@ -20,10 +20,25 @@ export interface ApiResponse<T, M> {
   message?: string
 }
 
-const baseUrl = import.meta.env.VITE_API_URL
+/** В dev — относительный путь: Vite проксирует `/api` → бэк, без CORS в браузере. В prod — полный URL из env. */
+export function getApiBaseUrl(): string {
+  if (import.meta.env.DEV) {
+    return '/api'
+  }
+  const raw = import.meta.env.VITE_API_URL as string | undefined
+  if (raw) {
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      return raw
+    }
+    return `https://${raw}`
+  }
+  return 'https://api.solitude-store.ru'
+}
+
+const baseUrl = getApiBaseUrl()
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: baseUrl,
+  baseUrl,
   prepareHeaders: headers => {
     const token = localStorage.getItem('access')
 
@@ -57,7 +72,7 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error('No refresh token')
   }
 
-  const response = await fetch(`${baseUrl}/auth/refresh`, {
+  const response = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -120,7 +135,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
       subscribeTokenRefresh(async (newToken: string) => {
         try {
           const retryResult = await fetchBaseQuery({
-            baseUrl: baseUrl,
+            baseUrl: getApiBaseUrl(),
             prepareHeaders: headers => {
               headers.set('Accept', 'application/json')
               headers.set('Content-Type', 'application/json')

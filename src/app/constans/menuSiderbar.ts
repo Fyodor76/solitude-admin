@@ -8,6 +8,13 @@ export const menuSidebar: MenuItem[] = [
     icon: 'categories',
     hasArrow: false,
   },
+  {
+    id: 'store-preview',
+    text: 'Просмотр сайта',
+    href: '/store-preview',
+    icon: 'charts',
+    hasArrow: false,
+  },
   /*{
     id: 'dashboard',
     text: 'Dashboard',

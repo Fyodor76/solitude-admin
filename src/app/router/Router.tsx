@@ -1,8 +1,7 @@
 import { BaseLayout } from '@/layouts/base-layout'
 import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
-import CatalogPage from '@/pages/test/CatalogPage'
-import TshortsPage from '@/pages/test/TshortsPage'
+import { StorePreview } from '@/pages/store-preview'
 import { RouteObject } from 'react-router-dom'
 
 import { Forgot } from '../../pages/forgot'
@@ -73,6 +72,14 @@ export const Router: RouteObject[] = [
         element: (
           <BaseLayout>
             <Categories />
+          </BaseLayout>
+        ),
+      },
+      {
+        path: '/store-preview',
+        element: (
+          <BaseLayout>
+            <StorePreview />
           </BaseLayout>
         ),
       },
