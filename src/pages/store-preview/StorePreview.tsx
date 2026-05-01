@@ -9,6 +9,20 @@ import { Button, Input, message, Space, Spin, Switch, Typography } from 'antd'
 
 import './StorePreview.scss'
 
+function storePreviewDbg(...args: unknown[]) {
+  try {
+    const on =
+      process.env.NODE_ENV === 'development' ||
+      (typeof window !== 'undefined' && window.localStorage.getItem('debug_store_preview') === '1')
+    if (!on) {
+      return
+    }
+    console.log('[store-preview]', ...args)
+  } catch {
+    /* empty */
+  }
+}
+
 const SITE_ORIGIN = 'https://solitude-store.ru'
 
 /** Origin документа во iframe (apex / www / поддомен витрины). */
@@ -67,6 +81,16 @@ function pageButtonLabel(row: TrackedPageSummary): string {
 function buildIframeSrc(pathname: string): string {
   const u = new URL(pathname, SITE_ORIGIN)
   u.searchParams.set('is_iframe', 'true')
+  try {
+    if (
+      typeof window !== 'undefined' &&
+      window.localStorage.getItem('debug_store_preview') === '1'
+    ) {
+      u.searchParams.set('debug_preview', '1')
+    }
+  } catch {
+    /* empty */
+  }
   return u.toString()
 }
 
@@ -105,6 +129,7 @@ const StorePreview = () => {
 
   useEffect(() => {
     if (pagesError) {
+      storePreviewDbg('tracked pages query error', pagesError)
       message.warning('Не удалось загрузить список страниц из API')
     }
   }, [pagesError])
@@ -125,18 +150,23 @@ const StorePreview = () => {
     async (pageIdForFetch?: string) => {
       const win = iframeRef.current?.contentWindow
       if (!win) {
+        storePreviewDbg('pushHeatmap: no contentWindow')
         return
       }
       if (!heatmap) {
+        storePreviewDbg('postMessage → iframe: heatmap OFF')
         win.postMessage({ isIframeInteraction: false }, '*')
         return
       }
       const pageId = pageIdForFetch ?? path
+      storePreviewDbg('pushHeatmap: fetch clicks', { pageId })
       try {
         const res = await triggerHeatmapClicks(pageId).unwrap()
         const clicks = res.data?.clicks ?? []
+        storePreviewDbg('postMessage → iframe: clicks', { count: clicks.length })
         win.postMessage({ clicks, isIframeInteraction: true }, '*')
       } catch (e) {
+        storePreviewDbg('pushHeatmap: API error', e)
         message.error(e instanceof Error ? e.message : 'Не удалось загрузить heatmap')
       }
     },
@@ -147,20 +177,33 @@ const StorePreview = () => {
     let readyTimer: number | null = null
 
     const onIframeReady = (event: MessageEvent) => {
+      storePreviewDbg('← iframe message', {
+        origin: event.origin,
+        storeOriginOk: isStoreIframeDocumentOrigin(event.origin),
+        dataType: typeof event.data,
+      })
       if (!isStoreIframeDocumentOrigin(event.origin)) {
+        storePreviewDbg('ready handler: skip bad origin', event.origin)
         return
       }
       const win = iframeRef.current?.contentWindow
       if (!win || event.source !== win) {
+        storePreviewDbg('ready handler: skip source mismatch', {
+          hasWin: Boolean(win),
+          sameSource: event.source === win,
+        })
         return
       }
       if (!isIframeReadyPayload(event.data)) {
+        storePreviewDbg('ready handler: skip not ready payload', event.data)
         return
       }
       if (!heatmap) {
+        storePreviewDbg('ready handler: skip heatmap off')
         return
       }
       const pageId = normalizePath(event.data.page_id)
+      storePreviewDbg('ready handler: schedule pushHeatmap', { pageId })
       if (readyTimer != null) {
         window.clearTimeout(readyTimer)
       }
@@ -182,12 +225,15 @@ const StorePreview = () => {
   useEffect(() => {
     const win = iframeRef.current?.contentWindow
     if (!win) {
+      storePreviewDbg('heatmap effect: no iframe window')
       return
     }
     if (!heatmap) {
+      storePreviewDbg('heatmap effect: OFF → postMessage iframe')
       win.postMessage({ isIframeInteraction: false }, '*')
       return
     }
+    storePreviewDbg('heatmap effect: ON → schedule push')
     const t = window.setTimeout(() => {
       void pushHeatmapToIframe()
     }, 150)
