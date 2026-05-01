@@ -3,7 +3,7 @@ import { MenuItem } from '@/app/components/sidebar/sidebarType'
 export const menuSidebar: MenuItem[] = [
   {
     id: 'categories',
-    text: 'Сategories',
+    text: 'Категории',
     href: '/categories',
     icon: 'categories',
     hasArrow: false,
