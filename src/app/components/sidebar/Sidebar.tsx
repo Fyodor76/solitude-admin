@@ -8,7 +8,7 @@ import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../../../shared/ui/icons/Icon'
-import './sidebar.scss'
+import './Sidebar.scss'
 import { SidebarProps } from './sidebarType'
 
 const Sidebar = ({
