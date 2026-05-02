@@ -2,7 +2,7 @@ import { BaseLayout } from '@/layouts/base-layout'
 import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
 import { StorePreview } from '@/pages/store-preview'
-import { RouteObject } from 'react-router-dom'
+import { Navigate, RouteObject } from 'react-router-dom'
 
 import { Forgot } from '../../pages/forgot'
 import Login from '../../pages/login/Login'
@@ -77,6 +77,10 @@ export const Router: RouteObject[] = [
       },
       {
         path: '/store-preview',
+        element: <Navigate to="/heatmap" replace />,
+      },
+      {
+        path: '/heatmap',
         element: (
           <BaseLayout>
             <StorePreview />

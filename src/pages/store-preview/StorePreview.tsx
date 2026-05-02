@@ -201,7 +201,7 @@ const StorePreview = () => {
   return (
     <div className="storePreview">
       <div className="storePreview__header">
-        <h1 className="storePreview__title">Просмотр витрины</h1>
+        <h1 className="storePreview__title">Тепловая карта сайта</h1>
         <Typography.Text type="secondary">
           {SITE_ORIGIN}
           {path}

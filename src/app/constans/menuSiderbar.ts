@@ -9,9 +9,9 @@ export const menuSidebar: MenuItem[] = [
     hasArrow: false,
   },
   {
-    id: 'store-preview',
-    text: 'Просмотр сайта',
-    href: '/store-preview',
+    id: 'heatmap',
+    text: 'Тепловая карта сайта',
+    href: '/heatmap',
     icon: 'charts',
     hasArrow: false,
   },
