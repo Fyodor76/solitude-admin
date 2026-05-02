@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 import Icon from '../../../shared/ui/icons/Icon'
-import './headerSidebar.scss'
+import './HeaderSidebar.scss'
 
 /*interface HeaderSidebarProps {
   isOpen: boolean
