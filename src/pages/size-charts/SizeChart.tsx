@@ -17,6 +17,7 @@ import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Select, Space } from 'antd'
+import { span } from 'framer-motion/client'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -237,97 +238,125 @@ const SizeChart = () => {
 
   return (
     <div className="size-chart-wrapper">
-      <span className="size-chart-title"> Управление размерами</span>
-      <Select
-        className="size-chart-select"
-        value={formSizeChart.categoryId || undefined}
-        placeholder="Выберете категорию"
-        onChange={value => {
-          setFormSizeChart({
-            ...initialData,
-            categoryId: value,
-          })
-          setEditParameter([])
-          setSelectedSizeToAdd(null)
-        }}
-        allowClear
-      >
-        {allCategories &&
-          allCategories.map(cat => (
-            <Select.Option key={cat.id} value={cat.id}>
-              {cat.name}
-            </Select.Option>
-          ))}
-      </Select>
-
-      {formSizeChart.categoryId && (
-        <span className="changeCategoryName">
-          {' '}
-          Выбрано: {allCategories.find(cat => cat.id === formSizeChart.categoryId)?.name}
-        </span>
-      )}
-
-      {formSizeChart.categoryId && (
-        <div className="size-chart-table-container">
-          {isFetching && <span> Загружаю таблицу! Ждите...</span>}
-          {!isFetching && currentData?.data?.id && (
-            <>
-              <span className="size-charts-parameters-title">Информация о таблице размеров</span>
-              <div className="size-charts-parameters">
-                <div className="btn-and-size-chart">
-                  <div className="size-chart">
-                    <span> Название: {currentData.data.name}</span>
-                    <span>Описание: {currentData.data.description}</span>
-                    <span>Замеры: {currentData.data.metricsText}</span>
-                    {imageUrl && <img src={imageUrl} alt="Size-chart preview" />}
-                  </div>
-                  <Button onClick={handleEditSizeChart}>
-                    <Icon name="editing" width="18px"></Icon>
-                  </Button>
-                </div>
-                <SizeParameters
-                  dataParameters={dataParameters}
-                  editParameter={editParameter}
-                  selectedSizeToAdd={selectedSizeToAdd}
-                  changedRows={changedRows}
-                  setChangedRows={setChangedRows}
-                  setSelectedSizeToAdd={setSelectedSizeToAdd}
-                  setEditParameter={setEditParameter}
-                  deleteSize={deleteSize}
-                  createNewSizeParameter={createNewSizeParameter}
-                />
-                <Space style={{ marginTop: 16, marginBottom: 16 }}>
-                  <Button onClick={() => onSaveAllChanges(currentData.data)} type="primary">
-                    Сохранить изменения
-                  </Button>
-                </Space>
-              </div>
-            </>
-          )}
-          {!isFetching && !currentData?.data.id && (
-            <div>
-              <span>У данной категории еще нет таблицы размеров...</span>
-              <Button type="default" className="size-chart-btn" onClick={handleCreateSizeChart}>
-                Создать
-              </Button>
-            </div>
+      <div className="size-chart-container-in-wrapper">
+        <h1 className="size-chart-title"> Управление таблицами размеров</h1>
+        <div className="size-chart-select-container">
+          <span className="size-chart-select-container-title">Выберете категорию</span>
+          <div className="change-category">
+            <Select
+              className="size-chart-select"
+              value={formSizeChart.categoryId || undefined}
+              placeholder="Выберете категорию"
+              onChange={value => {
+                setFormSizeChart({
+                  ...initialData,
+                  categoryId: value,
+                })
+                setEditParameter([])
+                setSelectedSizeToAdd(null)
+              }}
+              allowClear
+            >
+              {allCategories &&
+                allCategories.map(cat => (
+                  <Select.Option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </Select.Option>
+                ))}
+            </Select>
+            {formSizeChart.categoryId && (
+              <span className="changeCategoryName">
+                Выбрано:{' '}
+                <span className="category-name-change">
+                  {allCategories.find(cat => cat.id === formSizeChart.categoryId)?.name}
+                </span>
+              </span>
+            )}
+          </div>
+          {!formSizeChart.categoryId && (
+            <span className="size-chart-select-label">
+              Выберете категорию, чтобы посмотреть или редактировать таблицу размеров
+            </span>
           )}
         </div>
-      )}
-      <SizeChartModal
-        isCreated={isCreate}
-        isEdit={isEdit}
-        uploadImg={uploadImg}
-        isOpen={editModal.isOpen}
-        formSizeChart={formSizeChart}
-        imageUrl={imageUrl}
-        setUploadImg={setUploadImg}
-        setFormSizeChart={setFormSizeChart}
-        onClose={editModal.onClose}
-        saveAllChanges={onSaveAllChanges}
-        setModes={editModal.setMode}
-        createNewSizeChart={createNewSizeChart}
-      />
+        {formSizeChart.categoryId && (
+          <div className="size-chart-table-container">
+            {isFetching && <span> Загружаю таблицу! Ждите...</span>}
+
+            {!isFetching && currentData?.data?.id && (
+              <>
+                <span className="size-charts-parameters-title">Управление размерами</span>
+                <div className="size-charts-parameters">
+                  <div className="btn-and-size-chart">
+                    <div className="size-chart">
+                      <span> Название: {currentData.data.name}</span>
+                      <span>Описание: {currentData.data.description}</span>
+                      <span>Замеры: {currentData.data.metricsText}</span>
+                      {imageUrl && <img src={imageUrl} alt="Size-chart preview" />}
+                    </div>
+                    <Button onClick={handleEditSizeChart}>
+                      <Icon name="editing" width="18px"></Icon>
+                    </Button>
+                  </div>
+                  <SizeParameters
+                    dataParameters={dataParameters}
+                    editParameter={editParameter}
+                    selectedSizeToAdd={selectedSizeToAdd}
+                    changedRows={changedRows}
+                    setChangedRows={setChangedRows}
+                    setSelectedSizeToAdd={setSelectedSizeToAdd}
+                    setEditParameter={setEditParameter}
+                    deleteSize={deleteSize}
+                    createNewSizeParameter={createNewSizeParameter}
+                  />
+                  <Space style={{ marginTop: 16, marginBottom: 16 }}>
+                    <Button onClick={() => onSaveAllChanges(currentData.data)} type="primary">
+                      Сохранить изменения
+                    </Button>
+                  </Space>
+                </div>
+              </>
+            )}
+
+            {!isFetching && !currentData?.data.id && (
+              <>
+                <div className="size-chart-select-empty-container">
+                  <h2 className="empty-table">Информация о таблице размеров</h2>
+                  <div className="information">
+                    <h3 className="information-title">Категория не выбрана</h3>
+                    <span className="information-info">
+                      Выберете категорию, чтобы увидеть информацию о таблице размеров
+                    </span>
+                  </div>
+                </div>
+                <div className="size-chart-select-empty-container">
+                  <h2 className="empty-table">Таблица размеров</h2>
+                  <div className="information">
+                    <h3 className="information-title">Таблица размеров не отображается</h3>
+                    <span className="information-info">
+                      Выберете категорию, чтобы посмотреть и редактировать таблицу размеров
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        <SizeChartModal
+          isCreated={isCreate}
+          isEdit={isEdit}
+          uploadImg={uploadImg}
+          isOpen={editModal.isOpen}
+          formSizeChart={formSizeChart}
+          imageUrl={imageUrl}
+          setUploadImg={setUploadImg}
+          setFormSizeChart={setFormSizeChart}
+          onClose={editModal.onClose}
+          saveAllChanges={onSaveAllChanges}
+          setModes={editModal.setMode}
+          createNewSizeChart={createNewSizeChart}
+        />
+      </div>
     </div>
   )
 }
