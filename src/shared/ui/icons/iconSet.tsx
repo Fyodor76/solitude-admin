@@ -76,8 +76,8 @@ export const iconSet = {
   ),
   layoutOptions: (
     <svg
-      width="800px"
-      height="800px"
+      width="28px"
+      height="28px"
       viewBox="0 0 28 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -105,8 +105,8 @@ export const iconSet = {
 
   tables: (
     <svg
-      width="20"
-      height="20"
+      width="24px"
+      height="24px"
       viewBox="0 0 16 16"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
