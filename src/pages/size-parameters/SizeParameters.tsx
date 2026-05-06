@@ -134,6 +134,10 @@ const SizeParameters = ({
   return (
     <div className="tableAndAddParameter">
       <div className="addParameter">
+        <h3 className="information-title">Таблица размеров</h3>
+        <Button type="link">+ Добавить размер</Button>
+      </div>
+      {/*<div className=>
         <Select
           placeholder="Выберете размер, который хотите добавить"
           value={selectedSizeToAdd}
@@ -144,7 +148,7 @@ const SizeParameters = ({
           }))}
         ></Select>
         <Button onClick={createNewSizeParameter}>Добавить</Button>
-      </div>
+        </div>*/}
       <Table
         columns={columns}
         dataSource={sortedData}
