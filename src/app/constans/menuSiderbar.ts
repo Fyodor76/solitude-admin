@@ -8,6 +8,13 @@ export const menuSidebar: MenuItem[] = [
     icon: 'categories',
     hasArrow: false,
   },
+  {
+    id: 'size-charts',
+    text: 'Size-charts',
+    href: 'size-charts',
+    icon: 'tables',
+    hasArrow: false,
+  },
   /*{
     id: 'dashboard',
     text: 'Dashboard',

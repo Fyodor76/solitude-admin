@@ -1,6 +1,5 @@
 import { ReactNode, useState } from 'react'
 
-import Categories from '@/pages/categories/Categories'
 import { Header } from '@/shared/ui/header'
 import { Link } from 'react-router-dom'
 

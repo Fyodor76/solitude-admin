@@ -16,8 +16,8 @@ import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-para
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, Select, Space } from 'antd'
-import { span } from 'framer-motion/client'
+import { Button, Input, Select, Space, Spin } from 'antd'
+import { div, span } from 'framer-motion/client'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -236,6 +236,15 @@ const SizeChart = () => {
     }
   }
 
+  const handleSizeChartChange = (field: keyof SizeChartRequest, value: string) => {
+    setFormSizeChart(prev => {
+      return {
+        ...prev,
+        [field]: value,
+      }
+    })
+  }
+
   return (
     <div className="size-chart-wrapper">
       <div className="size-chart-container-in-wrapper">
@@ -279,25 +288,91 @@ const SizeChart = () => {
             </span>
           )}
         </div>
+        {!formSizeChart.id && !formSizeChart.categoryId && (
+          <>
+            <div className="size-chart-select-empty-container">
+              <h2 className="empty-table">Информация о таблице размеров</h2>
+              <div className="information">
+                <Icon className="information-icon" name="layoutOptions" color="#505253"></Icon>
+                <h3 className="information-title">Категория не выбрана</h3>
+                <span className="information-info">
+                  Выберете категорию, чтобы увидеть информацию о таблице размеров
+                </span>
+              </div>
+            </div>
+            <div className="size-chart-select-empty-container">
+              <h2 className="empty-table">Таблица размеров</h2>
+              <div className="information">
+                <Icon className="information-icon" name="tables" color="#505253"></Icon>
+                <h3 className="information-title">Таблица размеров не отображается</h3>
+                <span className="information-info">
+                  Выберете категорию, чтобы посмотреть и редактировать таблицу размеров
+                </span>
+              </div>
+            </div>{' '}
+          </>
+        )}
+
         {formSizeChart.categoryId && (
           <div className="size-chart-table-container">
-            {isFetching && <span> Загружаю таблицу! Ждите...</span>}
-
+            {isFetching && !currentData?.data?.id && (
+              <div className="spin-centered-size">
+                <Spin size="large" />
+              </div>
+            )}
             {!isFetching && currentData?.data?.id && (
               <>
-                <span className="size-charts-parameters-title">Управление размерами</span>
-                <div className="size-charts-parameters">
-                  <div className="btn-and-size-chart">
+                <div className="size-chart-select-empty-container">
+                  <h2 className="empty-table">Информация о таблице размеров</h2>
+                  <div className="main-info">
                     <div className="size-chart">
-                      <span> Название: {currentData.data.name}</span>
-                      <span>Описание: {currentData.data.description}</span>
-                      <span>Замеры: {currentData.data.metricsText}</span>
-                      {imageUrl && <img src={imageUrl} alt="Size-chart preview" />}
+                      <span>Название</span>
+                      <Input
+                        value={formSizeChart.name}
+                        onChange={e => handleSizeChartChange('name', e.target.value)}
+                      ></Input>
+                      <span>Замеры</span>
+                      <Input
+                        value={formSizeChart.metricsText}
+                        onChange={e => handleSizeChartChange('metricsText', e.target.value)}
+                      ></Input>
+                      <span>Тип</span>
+                      <Input
+                        value={formSizeChart.productType}
+                        onChange={e => handleSizeChartChange('productType', e.target.value)}
+                      ></Input>
                     </div>
-                    <Button onClick={handleEditSizeChart}>
-                      <Icon name="editing" width="18px"></Icon>
-                    </Button>
+                    <div className="size-chart-description">
+                      <span>Описание (необязательно)</span>
+                      <Input
+                        value={formSizeChart.description}
+                        onChange={e => handleSizeChartChange('description', e.target.value)}
+                      ></Input>
+                    </div>
+                    <div className="size-chart-img">
+                      <span>Изображение с инструкцией (необязательно)</span>
+                      <img
+                        src={imageUrl || '/visily-image.png'}
+                        alt="Size-chart preview"
+                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                          e.currentTarget.src = '/visily-image.png'
+                        }}
+                      />
+                    </div>
+
+                    <div className="size-chart-btn">
+                      <Button onClick={handleEditSizeChart}>
+                        <Icon name="editing" width="18px"></Icon>
+                      </Button>
+                      <Button>
+                        <Icon name="delete" width="18px"></Icon>
+                      </Button>
+                    </div>
                   </div>
+                </div>
+
+                <div className="size-charts-parameters">
+                  <div className="btn-and-size-chart"></div>
                   <SizeParameters
                     dataParameters={dataParameters}
                     editParameter={editParameter}
@@ -317,30 +392,21 @@ const SizeChart = () => {
                 </div>
               </>
             )}
-
-            {!isFetching && !currentData?.data.id && (
-              <>
-                <div className="size-chart-select-empty-container">
-                  <h2 className="empty-table">Информация о таблице размеров</h2>
-                  <div className="information">
-                    <Icon className="information-icon" name="layoutOptions" color="#505253"></Icon>
-                    <h3 className="information-title">Категория не выбрана</h3>
-                    <span className="information-info">
-                      Выберете категорию, чтобы увидеть информацию о таблице размеров
-                    </span>
-                  </div>
+            {!isFetching && !currentData?.data?.id && (
+              <div className="size-chart-select-empty-container">
+                <h2 className="empty-table">Информация о таблице размеров</h2>
+                <div className="information">
+                  <h3 className="information-title">У данной категории ещё нет таблицы размеров</h3>
+                  <span className="information-info">Создайте таблицу с размерами</span>
+                  <Button
+                    onClick={handleCreateSizeChart}
+                    className="information-btn"
+                    type="default"
+                  >
+                    Создать
+                  </Button>
                 </div>
-                <div className="size-chart-select-empty-container">
-                  <h2 className="empty-table">Таблица размеров</h2>
-                  <div className="information">
-                    <Icon className="information-icon" name="tables" color="#505253"></Icon>
-                    <h3 className="information-title">Таблица размеров не отображается</h3>
-                    <span className="information-info">
-                      Выберете категорию, чтобы посмотреть и редактировать таблицу размеров
-                    </span>
-                  </div>
-                </div>
-              </>
+              </div>
             )}
           </div>
         )}

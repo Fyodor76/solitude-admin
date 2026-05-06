@@ -4,7 +4,7 @@
   font-family: var(--font-primary);
   width: 100%;
   margin: 0 auto;
-  background-color: var(--color-grey-background-breadcrumbs);
+  background-color: #f8fafb;
 
   .size-chart-container-in-wrapper {
     display: flex;
@@ -42,10 +42,6 @@
         .size-chart-select::placeholder {
           font-size: 14px;
         }
-        .size-chart-select-label {
-          color: #7e7f83;
-          font-size: 13px;
-        }
 
         .changeCategoryName {
           color: #7e7f83;
@@ -57,12 +53,24 @@
           }
         }
       }
+      .size-chart-select-label {
+        color: #9d9fa1;
+        font-size: 13px;
+      }
     }
 
     .size-chart-table-container {
       display: flex;
       flex-direction: column;
       gap: 20px;
+
+      .spin-centered-size {
+        align-items: enter;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        margin-top: 20px;
+      }
 
       .size-charts-parameters-title {
         text-align: center;
@@ -100,6 +108,29 @@
         color: #303030;
         margin-bottom: 30px;
       }
+      .main-info {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+
+        .size-chart {
+          display: flex;
+          flex-direction: column;
+          width: 335px;
+        }
+        .size-chart-description {
+          display: flex;
+          flex-direction: column;
+          width: 335px;
+        }
+        .size-chart-img {
+          width: 20%;
+        }
+        .size-chart-btn {
+          display: flex;
+          flex-direction: column;
+        }
+      }
       .information {
         display: flex;
         flex-direction: column;
@@ -119,7 +150,21 @@
           font-size: 14px;
           color: #9d9fa1;
         }
+        &-btn {
+          margin-top: 8px;
+        }
       }
     }
   }
 }
+/* Container 
+.container {
+  position: absolute; 
+  top: 665px; 
+  left: 235px; 
+  width: 1173px; 
+  height: 382px; 
+  background: #FFFFFFFF; 
+  border-radius: 6px; 
+  box-shadow: 0px 2px 4px #000000A, 0px 0px 0px #171a1f00; 
+}*/
