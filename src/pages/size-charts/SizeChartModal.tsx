@@ -117,7 +117,11 @@ const SizeChartModal = ({
           message.success('Файл загружен')
         }}
       />
-      {currentUrl && <img className="imgSizeChart" src={currentUrl} alt="Category preview"></img>}
+      {currentUrl ? (
+        <img className="imgSizeChart" src={currentUrl} alt="Category preview"></img>
+      ) : (
+        <img className="imgSizeChart" src="/visily-image.png" alt="Category preview"></img>
+      )}
     </Modal>
   )
 }

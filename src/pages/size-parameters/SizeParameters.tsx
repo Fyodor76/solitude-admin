@@ -5,6 +5,7 @@ import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input, InputNumber, Select, Space, Table, Tooltip } from 'antd'
 
 import { ALL_RU_SIZES, ALL_SIZES, MAX_CHEST, MAX_LENGTH, MIN_CHEST, MIN_LENGTH } from './const'
+import SizeParameterAddModal from './SizeParameterAddModal'
 import './SizeParameters.scss'
 
 interface SizeParametesProps {
@@ -12,6 +13,9 @@ interface SizeParametesProps {
   editParameter: EditableSizeParameter[]
   selectedSizeToAdd?: string | null
   changedRows: Record<string, boolean>
+  isOpen: boolean
+  onOpen: (data: unknown) => void
+  onClose: () => void
   setChangedRows: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
   setEditParameter: React.Dispatch<React.SetStateAction<EditableSizeParameter[]>>
   setSelectedSizeToAdd: React.Dispatch<React.SetStateAction<string | null>>
@@ -23,6 +27,9 @@ const SizeParameters = ({
   changedRows,
   editParameter,
   selectedSizeToAdd,
+  isOpen,
+  onClose,
+  onOpen,
   setChangedRows,
   setEditParameter,
   setSelectedSizeToAdd,
@@ -131,30 +138,36 @@ const SizeParameters = ({
   const sortedData = [...editParameter].sort((a, b) => {
     return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
   })
+
+  const handleAddSize = () => {
+    if (filterParameters.length) {
+      onOpen(filterParameters)
+    }
+  }
+
   return (
     <div className="tableAndAddParameter">
       <div className="addParameter">
         <h3 className="information-title">Таблица размеров</h3>
-        <Button type="link">+ Добавить размер</Button>
+        <Button onClick={handleAddSize} type="link">
+          + Добавить размер
+        </Button>
       </div>
-      {/*<div className=>
-        <Select
-          placeholder="Выберете размер, который хотите добавить"
-          value={selectedSizeToAdd}
-          onChange={setSelectedSizeToAdd}
-          options={filterParameters.map(s => ({
-            label: `${s} (${ALL_RU_SIZES[s]} p.)`,
-            value: s,
-          }))}
-        ></Select>
-        <Button onClick={createNewSizeParameter}>Добавить</Button>
-        </div>*/}
+
       <Table
         columns={columns}
         dataSource={sortedData}
         rowKey="id"
         pagination={false}
         rowClassName={getRowClassName}
+      />
+      <SizeParameterAddModal
+        onClose={onClose}
+        isOpen={isOpen}
+        selectedSizeToAdd={selectedSizeToAdd}
+        setSelectedSizeToAdd={setSelectedSizeToAdd}
+        createNewSizeParameter={createNewSizeParameter}
+        filterParameters={filterParameters}
       />
     </div>
   )

@@ -4,6 +4,7 @@ import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categorie
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import {
   useCreateSizeChartMutation,
+  useDeleteSizeChartByIdMutation,
   useGetSizeChartByCategoryIdQuery,
   useUpdateSizeChartByIdMutation,
 } from '@/shared/lib/api/size-charts/SizeCharts'
@@ -16,8 +17,7 @@ import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-para
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, Input, Select, Space, Spin } from 'antd'
-import { div, span } from 'framer-motion/client'
+import { Button, Input, Modal, Select, Space, Spin } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -37,6 +37,8 @@ import SizeChartModal from './SizeChartModal'
 
 const SizeChart = () => {
   const editModal = useModal()
+  const addSizeModal = useModal()
+  const { TextArea } = Input
 
   const [createSizeChart] = useCreateSizeChartMutation()
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
@@ -54,12 +56,13 @@ const SizeChart = () => {
       skip: !formSizeChart.categoryId,
     }
   )
+  const [deleteSizeChartById] = useDeleteSizeChartByIdMutation()
   const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
 
   const mode = editModal.mode
   const isCreate = mode === MODES.CREATE
   const isEdit = mode === MODES.EDIT
-  const imageUrl = isEdit && formSizeChart.imageId ? `${CDN_URL}/${formSizeChart.imageId}` : null
+  const imageUrl = formSizeChart.imageId ? `${CDN_URL}/${formSizeChart.imageId}` : null
 
   const dataParameters = currentData?.data?.sizeParameters
   const sizeChartId = currentData?.data?.id
@@ -89,12 +92,6 @@ const SizeChart = () => {
     return getAllCategories(categoriesTreeData.data)
   }, [categoriesTreeData])
 
-  const handleEditSizeChart = () => {
-    if (formSizeChart) {
-      editModal.setMode(MODES.EDIT)
-      editModal.onOpen(formSizeChart)
-    }
-  }
   const handleCreateSizeChart = () => {
     if (!formSizeChart.categoryId) {
       alert('Выберете категорию!')
@@ -166,6 +163,23 @@ const SizeChart = () => {
     }
   }
 
+  const deleteSizeChart = async (id: string | undefined) => {
+    const isConfirmed = confirm('Удалить таблицу с размерами?')
+    if (!isConfirmed) return
+    try {
+      if (id) await deleteSizeChartById(id).unwrap()
+      setFormSizeChart({
+        ...initialData,
+        categoryId: formSizeChart.categoryId,
+      })
+      setEditParameter([])
+      setSelectedSizeToAdd(null)
+      console.log('Удаление прошло успешно!')
+    } catch (error) {
+      console.log('Ошибка удаления таблицы!', error)
+    }
+  }
+
   const deleteSize = async (id: string | undefined) => {
     const sizeToDelete = editParameter.find(p => p.id === id)
     const isConfirmed = confirm(`Удалить размер "${sizeToDelete?.internationalSize}"?`)
@@ -208,7 +222,7 @@ const SizeChart = () => {
 
     if (hasInvalid) {
       alert('Есть некорректные значения! Проверьте длину (20-150 см) и обхват груди (40-200 см)')
-      return // Не сохраняем, если есть ошибки
+      return
     }
     try {
       await updateSizeChart({
@@ -243,6 +257,20 @@ const SizeChart = () => {
         [field]: value,
       }
     })
+  }
+
+  const handleCancel = () => {
+    setFormSizeChart(prev => ({
+      ...prev,
+      name: currentData?.data?.name || '',
+      description: currentData?.data?.description || '',
+      metricsText: currentData?.data?.metricsText || '',
+      productType: currentData?.data?.productType || '',
+      imageId: currentData?.data?.imageId || null,
+    }))
+    setEditParameter(currentData?.data?.sizeParameters || [])
+    setChangedRows({})
+    setSelectedSizeToAdd(null)
   }
 
   return (
@@ -347,11 +375,12 @@ const SizeChart = () => {
                     </div>
                     <div className="size-chart-description">
                       <span className="size-chart-title-text">Описание (необязательно)</span>
-                      <Input
+                      <TextArea
                         className="size-chart-input-description"
                         value={formSizeChart.description}
+                        rows={10}
                         onChange={e => handleSizeChartChange('description', e.target.value)}
-                      ></Input>
+                      ></TextArea>
                     </div>
                     <div className="size-chart-img">
                       <span className="size-chart-title-text">
@@ -374,11 +403,17 @@ const SizeChart = () => {
                     </div>
 
                     <div className="size-chart-btn">
-                      <Button onClick={handleEditSizeChart}>
-                        <Icon name="editing" width="18px"></Icon>
+                      <Button
+                        className="btn-save-size"
+                        onClick={() => onSaveAllChanges(formSizeChart)}
+                      >
+                        <Icon name="save" width="24px" color="#414243"></Icon>
                       </Button>
-                      <Button>
-                        <Icon name="delete" width="18px"></Icon>
+                      <Button
+                        onClick={() => deleteSizeChart(formSizeChart.id)}
+                        className="btn-delete-size"
+                      >
+                        <Icon name="delete" width="24px" color="#505253"></Icon>
                       </Button>
                     </div>
                   </div>
@@ -387,10 +422,13 @@ const SizeChart = () => {
                 <div className="size-charts-parameters">
                   <div className="btn-and-size-chart"></div>
                   <SizeParameters
+                    isOpen={addSizeModal.isOpen}
                     dataParameters={dataParameters}
                     editParameter={editParameter}
                     selectedSizeToAdd={selectedSizeToAdd}
                     changedRows={changedRows}
+                    onOpen={addSizeModal.onOpen}
+                    onClose={addSizeModal.onClose}
                     setChangedRows={setChangedRows}
                     setSelectedSizeToAdd={setSelectedSizeToAdd}
                     setEditParameter={setEditParameter}
@@ -399,6 +437,7 @@ const SizeChart = () => {
                   />
                 </div>
                 <Space
+                  className="saveAndCancelBtn"
                   style={{
                     marginTop: 16,
                     marginBottom: 16,
@@ -406,7 +445,14 @@ const SizeChart = () => {
                     justifyContent: 'flex-end',
                   }}
                 >
-                  <Button onClick={() => onSaveAllChanges(currentData.data)} type="primary">
+                  <Button onClick={handleCancel} className="cancelBtn" type="link">
+                    Отмена
+                  </Button>
+                  <Button
+                    className="saveBtn"
+                    onClick={() => onSaveAllChanges(currentData.data)}
+                    type="primary"
+                  >
                     Сохранить изменения
                   </Button>
                 </Space>
@@ -437,9 +483,9 @@ const SizeChart = () => {
           isOpen={editModal.isOpen}
           formSizeChart={formSizeChart}
           imageUrl={imageUrl}
+          onClose={editModal.onClose}
           setUploadImg={setUploadImg}
           setFormSizeChart={setFormSizeChart}
-          onClose={editModal.onClose}
           saveAllChanges={onSaveAllChanges}
           setModes={editModal.setMode}
           createNewSizeChart={createNewSizeChart}

@@ -5,9 +5,17 @@
   background-color: var(--color-white);
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  .ant-table {
+    border-radius: 10px;
+    border: 1px solid #c6ccd0;
+    overflow: hidden;
+  }
   .addParameter {
     display: flex;
     justify-content: space-between;
+    .information-title {
+      color: #303030;
+    }
   }
   .changed-row {
     background-color: var(--color-light-blue) !important;
