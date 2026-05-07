@@ -31,6 +31,7 @@ import {
   MIN_LENGTH,
 } from '../size-parameters/const'
 import SizeParameters from '../size-parameters/SizeParameters'
+import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
 import { initialData } from './const'
 import './SizeChart.scss'
 import SizeChartModal from './SizeChartModal'
@@ -394,7 +395,27 @@ const SizeChart = () => {
                             e.currentTarget.src = '/visily-image.png'
                           }}
                         />
+                        <div className="image-edit-overlay">
+                          <Icon
+                            name="editing"
+                            width="20px"
+                            color="#505253"
+                            onClick={() => {
+                              const button = document.querySelector('.btn-upload-img-size')
+                              ;(button as HTMLElement)?.click()
+                            }}
+                          />
+                        </div>
                       </div>
+                      <div style={{ display: 'none' }}>
+                        <BtnUploadImgForSizeChart
+                          isEdit={isEdit}
+                          formSizeChartCreate={formSizeChart}
+                          setFormSizeChartCreate={setFormSizeChart}
+                          setUploadImg={setUploadImg}
+                        />
+                      </div>
+
                       <div className="size-chart-text-container">
                         <span className="size-chart-title-text">
                           Рекомендуемый размер: 1200 x 800 px. Форматы: JPG,PNG, WEBP, до 5 МБ

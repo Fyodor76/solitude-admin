@@ -152,13 +152,27 @@
           flex-direction: column;
 
           .size-chart-container-img {
+            position: relative;
             align-items: center;
             justify-content: center;
             display: flex;
             background-color: #f2f2fdff;
             border-color: #f2f2fd;
             border-radius: 8px;
+            .image-edit-overlay {
+              position: absolute;
+              top: 8px; // отступ сверху
+              right: 8px; // отступ справа
+              cursor: pointer;
 
+              border-radius: 50%;
+              width: 28px;
+              height: 28px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: background 0.2s;
+            }
             img {
               //top: 23px;
               color: #f2f2fdff;
