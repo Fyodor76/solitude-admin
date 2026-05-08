@@ -3,7 +3,7 @@ import { MenuItem } from '@/app/components/sidebar/sidebarType'
 export const menuSidebar: MenuItem[] = [
   {
     id: 'categories',
-    text: 'Сategories',
+    text: 'Категории',
     href: '/categories',
     icon: 'categories',
     hasArrow: false,
@@ -13,6 +13,13 @@ export const menuSidebar: MenuItem[] = [
     text: 'Size-charts',
     href: 'size-charts',
     icon: 'tables',
+    hasArrow: false,
+  },
+  {
+    id: 'heatmap',
+    text: 'Тепловая карта сайта',
+    href: '/heatmap',
+    icon: 'charts',
     hasArrow: false,
   },
   /*{

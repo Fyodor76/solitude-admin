@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button } from 'antd'
+import { Button, Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import defaultLogo from '@/app/assets/images/image.png'
@@ -8,7 +8,7 @@ import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../../../shared/ui/icons/Icon'
-import './sidebar.scss'
+import './Sidebar.scss'
 import { SidebarProps } from './sidebarType'
 
 const Sidebar = ({
@@ -141,47 +141,55 @@ const Sidebar = ({
                 const hasSubItems = item.subItems && item.subItems.length > 0
                 const isOpenSubItem = openSubMenuItem.has(item.id)
 
+                const tooltipPlacement = position === 'left' ? 'right' : 'left'
+
                 return (
                   <li className="sidebar-menu-item " key={item.id}>
-                    <a
-                      href={hasSubItems ? '#' : item.href || '#'}
-                      className={`sidebar-menu-link ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
-                      data-collapsed={!isOpen}
-                      onClick={e => {
-                        if (hasSubItems) {
-                          e.preventDefault()
-                          if (!isOpen) {
-                            toggleSidebar()
-                            toggleSubMenuItem(item.id)
-                          } else {
-                            toggleSubMenuItem(item.id)
-                          }
-                          if (item.onClick) {
-                            item.onClick()
-                          }
-                        }
-                      }}
+                    <Tooltip
+                      title={!isOpen ? item.text : undefined}
+                      placement={tooltipPlacement}
+                      mouseEnterDelay={0}
                     >
-                      <div className="icon-and-text">
-                        {item.icon && (
-                          <span className="menu-item-icon">
-                            <Icon name={item.icon} />
+                      <a
+                        href={hasSubItems ? '#' : item.href || '#'}
+                        className={`sidebar-menu-link ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
+                        data-collapsed={!isOpen}
+                        onClick={e => {
+                          if (hasSubItems) {
+                            e.preventDefault()
+                            if (!isOpen) {
+                              toggleSidebar()
+                              toggleSubMenuItem(item.id)
+                            } else {
+                              toggleSubMenuItem(item.id)
+                            }
+                            if (item.onClick) {
+                              item.onClick()
+                            }
+                          }
+                        }}
+                      >
+                        <div className="icon-and-text">
+                          {item.icon && (
+                            <span className="menu-item-icon">
+                              <Icon name={item.icon} />
+                            </span>
+                          )}
+                          {isOpen && (
+                            <span
+                              className={`menu-item-text ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
+                            >
+                              {item.text}
+                            </span>
+                          )}
+                        </div>
+                        {hasSubItems && isOpen && (
+                          <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
+                            <Icon name="arrow" color={`${isOpenSubItem ? '#1072d5' : '#ffffff'}`} />
                           </span>
                         )}
-                        {isOpen && (
-                          <span
-                            className={`menu-item-text ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
-                          >
-                            {item.text}
-                          </span>
-                        )}
-                      </div>
-                      {hasSubItems && isOpen && (
-                        <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
-                          <Icon name="arrow" color={`${isOpenSubItem ? '#1072d5' : '#ffffff'}`} />
-                        </span>
-                      )}
-                    </a>
+                      </a>
+                    </Tooltip>
                     <AnimatePresence>
                       {hasSubItems && isOpenSubItem && isOpen && item.subItems && (
                         <motion.ul
@@ -193,18 +201,24 @@ const Sidebar = ({
                         >
                           {item.subItems.map(subItem => (
                             <li className="sidebar-submenu-item" key={subItem.id}>
-                              <a
-                                href={subItem.href || '#'}
-                                className="sidebar-submenu-link"
-                                onClick={subItem.onClick}
+                              <Tooltip
+                                title={subItem.text}
+                                placement={tooltipPlacement}
+                                mouseEnterDelay={0}
                               >
-                                {subItem.icon && (
-                                  <span className="submenu-item-icon">
-                                    <Icon name={subItem.icon} color="#ffffff" />
-                                  </span>
-                                )}
-                                <span className="submenu-item-text">{subItem.text}</span>
-                              </a>
+                                <a
+                                  href={subItem.href || '#'}
+                                  className="sidebar-submenu-link"
+                                  onClick={subItem.onClick}
+                                >
+                                  {subItem.icon && (
+                                    <span className="submenu-item-icon">
+                                      <Icon name={subItem.icon} color="#ffffff" />
+                                    </span>
+                                  )}
+                                  <span className="submenu-item-text">{subItem.text}</span>
+                                </a>
+                              </Tooltip>
                             </li>
                           ))}
                         </motion.ul>

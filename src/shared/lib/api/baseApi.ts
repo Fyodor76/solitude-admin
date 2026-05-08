@@ -20,10 +20,10 @@ export interface ApiResponse<T, M> {
   message?: string
 }
 
-const baseUrl = import.meta.env.VITE_API_URL
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: baseUrl,
+  baseUrl: API_BASE_URL,
   prepareHeaders: headers => {
     const token = localStorage.getItem('access')
 
@@ -57,7 +57,7 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error('No refresh token')
   }
 
-  const response = await fetch(`${baseUrl}/auth/refresh`, {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -71,13 +71,15 @@ async function refreshAccessToken(): Promise<string> {
 
   const { data } = await response.json()
 
-  const newAccessToken = data.accessToken || data.token || data.access_token
+  const newAccessToken = data.accessToken
+  const newRefreshToken = data.refreshToken
 
   if (!newAccessToken) {
     throw new Error('No access token in response')
   }
 
   localStorage.setItem('access', newAccessToken)
+  localStorage.setItem('refresh', newRefreshToken)
 
   return newAccessToken
 }
@@ -118,7 +120,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
       subscribeTokenRefresh(async (newToken: string) => {
         try {
           const retryResult = await fetchBaseQuery({
-            baseUrl: baseUrl,
+            baseUrl: API_BASE_URL,
             prepareHeaders: headers => {
               headers.set('Accept', 'application/json')
               headers.set('Content-Type', 'application/json')
@@ -164,7 +166,19 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
             subscribers = []
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
-            window.location.href = '/login'
+
+            resolve({
+              error: {
+                statusCode: 401,
+                timestamp: new Date().toISOString(),
+                path: currentPath,
+                error: 'Session expired',
+              },
+            })
+
+            if (!window.location.pathname.includes('/login')) {
+              window.location.href = '/login'
+            }
           })
           .finally(() => {
             isRefreshing = false
