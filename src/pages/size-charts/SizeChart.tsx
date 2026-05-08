@@ -33,8 +33,8 @@ import {
 import SizeParameters from '../size-parameters/SizeParameters'
 import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
 import { initialData } from './const'
+import SizeChartModal from './size-charts-modal/SizeChartModal'
 import './SizeChart.scss'
-import SizeChartModal from './SizeChartModal'
 
 const SizeChart = () => {
   const editModal = useModal()

@@ -3,6 +3,7 @@ import React from 'react'
 import { Button, Modal, Select } from 'antd'
 
 import { ALL_RU_SIZES } from './const'
+import './SizeParameterAddModal.scss'
 
 interface SizeParameterAddModalProps {
   isOpen: boolean
@@ -31,6 +32,7 @@ const SizeParameterAddModal = ({
       onCancel={onClose}
       onOk={handleCreateAndCloseModal}
     >
+      <label className="selectedSize">Выберите размер из списка:</label>
       <Select
         placeholder="Выберете размер, который хотите добавить"
         value={selectedSizeToAdd}
