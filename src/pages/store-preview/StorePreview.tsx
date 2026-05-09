@@ -5,19 +5,17 @@ import {
   useGetTrackedPagesQuery,
   useLazyGetHeatmapClicksQuery,
 } from '@/shared/lib/api/page-analytics/pageAnalyticsApi'
-import { Button, Input, Space, Spin, Switch, Typography } from 'antd'
+import { Button, Input, Select, Space, Spin, Switch, Typography } from 'antd'
 
 import './StorePreview.scss'
 
-const STORE_ORIGIN = (
-  import.meta.env.VITE_STORE_ORIGIN?.trim() || 'https://solitude-store.ru'
-).replace(/\/$/, '')
+const SITE_ORIGIN = 'https://solitude-store.ru'
 
 /** Origin документа во iframe (apex / www / поддомен витрины). */
 function isStoreIframeDocumentOrigin(origin: string): boolean {
   try {
     const u = new URL(origin)
-    const base = new URL(STORE_ORIGIN)
+    const base = new URL(SITE_ORIGIN)
     if (u.protocol !== base.protocol) {
       return false
     }
@@ -67,7 +65,7 @@ function pageButtonLabel(row: TrackedPageSummary): string {
 }
 
 function buildIframeSrc(pathname: string): string {
-  const u = new URL(pathname, STORE_ORIGIN)
+  const u = new URL(pathname, SITE_ORIGIN)
   u.searchParams.set('is_iframe', 'true')
   return u.toString()
 }
@@ -104,6 +102,18 @@ const StorePreview = () => {
   const [triggerHeatmapClicks] = useLazyGetHeatmapClicksQuery()
 
   const iframeSrc = useMemo(() => buildIframeSrc(path), [path])
+
+  const trackedPageSelectOptions = useMemo(() => {
+    const byPath = new Map<string, { value: string; label: string }>()
+    for (const row of trackedPages) {
+      const p = normalizePath(row.externalPageId)
+      byPath.set(p, { value: p, label: pageButtonLabel(row) })
+    }
+    if (path && !byPath.has(path)) {
+      byPath.set(path, { value: path, label: path })
+    }
+    return [...byPath.values()]
+  }, [trackedPages, path])
 
   const applyDraft = useCallback(() => {
     const n = normalizePath(draft)
@@ -205,7 +215,7 @@ const StorePreview = () => {
       <div className="storePreview__header">
         <h1 className="storePreview__title">Тепловая карта сайта</h1>
         <Typography.Text type="secondary">
-          {STORE_ORIGIN}
+          {SITE_ORIGIN}
           {path}
         </Typography.Text>
       </div>
@@ -218,23 +228,34 @@ const StorePreview = () => {
       </div>
 
       <div className="storePreview__toolbar">
+        <Typography.Text type="secondary" className="storePreview__toolbarLabel">
+          Страницы из аналитики:
+        </Typography.Text>
         {pagesLoading ? (
           <Spin size="small" />
         ) : (
-          <Space wrap size="small">
-            {trackedPages.map(row => {
-              const p = normalizePath(row.externalPageId)
-              return (
-                <Button
-                  key={row.id}
-                  type={path === p ? 'primary' : 'default'}
-                  onClick={() => goTo(p)}
-                >
-                  {pageButtonLabel(row)}
-                </Button>
-              )
-            })}
-          </Space>
+          <Select
+            showSearch
+            className="storePreview__pageSelect"
+            placeholder={
+              trackedPages.length > 0 ? 'Поиск и выбор страницы' : 'Нет отслеживаемых страниц'
+            }
+            notFoundContent={trackedPages.length ? undefined : 'Пока нет данных'}
+            loading={pagesLoading}
+            disabled={trackedPages.length === 0 && !path}
+            options={trackedPageSelectOptions}
+            value={trackedPageSelectOptions.length ? path : undefined}
+            onChange={v => goTo(String(v))}
+            optionFilterProp="label"
+            filterOption={(input, option) => {
+              const label = String(option?.label ?? '')
+              const value = String(option?.value ?? '')
+              const q = input.trim().toLowerCase()
+              return label.toLowerCase().includes(q) || value.toLowerCase().includes(q)
+            }}
+            virtual={trackedPageSelectOptions.length > 48}
+            listHeight={320}
+          />
         )}
       </div>
 
