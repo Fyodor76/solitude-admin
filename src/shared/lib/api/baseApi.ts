@@ -6,6 +6,8 @@ import {
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react'
 
+import { normalizeApiBaseUrl } from './normalizeApiBaseUrl'
+
 export interface HttpErrorResponse {
   statusCode: number
   timestamp: string
@@ -20,7 +22,7 @@ export interface ApiResponse<T, M> {
   message?: string
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL
+const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL)
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,

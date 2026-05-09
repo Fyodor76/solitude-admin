@@ -9,13 +9,15 @@ import { Button, Input, Space, Spin, Switch, Typography } from 'antd'
 
 import './StorePreview.scss'
 
-const SITE_ORIGIN = 'https://solitude-store.ru'
+const STORE_ORIGIN = (
+  import.meta.env.VITE_STORE_ORIGIN?.trim() || 'https://solitude-store.ru'
+).replace(/\/$/, '')
 
 /** Origin документа во iframe (apex / www / поддомен витрины). */
 function isStoreIframeDocumentOrigin(origin: string): boolean {
   try {
     const u = new URL(origin)
-    const base = new URL(SITE_ORIGIN)
+    const base = new URL(STORE_ORIGIN)
     if (u.protocol !== base.protocol) {
       return false
     }
@@ -65,7 +67,7 @@ function pageButtonLabel(row: TrackedPageSummary): string {
 }
 
 function buildIframeSrc(pathname: string): string {
-  const u = new URL(pathname, SITE_ORIGIN)
+  const u = new URL(pathname, STORE_ORIGIN)
   u.searchParams.set('is_iframe', 'true')
   return u.toString()
 }
@@ -203,7 +205,7 @@ const StorePreview = () => {
       <div className="storePreview__header">
         <h1 className="storePreview__title">Тепловая карта сайта</h1>
         <Typography.Text type="secondary">
-          {SITE_ORIGIN}
+          {STORE_ORIGIN}
           {path}
         </Typography.Text>
       </div>
