@@ -180,7 +180,9 @@ const StorePreview = () => {
       }
       readyTimer = window.setTimeout(() => {
         readyTimer = null
-        void pushHeatmapToIframe(pageId)
+        /* force: иначе debounce после первого пуша (~150ms) может отменить этот вызов,
+           хотя первый postMessage до готовности слушателя во iframe мог не дойти */
+        void pushHeatmapToIframe(pageId, true)
       }, 120)
     }
 

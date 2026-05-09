@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { Button, Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
 
 import defaultLogo from '@/app/assets/images/image.png'
 import defaultUserLogo from '@/app/assets/images/user.jpg'
@@ -10,6 +11,17 @@ import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans
 import Icon from '../../../shared/ui/icons/Icon'
 import './Sidebar.scss'
 import { SidebarProps } from './sidebarType'
+
+/** Подсветка пункта по текущему URL (точное совпадение или вложенный путь). */
+function isSidebarHrefActive(href: string | undefined, pathname: string): boolean {
+  if (!href || href === '#') {
+    return false
+  }
+  if (pathname === href) {
+    return true
+  }
+  return pathname.startsWith(`${href}/`)
+}
 
 const Sidebar = ({
   isOpen,
@@ -29,6 +41,7 @@ const Sidebar = ({
     logo: defaultUserLogo,
   },
 }: SidebarProps) => {
+  const { pathname } = useLocation()
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
   useEffect(() => {
     if (!isOpen) {
@@ -140,6 +153,10 @@ const Sidebar = ({
               {menuItems.map(item => {
                 const hasSubItems = item.subItems && item.subItems.length > 0
                 const isOpenSubItem = openSubMenuItem.has(item.id)
+                const subMenuExpanded = hasSubItems && isOpenSubItem
+                const routeMatchesLeaf = !hasSubItems && isSidebarHrefActive(item.href, pathname)
+                const linkActive = subMenuExpanded || routeMatchesLeaf
+                const menuTextActive = subMenuExpanded || routeMatchesLeaf
 
                 const tooltipPlacement = position === 'left' ? 'right' : 'left'
 
@@ -152,7 +169,7 @@ const Sidebar = ({
                     >
                       <a
                         href={hasSubItems ? '#' : item.href || '#'}
-                        className={`sidebar-menu-link ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
+                        className={`sidebar-menu-link ${linkActive ? 'active' : ''}`}
                         data-collapsed={!isOpen}
                         onClick={e => {
                           if (hasSubItems) {
@@ -176,9 +193,7 @@ const Sidebar = ({
                             </span>
                           )}
                           {isOpen && (
-                            <span
-                              className={`menu-item-text ${openSubMenuItem.has(item.id) ? 'active' : ''}`}
-                            >
+                            <span className={`menu-item-text ${menuTextActive ? 'active' : ''}`}>
                               {item.text}
                             </span>
                           )}
@@ -199,28 +214,35 @@ const Sidebar = ({
                           exit="close"
                           className={`sidebar-submenu ${isOpenSubItem ? 'open' : ''}`}
                         >
-                          {item.subItems.map(subItem => (
-                            <li className="sidebar-submenu-item" key={subItem.id}>
-                              <Tooltip
-                                title={subItem.text}
-                                placement={tooltipPlacement}
-                                mouseEnterDelay={0}
-                              >
-                                <a
-                                  href={subItem.href || '#'}
-                                  className="sidebar-submenu-link"
-                                  onClick={subItem.onClick}
+                          {item.subItems.map(subItem => {
+                            const subRouteActive = isSidebarHrefActive(subItem.href, pathname)
+                            return (
+                              <li className="sidebar-submenu-item" key={subItem.id}>
+                                <Tooltip
+                                  title={subItem.text}
+                                  placement={tooltipPlacement}
+                                  mouseEnterDelay={0}
                                 >
-                                  {subItem.icon && (
-                                    <span className="submenu-item-icon">
-                                      <Icon name={subItem.icon} color="#ffffff" />
+                                  <a
+                                    href={subItem.href || '#'}
+                                    className={`sidebar-submenu-link ${subRouteActive ? 'active' : ''}`}
+                                    onClick={subItem.onClick}
+                                  >
+                                    {subItem.icon && (
+                                      <span className="submenu-item-icon">
+                                        <Icon name={subItem.icon} color="#ffffff" />
+                                      </span>
+                                    )}
+                                    <span
+                                      className={`submenu-item-text ${subRouteActive ? 'active' : ''}`}
+                                    >
+                                      {subItem.text}
                                     </span>
-                                  )}
-                                  <span className="submenu-item-text">{subItem.text}</span>
-                                </a>
-                              </Tooltip>
-                            </li>
-                          ))}
+                                  </a>
+                                </Tooltip>
+                              </li>
+                            )
+                          })}
                         </motion.ul>
                       )}
                     </AnimatePresence>

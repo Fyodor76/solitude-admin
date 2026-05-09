@@ -375,6 +375,11 @@
                 gap: 10px;
                 white-space: nowrap;
 
+                &.active {
+                  background-color: var(--color-grey-background-3);
+                  color: var(--color-white);
+                }
+
                 &:hover {
                   background-color: var(--color-grey-background-3);
                   color: var(--color-white);
