@@ -1,6 +1,6 @@
-import { BaseLayout } from '@/layouts/base-layout'
 import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
+import { PlatformImages } from '@/pages/platform-images'
 import { StorePreview } from '@/pages/store-preview'
 import { Navigate, RouteObject } from 'react-router-dom'
 
@@ -70,9 +70,17 @@ export const Router: RouteObject[] = [
       {
         path: '/categories',
         element: (
-          <BaseLayout>
+          <ProtectedRouter>
             <Categories />
-          </BaseLayout>
+          </ProtectedRouter>
+        ),
+      },
+      {
+        path: '/platform-images',
+        element: (
+          <ProtectedRouter>
+            <PlatformImages />
+          </ProtectedRouter>
         ),
       },
       {
@@ -82,9 +90,9 @@ export const Router: RouteObject[] = [
       {
         path: '/heatmap',
         element: (
-          <BaseLayout>
+          <ProtectedRouter>
             <StorePreview />
-          </BaseLayout>
+          </ProtectedRouter>
         ),
       },
     ],

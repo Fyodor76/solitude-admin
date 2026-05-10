@@ -9,6 +9,13 @@ export const menuSidebar: MenuItem[] = [
     hasArrow: false,
   },
   {
+    id: 'platform-images',
+    text: 'Изображения платформы',
+    href: '/platform-images',
+    icon: 'gallery',
+    hasArrow: false,
+  },
+  {
     id: 'heatmap',
     text: 'Тепловая карта сайта',
     href: '/heatmap',

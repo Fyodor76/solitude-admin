@@ -6,8 +6,33 @@ export interface imgUpload {
   folder?: string
 }
 
+export interface ListFilesMeta {
+  limit: number
+  isTruncated: boolean
+  nextContinuationToken?: string
+}
+
 export const uploadFiles = baseApi.injectEndpoints({
   endpoints: builder => ({
+    listFiles: builder.query<
+      ApiResponse<imgUpload[], ListFilesMeta>,
+      { folder?: string; limit?: number; continuationToken?: string }
+    >({
+      query: ({ folder, limit, continuationToken }) => ({
+        url: `/cdn/list`,
+        method: 'GET',
+        params: {
+          ...(folder ? { folder } : {}),
+          ...(limit ? { limit } : {}),
+          ...(continuationToken ? { continuationToken } : {}),
+        },
+      }),
+      providesTags: result =>
+        result?.data
+          ? [...result.data.map(f => ({ type: 'File' as const, id: f.fileId })), 'File']
+          : ['File'],
+    }),
+
     getFileUrlById: builder.query<ApiResponse<imgUpload, any>, { fileId: string; folder?: string }>(
       {
         query: ({ fileId, folder }) => ({
@@ -52,6 +77,8 @@ export const uploadFiles = baseApi.injectEndpoints({
 })
 
 export const {
+  useListFilesQuery,
+  useLazyListFilesQuery,
   useGetFileUrlByIdQuery,
   useUploadImageMutation,
   useDeleteFileByIdMutation,
