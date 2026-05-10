@@ -4,6 +4,9 @@ export interface imgUpload {
   fileId: string
   url: string
   folder?: string
+  name?: string
+  size?: number
+  lastModified?: string
 }
 
 export interface ListFilesMeta {
@@ -16,15 +19,25 @@ export const uploadFiles = baseApi.injectEndpoints({
   endpoints: builder => ({
     listFiles: builder.query<
       ApiResponse<imgUpload[], ListFilesMeta>,
-      { folder?: string; limit?: number; continuationToken?: string }
+      {
+        folder?: string
+        limit?: number
+        continuationToken?: string
+        search?: string
+        sortBy?: 'date' | 'size' | 'name'
+        sortOrder?: 'asc' | 'desc'
+      }
     >({
-      query: ({ folder, limit, continuationToken }) => ({
+      query: ({ folder, limit, continuationToken, search, sortBy, sortOrder }) => ({
         url: `/cdn/list`,
         method: 'GET',
         params: {
           ...(folder ? { folder } : {}),
           ...(limit ? { limit } : {}),
           ...(continuationToken ? { continuationToken } : {}),
+          ...(search ? { search } : {}),
+          ...(sortBy ? { sortBy } : {}),
+          ...(sortOrder ? { sortOrder } : {}),
         },
       }),
       providesTags: result =>
@@ -40,7 +53,8 @@ export const uploadFiles = baseApi.injectEndpoints({
           method: 'GET',
           params: folder ? { folder } : undefined,
         }),
-        providesTags: (result, error, { fileId }) => (result ? [{ type: 'File', id: fileId }] : []),
+        providesTags: (result, _error, { fileId }) =>
+          result ? [{ type: 'File', id: fileId }] : [],
       }
     ),
 
@@ -71,7 +85,7 @@ export const uploadFiles = baseApi.injectEndpoints({
           accept: 'application/json',
         },
       }),
-      invalidatesTags: (result, error, { fileId }) => [{ type: 'File', id: fileId }],
+      invalidatesTags: (_result, _error, { fileId }) => [{ type: 'File', id: fileId }],
     }),
   }),
 })
