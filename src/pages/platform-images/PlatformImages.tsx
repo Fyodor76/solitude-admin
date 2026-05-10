@@ -1,71 +1,92 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   imgUpload,
   useDeleteFileByIdMutation,
+  useDeleteFilesBulkMutation,
   useLazyListFilesQuery,
   useUploadImageMutation,
 } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { CustomButton } from '@/shared/ui/custom-button/CustomButton'
-import Portal from '@/shared/ui/portal'
 import { Spinner } from '@/shared/ui/spinner/Spinner'
-import { Input, Select } from 'antd'
+import { Checkbox } from 'antd'
 
-const PAGE_SIZE = 24
-const PLATFORM_IMAGES_FOLDER = ''
+import { PlatformImageCard } from './components/PlatformImageCard'
+import { PlatformImagePreview } from './components/PlatformImagePreview'
+import { PlatformImagesToolbar } from './components/PlatformImagesToolbar'
+import { PlatformImagesUploadModal } from './components/PlatformImagesUploadModal'
+import { PAGE_SIZE, PLATFORM_IMAGES_FOLDER } from './constants'
+import './PlatformImages.scss'
 
 export const PlatformImages = () => {
   const { contextHolder, openNotification } = useNotificationHandler()
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const [triggerList, listState] = useLazyListFilesQuery()
   const [uploadImage, uploadState] = useUploadImageMutation()
   const [deleteFileById, deleteState] = useDeleteFileByIdMutation()
+  const [deleteFilesBulk, bulkDeleteState] = useDeleteFilesBulkMutation()
 
   const [items, setItems] = useState<imgUpload[]>([])
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [nextToken, setNextToken] = useState<string | undefined>(undefined)
-  const [hasMore, setHasMore] = useState<boolean>(false)
+  const [hasMore, setHasMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [uploadModalOpen, setUploadModalOpen] = useState(false)
 
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState<'date' | 'size' | 'name'>('date')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [previewFile, setPreviewFile] = useState<imgUpload | null>(null)
 
-  const files = useMemo(() => items, [items])
+  const busy = uploadState.isLoading || deleteState.isLoading || bulkDeleteState.isLoading
+  const loading = listState.isLoading || listState.isFetching
+  const isInitialLoading = loading && items.length === 0
+  const controlsDisabled = busy || loading || loadingMore
+
+  const allVisibleIds = useMemo(() => items.map(item => item.fileId), [items])
+  const isAllVisibleSelected =
+    allVisibleIds.length > 0 && allVisibleIds.every(id => selectedIds.includes(id))
 
   const loadFirstPage = async () => {
     setItems([])
+    setSelectedIds([])
     setNextToken(undefined)
     setHasMore(false)
     setLoadingMore(false)
 
     try {
-      const res = await triggerList({
+      const response = await triggerList({
         folder: PLATFORM_IMAGES_FOLDER,
         limit: PAGE_SIZE,
         search: search.trim() || undefined,
         sortBy,
         sortOrder,
       }).unwrap()
-      setItems(res.data ?? [])
-      setNextToken(res.meta?.nextContinuationToken)
-      setHasMore(Boolean(res.meta?.nextContinuationToken) || Boolean(res.meta?.isTruncated))
-    } catch (err: any) {
+
+      setItems(response.data ?? [])
+      setNextToken(response.meta?.nextContinuationToken)
+      setHasMore(
+        Boolean(response.meta?.nextContinuationToken) || Boolean(response.meta?.isTruncated)
+      )
+    } catch (error: any) {
       openNotification(
         'error',
-        err?.data?.error || err?.data?.message || 'Не удалось загрузить список файлов'
+        error?.data?.error || error?.data?.message || 'Не удалось загрузить изображения.'
       )
     }
   }
 
   const loadMore = async () => {
-    if (!nextToken) return
+    if (!nextToken) {
+      return
+    }
+
     setLoadingMore(true)
+
     try {
-      const res = await triggerList({
+      const response = await triggerList({
         folder: PLATFORM_IMAGES_FOLDER,
         limit: PAGE_SIZE,
         continuationToken: nextToken,
@@ -73,13 +94,16 @@ export const PlatformImages = () => {
         sortBy,
         sortOrder,
       }).unwrap()
-      setItems(prev => [...prev, ...(res.data ?? [])])
-      setNextToken(res.meta?.nextContinuationToken)
-      setHasMore(Boolean(res.meta?.nextContinuationToken) || Boolean(res.meta?.isTruncated))
-    } catch (err: any) {
+
+      setItems(previous => [...previous, ...(response.data ?? [])])
+      setNextToken(response.meta?.nextContinuationToken)
+      setHasMore(
+        Boolean(response.meta?.nextContinuationToken) || Boolean(response.meta?.isTruncated)
+      )
+    } catch (error: any) {
       openNotification(
         'error',
-        err?.data?.error || err?.data?.message || 'Не удалось загрузить следующую страницу'
+        error?.data?.error || error?.data?.message || 'Не удалось загрузить следующую страницу.'
       )
     } finally {
       setLoadingMore(false)
@@ -91,285 +115,203 @@ export const PlatformImages = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setPreviewUrl(null)
-    }
-    if (previewUrl) {
-      window.addEventListener('keydown', handleEsc)
-      document.body.style.overflow = 'hidden'
-    }
-    return () => {
-      window.removeEventListener('keydown', handleEsc)
-      document.body.style.overflow = 'unset'
-    }
-  }, [previewUrl])
-
-  const onPickFile = () => fileInputRef.current?.click()
-
-  const onFileChange: React.ChangeEventHandler<HTMLInputElement> = async e => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
+  const handleUpload = async ({ file, name }: { file: File; name: string }) => {
     try {
-      await uploadImage({ file, folder: PLATFORM_IMAGES_FOLDER }).unwrap()
-      openNotification('success', 'Файл загружен')
+      await uploadImage({
+        file,
+        folder: PLATFORM_IMAGES_FOLDER,
+        name: name || file.name,
+      }).unwrap()
+
+      openNotification('success', 'Изображение загружено.')
+      setUploadModalOpen(false)
       await loadFirstPage()
-    } catch (err: any) {
+    } catch (error: any) {
       openNotification(
         'error',
-        err?.data?.error || err?.data?.message || 'Не удалось загрузить файл'
+        error?.data?.error || error?.data?.message || 'Не удалось загрузить изображение.'
       )
-    } finally {
-      e.target.value = ''
     }
   }
 
-  const onDelete = async (fileId: string) => {
+  const handleDelete = async (fileId: string) => {
     const ok = window.confirm('Удалить изображение?')
-    if (!ok) return
+
+    if (!ok) {
+      return
+    }
 
     try {
       await deleteFileById({ fileId, folder: PLATFORM_IMAGES_FOLDER }).unwrap()
-      openNotification('success', 'Изображение удалено')
+      setSelectedIds(previous => previous.filter(id => id !== fileId))
+      openNotification('success', 'Изображение удалено.')
       await loadFirstPage()
-    } catch (err: any) {
+    } catch (error: any) {
       openNotification(
         'error',
-        err?.data?.error || err?.data?.message || 'Не удалось удалить изображение'
+        error?.data?.error || error?.data?.message || 'Не удалось удалить изображение.'
       )
     }
   }
 
-  const isInitialLoading = listState.isLoading && files.length === 0
-  const busy = uploadState.isLoading || deleteState.isLoading
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0) {
+      return
+    }
+
+    const ok = window.confirm(`Удалить выбранные изображения: ${selectedIds.length} шт.?`)
+
+    if (!ok) {
+      return
+    }
+
+    try {
+      await deleteFilesBulk({
+        fileIds: selectedIds,
+        folder: PLATFORM_IMAGES_FOLDER,
+      }).unwrap()
+
+      openNotification('success', 'Выбранные изображения удалены.')
+      await loadFirstPage()
+    } catch (error: any) {
+      openNotification(
+        'error',
+        error?.data?.error || error?.data?.message || 'Не удалось удалить выбранные изображения.'
+      )
+    }
+  }
+
+  const handleCopy = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url)
+      openNotification('success', 'Ссылка скопирована.')
+    } catch {
+      openNotification('error', 'Не удалось скопировать ссылку.')
+    }
+  }
+
+  const handleSelectChange = (fileId: string, checked: boolean) => {
+    setSelectedIds(previous => {
+      if (checked) {
+        return previous.includes(fileId) ? previous : [...previous, fileId]
+      }
+
+      return previous.filter(id => id !== fileId)
+    })
+  }
+
+  const handleToggleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(allVisibleIds)
+      return
+    }
+
+    setSelectedIds([])
+  }
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="platform-images-page">
       {contextHolder}
 
-      <div
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
-      >
-        <h2 style={{ margin: 0 }}>Изображения платформы</h2>
-
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <Input
-            placeholder="Поиск по названию / fileId"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ width: 260 }}
-            allowClear
-          />
-          <Select
-            value={`${sortBy}:${sortOrder}`}
-            onChange={v => {
-              const [sb, so] = v.split(':') as ['date' | 'size' | 'name', 'asc' | 'desc']
-              setSortBy(sb)
-              setSortOrder(so)
-            }}
-            style={{ width: 220 }}
-            options={[
-              { value: 'date:desc', label: 'По дате (новые)' },
-              { value: 'date:asc', label: 'По дате (старые)' },
-              { value: 'size:desc', label: 'По размеру (больше)' },
-              { value: 'size:asc', label: 'По размеру (меньше)' },
-              { value: 'name:asc', label: 'По имени (A→Z)' },
-              { value: 'name:desc', label: 'По имени (Z→A)' },
-            ]}
-          />
-          <CustomButton
-            onClick={loadFirstPage}
-            disabled={busy || listState.isFetching || listState.isLoading || loadingMore}
-          >
-            Применить
-          </CustomButton>
-          <CustomButton
-            onClick={onPickFile}
-            type="primary"
-            disabled={busy || listState.isFetching || listState.isLoading || loadingMore}
-          >
-            Добавить
-          </CustomButton>
-        </div>
-      </div>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        onChange={onFileChange}
-        style={{ display: 'none' }}
+      <PlatformImagesToolbar
+        filters={{ search, sortBy, sortOrder }}
+        disabled={controlsDisabled}
+        onSearchChange={setSearch}
+        onSortChange={(nextSortBy, nextSortOrder) => {
+          setSortBy(nextSortBy)
+          setSortOrder(nextSortOrder)
+        }}
+        onApply={loadFirstPage}
+        onUploadOpen={() => setUploadModalOpen(true)}
       />
 
-      <div style={{ marginTop: 16 }}>
+      <section className="platform-images-page__content">
+        <div className="platform-images-page__summary">
+          <div className="platform-images-page__summary-left">
+            <Checkbox
+              checked={isAllVisibleSelected}
+              disabled={items.length === 0 || controlsDisabled}
+              onChange={event => handleToggleSelectAll(event.target.checked)}
+            >
+              Выбрать всё
+            </Checkbox>
+            <span>
+              На экране: <strong>{items.length}</strong>
+            </span>
+            <span>
+              Выбрано: <strong>{selectedIds.length}</strong>
+            </span>
+          </div>
+
+          <div className="platform-images-page__summary-actions">
+            {selectedIds.length > 0 ? (
+              <CustomButton onClick={() => setSelectedIds([])} disabled={controlsDisabled}>
+                Снять всё
+              </CustomButton>
+            ) : null}
+            <CustomButton
+              onClick={handleDeleteSelected}
+              danger
+              disabled={controlsDisabled || selectedIds.length === 0}
+            >
+              Удалить выбранные
+            </CustomButton>
+          </div>
+        </div>
+
         {isInitialLoading ? (
-          <Spinner />
-        ) : files.length === 0 ? (
-          <div style={{ opacity: 0.7 }}>В папке пока нет изображений.</div>
+          <div className="platform-images-page__loading">
+            <Spinner />
+          </div>
+        ) : items.length === 0 ? (
+          <div className="platform-images-page__empty">
+            Пока нет изображений. Добавьте первое фото.
+          </div>
         ) : (
           <>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                gap: 12,
-              }}
-            >
-              {files.map(f => (
-                <div
-                  key={f.fileId}
-                  style={{
-                    border: '1px solid rgba(0,0,0,0.12)',
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                    background: '#fff',
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setPreviewUrl(f.url)}
-                    style={{
-                      padding: 0,
-                      border: 0,
-                      width: '100%',
-                      height: 160,
-                      cursor: 'pointer',
-                      background: '#fafafa',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    title="Открыть на весь экран"
-                  >
-                    <img
-                      src={f.url}
-                      alt={f.name || f.fileId}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                      }}
-                      loading="lazy"
-                    />
-                  </button>
-
-                  <div style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div style={{ fontSize: 12, opacity: 0.75, wordBreak: 'break-all' }}>
-                      {f.name || f.fileId}
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 8 }}>
-                      <CustomButton
-                        onClick={() => navigator.clipboard.writeText(f.url)}
-                        disabled={
-                          busy || listState.isFetching || listState.isLoading || loadingMore
-                        }
-                        size="small"
-                      >
-                        Скопировать ссылку
-                      </CustomButton>
-                      <CustomButton
-                        onClick={() => onDelete(f.fileId)}
-                        danger
-                        disabled={
-                          busy || listState.isFetching || listState.isLoading || loadingMore
-                        }
-                        size="small"
-                      >
-                        Удалить
-                      </CustomButton>
-                    </div>
-                  </div>
-                </div>
+            <div className="platform-images-page__grid">
+              {items.map(file => (
+                <PlatformImageCard
+                  key={file.fileId}
+                  file={file}
+                  checked={selectedIds.includes(file.fileId)}
+                  disabled={controlsDisabled}
+                  onSelectChange={handleSelectChange}
+                  onPreview={setPreviewFile}
+                  onDelete={handleDelete}
+                  onCopy={handleCopy}
+                />
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+            <div className="platform-images-page__footer">
               {hasMore ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="platform-images-page__load-more">
                   <CustomButton
                     onClick={loadMore}
-                    disabled={
-                      busy ||
-                      !nextToken ||
-                      listState.isFetching ||
-                      listState.isLoading ||
-                      loadingMore
-                    }
                     type="primary"
+                    disabled={controlsDisabled || !nextToken}
                   >
-                    {loadingMore ? 'Загрузка…' : 'Загрузить ещё'}
+                    {loadingMore ? 'Загружаем...' : 'Загрузить ещё'}
                   </CustomButton>
-                  {loadingMore ? (
-                    <span style={{ opacity: 0.7, fontSize: 12 }}>Подгружаем…</span>
-                  ) : null}
+                  {loadingMore ? <span>Подгружаем следующую страницу...</span> : null}
                 </div>
               ) : (
-                <div style={{ opacity: 0.6 }}>Это все изображения.</div>
+                <span>Это все изображения по текущему фильтру.</span>
               )}
             </div>
           </>
         )}
-      </div>
+      </section>
 
-      {previewUrl ? (
-        <div
-          onClick={() => setPreviewUrl(null)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.9)',
-            zIndex: 999999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-          }}
-        >
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              position: 'relative',
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setPreviewUrl(null)}
-              style={{
-                position: 'absolute',
-                top: 12,
-                right: 12,
-                background: 'rgba(255,255,255,0.12)',
-                border: '1px solid rgba(255,255,255,0.22)',
-                color: '#fff',
-                borderRadius: 10,
-                padding: '8px 12px',
-                cursor: 'pointer',
-                zIndex: 1,
-              }}
-            >
-              ✕
-            </button>
+      <PlatformImagesUploadModal
+        open={uploadModalOpen}
+        loading={uploadState.isLoading}
+        onClose={() => setUploadModalOpen(false)}
+        onSubmit={handleUpload}
+      />
 
-            <img
-              src={previewUrl}
-              alt="preview"
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                objectFit: 'contain',
-                borderRadius: 12,
-              }}
-            />
-          </div>
-        </div>
-      ) : null}
+      <PlatformImagePreview file={previewFile} onClose={() => setPreviewFile(null)} />
     </div>
   )
 }

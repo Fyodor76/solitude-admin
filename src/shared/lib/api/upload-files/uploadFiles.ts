@@ -58,11 +58,15 @@ export const uploadFiles = baseApi.injectEndpoints({
       }
     ),
 
-    uploadImage: builder.mutation<ApiResponse<imgUpload, any>, { file: File; folder?: string }>({
-      query: ({ file, folder }) => {
+    uploadImage: builder.mutation<
+      ApiResponse<imgUpload, any>,
+      { file: File; folder?: string; name?: string }
+    >({
+      query: ({ file, folder, name }) => {
         const formData = new FormData()
         formData.append('file', file)
         if (folder) formData.append('folder', folder)
+        if (name?.trim()) formData.append('name', name.trim())
         return {
           url: `/cdn/upload`,
           method: 'POST',
@@ -87,6 +91,21 @@ export const uploadFiles = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, { fileId }) => [{ type: 'File', id: fileId }],
     }),
+
+    deleteFilesBulk: builder.mutation<
+      ApiResponse<{ deletedIds: string[] }, any>,
+      { fileIds: string[]; folder?: string }
+    >({
+      query: ({ fileIds, folder }) => ({
+        url: `/cdn/delete/bulk`,
+        method: 'POST',
+        body: {
+          fileIds,
+          folder,
+        },
+      }),
+      invalidatesTags: ['File'],
+    }),
   }),
 })
 
@@ -96,5 +115,6 @@ export const {
   useGetFileUrlByIdQuery,
   useUploadImageMutation,
   useDeleteFileByIdMutation,
+  useDeleteFilesBulkMutation,
   useLazyGetFileUrlByIdQuery,
 } = uploadFiles

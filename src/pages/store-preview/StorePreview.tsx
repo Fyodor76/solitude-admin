@@ -5,13 +5,13 @@ import {
   useGetTrackedPagesQuery,
   useLazyGetHeatmapClicksQuery,
 } from '@/shared/lib/api/page-analytics/pageAnalyticsApi'
+import { PageHeader } from '@/shared/ui/page-header'
 import { Button, Input, Select, Space, Spin, Switch, Typography } from 'antd'
 
 import './StorePreview.scss'
 
 const SITE_ORIGIN = 'https://solitude-store.ru'
 
-/** Origin документа во iframe (apex / www / поддомен витрины). */
 function isStoreIframeDocumentOrigin(origin: string): boolean {
   try {
     const u = new URL(origin)
@@ -85,7 +85,6 @@ function isIframeReadyPayload(data: unknown): data is { page_id: string; uri: st
   return typeof o.page_id === 'string'
 }
 
-/** Не дергать API/postMessage дважды подряд с тем же page_id (эффект вкл. + ready из iframe). */
 const HEATMAP_PUSH_DEBOUNCE_MS = 400
 
 const StorePreview = () => {
@@ -116,15 +115,15 @@ const StorePreview = () => {
   }, [trackedPages, path])
 
   const applyDraft = useCallback(() => {
-    const n = normalizePath(draft)
-    setPath(n)
-    setDraft(n)
+    const normalized = normalizePath(draft)
+    setPath(normalized)
+    setDraft(normalized)
   }, [draft])
 
   const goTo = useCallback((next: string) => {
-    const n = normalizePath(next)
-    setPath(n)
-    setDraft(n)
+    const normalized = normalizePath(next)
+    setPath(normalized)
+    setDraft(normalized)
   }, [])
 
   const pushHeatmapToIframe = useCallback(
@@ -151,7 +150,7 @@ const StorePreview = () => {
         const clicks = res.data?.clicks ?? []
         win.postMessage({ clicks, isIframeInteraction: true }, '*')
       } catch {
-        /* ошибка уходит в глобальный RTK middleware / toast */
+        return
       }
     },
     [heatmap, path, triggerHeatmapClicks]
@@ -168,20 +167,16 @@ const StorePreview = () => {
       if (!win || event.source !== win) {
         return
       }
-      if (!isIframeReadyPayload(event.data)) {
+      if (!isIframeReadyPayload(event.data) || !heatmap) {
         return
       }
-      if (!heatmap) {
-        return
-      }
+
       const pageId = normalizePath(event.data.page_id)
       if (readyTimer != null) {
         window.clearTimeout(readyTimer)
       }
       readyTimer = window.setTimeout(() => {
         readyTimer = null
-        /* force: иначе debounce после первого пуша (~150ms) может отменить этот вызов,
-           хотя первый postMessage до готовности слушателя во iframe мог не дойти */
         void pushHeatmapToIframe(pageId, true)
       }, 120)
     }
@@ -204,28 +199,31 @@ const StorePreview = () => {
       win.postMessage({ isIframeInteraction: false }, '*')
       return
     }
-    const t = window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       void pushHeatmapToIframe()
     }, 150)
-    return () => window.clearTimeout(t)
-    // Вкл.: первый пуш; выкл.: снять слой во iframe. Смена path — через postMessage ready.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- pushHeatmapToIframe меняется при path и дублирует ready
+    return () => window.clearTimeout(timer)
   }, [heatmap, pushHeatmapToIframe])
 
   return (
     <div className="storePreview">
-      <div className="storePreview__header">
-        <h1 className="storePreview__title">Тепловая карта сайта</h1>
-        <Typography.Text type="secondary">
-          {SITE_ORIGIN}
-          {path}
-        </Typography.Text>
-      </div>
+      <PageHeader
+        title="Тепловая карта сайта"
+        subtitle={
+          <>
+            <div>
+              {SITE_ORIGIN}
+              {path}
+            </div>
+            <div>Heatmap: клики из API, слой heatmap.js во iframe</div>
+          </>
+        }
+      />
 
       <div className="storePreview__heatmapRow">
         <Space align="center">
           <Switch checked={heatmap} onChange={setHeatmap} />
-          <Typography.Text>Heatmap (клики из API, слой heatmap.js во iframe)</Typography.Text>
+          <Typography.Text>Показывать слой heatmap</Typography.Text>
         </Space>
       </div>
 
@@ -247,13 +245,13 @@ const StorePreview = () => {
             disabled={trackedPages.length === 0 && !path}
             options={trackedPageSelectOptions}
             value={trackedPageSelectOptions.length ? path : undefined}
-            onChange={v => goTo(String(v))}
+            onChange={value => goTo(String(value))}
             optionFilterProp="label"
             filterOption={(input, option) => {
               const label = String(option?.label ?? '')
               const value = String(option?.value ?? '')
-              const q = input.trim().toLowerCase()
-              return label.toLowerCase().includes(q) || value.toLowerCase().includes(q)
+              const query = input.trim().toLowerCase()
+              return label.toLowerCase().includes(query) || value.toLowerCase().includes(query)
             }}
             virtual={trackedPageSelectOptions.length > 48}
             listHeight={320}
@@ -264,7 +262,7 @@ const StorePreview = () => {
       <div className="storePreview__pathForm">
         <Input
           value={draft}
-          onChange={e => setDraft(e.target.value)}
+          onChange={event => setDraft(event.target.value)}
           onPressEnter={applyDraft}
           placeholder="/collection или полный URL solitude-store.ru"
           style={{ maxWidth: 480, minWidth: 200 }}
@@ -272,7 +270,7 @@ const StorePreview = () => {
         <Button type="primary" onClick={applyDraft}>
           Открыть
         </Button>
-        <Button onClick={() => setIframeNonce(n => n + 1)}>Обновить</Button>
+        <Button onClick={() => setIframeNonce(value => value + 1)}>Обновить</Button>
         {heatmap ? (
           <Button onClick={() => void pushHeatmapToIframe(undefined, true)}>
             Перезагрузить heatmap
