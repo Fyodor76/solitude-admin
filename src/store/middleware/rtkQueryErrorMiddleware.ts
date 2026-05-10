@@ -18,8 +18,7 @@ type RtkQueryRejectedAction = {
 
 const isRtkQueryRejectedAction = (action: unknown): action is RtkQueryRejectedAction =>
   isRejectedWithValue(action) &&
-  typeof (action as RtkQueryRejectedAction).meta?.arg?.endpointName === 'string' &&
-  Array.isArray((action as RtkQueryRejectedAction).payload?.error)
+  typeof (action as RtkQueryRejectedAction).meta?.arg?.endpointName === 'string'
 
 export const rtkQueryErrorMiddleware: Middleware =
   ({ dispatch }) =>
@@ -32,14 +31,14 @@ export const rtkQueryErrorMiddleware: Middleware =
         return next(action)
       }
 
-      action.payload.error.forEach(err => {
-        dispatch(
-          addNotification({
-            type: 'error',
-            message: err,
-          })
-        )
+      const errorMessages = Object.entries(action.payload.error).map(([key, value]) => {
+        return {
+          type: 'error',
+          message: value.titles,
+        }
       })
+
+      dispatch(addNotification(errorMessages))
     }
 
     return next(action)

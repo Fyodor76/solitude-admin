@@ -10,11 +10,12 @@ export const configLogin: ConfigLoginType = {
       className: 'input-container',
       fields: [
         {
-          name: 'email',
+          name: 'login',
           typeField: 'input',
           size: 'large',
           placeholder: 'Логин',
           type: 'email',
+          status: '',
         },
         {
           name: 'password',
@@ -22,6 +23,23 @@ export const configLogin: ConfigLoginType = {
           size: 'large',
           placeholder: 'Пароль',
           type: 'password',
+          status: '',
+        },
+        {
+          name: 'house.name',
+          typeField: 'input',
+          size: 'large',
+          placeholder: 'Название дома',
+          type: 'text',
+          status: '',
+        },
+        {
+          name: 'people.user.name',
+          typeField: 'input',
+          size: 'large',
+          placeholder: 'Название people',
+          type: 'text',
+          status: '',
         },
       ],
     },

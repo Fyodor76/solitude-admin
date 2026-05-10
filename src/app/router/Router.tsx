@@ -1,8 +1,6 @@
-import { BaseLayout } from '@/layouts/base-layout'
+import { ValidationProvider } from '@/context/validation/provider'
 import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
-import CatalogPage from '@/pages/test/CatalogPage'
-import TshortsPage from '@/pages/test/TshortsPage'
 import { RouteObject } from 'react-router-dom'
 
 import { Forgot } from '../../pages/forgot'
@@ -31,9 +29,11 @@ export const Router: RouteObject[] = [
       {
         path: '/login',
         element: (
-          <PublicRouter>
-            <Login />
-          </PublicRouter>
+          <ValidationProvider>
+            <PublicRouter>
+              <Login />
+            </PublicRouter>
+          </ValidationProvider>
         ),
       },
       {
@@ -71,9 +71,9 @@ export const Router: RouteObject[] = [
       {
         path: '/categories',
         element: (
-          <BaseLayout>
+          <ProtectedRouter>
             <Categories />
-          </BaseLayout>
+          </ProtectedRouter>
         ),
       },
     ],

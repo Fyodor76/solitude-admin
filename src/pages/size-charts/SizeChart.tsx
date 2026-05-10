@@ -60,9 +60,7 @@ const SizeChart = () => {
     }
     try {
       await createSizeChart(formSizeChart).unwrap()
-      console.log('✅ Таблица размеров создана, обновляем данные...')
     } catch (error) {
-      console.log('Ошибка создания таблицы категории!', error)
       throw error
     }
   }

@@ -13,6 +13,7 @@ export type ConfigLoginType = {
           size: 'large'
           placeholder: string
           type: string
+          status: 'error' | 'warning' | string
         },
         {
           name: string
@@ -20,6 +21,7 @@ export type ConfigLoginType = {
           size: 'large'
           placeholder: string
           type: string
+          status: 'error' | 'warning' | string
         },
       ]
     },

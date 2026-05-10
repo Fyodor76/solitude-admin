@@ -13,9 +13,7 @@ export const useServerActions = () => {
   const createNewCategory = async (formDataModal: FormData): Promise<void> => {
     try {
       await createCategory(formDataModal).unwrap()
-      console.log('✅ Категория создана, обновляем данные...')
     } catch (error) {
-      console.log('Ошибка создания категории!', error)
       throw error
     }
   }
@@ -34,18 +32,15 @@ export const useServerActions = () => {
       if (fileId && folder) {
         try {
           await deleteFileById({ fileId, folder }).unwrap()
-          console.log(' Изображение удалено с CDN')
         } catch (imageError) {
           console.log(' Не удалось удалить изображение, но продолжаем...', imageError)
         }
       }
 
       await deleteCategory(categoryId).unwrap()
-      console.log('✅ Категория успешно удалена, ID:', categoryId)
 
       alert(' Категория успешно удалена!')
     } catch (error) {
-      console.log(' Ошибка удаления категории!', error)
       alert('Не удалось удалить категорию')
     }
   }

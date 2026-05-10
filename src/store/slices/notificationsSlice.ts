@@ -20,8 +20,8 @@ const notificationsSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    addNotification: (state, action: PayloadAction<AppNotification>) => {
-      state.items.push(action.payload)
+    addNotification: (state, action: PayloadAction<AppNotification[]>) => {
+      state.items = action.payload
     },
     clearNotifications: state => {
       state.items = []

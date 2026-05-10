@@ -1,3 +1,4 @@
+import { useValidation } from '@/context/validation/use-validation'
 import { useLoginMutation } from '@/shared/lib/api/auth/auth'
 import { useForm } from '@/shared/lib/hooks/useForm'
 import { Card } from '@/shared/ui/card'
@@ -9,7 +10,7 @@ import { configLogin } from './const/config-login'
 import './Login.scss'
 
 type formLoginProps = {
-  email: string
+  login: string
   password: string
 }
 
@@ -18,21 +19,39 @@ const Login = () => {
 
   const [login, { isLoading }] = useLoginMutation()
   const { form, handleChange } = useForm<formLoginProps>({
-    email: '',
+    login: '',
     password: '',
+    house: {
+      name: '1',
+    },
+    people: {
+      user: {
+        name: 'fydor',
+      },
+    },
   })
+  const { errors, applyServerErrors } = useValidation()
 
   const onLoginFinish = async () => {
     try {
-      if (form.email === '' && form.password === '') return
-      const response = await login({ login: form.email, password: form.password }).unwrap()
+      const payload = { login: form.login, password: form.password }
+
+      const response = await login(payload).unwrap()
 
       localStorage.setItem('refresh', response.refreshToken)
       localStorage.setItem('access', response.accessToken)
 
       navigate('/')
     } catch (error) {
-      console.log(error, 'error')
+      const { error: dataError } = error
+      applyServerErrors({
+        ...dataError,
+        ['house.name']: { id: '222', titles: ['какая нибудь пися, ну писяяяяяя'] },
+        ['people.user.name']: {
+          id: '333',
+          titles: ['какая нибудь пися, ну писяяяяяя2222222222222'],
+        },
+      })
     }
   }
 
@@ -49,6 +68,7 @@ const Login = () => {
           configForm={configLogin}
           onChange={handleChange}
           onFinish={onLoginFinish}
+          errors={errors}
         />
       </Card>
     </div>

@@ -144,11 +144,8 @@ const EditCategoryModal = ({
   const handleSave = async () => {
     try {
       if (isEdit) {
-        console.log('Вызов handleSaveEdit для категории:', category?.id)
         await handleSaveEdit()
       } else {
-        console.log('Вызов handleSaveCreate')
-
         await handleSaveCreate()
       }
       setMode(edit)

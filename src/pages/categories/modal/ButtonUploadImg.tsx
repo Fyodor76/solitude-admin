@@ -35,7 +35,6 @@ const ButtonUploadImg = ({
     },
     onChange(info) {
       if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList)
       }
 
       if (info.fileList.length === 0) {
@@ -46,6 +45,7 @@ const ButtonUploadImg = ({
         setUploadImg(null)
         return
       }
+
       if (info.file.status === 'done') {
         setUploadImg(info.file.response?.data)
         if (isEdit) {
