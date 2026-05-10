@@ -92,6 +92,7 @@ const StorePreview = () => {
   const [draft, setDraft] = useState('/')
   const [iframeNonce, setIframeNonce] = useState(0)
   const [heatmap, setHeatmap] = useState(true)
+  const [isControlsVisible, setIsControlsVisible] = useState(true)
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const lastHeatmapPushRef = useRef<{ pageId: string; at: number } | null>(null)
 
@@ -218,65 +219,74 @@ const StorePreview = () => {
             <div>Heatmap: клики из API, слой heatmap.js во iframe</div>
           </>
         }
+        actions={
+          <Button onClick={() => setIsControlsVisible(previous => !previous)}>
+            {isControlsVisible ? 'Скрыть настройки' : 'Показать настройки'}
+          </Button>
+        }
       />
 
-      <div className="storePreview__heatmapRow">
-        <Space align="center">
-          <Switch checked={heatmap} onChange={setHeatmap} />
-          <Typography.Text>Показывать слой heatmap</Typography.Text>
-        </Space>
-      </div>
+      {isControlsVisible ? (
+        <div className="storePreview__controls">
+          <div className="storePreview__heatmapRow">
+            <Space align="center">
+              <Switch checked={heatmap} onChange={setHeatmap} />
+              <Typography.Text>Показывать слой heatmap</Typography.Text>
+            </Space>
+          </div>
 
-      <div className="storePreview__toolbar">
-        <Typography.Text type="secondary" className="storePreview__toolbarLabel">
-          Страницы из аналитики:
-        </Typography.Text>
-        {pagesLoading ? (
-          <Spin size="small" />
-        ) : (
-          <Select
-            showSearch
-            className="storePreview__pageSelect"
-            placeholder={
-              trackedPages.length > 0 ? 'Поиск и выбор страницы' : 'Нет отслеживаемых страниц'
-            }
-            notFoundContent={trackedPages.length ? undefined : 'Пока нет данных'}
-            loading={pagesLoading}
-            disabled={trackedPages.length === 0 && !path}
-            options={trackedPageSelectOptions}
-            value={trackedPageSelectOptions.length ? path : undefined}
-            onChange={value => goTo(String(value))}
-            optionFilterProp="label"
-            filterOption={(input, option) => {
-              const label = String(option?.label ?? '')
-              const value = String(option?.value ?? '')
-              const query = input.trim().toLowerCase()
-              return label.toLowerCase().includes(query) || value.toLowerCase().includes(query)
-            }}
-            virtual={trackedPageSelectOptions.length > 48}
-            listHeight={320}
-          />
-        )}
-      </div>
+          <div className="storePreview__toolbar">
+            <Typography.Text type="secondary" className="storePreview__toolbarLabel">
+              Страницы из аналитики:
+            </Typography.Text>
+            {pagesLoading ? (
+              <Spin size="small" />
+            ) : (
+              <Select
+                showSearch
+                className="storePreview__pageSelect"
+                placeholder={
+                  trackedPages.length > 0 ? 'Поиск и выбор страницы' : 'Нет отслеживаемых страниц'
+                }
+                notFoundContent={trackedPages.length ? undefined : 'Пока нет данных'}
+                loading={pagesLoading}
+                disabled={trackedPages.length === 0 && !path}
+                options={trackedPageSelectOptions}
+                value={trackedPageSelectOptions.length ? path : undefined}
+                onChange={value => goTo(String(value))}
+                optionFilterProp="label"
+                filterOption={(input, option) => {
+                  const label = String(option?.label ?? '')
+                  const value = String(option?.value ?? '')
+                  const query = input.trim().toLowerCase()
+                  return label.toLowerCase().includes(query) || value.toLowerCase().includes(query)
+                }}
+                virtual={trackedPageSelectOptions.length > 48}
+                listHeight={320}
+              />
+            )}
+          </div>
 
-      <div className="storePreview__pathForm">
-        <Input
-          value={draft}
-          onChange={event => setDraft(event.target.value)}
-          onPressEnter={applyDraft}
-          placeholder="/collection или полный URL solitude-store.ru"
-          style={{ maxWidth: 480, minWidth: 200 }}
-        />
-        <Button type="primary" onClick={applyDraft}>
-          Открыть
-        </Button>
-        <Button onClick={() => setIframeNonce(value => value + 1)}>Обновить</Button>
-        {heatmap ? (
-          <Button onClick={() => void pushHeatmapToIframe(undefined, true)}>
-            Перезагрузить heatmap
-          </Button>
-        ) : null}
-      </div>
+          <div className="storePreview__pathForm">
+            <Input
+              value={draft}
+              onChange={event => setDraft(event.target.value)}
+              onPressEnter={applyDraft}
+              placeholder="/collection или полный URL solitude-store.ru"
+              style={{ maxWidth: 480, minWidth: 200 }}
+            />
+            <Button type="primary" onClick={applyDraft}>
+              Открыть
+            </Button>
+            <Button onClick={() => setIframeNonce(value => value + 1)}>Обновить</Button>
+            {heatmap ? (
+              <Button onClick={() => void pushHeatmapToIframe(undefined, true)}>
+                Перезагрузить heatmap
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       <div className="storePreview__frameWrap">
         <iframe

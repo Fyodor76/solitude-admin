@@ -6,6 +6,11 @@
   flex: 1;
   gap: 12px;
 
+  &__controls {
+    display: grid;
+    gap: 12px;
+  }
+
   &__heatmapRow,
   &__toolbar,
   &__pathForm {
