@@ -43,14 +43,14 @@ const BtnUploadImgForSizeChart = ({
         return
       }
       if (info.file.status === 'done') {
+        console.log('Новый imageId:', info.file.response?.data.fileId)
+        console.log('✅ Файл загружен успешно:', info.file.name)
         setUploadImg(info.file.response?.data)
 
         setFormSizeChartCreate(prev => ({
           ...prev,
           imageId: info.file.response?.data.fileId || null,
         }))
-
-        message.success(`${info.file.name} Файл загружен successfully`)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`)
       }

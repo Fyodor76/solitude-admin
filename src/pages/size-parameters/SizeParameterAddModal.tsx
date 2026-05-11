@@ -27,13 +27,14 @@ const SizeParameterAddModal = ({
   }
   return (
     <Modal
-      className="sizeCParameterAddModal"
+      className="sizeParameterAddModal"
       open={isOpen}
       onCancel={onClose}
       onOk={handleCreateAndCloseModal}
     >
       <label className="selectedSize">Выберите размер из списка:</label>
       <Select
+        className="selectedSizeSelect"
         placeholder="Выберете размер, который хотите добавить"
         value={selectedSizeToAdd}
         onChange={setSelectedSizeToAdd}

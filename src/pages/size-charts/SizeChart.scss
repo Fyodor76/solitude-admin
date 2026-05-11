@@ -32,15 +32,21 @@
         display: flex;
         width: 100%;
         gap: 32px;
+
         .size-chart-select {
           //width: 90%;
           margin-top: 8px;
           margin-bottom: 15px;
           height: 44px;
           width: 448px;
-        }
-        .size-chart-select::placeholder {
-          font-size: 14px;
+          .ant-select-suffix {
+            cursor: pointer;
+          }
+          .ant-select-content {
+            .ant-select-placeholder {
+              font-size: 14px;
+            }
+          }
         }
 
         .changeCategoryName {

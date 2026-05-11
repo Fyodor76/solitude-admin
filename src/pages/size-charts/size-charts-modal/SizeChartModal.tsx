@@ -68,6 +68,7 @@ const SizeChartModal = ({
         <span>Название</span>
         <Input
           type="text"
+          placeholder="Введите название таблицы (например: Мужские футболки)"
           id="size-chart-name"
           value={formSizeChart.name}
           onChange={e => handleInputChange('name', e.target.value)}
@@ -75,6 +76,7 @@ const SizeChartModal = ({
         <span>Описание</span>
         <Input
           type="text"
+          placeholder="Введите описание таблицы (необязательно)"
           id="size-chart-description"
           value={formSizeChart.description}
           onChange={e => handleInputChange('description', e.target.value)}
@@ -82,6 +84,7 @@ const SizeChartModal = ({
         <span>Замеры</span>
         <Input
           type="text"
+          placeholder="A - длина изделия, B - обхват груди, C - длина рукава"
           id="size-chart-metricsText"
           value={formSizeChart.metricsText}
           onChange={e => handleInputChange('metricsText', e.target.value)}
@@ -89,6 +92,7 @@ const SizeChartModal = ({
         <span>Тип</span>
         <Input
           type="text"
+          placeholder="Например: футболка, свитшот, платье"
           id="size-chart-productType"
           value={formSizeChart.productType}
           onChange={e => handleInputChange('productType', e.target.value)}

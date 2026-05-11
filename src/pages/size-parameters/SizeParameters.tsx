@@ -118,6 +118,13 @@ const SizeParameters = ({
         </Tooltip>
       ),
     },
+    {
+      title: 'Порядок',
+      dataIndex: 'order',
+      key: 'order',
+      width: 80,
+      render: (text: number) => <span style={{ textAlign: 'center' }}>{text}</span>,
+    },
 
     {
       title: 'Действия',
@@ -140,9 +147,13 @@ const SizeParameters = ({
   })
 
   const handleAddSize = () => {
-    if (filterParameters.length) {
-      onOpen(filterParameters)
+    if (filterParameters.length === 0) {
+      alert(
+        'Все возможные размеры уже добавлены. Удалите хотя бы один размер, чтобы добавить новый.'
+      )
+      return
     }
+    onOpen(filterParameters)
   }
 
   return (

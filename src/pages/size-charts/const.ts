@@ -4,6 +4,6 @@ export const initialData = {
   description: '',
   imageId: null,
   productType: '',
-  metricsText: 'A - длина\nB - грудь',
+  metricsText: '',
   sizeParameters: [],
 }

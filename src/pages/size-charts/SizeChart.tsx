@@ -51,6 +51,7 @@ const SizeChart = () => {
   const [editParameter, setEditParameter] = useState<EditableSizeParameter[]>([])
   const [selectedSizeToAdd, setSelectedSizeToAdd] = useState<string | null>(null)
   const [changedRows, setChangedRows] = useState<Record<string, boolean>>({})
+  const [deleteSizeIds, setDeleteSizeIds] = useState<string[]>([])
   const { isFetching, currentData, refetch } = useGetSizeChartByCategoryIdQuery(
     formSizeChart.categoryId || '',
     {
@@ -70,6 +71,7 @@ const SizeChart = () => {
 
   useEffect(() => {
     if (currentData?.data) {
+      console.log('Данные с сервера - imageId:', currentData.data.imageId)
       setFormSizeChart(currentData.data)
       setEditParameter([...(currentData?.data?.sizeParameters || [])])
     } else {
@@ -181,23 +183,20 @@ const SizeChart = () => {
     }
   }
 
-  const deleteSize = async (id: string | undefined) => {
+  const deleteSize = (id: string | undefined) => {
+    if (!id) {
+      return
+    }
     const sizeToDelete = editParameter.find(p => p.id === id)
+
     const isConfirmed = confirm(`Удалить размер "${sizeToDelete?.internationalSize}"?`)
     if (!isConfirmed) return
 
-    try {
-      if (sizeToDelete?.id) await deleteSizeParameter(sizeToDelete.id).unwrap()
-
-      const newParameters = editParameter.filter(p => {
-        return p.id !== id && p.tempId !== id
-      })
-      setEditParameter(reOrderParameter(newParameters))
-      refetch()
-      console.log('Удаление прошло успешно!')
-    } catch (error) {
-      console.log('Ошибка удаления размера...', error)
-    }
+    setDeleteSizeIds(prev => [...prev, id])
+    const newParameters = editParameter.filter(p => {
+      return p.id !== id
+    })
+    setEditParameter(reOrderParameter(newParameters))
   }
 
   const clearChanges = () => {
@@ -226,6 +225,14 @@ const SizeChart = () => {
       return
     }
     try {
+      for (const id of deleteSizeIds) {
+        try {
+          await deleteSizeParameter(id).unwrap()
+          console.log(`Удалён размер с id: ${id}`)
+        } catch (error) {
+          console.error(`Ошибка удаления размера ${id}:`, error)
+        }
+      }
       await updateSizeChart({
         id: sizeChartId,
         data: {
@@ -244,6 +251,7 @@ const SizeChart = () => {
           })),
         },
       }).unwrap()
+
       alert('✅ Изменения сохранены!')
       clearChanges()
     } catch (error) {
@@ -294,10 +302,17 @@ const SizeChart = () => {
                 setSelectedSizeToAdd(null)
               }}
               allowClear
+              placement="bottomLeft"
+              showSearch={{
+                filterOption: (input, option) =>
+                  String(option?.label ?? '')
+                    .toLowerCase()
+                    .includes(input.toLowerCase()),
+              }}
             >
               {allCategories &&
                 allCategories.map(cat => (
-                  <Select.Option key={cat.id} value={cat.id}>
+                  <Select.Option key={cat.id} value={cat.id} label={cat.name}>
                     {cat.name}
                   </Select.Option>
                 ))}
@@ -471,7 +486,7 @@ const SizeChart = () => {
                   </Button>
                   <Button
                     className="saveBtn"
-                    onClick={() => onSaveAllChanges(currentData.data)}
+                    onClick={() => onSaveAllChanges(formSizeChart)}
                     type="primary"
                   >
                     Сохранить изменения
