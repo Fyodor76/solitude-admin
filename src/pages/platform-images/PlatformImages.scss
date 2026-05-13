@@ -1,0 +1,261 @@
+.platform-images-page {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+  background: #f5f7fa;
+}
+
+.platform-images-toolbar__search {
+  width: 260px;
+}
+
+.platform-images-toolbar__select {
+  width: 240px;
+}
+
+.platform-images-page__content {
+  display: grid;
+  gap: 16px;
+}
+
+.platform-images-page__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 0;
+  color: #556476;
+  font-size: 14px;
+
+  strong {
+    color: #223041;
+  }
+}
+
+.platform-images-page__summary-left,
+.platform-images-page__summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.platform-images-page__loading,
+.platform-images-page__empty,
+.platform-images-page__footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 96px;
+  padding: 24px;
+  border: 1px solid #e6ebf2;
+  border-radius: 16px;
+  background: #fff;
+  color: #5d6d7f;
+  text-align: center;
+}
+
+.platform-images-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.platform-image-card {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid #e6ebf2;
+  border-radius: 18px;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.platform-image-card--selected {
+  border-color: #9fbce6;
+  box-shadow: 0 0 0 2px rgba(72, 128, 201, 0.12);
+  background: #fafdff;
+}
+
+.platform-image-card__select {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px 0;
+}
+
+.platform-image-card__preview {
+  height: 260px;
+  padding: 12px;
+  border: 0;
+  background: #f7f9fc;
+  cursor: pointer;
+
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+}
+
+.platform-image-card__body {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.platform-image-card__meta {
+  display: grid;
+  gap: 6px;
+
+  h3,
+  p,
+  span {
+    margin: 0;
+  }
+
+  h3 {
+    color: #223041;
+    font-size: 16px;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  p {
+    font-size: 12px;
+    color: #7a8898;
+    word-break: break-all;
+  }
+
+  span {
+    font-size: 13px;
+    color: #556476;
+  }
+}
+
+.platform-image-card__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  .ant-btn {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.platform-images-page__load-more {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.platform-images-upload-modal {
+  display: grid;
+  gap: 16px;
+}
+
+.platform-images-upload-modal__field {
+  display: grid;
+  gap: 8px;
+
+  span {
+    color: #23313f;
+    font-size: 14px;
+    font-weight: 600;
+  }
+}
+
+.platform-images-upload-modal__hint {
+  color: #5d6d7f;
+  font-size: 13px;
+}
+
+.platform-images-preview-modal {
+  .ant-modal-content {
+    padding: 20px;
+  }
+}
+
+.platform-images-preview__content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: min(90vw, 1100px);
+  min-height: min(80vh, 700px);
+  padding-top: 24px;
+}
+
+.platform-images-preview__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #d8e0ea;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.platform-images-preview__close::before,
+.platform-images-preview__close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #556476;
+  transform-origin: center;
+}
+
+.platform-images-preview__close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.platform-images-preview__close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.platform-images-preview__image {
+  max-width: 100%;
+  max-height: calc(75vh - 24px);
+  object-fit: contain;
+}
+
+@media (max-width: 900px) {
+  .platform-images-toolbar__search,
+  .platform-images-toolbar__select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .platform-images-page {
+    padding: 16px;
+  }
+
+  .platform-images-page__summary {
+    display: grid;
+  }
+
+  .platform-images-page__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-image-card__preview {
+    height: 220px;
+  }
+
+  .platform-image-card__actions {
+    grid-template-columns: 1fr;
+  }
+}

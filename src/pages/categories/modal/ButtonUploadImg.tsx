@@ -2,8 +2,8 @@ import React from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
-import { UploadOutlined } from '@ant-design/icons'
-import { Button, message, Upload, UploadProps } from 'antd'
+import { ImageUploadButton } from '@/shared/ui/image-upload'
+import { message, UploadProps } from 'antd'
 
 import { API_URL } from '@/app/constans/url'
 
@@ -34,10 +34,6 @@ const ButtonUploadImg = ({
       authorization: 'authorization-text',
     },
     onChange(info) {
-      if (info.file.status !== 'uploading') {
-        console.log(info.file, info.fileList)
-      }
-
       if (info.fileList.length === 0) {
         setFormDataModal(prev => ({
           ...prev,
@@ -46,6 +42,7 @@ const ButtonUploadImg = ({
         setUploadImg(null)
         return
       }
+
       if (info.file.status === 'done') {
         setUploadImg(info.file.response?.data)
         if (isEdit) {
@@ -56,18 +53,19 @@ const ButtonUploadImg = ({
         }
 
         setImgError(false)
-        message.success(`${info.file.name} Файл загружен successfully`)
+        message.success(`${info.file.name} загружен`)
       } else if (info.file.status === 'error') {
-        message.error(`${info.file.name} file upload failed.`)
+        message.error(`${info.file.name} не удалось загрузить`)
       }
     },
   }
+
   return (
-    <Upload {...props} key={isEdit ? `edit-${category?.id}` : 'create'}>
-      <Button icon={<UploadOutlined />} className="ant-input">
-        Загрузить
-      </Button>
-    </Upload>
+    <ImageUploadButton
+      {...props}
+      key={isEdit ? `edit-${category?.id}` : 'create'}
+      buttonText="Загрузить"
+    />
   )
 }
 

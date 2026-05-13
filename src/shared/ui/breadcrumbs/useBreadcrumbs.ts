@@ -12,9 +12,12 @@ export const useBreadcrumbs = (): BreadcrumbsItemProps[] => {
   pathnames.forEach((segment, index) => {
     const path = '/' + pathnames.slice(0, index + 1).join('/')
     const route = Object.values(ROUTES).find(r => r.path === path)
+    const decodedSegment = decodeURIComponent(segment)
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, char => char.toUpperCase())
 
     crumbs.push({
-      label: route ? route.label : segment,
+      label: route ? route.label : decodedSegment,
       href: path,
     })
   })

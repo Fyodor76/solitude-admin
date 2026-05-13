@@ -4,10 +4,48 @@ export interface imgUpload {
   fileId: string
   url: string
   folder?: string
+  name?: string
+  size?: number
+  lastModified?: string
+}
+
+export interface ListFilesMeta {
+  limit: number
+  isTruncated: boolean
+  nextContinuationToken?: string
 }
 
 export const uploadFiles = baseApi.injectEndpoints({
   endpoints: builder => ({
+    listFiles: builder.query<
+      ApiResponse<imgUpload[], ListFilesMeta>,
+      {
+        folder?: string
+        limit?: number
+        continuationToken?: string
+        search?: string
+        sortBy?: 'date' | 'size' | 'name'
+        sortOrder?: 'asc' | 'desc'
+      }
+    >({
+      query: ({ folder, limit, continuationToken, search, sortBy, sortOrder }) => ({
+        url: `/cdn/list`,
+        method: 'GET',
+        params: {
+          ...(folder ? { folder } : {}),
+          ...(limit ? { limit } : {}),
+          ...(continuationToken ? { continuationToken } : {}),
+          ...(search ? { search } : {}),
+          ...(sortBy ? { sortBy } : {}),
+          ...(sortOrder ? { sortOrder } : {}),
+        },
+      }),
+      providesTags: result =>
+        result?.data
+          ? [...result.data.map(f => ({ type: 'File' as const, id: f.fileId })), 'File']
+          : ['File'],
+    }),
+
     getFileUrlById: builder.query<ApiResponse<imgUpload, any>, { fileId: string; folder?: string }>(
       {
         query: ({ fileId, folder }) => ({
@@ -15,15 +53,20 @@ export const uploadFiles = baseApi.injectEndpoints({
           method: 'GET',
           params: folder ? { folder } : undefined,
         }),
-        providesTags: (result, error, { fileId }) => (result ? [{ type: 'File', id: fileId }] : []),
+        providesTags: (result, _error, { fileId }) =>
+          result ? [{ type: 'File', id: fileId }] : [],
       }
     ),
 
-    uploadImage: builder.mutation<ApiResponse<imgUpload, any>, { file: File; folder?: string }>({
-      query: ({ file, folder }) => {
+    uploadImage: builder.mutation<
+      ApiResponse<imgUpload, any>,
+      { file: File; folder?: string; name?: string }
+    >({
+      query: ({ file, folder, name }) => {
         const formData = new FormData()
         formData.append('file', file)
         if (folder) formData.append('folder', folder)
+        if (name?.trim()) formData.append('name', name.trim())
         return {
           url: `/cdn/upload`,
           method: 'POST',
@@ -46,14 +89,32 @@ export const uploadFiles = baseApi.injectEndpoints({
           accept: 'application/json',
         },
       }),
-      invalidatesTags: (result, error, { fileId }) => [{ type: 'File', id: fileId }],
+      invalidatesTags: (_result, _error, { fileId }) => [{ type: 'File', id: fileId }],
+    }),
+
+    deleteFilesBulk: builder.mutation<
+      ApiResponse<{ deletedIds: string[] }, any>,
+      { fileIds: string[]; folder?: string }
+    >({
+      query: ({ fileIds, folder }) => ({
+        url: `/cdn/delete/bulk`,
+        method: 'POST',
+        body: {
+          fileIds,
+          folder,
+        },
+      }),
+      invalidatesTags: ['File'],
     }),
   }),
 })
 
 export const {
+  useListFilesQuery,
+  useLazyListFilesQuery,
   useGetFileUrlByIdQuery,
   useUploadImageMutation,
   useDeleteFileByIdMutation,
+  useDeleteFilesBulkMutation,
   useLazyGetFileUrlByIdQuery,
 } = uploadFiles
