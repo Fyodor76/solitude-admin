@@ -4,6 +4,7 @@
   background-color: var(--color-grey-background-breadcrumbs);
 
   animation: gentleAppear 0.4s ease forwards;
+
   .breadcrumbs {
     width: 100%;
     display: flex;
@@ -11,8 +12,13 @@
 
     .list {
       display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       gap: 5px;
       font-style: italic;
+      margin: 0;
+      padding: 0;
+      list-style: none;
 
       .inactive {
         .link {
@@ -23,7 +29,6 @@
           font-family: 'Source Sans 3';
           font-size: 14px;
           font-weight: 300;
-          color: var(--color-grey-2);
 
           &:hover {
             color: var(--color-blue);
@@ -31,6 +36,7 @@
           }
         }
       }
+
       .active {
         .text {
           cursor: default;
@@ -40,6 +46,11 @@
           font-size: 14px;
           font-weight: 300;
         }
+      }
+
+      .separator {
+        margin-left: 2px;
+        color: var(--color-grey-5);
       }
     }
   }
