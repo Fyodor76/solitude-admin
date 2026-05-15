@@ -105,7 +105,7 @@ const SizeChartModal = ({
       />*/}
         <UniversalUploadButton
           folder="products"
-          buttonText="Загрузить"
+          buttonText="Загрузить изображение"
           buttonClassName="btn-upload-img-size"
           key={isEdit ? `edit-${formSizeChart.id}` : 'create'}
           onFileRemoved={() => {

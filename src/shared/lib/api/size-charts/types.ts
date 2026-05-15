@@ -7,7 +7,7 @@ export interface SizeChartRequest {
   description: string
   imageId: string | null
   productType: string
-  metricsText: string
+  metricsText?: string
   sizeParameters: SizeParameter[]
 }
 

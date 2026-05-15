@@ -32,9 +32,12 @@ import {
 } from '../size-parameters/const'
 import SizeParameters from '../size-parameters/SizeParameters'
 import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
+import ChoosingCategory from './ChoosingCategory'
 import { initialData } from './const'
+import { hasAnyData, isValidateParemeters, prepareUpdateData } from './helpers/SizeChartHelper'
 import SizeChartModal from './size-charts-modal/SizeChartModal'
 import './SizeChart.scss'
+import SizeChartEmpty from './SizeChartEmpty'
 
 const SizeChart = () => {
   const editModal = useModal()
@@ -125,14 +128,13 @@ const SizeChart = () => {
     }
   }
 
-  const reOrderParameter = (array: EditableSizeParameter[]): EditableSizeParameter[] => {
-    const newArr = array.map((el, index) => {
+  const recalculateOrder = (parameters: EditableSizeParameter[]): EditableSizeParameter[] => {
+    return parameters.map((parameter, index) => {
       return {
-        ...el,
+        ...parameter,
         order: index + 1,
       }
     })
-    return newArr
   }
 
   const createNewSizeParameter = async () => {
@@ -158,7 +160,7 @@ const SizeChart = () => {
         sizeChartId: sizeChartId,
       }).unwrap()
       const newParameters = [...editParameter, result.data]
-      setEditParameter(reOrderParameter(newParameters))
+      setEditParameter(recalculateOrder(newParameters))
       setSelectedSizeToAdd(null)
       console.log('Создала новый размер!')
     } catch (error) {
@@ -196,7 +198,7 @@ const SizeChart = () => {
     const newParameters = editParameter.filter(p => {
       return p.id !== id
     })
-    setEditParameter(reOrderParameter(newParameters))
+    setEditParameter(recalculateOrder(newParameters))
   }
 
   const clearChanges = () => {
@@ -205,25 +207,20 @@ const SizeChart = () => {
 
   const onSaveAllChanges = async (data: Partial<SizeChartRequest>) => {
     if (!sizeChartId) {
-      console.error('Нет таблицы для сохранения')
+      alert('Нет таблицы для сохранения')
       return
     }
-    if (editParameter.length === 0) {
+    const hasData = hasAnyData(editParameter, formSizeChart)
+    if (!hasData) {
       alert('Нет данных для сохранения')
       return
     }
-    const hasInvalid = editParameter.some(
-      p =>
-        p.lengthCm < MIN_LENGTH ||
-        p.lengthCm > MAX_LENGTH ||
-        p.chestCircumferenceCm < MIN_CHEST ||
-        p.chestCircumferenceCm > MAX_CHEST
-    )
-
+    const hasInvalid = isValidateParemeters(editParameter)
     if (hasInvalid) {
       alert('Есть некорректные значения! Проверьте длину (20-150 см) и обхват груди (40-200 см)')
       return
     }
+
     try {
       for (const id of deleteSizeIds) {
         try {
@@ -233,27 +230,15 @@ const SizeChart = () => {
           console.error(`Ошибка удаления размера ${id}:`, error)
         }
       }
+
       await updateSizeChart({
         id: sizeChartId,
-        data: {
-          name: data.name,
-          description: data.description,
-          imageId: data.imageId,
-          productType: data.productType,
-
-          sizeParameters: editParameter.map(p => ({
-            id: p.id,
-            internationalSize: p.internationalSize,
-            russianSize: p.russianSize,
-            lengthCm: Number(p.lengthCm),
-            chestCircumferenceCm: Number(p.chestCircumferenceCm),
-            order: Number(p.order),
-          })),
-        },
+        data: prepareUpdateData(data, editParameter),
       }).unwrap()
 
       alert('✅ Изменения сохранены!')
       clearChanges()
+      setDeleteSizeIds([])
     } catch (error) {
       console.log('Ошибка соханения изменений в таблице...')
     }
@@ -286,76 +271,14 @@ const SizeChart = () => {
     <div className="size-chart-wrapper">
       <div className="size-chart-container-in-wrapper">
         <h1 className="size-chart-title"> Управление таблицами размеров</h1>
-        <div className="size-chart-select-container">
-          <span className="size-chart-select-container-title">Выберете категорию</span>
-          <div className="change-category">
-            <Select
-              className="size-chart-select"
-              value={formSizeChart.categoryId || undefined}
-              placeholder="Выберете категорию"
-              onChange={value => {
-                setFormSizeChart({
-                  ...initialData,
-                  categoryId: value,
-                })
-                setEditParameter([])
-                setSelectedSizeToAdd(null)
-              }}
-              allowClear
-              placement="bottomLeft"
-              showSearch={{
-                filterOption: (input, option) =>
-                  String(option?.label ?? '')
-                    .toLowerCase()
-                    .includes(input.toLowerCase()),
-              }}
-            >
-              {allCategories &&
-                allCategories.map(cat => (
-                  <Select.Option key={cat.id} value={cat.id} label={cat.name}>
-                    {cat.name}
-                  </Select.Option>
-                ))}
-            </Select>
-            {formSizeChart.categoryId && (
-              <span className="changeCategoryName">
-                Выбрано:{' '}
-                <span className="category-name-change">
-                  {allCategories.find(cat => cat.id === formSizeChart.categoryId)?.name}
-                </span>
-              </span>
-            )}
-          </div>
-          {!formSizeChart.categoryId && (
-            <span className="size-chart-select-label">
-              Выберете категорию, чтобы посмотреть или редактировать таблицу размеров
-            </span>
-          )}
-        </div>
-        {!formSizeChart.id && !formSizeChart.categoryId && (
-          <>
-            <div className="size-chart-select-empty-container">
-              <h2 className="empty-table">Информация о таблице размеров</h2>
-              <div className="information">
-                <Icon className="information-icon" name="layoutOptions" color="#505253"></Icon>
-                <h3 className="information-title">Категория не выбрана</h3>
-                <span className="information-info">
-                  Выберете категорию, чтобы увидеть информацию о таблице размеров
-                </span>
-              </div>
-            </div>
-            <div className="size-chart-select-empty-container">
-              <h2 className="empty-table">Таблица размеров</h2>
-              <div className="information">
-                <Icon className="information-icon" name="tables" color="#505253"></Icon>
-                <h3 className="information-title">Таблица размеров не отображается</h3>
-                <span className="information-info">
-                  Выберете категорию, чтобы посмотреть и редактировать таблицу размеров
-                </span>
-              </div>
-            </div>{' '}
-          </>
-        )}
+        <ChoosingCategory
+          formSizeChart={formSizeChart}
+          allCategories={allCategories}
+          setFormSizeChart={setFormSizeChart}
+          setEditParameter={setEditParameter}
+          setSelectedSizeToAdd={setSelectedSizeToAdd}
+        />
+        {!formSizeChart.id && !formSizeChart.categoryId && <SizeChartEmpty />}
 
         {formSizeChart.categoryId && (
           <div className="size-chart-table-container">
