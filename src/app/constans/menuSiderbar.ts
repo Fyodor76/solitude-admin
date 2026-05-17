@@ -11,8 +11,9 @@ export const menuSidebar: MenuItem[] = [
   {
     id: 'size-charts',
     text: 'Size-charts',
-    href: 'size-charts',
+    href: '/size-charts',
     icon: 'tables',
+    hasArrow: false,
   },
   {
     id: 'platform-images',
