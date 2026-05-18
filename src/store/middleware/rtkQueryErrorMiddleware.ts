@@ -31,14 +31,15 @@ export const rtkQueryErrorMiddleware: Middleware =
         return next(action)
       }
 
-      const errorMessages = Object.entries(action.payload.error).map(([key, value]) => {
+      const messagesWithErrors = Object.entries(action.payload.error).map(([key, value]) => {
+        console.log(value, 'value value value')
         return {
           type: 'error',
           message: value.titles,
         }
       })
 
-      dispatch(addNotification(errorMessages))
+      dispatch(addNotification(messagesWithErrors))
     }
 
     return next(action)

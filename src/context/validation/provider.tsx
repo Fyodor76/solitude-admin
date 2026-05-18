@@ -6,12 +6,13 @@ import { Props, ValidationField } from './types'
 export const ValidationProvider = ({ children }: Props) => {
   const [errors, setErrors] = useState<ValidationField[]>([])
 
-  const applyServerErrors = <T extends Record<string, any>>(
-    errorsFromServer: Record<string, any>
-  ) => {
+  const applyServerErrors = (errorsFromServer: Record<string, any>) => {
     const mappedErrors: ValidationField[] = Object.entries(errorsFromServer).map(
       ([route, value]: any) => {
         console.log(route, 'route')
+
+        const splitRoute = route.split('.')
+        console.log(splitRoute, 'splitRoute')
 
         return {
           route,

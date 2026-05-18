@@ -7,6 +7,9 @@ const styleFn: NotificationArgsProps['styles'] = ({ props }) => {
     return {
       root: {
         backgroundColor: `rgba(255, 200, 200, 0.3)`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '5px',
       },
     } satisfies NotificationArgsProps['styles']
   }
@@ -31,14 +34,20 @@ export const useNotificationHandler = () => {
 
   const openNotification = (
     type: NotificationType,
-    errorMessage: string,
+    notificationText: string[],
     duration: number | false = 3,
     onClose?: () => void
   ) => {
+    let error = ''
+
+    notificationText.forEach(element => {})
+
+    console.log(notificationText, 'notificationText')
+
     api[type]({
       ...sharedProps,
       title: '',
-      description: errorMessage,
+      description: notificationText,
       duration: duration,
       styles: styleFn,
       onClose: onClose,
