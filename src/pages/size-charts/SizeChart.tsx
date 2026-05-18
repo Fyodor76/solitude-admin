@@ -16,34 +16,26 @@ import {
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
-import Icon from '@/shared/ui/icons/Icon'
-import { Button, Input, Modal, Select, Space, Spin } from 'antd'
+import { Spin } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
 import { MODES } from '../categories/const/constans'
-import {
-  ALL_RU_SIZES,
-  DEFAULT_MEASUREMENTS,
-  MAX_CHEST,
-  MAX_LENGTH,
-  MIN_CHEST,
-  MIN_LENGTH,
-} from '../size-parameters/const'
+import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/const'
 import SizeParameters from '../size-parameters/SizeParameters'
-import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
 import ChoosingCategory from './ChoosingCategory'
 import { initialData } from './const'
 import { hasAnyData, isValidateParemeters, prepareUpdateData } from './helpers/SizeChartHelper'
 import SizeChartModal from './size-charts-modal/SizeChartModal'
 import './SizeChart.scss'
+import SizeChartButtons from './SizeChartButtons'
+import SizeChartCreate from './SizeChartCreate'
 import SizeChartEmpty from './SizeChartEmpty'
 import SizeChartMainInfo from './SizeChartMainInfo'
 
 const SizeChart = () => {
   const editModal = useModal()
   const addSizeModal = useModal()
-  const { TextArea } = Input
 
   const [createSizeChart] = useCreateSizeChartMutation()
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
@@ -302,7 +294,6 @@ const SizeChart = () => {
                 />
 
                 <div className="size-charts-parameters">
-                  <div className="btn-and-size-chart"></div>
                   <SizeParameters
                     isOpen={addSizeModal.isOpen}
                     dataParameters={dataParameters}
@@ -318,43 +309,15 @@ const SizeChart = () => {
                     createNewSizeParameter={createNewSizeParameter}
                   />
                 </div>
-                <Space
-                  className="saveAndCancelBtn"
-                  style={{
-                    marginTop: 16,
-                    marginBottom: 16,
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                  }}
-                >
-                  <Button onClick={handleCancel} className="cancelBtn" type="link">
-                    Отмена
-                  </Button>
-                  <Button
-                    className="saveBtn"
-                    onClick={() => onSaveAllChanges(formSizeChart)}
-                    type="primary"
-                  >
-                    Сохранить изменения
-                  </Button>
-                </Space>
+                <SizeChartButtons
+                  formSizeChart={formSizeChart}
+                  handleCancel={handleCancel}
+                  onSaveAllChanges={onSaveAllChanges}
+                />
               </>
             )}
             {!isFetching && !currentData?.data?.id && (
-              <div className="size-chart-select-empty-container">
-                <h2 className="empty-table">Информация о таблице размеров</h2>
-                <div className="information">
-                  <h3 className="information-title">У данной категории ещё нет таблицы размеров</h3>
-                  <span className="information-info">Создайте таблицу с размерами</span>
-                  <Button
-                    onClick={handleCreateSizeChart}
-                    className="information-btn"
-                    type="default"
-                  >
-                    Создать
-                  </Button>
-                </div>
-              </div>
+              <SizeChartCreate handleCreateSizeChart={handleCreateSizeChart} />
             )}
           </div>
         )}

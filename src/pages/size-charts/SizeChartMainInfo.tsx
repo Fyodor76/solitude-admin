@@ -4,7 +4,6 @@ import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input } from 'antd'
-import TextArea from 'antd/es/input/TextArea'
 
 import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
 
@@ -29,6 +28,7 @@ const SizeChartMainInfo = ({
   setFormSizeChart,
   setUploadImg,
 }: SizeChartMainInfoProps) => {
+  const { TextArea } = Input
   return (
     <div className="size-chart-select-empty-container">
       <h2 className="empty-table">Информация о таблице размеров</h2>
