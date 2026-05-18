@@ -9,6 +9,13 @@ export const menuSidebar: MenuItem[] = [
     hasArrow: false,
   },
   {
+    id: 'size-charts',
+    text: 'Size-charts',
+    href: '/size-charts',
+    icon: 'tables',
+    hasArrow: false,
+  },
+  {
     id: 'platform-images',
     text: 'Изображения платформы',
     href: '/platform-images',

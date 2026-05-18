@@ -2,14 +2,14 @@ import React, { useState } from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
-import { Input, Modal, Select } from 'antd'
+import UniversalUploadButton from '@/shared/ui/upload-image-btn/UniversalUploadButton'
+import { Input, message, Modal, Select } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
 import { CategoryType, InitialFormData } from '../const/constans'
 import { mapFormToRequest } from '../mappers/categoryMappers'
 import { FormData } from '../types/type'
-import ButtonUploadImg from './ButtonUploadImg'
 import './EditCategoryModal.scss'
 
 interface EditCategoryModalProps {
@@ -238,12 +238,35 @@ const EditCategoryModal = ({
           </>
         )}
         <span className="editModal-title">Изображение категории</span>
-        <ButtonUploadImg
-          category={category}
-          isEdit={isEdit}
-          setFormDataModal={setFormDataModal}
-          setUploadImg={setUploadImg}
-          setImgError={setImgError}
+        <UniversalUploadButton
+          folder=""
+          key={isEdit ? `edit-${category?.id}` : 'create'}
+          buttonClassName="ant-input"
+          buttonText="Загрузить"
+          onFileRemoved={() => {
+            setFormDataModal(prev => ({
+              ...prev,
+              imageId: null,
+            }))
+            setUploadImg(null)
+            setImgError(true)
+            message.info('Файл удален')
+          }}
+          onFileUploaded={(fileId, fileData) => {
+            setUploadImg(fileData)
+            if (isEdit) {
+              setFormDataModal(prev => ({
+                ...prev,
+                imageId: fileId || null,
+              }))
+            }
+
+            setImgError(false)
+            message.success('Файл загружен successfully')
+          }}
+          onFileError={() => {
+            message.error('Ошибка загрузки файла.')
+          }}
         />
         {currentUrl && !imgError && (
           <img onError={handleImageError} src={currentUrl} alt="Category preview" />

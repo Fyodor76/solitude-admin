@@ -1,6 +1,7 @@
 import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
 import { PlatformImages } from '@/pages/platform-images'
+import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
 import { Navigate, RouteObject } from 'react-router-dom'
 
@@ -80,6 +81,14 @@ export const Router: RouteObject[] = [
         element: (
           <ProtectedRouter>
             <PlatformImages />
+          </ProtectedRouter>
+        ),
+      },
+      {
+        path: '/size-charts',
+        element: (
+          <ProtectedRouter>
+            <SizeChart />
           </ProtectedRouter>
         ),
       },

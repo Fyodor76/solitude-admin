@@ -8,7 +8,6 @@ const MainPage = () => {
         <PublicIcon name="apple-touch-icon" />
         Главная страница (Main Page)
       </h1>
-      <SizeChart />
     </div>
   )
 }
