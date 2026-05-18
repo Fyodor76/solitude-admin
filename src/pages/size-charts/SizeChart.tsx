@@ -291,11 +291,14 @@ const SizeChart = () => {
             {!isFetching && currentData?.data?.id && (
               <>
                 <SizeChartMainInfo
+                  isEdit={isEdit}
                   formSizeChart={formSizeChart}
                   imageUrl={imageUrl}
                   handleSizeChartChange={handleSizeChartChange}
                   onSaveAllChanges={onSaveAllChanges}
                   deleteSizeChart={deleteSizeChart}
+                  setFormSizeChart={setFormSizeChart}
+                  setUploadImg={setUploadImg}
                 />
 
                 <div className="size-charts-parameters">
