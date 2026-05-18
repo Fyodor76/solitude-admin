@@ -5,7 +5,7 @@ import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input } from 'antd'
 
-import BtnUploadImgForSizeChart from './BtnUploadImgForSizeChart'
+import BtnUploadImgForSizeChart from '../BtnUploadImgForSizeChart'
 
 interface SizeChartMainInfoProps {
   isEdit: boolean
