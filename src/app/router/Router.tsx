@@ -52,22 +52,6 @@ export const Router: RouteObject[] = [
           </PublicRouter>
         ),
       },
-      /* {
-        path: '/catalog',
-        element: (
-          <BaseLayout>
-            <CatalogPage />
-          </BaseLayout>
-        ),
-      },
-      {
-        path: '/catalog/tshorts',
-        element: (
-          <BaseLayout>
-            <TshortsPage />
-          </BaseLayout>
-        ),
-      },*/
       {
         path: '/categories',
         element: (

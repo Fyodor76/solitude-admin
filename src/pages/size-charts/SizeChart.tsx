@@ -15,6 +15,7 @@ import { SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { Spin } from 'antd'
+import { useSearchParams } from 'react-router-dom'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -26,7 +27,7 @@ import SizeChartButtons from './components/SizeChartButtons'
 import SizeChartCreate from './components/SizeChartCreate'
 import SizeChartEmpty from './components/SizeChartEmpty'
 import SizeChartMainInfo from './components/SizeChartMainInfo'
-import { initialData } from './const'
+import { initialData } from './constans/const'
 import { hasAnyData, isValidateParemeters, prepareUpdateData } from './helpers/SizeChartHelper'
 import { getAllCategories } from './helpers/SizeChartHelper'
 import { useSizeChartData } from './hooks/useSizeChartData'
@@ -37,14 +38,18 @@ import './SizeChart.scss'
 const SizeChart = () => {
   const editModal = useModal()
   const addSizeModal = useModal()
-
+  const [searchParams, setSearchParams] = useSearchParams()
+  const categoryIdFromUrl = searchParams.get('categoryId')
   const [createSizeChart] = useCreateSizeChartMutation()
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
   const [createNewParameter] = useCreateSizeParameterBySizeChartIdMutation()
   const [deleteSizeParameter] = useDeleteSizeParameterByIdMutation()
   const [updateSizeChart] = useUpdateSizeChartByIdMutation()
 
-  const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(initialData)
+  const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(() => ({
+    ...initialData,
+    categoryId: categoryIdFromUrl || '',
+  }))
 
   const [selectedSizeToAdd, setSelectedSizeToAdd] = useState<string | null>(null)
   const [changedRows, setChangedRows] = useState<Record<string, boolean>>({})
@@ -71,15 +76,22 @@ const SizeChart = () => {
   } = useSizeParameters(sizeChartId)
 
   useEffect(() => {
+    if (formSizeChart.categoryId) {
+      setSearchParams({ categoryId: formSizeChart.categoryId })
+    } else {
+      setSearchParams({})
+    }
+  }, [formSizeChart.categoryId, setSearchParams])
+
+  useEffect(() => {
     if (sizeChart) {
       console.log('Данные с сервера - imageId:', sizeChart.imageId)
       setFormSizeChart(sizeChart)
       setParameters([...(sizeChart?.sizeParameters || [])])
     } else {
-      setFormSizeChart(initialData)
       setParameters([])
     }
-  }, [sizeChart])
+  }, [sizeChart, , setParameters])
 
   const allCategories = useMemo(() => {
     if (!categoriesTreeData?.data) return []
@@ -267,10 +279,10 @@ const SizeChart = () => {
               <>
                 <SizeChartMainInfo
                   isEdit={isEdit}
+                  sizeChart={sizeChart}
                   formSizeChart={formSizeChart}
                   imageUrl={imageUrl}
                   handleSizeChartChange={handleSizeChartChange}
-                  onSaveAllChanges={onSaveAllChanges}
                   deleteSizeChart={deleteSizeChart}
                   setFormSizeChart={setFormSizeChart}
                   setUploadImg={setUploadImg}

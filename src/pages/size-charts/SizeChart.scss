@@ -34,7 +34,6 @@
         gap: 32px;
 
         .size-chart-select {
-          //width: 90%;
           margin-top: 8px;
           margin-bottom: 15px;
           height: 44px;
@@ -128,6 +127,13 @@
         .size-chart-img {
           flex: 1;
           width: auto;
+          .size-chart-input {
+            display: flex;
+            flex-wrap: wrap;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: break-word;
+          }
         }
         .size-chart {
           display: flex;
@@ -153,55 +159,72 @@
 
           vertical-align: top;
         }
-        .size-chart-img {
+        .size-chart-img-with-btn {
           display: flex;
-          flex-direction: column;
-
-          .size-chart-container-img {
-            position: relative;
-            align-items: center;
-            justify-content: center;
+          gap: 30px;
+          .size-chart-img {
             display: flex;
-            background-color: #f2f2fdff;
-            border-color: #f2f2fd;
-            border-radius: 8px;
-            .image-edit-overlay {
-              position: absolute;
-              top: 8px; // отступ сверху
-              right: 8px; // отступ справа
-              cursor: pointer;
+            flex-direction: column;
+            align-items: center;
 
-              border-radius: 50%;
-              width: 28px;
-              height: 28px;
-              display: flex;
+            .size-chart-container-img {
+              position: relative;
               align-items: center;
               justify-content: center;
-              transition: background 0.2s;
-            }
-            img {
-              //top: 23px;
-              color: #f2f2fdff;
-              width: 274px;
-              height: 182px;
-              border-radius: 0px 0px 0px 0px;
-            }
-          }
+              display: flex;
+              background-color: #f2f2fdff;
+              border-color: #f2f2fd;
+              border-radius: 8px;
+              max-width: 200px; // или любое нужное значение (300px, 100% и т.д.)
+              width: 100%; // чтобы занимал доступное пространство до max-width
 
-          .size-chart-text-container {
+              // ✅ Чтобы img был на весь контейнер
+              img {
+                width: 100%; // ширина на 100% от контейнера
+                height: auto; // высота автоматически (сохраняет пропорции)
+                object-fit: cover; // или contain — как тебе нужно
+                // cover: заполняет весь контейнер, обрезая края
+                // contain: помещает всё изображение внутрь, не обрезая
+
+                display: block;
+                border-radius: inherit; // наследует радиус от родителя (опционально)
+              }
+              .image-edit-overlay {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                cursor: pointer;
+
+                border-radius: 50%;
+                width: 28px;
+                height: 28px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s;
+              }
+              img {
+                color: #f2f2fdff;
+                width: 274px;
+                height: 182px;
+                border-radius: 0px 0px 0px 0px;
+              }
+            }
+
+            .size-chart-text-container {
+            }
           }
-        }
-        .size-chart-btn {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-          flex-shrink: 0;
-          width: auto;
-          padding-top: 15px;
-          .btn-save-size,
-          .btn-delete-size {
-            color: #414243;
-            border: none;
+          .size-chart-btn {
+            display: flex;
+            justify-content: center;
+
+            flex-shrink: 0;
+            width: auto;
+
+            .btn-delete-size {
+              color: #414243;
+              border: none;
+            }
           }
         }
       }

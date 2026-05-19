@@ -5,7 +5,7 @@ import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 import { Select } from 'antd'
 
-import { initialData } from '../const'
+import { initialData } from '../constans/const'
 
 interface ChoosingCategoryProps {
   formSizeChart: SizeChartRequest
