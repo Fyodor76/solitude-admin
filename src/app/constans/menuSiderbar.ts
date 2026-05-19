@@ -10,7 +10,7 @@ export const menuSidebar: MenuItem[] = [
   },
   {
     id: 'size-charts',
-    text: 'Size-charts',
+    text: 'Размерные сетки',
     href: '/size-charts',
     icon: 'tables',
     hasArrow: false,
