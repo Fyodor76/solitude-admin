@@ -258,7 +258,9 @@ const SizeChart = () => {
   return (
     <div className="size-chart-wrapper">
       <div className="size-chart-container-in-wrapper">
-        <h1 className="size-chart-title"> Управление таблицами размеров</h1>
+        <div className="size-chart-header">
+          <h1 className="size-chart-title"> Управление таблицами размеров</h1>
+        </div>
         <ChoosingCategory
           formSizeChart={formSizeChart}
           allCategories={allCategories}
