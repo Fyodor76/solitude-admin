@@ -219,6 +219,16 @@ const getErrorMessage = (error: FetchBaseQueryError): string => {
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['File', 'Category', 'Collection', 'Product', 'Size-chart', 'Size-parameter'],
+  tagTypes: [
+    'File',
+    'Category',
+    'Collection',
+    'Product',
+    'Size-chart',
+    'Size-parameter',
+    'SupportInbox',
+    'SupportConversation',
+    'SupportMessages',
+  ],
   endpoints: () => ({}),
 })

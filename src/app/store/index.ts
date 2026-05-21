@@ -1,4 +1,5 @@
 import { baseApi } from '@/shared/lib/api/baseApi'
+import '@/shared/lib/api/support/supportApi'
 import { rtkQueryErrorMiddleware } from '@/store/middleware/rtkQueryErrorMiddleware'
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
