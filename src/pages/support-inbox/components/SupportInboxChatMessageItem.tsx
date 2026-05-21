@@ -1,6 +1,6 @@
 import { SUPPORT_MESSAGE_KIND } from '@/shared/lib/api/support/constants'
 import type { SupportConversation, SupportMessage } from '@/shared/lib/api/support/types'
-import { Image, Spin } from 'antd'
+import { Spin } from 'antd'
 
 import { SUPPORT_INBOX_COPY } from '../constants'
 import { formatSupportDate } from '../helpers/formatSupportDate'
@@ -37,8 +37,13 @@ export function SupportInboxChatMessageItem({
           <div className="support-inbox__message-media">
             {loading && <Spin size="small" />}
             {!loading && url && (
-              <a href={url} target="_blank" rel="noreferrer">
-                <Image src={url} alt="" className="support-inbox__message-image" preview />
+              <a
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                className="support-inbox__message-photo-link"
+              >
+                <img src={url} alt="" className="support-inbox__message-image" loading="lazy" />
               </a>
             )}
             {!loading && !url && (

@@ -26,17 +26,17 @@ function buildSnapshot(conversations: SupportConversation[]): InboxSnapshot {
   return { waitingIds, lastMessageAt }
 }
 
-function hasNewAlert(prev: InboxSnapshot, next: InboxSnapshot): boolean {
-  for (const id of next.waitingIds) {
-    if (!prev.waitingIds.has(id)) return true
-    if (prev.lastMessageAt.get(id) !== next.lastMessageAt.get(id)) return true
-  }
-  return false
+/** Стабильный ключ: звук только при новом сообщении в «ждут оператора», не при простом наличии непрочитанных. */
+function getSnapshotKey(snapshot: InboxSnapshot): string {
+  return Array.from(snapshot.waitingIds)
+    .sort((a, b) => a - b)
+    .map(id => `${id}:${snapshot.lastMessageAt.get(id) ?? ''}`)
+    .join('|')
 }
 
 export function useSupportInboxAlerts(options?: { enableSound?: boolean }) {
   const enableSound = options?.enableSound ?? true
-  const { data } = useGetSupportInboxQuery(
+  const { data, isFetching, isSuccess } = useGetSupportInboxQuery(
     { limit: SUPPORT_ALERTS_INBOX_LIMIT },
     { pollingInterval: SUPPORT_ALERTS_POLL_MS }
   )
@@ -46,25 +46,38 @@ export function useSupportInboxAlerts(options?: { enableSound?: boolean }) {
     c => c.status === SUPPORT_CONVERSATION_STATUS.WAITING_OPERATOR
   ).length
 
-  const snapshotRef = useRef<InboxSnapshot | null>(null)
+  const snapshotKeyRef = useRef('')
   const readyRef = useRef(false)
 
   useEffect(() => {
-    const next = buildSnapshot(conversations)
+    if (!isSuccess || !conversations.length) {
+      return
+    }
 
-    if (!readyRef.current) {
-      snapshotRef.current = next
+    const next = buildSnapshot(conversations)
+    const nextKey = getSnapshotKey(next)
+
+    if (!enableSound) {
+      snapshotKeyRef.current = nextKey
       readyRef.current = true
       return
     }
 
-    const prev = snapshotRef.current
-    if (prev && enableSound && hasNewAlert(prev, next)) {
-      playSupportAlertSound()
+    if (isFetching && !readyRef.current) {
+      return
     }
 
-    snapshotRef.current = next
-  }, [conversations, enableSound])
+    if (!readyRef.current) {
+      snapshotKeyRef.current = nextKey
+      readyRef.current = true
+      return
+    }
+
+    if (nextKey !== snapshotKeyRef.current) {
+      playSupportAlertSound()
+      snapshotKeyRef.current = nextKey
+    }
+  }, [conversations, enableSound, isFetching, isSuccess])
 
   return { waitingCount }
 }

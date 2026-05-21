@@ -1,11 +1,18 @@
 .support-inbox {
-  padding: 0 24px 32px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 96px);
+  min-height: 640px;
+  max-height: calc(100vh - 96px);
+  padding: 0 24px 24px;
+  box-sizing: border-box;
 
   &__header-block {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
   }
 
   &__toolbar {
@@ -88,9 +95,8 @@
     display: grid;
     grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
     gap: 20px;
-    height: calc(100vh - 220px);
-    max-height: calc(100vh - 220px);
-    min-height: 480px;
+    flex: 1;
+    min-height: 0;
   }
 
   &__sidebar,
@@ -101,7 +107,7 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     overflow: hidden;
     min-height: 0;
-    max-height: calc(100vh - 220px);
+    height: 100%;
     display: flex;
     flex-direction: column;
   }
@@ -239,7 +245,7 @@
   }
 
   &__messages {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
@@ -251,11 +257,11 @@
   }
 
   &__messages-loading {
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
   }
 
   &__message {
@@ -307,17 +313,30 @@
 
   &__message-media {
     margin-bottom: 8px;
+  }
 
-    .ant-image {
-      display: block;
-      max-width: 100%;
+  &__message-photo-link {
+    display: block;
+    line-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+
+    &:hover .support-inbox__message-image {
+      filter: brightness(1.03);
     }
   }
 
   &__message-image {
     max-width: min(280px, 100%);
+    width: 100%;
+    height: auto;
     border-radius: 8px;
     display: block;
+    vertical-align: top;
+  }
+
+  &__message--operator .support-inbox__message-photo-link:hover .support-inbox__message-image {
+    filter: brightness(1.08);
   }
 
   &__message-media-fallback {
@@ -400,7 +419,10 @@
 
 @media (max-width: 1023px) {
   .support-inbox {
-    padding: 0 12px 20px;
+    height: calc(100dvh - 88px);
+    max-height: calc(100dvh - 88px);
+    min-height: 520px;
+    padding: 0 12px 16px;
 
     &__header-block {
       margin-bottom: 12px;
@@ -424,17 +446,16 @@
     &__layout {
       grid-template-columns: 1fr;
       gap: 0;
-      min-height: calc(100dvh - 200px);
     }
 
     &__sidebar {
-      min-height: calc(100dvh - 220px);
+      height: 100%;
       border-radius: 12px;
     }
 
     &__main {
       display: none;
-      min-height: calc(100dvh - 220px);
+      height: 100%;
       border-radius: 12px;
     }
 
