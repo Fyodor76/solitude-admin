@@ -1,4 +1,6 @@
-const IMAGE_LOAD_SCROLL_DELAYS_MS = [150, 450, 900] as const
+import { SUPPORT_INBOX_SCROLL } from '../constants'
+
+const IMAGE_LOAD_SCROLL_DELAYS_MS = SUPPORT_INBOX_SCROLL.IMAGE_LOAD_DELAYS_MS
 
 export function scrollMessagesToBottom(
   container: HTMLElement | null,

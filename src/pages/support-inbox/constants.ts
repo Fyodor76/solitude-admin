@@ -41,9 +41,23 @@ export const SUPPORT_INBOX_LAYOUT_CLASS = {
   MOBILE_CHAT: 'support-inbox--mobile-chat',
 } as const
 
-/** Высота ленты сообщений от viewport (см. SupportInbox.scss). */
-export const SUPPORT_INBOX_MESSAGES_VIEWPORT = {
-  HEIGHT: 'calc(100vh - 320px)',
+/** Layout / timing — значения дублируются в SupportInbox.scss (px). */
+export const SUPPORT_INBOX_LAYOUT = {
+  SIDEBAR_MIN_WIDTH_PX: 280,
+  SIDEBAR_MAX_WIDTH_PX: 360,
+  MESSAGES_MAX_HEIGHT_OFFSET_PX: 320,
+  PANEL_MIN_HEIGHT_OFFSET_PX: 240,
+  MOBILE_MESSAGES_MAX_HEIGHT_OFFSET_PX: 200,
+  CHAT_HEADER_CONTAINER_MAX_PX: 560,
+  MEDIA_MAX_WIDTH_PX: 240,
+  MEDIA_PLACEHOLDER_HEIGHT_PX: 160,
+  MEDIA_PLACEHOLDER_MIN_WIDTH_PX: 140,
+  COMPOSER_PREVIEW_SIZE_PX: 72,
+  COMPOSER_PREVIEW_REMOVE_PX: 22,
+} as const
+
+export const SUPPORT_INBOX_SCROLL = {
+  IMAGE_LOAD_DELAYS_MS: [150, 450, 900] as const,
 } as const
 
 export const SUPPORT_STATUS_LABELS: Record<SupportConversationStatus | string, string> = {
@@ -98,6 +112,8 @@ export const SUPPORT_INBOX_COPY = {
   ATTACH_PHOTO: 'Прикрепить фото',
   REMOVE_PHOTO: 'Убрать фото',
   PHOTO_LABEL: 'Фото',
+  PHOTO_LOADING: 'Загрузка фото…',
+  FILE_LOADING: 'Загрузка файла…',
   FILE_LABEL: 'Файл',
   PHOTO_UNAVAILABLE: 'Не удалось загрузить фото',
   FILE_UNAVAILABLE: 'Не удалось загрузить файл',

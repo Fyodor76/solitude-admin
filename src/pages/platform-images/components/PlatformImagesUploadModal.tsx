@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { ImageUploadButton } from '@/shared/ui/image-upload'
+import { InboxOutlined } from '@ant-design/icons'
 import type { UploadFile, UploadProps } from 'antd'
-import { Input, Modal } from 'antd'
+import { Input, Modal, Upload } from 'antd'
+import type { RcFile } from 'antd/es/upload'
 
-import { UploadPlatformImagePayload } from '../types'
+import { PLATFORM_IMAGE_ACCEPT, PLATFORM_IMAGES_UPLOAD } from '../constants'
+import { filterPlatformImageFiles } from '../helpers/filterPlatformImageFiles'
+import { filesFromUploadFileList, mapFilesToUploadFileList } from '../helpers/uploadFileList'
 
 interface PlatformImagesUploadModalProps {
   open: boolean
   loading?: boolean
   onClose: () => void
-  onSubmit: (payload: UploadPlatformImagePayload) => Promise<void>
+  onSubmit: (files: File[], displayName?: string) => Promise<void>
 }
 
 export const PlatformImagesUploadModal = ({
@@ -19,40 +22,41 @@ export const PlatformImagesUploadModal = ({
   onClose,
   onSubmit,
 }: PlatformImagesUploadModalProps) => {
-  const [file, setFile] = useState<File | null>(null)
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [name, setName] = useState('')
 
+  const files = useMemo(() => filesFromUploadFileList(fileList), [fileList])
+
+  const isSingleFile = files.length === 1
+
   useEffect(() => {
     if (!open) {
-      setFile(null)
       setFileList([])
       setName('')
     }
   }, [open])
 
   const uploadProps: UploadProps = {
+    multiple: true,
+    accept: PLATFORM_IMAGE_ACCEPT,
     fileList,
-    beforeUpload: nextFile => {
-      setFile(nextFile)
-      setFileList([nextFile as UploadFile])
+    beforeUpload: (_file, batch) => {
+      const next = filterPlatformImageFiles(batch as RcFile[])
+      setFileList(mapFilesToUploadFileList(next))
       return false
     },
-    onRemove: () => {
-      setFile(null)
-      setFileList([])
+    onRemove: file => {
+      setFileList(previous => previous.filter(item => item.uid !== file.uid))
     },
   }
 
   const handleSubmit = async () => {
-    if (!file) {
+    if (files.length === 0) {
       return
     }
 
-    await onSubmit({
-      file,
-      name: name.trim(),
-    })
+    const displayName = isSingleFile && name.trim() ? name.trim() : undefined
+    await onSubmit(files, displayName)
   }
 
   return (
@@ -61,38 +65,45 @@ export const PlatformImagesUploadModal = ({
       onCancel={onClose}
       onOk={handleSubmit}
       confirmLoading={loading}
-      okText="Загрузить"
+      okText={files.length > 1 ? `Загрузить (${files.length})` : 'Загрузить'}
       cancelText="Отмена"
-      title="Добавить изображение"
-      okButtonProps={{ disabled: !file }}
+      title={files.length > 1 ? 'Добавить изображения' : 'Добавить изображение'}
+      okButtonProps={{ disabled: files.length === 0 }}
       destroyOnHidden
+      width={PLATFORM_IMAGES_UPLOAD.MODAL_WIDTH_PX}
     >
       <div className="platform-images-upload-modal">
-        <label className="platform-images-upload-modal__field">
-          <span>Файл</span>
-          <ImageUploadButton
-            {...uploadProps}
-            buttonText={file ? 'Выбрать другой файл' : 'Выбрать файл'}
-          />
-        </label>
+        <Upload.Dragger {...uploadProps} className="platform-images-upload-modal__dragger">
+          <p className="platform-images-upload-modal__dragger-icon">
+            <InboxOutlined />
+          </p>
+          <p className="platform-images-upload-modal__dragger-title">
+            Перетащите фото или выберите файлы
+          </p>
+          <p className="platform-images-upload-modal__dragger-hint">
+            Можно выбрать несколько сразу
+          </p>
+        </Upload.Dragger>
 
-        <label className="platform-images-upload-modal__field">
-          <span>Название изображения</span>
-          <Input
-            value={name}
-            onChange={event => setName(event.target.value)}
-            placeholder="Например, Главный баннер"
-            maxLength={255}
-          />
-        </label>
+        {isSingleFile ? (
+          <label className="platform-images-upload-modal__field">
+            <span>Название изображения (необязательно)</span>
+            <Input
+              value={name}
+              onChange={event => setName(event.target.value)}
+              placeholder="Например, Главный баннер"
+              maxLength={PLATFORM_IMAGES_UPLOAD.NAME_MAX_LENGTH}
+            />
+          </label>
+        ) : null}
 
-        {file ? (
+        {files.length > 0 ? (
           <div className="platform-images-upload-modal__hint">
-            Выбран файл: <strong>{file.name}</strong>
+            Выбрано файлов: <strong>{files.length}</strong>
           </div>
         ) : (
           <div className="platform-images-upload-modal__hint">
-            Сначала выберите изображение для загрузки.
+            Добавьте одно или несколько изображений для загрузки.
           </div>
         )}
       </div>

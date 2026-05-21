@@ -9,9 +9,19 @@ export interface PlatformImagesFilters {
   sortOrder: PlatformImageSortOrder
 }
 
-export interface UploadPlatformImagePayload {
+export type PlatformImageUploadQueueStatus = 'queued' | 'uploading' | 'success' | 'error'
+
+export interface PlatformImageUploadQueueItem {
+  id: string
   file: File
-  name: string
+  previewUrl: string
+  status: PlatformImageUploadQueueStatus
+}
+
+export interface PlatformImagesBulkProgress {
+  completed: number
+  total: number
+  failed: number
 }
 
 export interface PlatformImageCardProps {

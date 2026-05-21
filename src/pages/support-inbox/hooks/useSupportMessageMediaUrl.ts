@@ -36,16 +36,18 @@ export function useSupportMessageMediaUrl(
     setLoading(true)
     setUrl(null)
 
+    const fileId = message.fileId
+
     const resolve = async () => {
       try {
         if (isTelegramChannel) {
-          const res = await fetchTelegramUrl(message.fileId).unwrap()
+          const res = await fetchTelegramUrl(fileId).unwrap()
           if (!cancelled) setUrl(res.data?.url ?? null)
           return
         }
 
         // Web: fileId в корне бакета (без folder) — URL отдаёт core через GET /cdn/url/:fileId
-        const res = await fetchWebFileUrl({ fileId: message.fileId }).unwrap()
+        const res = await fetchWebFileUrl({ fileId }).unwrap()
         if (!cancelled) setUrl(res.data?.url ?? null)
       } catch {
         if (!cancelled) setUrl(null)

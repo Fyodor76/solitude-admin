@@ -1,10 +1,10 @@
 import { SUPPORT_MESSAGE_KIND } from '@/shared/lib/api/support/constants'
 import type { SupportConversation, SupportMessage } from '@/shared/lib/api/support/types'
-import { Spin } from 'antd'
 
 import { SUPPORT_INBOX_COPY } from '../constants'
 import { formatSupportDate } from '../helpers/formatSupportDate'
 import { useSupportMessageMediaUrl } from '../hooks/useSupportMessageMediaUrl'
+import { SupportInboxChatMessagePhoto } from './SupportInboxChatMessagePhoto'
 
 const MESSAGE_SENDER_CLASS = {
   user: 'user',
@@ -37,30 +37,12 @@ export function SupportInboxChatMessageItem({
       <div className="support-inbox__message-bubble">
         {isMedia && (
           <div className="support-inbox__message-media">
-            {loading && <Spin size="small" />}
-            {!loading && url && (
-              <a
-                href={url}
-                target="_blank"
-                rel="noreferrer"
-                className="support-inbox__message-photo-link"
-              >
-                <img
-                  src={url}
-                  alt=""
-                  className="support-inbox__message-image"
-                  loading="lazy"
-                  onLoad={onMediaLoaded}
-                />
-              </a>
-            )}
-            {!loading && !url && (
-              <span className="support-inbox__message-media-fallback">
-                {message.kind === SUPPORT_MESSAGE_KIND.PHOTO
-                  ? SUPPORT_INBOX_COPY.PHOTO_UNAVAILABLE
-                  : SUPPORT_INBOX_COPY.FILE_UNAVAILABLE}
-              </span>
-            )}
+            <SupportInboxChatMessagePhoto
+              url={url}
+              urlLoading={loading}
+              kind={message.kind}
+              onImageLoaded={onMediaLoaded}
+            />
           </div>
         )}
 

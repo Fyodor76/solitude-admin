@@ -50,19 +50,21 @@ export function SupportInboxChatComposer({
         }}
       />
 
-      {pendingPreviewUrl && (
+      {pendingPreviewUrl ? (
         <div className="support-inbox__composer-preview">
-          <img src={pendingPreviewUrl} alt="" />
-          <button
-            type="button"
-            className="support-inbox__composer-preview-remove"
-            onClick={onClearPendingPhoto}
-            aria-label={SUPPORT_INBOX_COPY.REMOVE_PHOTO}
-          >
-            <CloseOutlined />
-          </button>
+          <div className="support-inbox__composer-preview-thumb">
+            <img src={pendingPreviewUrl} alt="" />
+            <button
+              type="button"
+              className="support-inbox__composer-preview-remove"
+              onClick={onClearPendingPhoto}
+              aria-label={SUPPORT_INBOX_COPY.REMOVE_PHOTO}
+            >
+              <CloseOutlined />
+            </button>
+          </div>
         </div>
-      )}
+      ) : null}
 
       <div className="support-inbox__composer-main">
         <TextArea

@@ -154,9 +154,235 @@
   gap: 12px;
 }
 
+.platform-images-dropzone {
+  border-radius: 16px;
+  transition: box-shadow 0.2s ease;
+
+  &--uploading .platform-images-dropzone__upload,
+  &__upload .ant-upload-drag-hover:not(.ant-upload-disabled) {
+    border-color: #4880c9;
+    background: #f0f6ff;
+  }
+
+  &__upload.ant-upload-wrapper {
+    display: block;
+  }
+
+  &__upload .ant-upload-drag {
+    border-radius: 16px;
+    border: 2px dashed #c5d3e3;
+    background: #fff;
+    padding: 28px 20px;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease;
+  }
+
+  &__upload .ant-upload-drag:hover:not(.ant-upload-disabled) {
+    border-color: #4880c9;
+  }
+
+  &__icon {
+    margin: 0 0 8px;
+    font-size: 40px;
+    color: #4880c9;
+  }
+
+  &__title {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #223041;
+  }
+
+  &__hint,
+  &__progress {
+    margin: 0;
+    font-size: 13px;
+    color: #5d6d7f;
+  }
+
+  &__progress {
+    margin-top: 10px;
+    font-weight: 600;
+    color: #4880c9;
+  }
+
+  &--has-queue &__upload .ant-upload-drag {
+    padding-bottom: 16px;
+  }
+}
+
+.platform-images-upload-queue {
+  margin-top: 16px;
+  padding: 14px 16px 12px;
+  border-top: 1px solid #e6ebf2;
+  background: #f7f9fc;
+  border-radius: 0 0 14px 14px;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 13px;
+    color: #556476;
+
+    strong {
+      color: #223041;
+    }
+  }
+
+  &__pending {
+    font-weight: 400;
+    color: #7a8898;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    width: 88px;
+    display: grid;
+    gap: 6px;
+  }
+
+  &__thumb {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #d8e0ea;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    padding: 0;
+    z-index: 1;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.72);
+    }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.72);
+    font-size: 22px;
+    color: #4880c9;
+
+    &--success {
+      background: rgba(82, 196, 26, 0.2);
+      color: #389e0d;
+    }
+
+    &--error {
+      background: rgba(255, 77, 79, 0.18);
+      color: #cf1322;
+    }
+  }
+
+  &__name {
+    font-size: 11px;
+    line-height: 1.3;
+    color: #5d6d7f;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+
+  &__item--queued &__thumb {
+    border-color: #adc6ff;
+  }
+
+  &__item--uploading &__thumb {
+    border-color: #4880c9;
+  }
+
+  &__item--success &__thumb {
+    border-color: #95de64;
+  }
+
+  &__item--error &__thumb {
+    border-color: #ff7875;
+  }
+}
+
 .platform-images-upload-modal {
   display: grid;
   gap: 16px;
+
+  &__dragger .ant-upload-drag {
+    border-radius: 12px;
+    padding: 20px 16px;
+  }
+
+  &__dragger-icon {
+    margin: 0 0 8px;
+    font-size: 32px;
+    color: #4880c9;
+  }
+
+  &__dragger-title {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #223041;
+  }
+
+  &__dragger-hint {
+    margin: 0;
+    font-size: 13px;
+    color: #5d6d7f;
+  }
 }
 
 .platform-images-upload-modal__field {

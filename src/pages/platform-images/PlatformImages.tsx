@@ -5,7 +5,6 @@ import {
   useDeleteFileByIdMutation,
   useDeleteFilesBulkMutation,
   useLazyListFilesQuery,
-  useUploadImageMutation,
 } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { CustomButton } from '@/shared/ui/custom-button/CustomButton'
@@ -14,16 +13,17 @@ import { Checkbox } from 'antd'
 
 import { PlatformImageCard } from './components/PlatformImageCard'
 import { PlatformImagePreview } from './components/PlatformImagePreview'
+import { PlatformImagesDropZone } from './components/PlatformImagesDropZone'
 import { PlatformImagesToolbar } from './components/PlatformImagesToolbar'
 import { PlatformImagesUploadModal } from './components/PlatformImagesUploadModal'
 import { PAGE_SIZE, PLATFORM_IMAGES_FOLDER } from './constants'
+import { usePlatformImagesUpload } from './hooks/usePlatformImagesUpload'
 import './PlatformImages.scss'
 
 export const PlatformImages = () => {
   const { contextHolder, openNotification } = useNotificationHandler()
 
   const [triggerList, listState] = useLazyListFilesQuery()
-  const [uploadImage, uploadState] = useUploadImageMutation()
   const [deleteFileById, deleteState] = useDeleteFileByIdMutation()
   const [deleteFilesBulk, bulkDeleteState] = useDeleteFilesBulkMutation()
 
@@ -39,15 +39,6 @@ export const PlatformImages = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
 
   const [previewFile, setPreviewFile] = useState<imgUpload | null>(null)
-
-  const busy = uploadState.isLoading || deleteState.isLoading || bulkDeleteState.isLoading
-  const loading = listState.isLoading || listState.isFetching
-  const isInitialLoading = loading && items.length === 0
-  const controlsDisabled = busy || loading || loadingMore
-
-  const allVisibleIds = useMemo(() => items.map(item => item.fileId), [items])
-  const isAllVisibleSelected =
-    allVisibleIds.length > 0 && allVisibleIds.every(id => selectedIds.includes(id))
 
   const loadFirstPage = async () => {
     setItems([])
@@ -77,6 +68,27 @@ export const PlatformImages = () => {
       )
     }
   }
+
+  const {
+    bulkUploading,
+    bulkProgress,
+    uploadQueue,
+    addFilesToQueue,
+    handleRemoveFromQueue,
+    handleClearPendingQueue,
+    handleStartUpload,
+    handleModalUpload,
+    notifyInvalidFiles,
+  } = usePlatformImagesUpload({ onUploaded: loadFirstPage })
+
+  const busy = bulkUploading || deleteState.isLoading || bulkDeleteState.isLoading
+  const loading = listState.isLoading || listState.isFetching
+  const isInitialLoading = loading && items.length === 0
+  const controlsDisabled = busy || loading || loadingMore
+
+  const allVisibleIds = useMemo(() => items.map(item => item.fileId), [items])
+  const isAllVisibleSelected =
+    allVisibleIds.length > 0 && allVisibleIds.every(id => selectedIds.includes(id))
 
   const loadMore = async () => {
     if (!nextToken) {
@@ -111,28 +123,9 @@ export const PlatformImages = () => {
   }
 
   useEffect(() => {
-    loadFirstPage()
+    void loadFirstPage()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const handleUpload = async ({ file, name }: { file: File; name: string }) => {
-    try {
-      await uploadImage({
-        file,
-        folder: PLATFORM_IMAGES_FOLDER,
-        name: name || file.name,
-      }).unwrap()
-
-      openNotification('success', 'Изображение загружено.')
-      setUploadModalOpen(false)
-      await loadFirstPage()
-    } catch (error: any) {
-      openNotification(
-        'error',
-        error?.data?.error || error?.data?.message || 'Не удалось загрузить изображение.'
-      )
-    }
-  }
 
   const handleDelete = async (fileId: string) => {
     const ok = window.confirm('Удалить изображение?')
@@ -209,6 +202,13 @@ export const PlatformImages = () => {
     setSelectedIds([])
   }
 
+  const onModalSubmit = async (files: File[], displayName?: string) => {
+    const uploaded = await handleModalUpload(files, displayName)
+    if (uploaded) {
+      setUploadModalOpen(false)
+    }
+  }
+
   return (
     <div className="platform-images-page">
       {contextHolder}
@@ -226,6 +226,18 @@ export const PlatformImages = () => {
       />
 
       <section className="platform-images-page__content">
+        <PlatformImagesDropZone
+          disabled={controlsDisabled}
+          uploading={bulkUploading}
+          progress={bulkProgress}
+          queueItems={uploadQueue}
+          onFilesSelected={addFilesToQueue}
+          onInvalidFiles={notifyInvalidFiles}
+          onRemoveQueueItem={handleRemoveFromQueue}
+          onClearQueue={handleClearPendingQueue}
+          onStartUpload={handleStartUpload}
+        />
+
         <div className="platform-images-page__summary">
           <div className="platform-images-page__summary-left">
             <Checkbox
@@ -265,7 +277,7 @@ export const PlatformImages = () => {
           </div>
         ) : items.length === 0 ? (
           <div className="platform-images-page__empty">
-            Пока нет изображений. Добавьте первое фото.
+            Пока нет изображений. Перетащите фото в зону выше или нажмите «Добавить фото».
           </div>
         ) : (
           <>
@@ -306,9 +318,9 @@ export const PlatformImages = () => {
 
       <PlatformImagesUploadModal
         open={uploadModalOpen}
-        loading={uploadState.isLoading}
+        loading={bulkUploading}
         onClose={() => setUploadModalOpen(false)}
-        onSubmit={handleUpload}
+        onSubmit={onModalSubmit}
       />
 
       <PlatformImagePreview file={previewFile} onClose={() => setPreviewFile(null)} />

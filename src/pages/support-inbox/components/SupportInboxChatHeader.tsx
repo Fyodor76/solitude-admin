@@ -64,7 +64,7 @@ export function SupportInboxChatHeader({
           <SupportInboxChatContactHints conversation={conversation} />
         </div>
         {(canTake || !isClosed) && (
-          <Space wrap className="support-inbox__chat-actions">
+          <Space size={[8, 8]} wrap className="support-inbox__chat-actions">
             {canTake && (
               <Button type="primary" loading={opening} onClick={onOpen}>
                 {SUPPORT_INBOX_COPY.TAKE_CONVERSATION}
