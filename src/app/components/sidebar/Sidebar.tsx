@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Button, Tooltip } from 'antd'
+import { Badge, Button, Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 
@@ -188,9 +188,16 @@ const Sidebar = ({
                       >
                         <div className="icon-and-text">
                           {item.icon && (
-                            <span className="menu-item-icon">
-                              <Icon name={item.icon} />
-                            </span>
+                            <Badge
+                              count={item.badgeCount}
+                              size="small"
+                              offset={isOpen ? [6, 0] : [4, 4]}
+                              className="sidebar-menu-badge"
+                            >
+                              <span className="menu-item-icon">
+                                <Icon name={item.icon} />
+                              </span>
+                            </Badge>
                           )}
                           {isOpen && (
                             <span className={`menu-item-text ${menuTextActive ? 'active' : ''}`}>

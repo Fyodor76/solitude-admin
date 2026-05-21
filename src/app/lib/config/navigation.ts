@@ -5,6 +5,7 @@ export const ROUTES = {
   CATALOG: { label: 'Каталог', path: '/catalog' },
   TSHORTS: { label: 'Футболки', path: '/catalog/tshorts' },
   CATEGORIES: { label: 'Категории', path: '/categories' },
+  SIZE_CHARTS: { label: 'Таблицы размеров', path: '/size-charts' },
   PLATFORM_IMAGES: { label: 'Изображения платформы', path: '/platform-images' },
   HEATMAP: { label: 'Тепловая карта сайта', path: '/heatmap' },
 } as const

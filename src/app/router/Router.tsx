@@ -3,6 +3,7 @@ import { MainPage } from '@/pages/main'
 import { PlatformImages } from '@/pages/platform-images'
 import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
+import { SupportInbox } from '@/pages/support-inbox'
 import { Navigate, RouteObject } from 'react-router-dom'
 
 import { Forgot } from '../../pages/forgot'
@@ -52,22 +53,6 @@ export const Router: RouteObject[] = [
           </PublicRouter>
         ),
       },
-      /* {
-        path: '/catalog',
-        element: (
-          <BaseLayout>
-            <CatalogPage />
-          </BaseLayout>
-        ),
-      },
-      {
-        path: '/catalog/tshorts',
-        element: (
-          <BaseLayout>
-            <TshortsPage />
-          </BaseLayout>
-        ),
-      },*/
       {
         path: '/categories',
         element: (
@@ -101,6 +86,14 @@ export const Router: RouteObject[] = [
         element: (
           <ProtectedRouter>
             <StorePreview />
+          </ProtectedRouter>
+        ),
+      },
+      {
+        path: '/support',
+        element: (
+          <ProtectedRouter>
+            <SupportInbox />
           </ProtectedRouter>
         ),
       },
