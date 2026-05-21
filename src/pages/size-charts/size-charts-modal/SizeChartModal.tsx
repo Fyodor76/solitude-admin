@@ -27,7 +27,6 @@ const SizeChartModal = ({
   isOpen,
   formSizeChart,
   isEdit,
-  isCreated,
   uploadImg,
   imageUrl,
   setUploadImg,
@@ -97,14 +96,9 @@ const SizeChartModal = ({
           value={formSizeChart.productType}
           onChange={e => handleInputChange('productType', e.target.value)}
         ></Input>
-        {/*<BtnUploadImgForSizeChart
-        setFormSizeChartCreate={setFormSizeChart}
-        setUploadImg={setUploadImg}
-        formSizeChartCreate={formSizeChart}
-        isEdit={isEdit}
-      />*/}
+
         <UniversalUploadButton
-          folder="products"
+          folder=""
           buttonText="Загрузить изображение"
           buttonClassName="btn-upload-img-size"
           key={isEdit ? `edit-${formSizeChart.id}` : 'create'}
