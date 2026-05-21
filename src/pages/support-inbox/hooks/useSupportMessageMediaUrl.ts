@@ -5,6 +5,8 @@ import { useLazyGetSupportTelegramMediaUrlQuery } from '@/shared/lib/api/support
 import type { SupportConversation, SupportMessage } from '@/shared/lib/api/support/types'
 import { useLazyGetFileUrlByIdQuery } from '@/shared/lib/api/upload-files/uploadFiles'
 
+import { extractMediaUrl } from '../helpers/extractMediaUrl'
+
 export function useSupportMessageMediaUrl(
   message: SupportMessage,
   conversation: SupportConversation | null
@@ -42,13 +44,13 @@ export function useSupportMessageMediaUrl(
       try {
         if (isTelegramChannel) {
           const res = await fetchTelegramUrl(fileId).unwrap()
-          if (!cancelled) setUrl(res.data?.url ?? null)
+          if (!cancelled) setUrl(extractMediaUrl(res))
           return
         }
 
         // Web: fileId в корне бакета (без folder) — URL отдаёт core через GET /cdn/url/:fileId
         const res = await fetchWebFileUrl({ fileId }).unwrap()
-        if (!cancelled) setUrl(res.data?.url ?? null)
+        if (!cancelled) setUrl(extractMediaUrl(res))
       } catch {
         if (!cancelled) setUrl(null)
       } finally {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { SUPPORT_MESSAGE_KIND } from '@/shared/lib/api/support/constants'
 import type { SupportMessage } from '@/shared/lib/api/support/types'
@@ -19,6 +19,7 @@ export function SupportInboxChatMessagePhoto({
   kind,
   onImageLoaded,
 }: SupportInboxChatMessagePhotoProps) {
+  const imgRef = useRef<HTMLImageElement>(null)
   const [imageReady, setImageReady] = useState(false)
   const [imageError, setImageError] = useState(false)
 
@@ -27,7 +28,23 @@ export function SupportInboxChatMessagePhoto({
     setImageError(false)
   }, [url])
 
-  const showPlaceholder = urlLoading || Boolean(url && !imageReady && !imageError)
+  useEffect(() => {
+    const img = imgRef.current
+    if (!url || !img) {
+      return
+    }
+
+    if (img.complete && img.naturalWidth > 0) {
+      setImageReady(true)
+      setImageError(false)
+      onImageLoaded?.()
+    }
+  }, [url, onImageLoaded])
+
+  const loadingLabel =
+    kind === SUPPORT_MESSAGE_KIND.PHOTO
+      ? SUPPORT_INBOX_COPY.PHOTO_LOADING
+      : SUPPORT_INBOX_COPY.FILE_LOADING
 
   if (!urlLoading && (!url || imageError)) {
     return (
@@ -39,42 +56,27 @@ export function SupportInboxChatMessagePhoto({
     )
   }
 
-  return (
-    <>
-      {showPlaceholder ? (
-        <div
-          className="support-inbox__message-media-placeholder"
-          role="status"
-          aria-live="polite"
-          aria-label={
-            kind === SUPPORT_MESSAGE_KIND.PHOTO
-              ? SUPPORT_INBOX_COPY.PHOTO_LOADING
-              : SUPPORT_INBOX_COPY.FILE_LOADING
-          }
-        >
-          <Spin size="default" />
-          <span className="support-inbox__message-media-placeholder-label">
-            {kind === SUPPORT_MESSAGE_KIND.PHOTO
-              ? SUPPORT_INBOX_COPY.PHOTO_LOADING
-              : SUPPORT_INBOX_COPY.FILE_LOADING}
-          </span>
-        </div>
-      ) : null}
+  const showPlaceholder = urlLoading || Boolean(url && !imageReady && !imageError)
 
+  return (
+    <div className="support-inbox__message-media-frame">
       {url ? (
         <a
           href={url}
           target="_blank"
           rel="noreferrer"
-          className="support-inbox__message-photo-link"
-          aria-hidden={!imageReady}
-          style={imageReady ? undefined : { display: 'none' }}
+          className={[
+            'support-inbox__message-photo-link',
+            imageReady ? 'support-inbox__message-photo-link--ready' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
           <img
+            ref={imgRef}
             src={url}
             alt=""
             className="support-inbox__message-image"
-            loading="lazy"
             onLoad={() => {
               setImageReady(true)
               setImageError(false)
@@ -87,6 +89,18 @@ export function SupportInboxChatMessagePhoto({
           />
         </a>
       ) : null}
-    </>
+
+      {showPlaceholder ? (
+        <div
+          className="support-inbox__message-media-placeholder"
+          role="status"
+          aria-live="polite"
+          aria-label={loadingLabel}
+        >
+          <Spin size="default" />
+          <span className="support-inbox__message-media-placeholder-label">{loadingLabel}</span>
+        </div>
+      ) : null}
+    </div>
   )
 }
