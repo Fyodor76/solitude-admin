@@ -28,6 +28,16 @@
       display: block;
       flex: none;
       min-height: auto;
+      scroll-behavior: smooth;
     }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-page--support .main-page__body,
+  .support-inbox__messages,
+  .support-inbox__list,
+  .support-widget__messages {
+    scroll-behavior: auto;
   }
 }

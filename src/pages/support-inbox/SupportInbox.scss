@@ -81,13 +81,15 @@
   }
 
   &__sidebar {
-    min-height: 480px;
+    min-height: calc(100vh - 240px);
     display: flex;
     flex-direction: column;
   }
 
   &__main {
-    min-height: 480px;
+    min-height: calc(100vh - 240px);
+    display: flex;
+    flex-direction: column;
   }
 
   &__sidebar-search {
@@ -109,8 +111,9 @@
     list-style: none;
     margin: 0;
     padding: 8px;
-    max-height: 440px;
+    max-height: calc(100vh - 320px);
     overflow-y: auto;
+    scroll-behavior: smooth;
   }
 
   &__list-loading,
@@ -183,7 +186,8 @@
   &__chat {
     display: flex;
     flex-direction: column;
-    min-height: 480px;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   &__chat-empty {
@@ -250,7 +254,13 @@
   }
 
   &__messages {
-    min-height: 320px;
+    flex: 1 1 auto;
+    min-height: min(320px, calc(100vh - 320px));
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
     padding: 16px 20px;
     display: flex;
     flex-direction: column;
@@ -259,7 +269,11 @@
   }
 
   &__messages-loading {
-    min-height: 320px;
+    flex: 1 1 auto;
+    min-height: min(320px, calc(100vh - 320px));
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+    scroll-behavior: smooth;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -506,7 +520,8 @@
 
       .support-inbox__messages,
       .support-inbox__messages-loading {
-        min-height: 280px;
+        min-height: min(calc(100vh - 200px), 70vh);
+        max-height: min(calc(100vh - 200px), 70vh);
       }
     }
 

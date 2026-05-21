@@ -21,6 +21,7 @@ import {
 import { buildInboxQueryParams } from '../helpers/buildInboxQueryParams'
 import { filterSupportConversations } from '../helpers/filterConversations'
 import { getEmptyListDescription } from '../helpers/getEmptyListDescription'
+import { scrollSupportInboxChatIntoView } from '../helpers/scrollMessagesToBottom'
 import { sortConversationsByLastMessage } from '../helpers/sortConversations'
 import { useSupportInboxMessages } from './useSupportInboxMessages'
 
@@ -100,6 +101,7 @@ export function useSupportInbox() {
 
   const handleSelect = (id: number) => {
     setSelectedId(id)
+    requestAnimationFrame(() => scrollSupportInboxChatIntoView('smooth'))
   }
 
   const handleOpen = async () => {

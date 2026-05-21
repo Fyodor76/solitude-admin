@@ -40,7 +40,7 @@ export function SupportInboxChatPanel({
 }: SupportInboxChatPanelProps) {
   const reply = useSupportInboxReply(conversation?.id ?? null, onReplySent)
 
-  const { messagesScrollRef, messagesEndRef } = useSupportChatAutoScroll({
+  const { messagesScrollRef, scrollToBottom } = useSupportChatAutoScroll({
     conversation,
     messages,
     messagesLoading,
@@ -77,7 +77,7 @@ export function SupportInboxChatPanel({
         messagesLoading={messagesLoading}
         messagesSwitching={messagesSwitching}
         messagesScrollRef={messagesScrollRef}
-        messagesEndRef={messagesEndRef}
+        onMediaLoaded={scrollToBottom}
       />
 
       {showComposer && (

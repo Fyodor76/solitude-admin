@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react'
 
 import type { SupportConversation, SupportMessage } from '@/shared/lib/api/support/types'
 
-function scrollMessagesToBottom(container: HTMLElement | null) {
-  if (!container) return
-  container.scrollTop = container.scrollHeight
-}
+import {
+  scrollMessagesToBottomSoon,
+  scrollSupportInboxChatIntoView,
+} from '../helpers/scrollMessagesToBottom'
 
 export function useSupportChatAutoScroll(options: {
   conversation: SupportConversation | null
@@ -14,7 +14,6 @@ export function useSupportChatAutoScroll(options: {
   messagesSwitching: boolean
 }) {
   const messagesScrollRef = useRef<HTMLDivElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
   const prevMessageCountRef = useRef(0)
   const prevConversationIdRef = useRef<number | null>(null)
 
@@ -29,9 +28,13 @@ export function useSupportChatAutoScroll(options: {
     prevConversationIdRef.current = conversation.id
     prevMessageCountRef.current = messages.length
 
-    if (!messages.length && !conversationChanged) return
+    if (!conversationChanged && !countGrew) return
 
-    scrollMessagesToBottom(messagesScrollRef.current)
+    if (conversationChanged) {
+      scrollSupportInboxChatIntoView('smooth')
+    }
+
+    scrollMessagesToBottomSoon(messagesScrollRef.current, 'smooth')
   }, [conversation, messages, messagesLoading, messagesSwitching])
 
   useEffect(() => {
@@ -41,5 +44,9 @@ export function useSupportChatAutoScroll(options: {
     }
   }, [conversation])
 
-  return { messagesScrollRef, messagesEndRef }
+  const scrollToBottom = () => {
+    scrollMessagesToBottomSoon(messagesScrollRef.current, 'smooth')
+  }
+
+  return { messagesScrollRef, scrollToBottom }
 }

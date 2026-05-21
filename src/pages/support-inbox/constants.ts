@@ -41,6 +41,11 @@ export const SUPPORT_INBOX_LAYOUT_CLASS = {
   MOBILE_CHAT: 'support-inbox--mobile-chat',
 } as const
 
+/** Высота ленты сообщений от viewport (см. SupportInbox.scss). */
+export const SUPPORT_INBOX_MESSAGES_VIEWPORT = {
+  HEIGHT: 'calc(100vh - 320px)',
+} as const
+
 export const SUPPORT_STATUS_LABELS: Record<SupportConversationStatus | string, string> = {
   [SUPPORT_CONVERSATION_STATUS.OPEN]: 'Открыт',
   [SUPPORT_CONVERSATION_STATUS.WAITING_OPERATOR]: 'Ждёт оператора',

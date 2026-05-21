@@ -12,7 +12,7 @@ interface SupportInboxChatMessagesProps {
   messagesLoading: boolean
   messagesSwitching: boolean
   messagesScrollRef: RefObject<HTMLDivElement | null>
-  messagesEndRef: RefObject<HTMLDivElement | null>
+  onMediaLoaded?: () => void
 }
 
 export function SupportInboxChatMessages({
@@ -21,7 +21,7 @@ export function SupportInboxChatMessages({
   messagesLoading,
   messagesSwitching,
   messagesScrollRef,
-  messagesEndRef,
+  onMediaLoaded,
 }: SupportInboxChatMessagesProps) {
   if (messagesLoading || messagesSwitching) {
     return (
@@ -48,9 +48,13 @@ export function SupportInboxChatMessages({
   return (
     <div ref={messagesScrollRef} className="support-inbox__messages">
       {messages.map(msg => (
-        <SupportInboxChatMessageItem key={msg.id} message={msg} conversation={conversation} />
+        <SupportInboxChatMessageItem
+          key={msg.id}
+          message={msg}
+          conversation={conversation}
+          onMediaLoaded={onMediaLoaded}
+        />
       ))}
-      <div ref={messagesEndRef} className="support-inbox__messages-anchor" aria-hidden />
     </div>
   )
 }

@@ -14,11 +14,13 @@ const MESSAGE_SENDER_CLASS = {
 interface SupportInboxChatMessageItemProps {
   message: SupportMessage
   conversation: SupportConversation
+  onMediaLoaded?: () => void
 }
 
 export function SupportInboxChatMessageItem({
   message,
   conversation,
+  onMediaLoaded,
 }: SupportInboxChatMessageItemProps) {
   const { url, loading, isMedia } = useSupportMessageMediaUrl(message, conversation)
 
@@ -43,7 +45,13 @@ export function SupportInboxChatMessageItem({
                 rel="noreferrer"
                 className="support-inbox__message-photo-link"
               >
-                <img src={url} alt="" className="support-inbox__message-image" loading="lazy" />
+                <img
+                  src={url}
+                  alt=""
+                  className="support-inbox__message-image"
+                  loading="lazy"
+                  onLoad={onMediaLoaded}
+                />
               </a>
             )}
             {!loading && !url && (
