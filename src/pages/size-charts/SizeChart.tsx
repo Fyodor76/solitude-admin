@@ -4,6 +4,7 @@ import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categorie
 import {
   useCreateSizeChartMutation,
   useDeleteSizeChartByIdMutation,
+  useGetSizeChartByCategoryIdQuery,
   useUpdateSizeChartByIdMutation,
 } from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
@@ -20,7 +21,7 @@ import { useSearchParams } from 'react-router-dom'
 import { CDN_URL } from '@/app/constans/url'
 
 import { MODES } from '../categories/const/constans'
-import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/const'
+import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/constans/const'
 import SizeParameters from '../size-parameters/SizeParameters'
 import ChoosingCategory from './components/ChoosingCategory'
 import SizeChartButtons from './components/SizeChartButtons'
@@ -30,7 +31,6 @@ import SizeChartMainInfo from './components/SizeChartMainInfo'
 import { initialData } from './constans/const'
 import { hasAnyData, isValidateParemeters, prepareUpdateData } from './helpers/SizeChartHelper'
 import { getAllCategories } from './helpers/SizeChartHelper'
-import { useSizeChartData } from './hooks/useSizeChartData'
 import { useSizeParameters } from './hooks/useSizeParameters'
 import SizeChartModal from './size-charts-modal/SizeChartModal'
 import './SizeChart.scss'
@@ -54,7 +54,19 @@ const SizeChart = () => {
   const [selectedSizeToAdd, setSelectedSizeToAdd] = useState<string | null>(null)
   const [changedRows, setChangedRows] = useState<Record<string, boolean>>({})
 
-  const { sizeChart, isFetching, refetch } = useSizeChartData(formSizeChart.categoryId || '')
+  const {
+    data: sizeChartResponse,
+    isFetching,
+    refetch,
+  } = useGetSizeChartByCategoryIdQuery(formSizeChart.categoryId || '', {
+    skip: !formSizeChart.categoryId,
+  })
+
+  const sizeChart =
+    sizeChartResponse?.data?.categoryId === formSizeChart.categoryId
+      ? sizeChartResponse?.data
+      : null
+
   const [deleteSizeChartById] = useDeleteSizeChartByIdMutation()
   const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
 
@@ -81,17 +93,22 @@ const SizeChart = () => {
     } else {
       setSearchParams({})
     }
-  }, [formSizeChart.categoryId, setSearchParams])
+  }, [formSizeChart.categoryId, setParameters])
 
   useEffect(() => {
-    if (sizeChart) {
+    if (sizeChart?.id) {
       console.log('Данные с сервера - imageId:', sizeChart.imageId)
       setFormSizeChart(sizeChart)
       setParameters([...(sizeChart?.sizeParameters || [])])
     } else {
+      setFormSizeChart(prev => ({
+        ...initialData,
+        categoryId: prev.categoryId,
+        id: undefined,
+      }))
       setParameters([])
     }
-  }, [sizeChart, , setParameters])
+  }, [sizeChart?.id, setParameters])
 
   const allCategories = useMemo(() => {
     if (!categoriesTreeData?.data) return []
@@ -103,6 +120,7 @@ const SizeChart = () => {
       alert('Выберете категорию!')
       return
     }
+    setUploadImg(null)
     setFormSizeChart({
       ...initialData,
       categoryId: formSizeChart.categoryId,
@@ -170,6 +188,7 @@ const SizeChart = () => {
       })
       setParameters([])
       setSelectedSizeToAdd(null)
+      refetch()
       console.log('Удаление прошло успешно!')
     } catch (error) {
       console.log('Ошибка удаления таблицы!', error)
@@ -223,7 +242,7 @@ const SizeChart = () => {
         id: sizeChartId,
         data: prepareUpdateData(data, parameters),
       }).unwrap()
-
+      await refetch()
       alert('✅ Изменения сохранены!')
       clearChanges()
       setDeleteIds([])
