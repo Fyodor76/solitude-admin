@@ -2,12 +2,18 @@ import { useEffect, useRef } from 'react'
 
 import type { SupportConversation, SupportMessage } from '@/shared/lib/api/support/types'
 
+function scrollMessagesToBottom(container: HTMLElement | null) {
+  if (!container) return
+  container.scrollTop = container.scrollHeight
+}
+
 export function useSupportChatAutoScroll(options: {
   conversation: SupportConversation | null
   messages: SupportMessage[]
   messagesLoading: boolean
   messagesSwitching: boolean
 }) {
+  const messagesScrollRef = useRef<HTMLDivElement>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const prevMessageCountRef = useRef(0)
   const prevConversationIdRef = useRef<number | null>(null)
@@ -23,12 +29,9 @@ export function useSupportChatAutoScroll(options: {
     prevConversationIdRef.current = conversation.id
     prevMessageCountRef.current = messages.length
 
-    if (!messages.length) return
+    if (!messages.length && !conversationChanged) return
 
-    messagesEndRef.current?.scrollIntoView({
-      behavior: conversationChanged || !countGrew ? 'auto' : 'smooth',
-      block: 'end',
-    })
+    scrollMessagesToBottom(messagesScrollRef.current)
   }, [conversation, messages, messagesLoading, messagesSwitching])
 
   useEffect(() => {
@@ -38,5 +41,5 @@ export function useSupportChatAutoScroll(options: {
     }
   }, [conversation])
 
-  return { messagesEndRef }
+  return { messagesScrollRef, messagesEndRef }
 }

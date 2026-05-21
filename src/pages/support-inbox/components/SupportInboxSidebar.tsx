@@ -24,7 +24,7 @@ export function SupportInboxSidebar({
   onSelect,
 }: SupportInboxSidebarProps) {
   return (
-    <aside className="support-inbox__sidebar support-inbox__sidebar--scroll">
+    <aside className="support-inbox__sidebar">
       <div className="support-inbox__sidebar-search">
         <Input.Search
           allowClear
@@ -33,13 +33,15 @@ export function SupportInboxSidebar({
           onChange={e => onSearchChange(e.target.value)}
         />
       </div>
-      <SupportInboxConversationList
-        conversations={conversations}
-        selectedId={selectedId}
-        isLoading={isLoading}
-        onSelect={onSelect}
-        emptyDescription={emptyDescription}
-      />
+      <div className="support-inbox__sidebar-list">
+        <SupportInboxConversationList
+          conversations={conversations}
+          selectedId={selectedId}
+          isLoading={isLoading}
+          onSelect={onSelect}
+          emptyDescription={emptyDescription}
+        />
+      </div>
     </aside>
   )
 }

@@ -11,6 +11,7 @@ interface SupportInboxChatMessagesProps {
   messages: SupportMessage[]
   messagesLoading: boolean
   messagesSwitching: boolean
+  messagesScrollRef: RefObject<HTMLDivElement | null>
   messagesEndRef: RefObject<HTMLDivElement | null>
 }
 
@@ -19,11 +20,15 @@ export function SupportInboxChatMessages({
   messages,
   messagesLoading,
   messagesSwitching,
+  messagesScrollRef,
   messagesEndRef,
 }: SupportInboxChatMessagesProps) {
   if (messagesLoading || messagesSwitching) {
     return (
-      <div className="support-inbox__messages support-inbox__messages-loading">
+      <div
+        ref={messagesScrollRef}
+        className="support-inbox__messages support-inbox__messages-loading"
+      >
         <Spin tip={messagesSwitching ? SUPPORT_INBOX_COPY.MESSAGES_SWITCHING : undefined} />
       </div>
     )
@@ -31,7 +36,7 @@ export function SupportInboxChatMessages({
 
   if (!messages.length) {
     return (
-      <div className="support-inbox__messages">
+      <div ref={messagesScrollRef} className="support-inbox__messages">
         <Empty
           description={SUPPORT_INBOX_COPY.MESSAGES_EMPTY}
           image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -41,7 +46,7 @@ export function SupportInboxChatMessages({
   }
 
   return (
-    <div className="support-inbox__messages">
+    <div ref={messagesScrollRef} className="support-inbox__messages">
       {messages.map(msg => (
         <SupportInboxChatMessageItem key={msg.id} message={msg} conversation={conversation} />
       ))}
