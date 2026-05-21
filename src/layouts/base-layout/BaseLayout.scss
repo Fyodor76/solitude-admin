@@ -13,9 +13,21 @@
     overflow-x: hidden;
   }
 
-  &--support .main-page__body {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+  /* Обращения: обычный скролл страницы, без обрезки */
+  &--support {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+
+    .header {
+      flex-shrink: 0;
+    }
+
+    .main-page__body {
+      overflow: visible;
+      display: block;
+      flex: none;
+      min-height: auto;
+    }
   }
 }

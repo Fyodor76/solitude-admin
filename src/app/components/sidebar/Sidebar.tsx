@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import { Badge, Button, Tooltip } from 'antd'
+import { Button, Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 
@@ -188,16 +188,19 @@ const Sidebar = ({
                       >
                         <div className="icon-and-text">
                           {item.icon && (
-                            <Badge
-                              count={item.badgeCount}
-                              size="small"
-                              offset={isOpen ? [6, 0] : [4, 4]}
-                              className="sidebar-menu-badge"
-                            >
+                            <span className="menu-item-icon-wrap">
                               <span className="menu-item-icon">
                                 <Icon name={item.icon} />
                               </span>
-                            </Badge>
+                              {item.badgeCount != null && item.badgeCount > 0 ? (
+                                <span
+                                  className="sidebar-menu-badge-count"
+                                  aria-label={`Новых обращений: ${item.badgeCount}`}
+                                >
+                                  {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                                </span>
+                              ) : null}
+                            </span>
                           )}
                           {isOpen && (
                             <span className={`menu-item-text ${menuTextActive ? 'active' : ''}`}>

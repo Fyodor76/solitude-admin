@@ -43,37 +43,41 @@ export function SupportInboxChatHeader({
           {SUPPORT_INBOX_COPY.BACK_TO_LIST}
         </Button>
       )}
-      <div className="support-inbox__chat-header-main">
-        <Typography.Title level={4} className="support-inbox__chat-title">
-          {conversation.displayName}
-        </Typography.Title>
-        <div className="support-inbox__chat-meta">
-          <Tag color={conversation.channel === SUPPORT_CHANNEL.WEB ? 'blue' : 'green'}>
-            {SUPPORT_CHANNEL_LABELS[conversation.channel]}
-          </Tag>
-          <Tag color={statusColor}>
-            {SUPPORT_STATUS_LABELS[conversation.status] ?? conversation.status}
-          </Tag>
-          {conversation.assignedOperatorLabel && (
-            <span className="support-inbox__chat-operator">
-              {SUPPORT_INBOX_COPY.OPERATOR_PREFIX} {conversation.assignedOperatorLabel}
-            </span>
-          )}
+      <div className="support-inbox__chat-header-row">
+        <div className="support-inbox__chat-header-main">
+          <Typography.Title level={4} className="support-inbox__chat-title">
+            {conversation.displayName}
+          </Typography.Title>
+          <div className="support-inbox__chat-meta">
+            <Tag color={conversation.channel === SUPPORT_CHANNEL.WEB ? 'blue' : 'green'}>
+              {SUPPORT_CHANNEL_LABELS[conversation.channel]}
+            </Tag>
+            <Tag color={statusColor}>
+              {SUPPORT_STATUS_LABELS[conversation.status] ?? conversation.status}
+            </Tag>
+            {conversation.assignedOperatorLabel && (
+              <span className="support-inbox__chat-operator">
+                {SUPPORT_INBOX_COPY.OPERATOR_PREFIX} {conversation.assignedOperatorLabel}
+              </span>
+            )}
+          </div>
+          <SupportInboxChatContactHints conversation={conversation} />
         </div>
-        <SupportInboxChatContactHints conversation={conversation} />
+        {(canTake || !isClosed) && (
+          <Space wrap className="support-inbox__chat-actions">
+            {canTake && (
+              <Button type="primary" loading={opening} onClick={onOpen}>
+                {SUPPORT_INBOX_COPY.TAKE_CONVERSATION}
+              </Button>
+            )}
+            {!isClosed && (
+              <Button danger loading={closing} onClick={onClose}>
+                {SUPPORT_INBOX_COPY.CLOSE_CONVERSATION}
+              </Button>
+            )}
+          </Space>
+        )}
       </div>
-      <Space wrap className="support-inbox__chat-actions">
-        {canTake && (
-          <Button type="primary" loading={opening} onClick={onOpen}>
-            {SUPPORT_INBOX_COPY.TAKE_CONVERSATION}
-          </Button>
-        )}
-        {!isClosed && (
-          <Button danger loading={closing} onClick={onClose}>
-            {SUPPORT_INBOX_COPY.CLOSE_CONVERSATION}
-          </Button>
-        )}
-      </Space>
     </header>
   )
 }

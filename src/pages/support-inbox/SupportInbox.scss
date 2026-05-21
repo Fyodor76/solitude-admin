@@ -1,19 +1,12 @@
 .support-inbox {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
-  padding: 0 24px 16px;
+  padding: 0 16px 32px;
   box-sizing: border-box;
 
   &__header-block {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 12px;
-    flex-shrink: 0;
   }
 
   &__toolbar {
@@ -76,9 +69,7 @@
     display: grid;
     grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
     gap: 16px;
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: hidden;
+    align-items: start;
   }
 
   &__sidebar,
@@ -87,38 +78,38 @@
     border: 1px solid #ebebeb;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-    min-height: 0;
-    height: 100%;
+  }
+
+  &__sidebar {
+    min-height: 480px;
     display: flex;
     flex-direction: column;
+  }
+
+  &__main {
+    min-height: 480px;
   }
 
   &__sidebar-search {
     padding: 12px 12px 0;
     border-bottom: 1px solid #f0f0f0;
-    flex-shrink: 0;
   }
 
   &__sidebar-list {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: hidden;
+    flex: 1;
     display: flex;
     flex-direction: column;
   }
 
   &__messages-anchor {
     height: 1px;
-    flex-shrink: 0;
   }
 
   &__list {
     list-style: none;
     margin: 0;
     padding: 8px;
-    flex: 1 1 auto;
-    min-height: 0;
+    max-height: 440px;
     overflow-y: auto;
   }
 
@@ -127,9 +118,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1 1 auto;
-    min-height: 0;
     padding: 24px;
+    min-height: 200px;
   }
 
   &__list-item {
@@ -193,18 +183,14 @@
   &__chat {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-    height: 100%;
-    overflow: hidden;
+    min-height: 480px;
   }
 
   &__chat-empty {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1 1 auto;
-    min-height: 0;
+    min-height: 280px;
     padding: 32px;
   }
 
@@ -214,7 +200,19 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex-shrink: 0;
+  }
+
+  &__chat-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+  }
+
+  &__chat-header-main {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   &__chat-title {
@@ -246,33 +244,30 @@
   }
 
   &__chat-actions {
-    justify-content: flex-start;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    margin-left: auto;
   }
 
   &__messages {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
+    min-height: 320px;
     padding: 16px 20px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
   }
 
   &__messages-loading {
-    flex: 1 1 auto;
-    min-height: 0;
+    min-height: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 24px;
   }
 
   &__message {
     display: flex;
-    flex-shrink: 0;
 
     &--user {
       justify-content: flex-start;
@@ -284,8 +279,8 @@
   }
 
   &__message-bubble {
-    max-width: min(78%, 520px);
-    padding: 10px 14px;
+    max-width: min(92%, 640px);
+    padding: 12px 16px;
     border-radius: 14px;
   }
 
@@ -326,7 +321,6 @@
     display: block;
     line-height: 0;
     border-radius: 8px;
-    overflow: hidden;
 
     &:hover .support-inbox__message-image {
       filter: brightness(1.03);
@@ -334,12 +328,13 @@
   }
 
   &__message-image {
-    max-width: min(200px, 100%);
+    max-width: min(240px, 100%);
     width: auto;
     height: auto;
+    max-height: 200px;
+    object-fit: contain;
     border-radius: 8px;
     display: block;
-    vertical-align: top;
   }
 
   &__message--operator .support-inbox__message-photo-link:hover .support-inbox__message-image {
@@ -352,13 +347,12 @@
   }
 
   &__composer {
-    padding: 14px 16px 16px;
+    padding: 14px 16px 20px;
     border-top: 1px solid #f0f0f0;
     display: flex;
     flex-direction: column;
     gap: 10px;
     background: #fff;
-    flex-shrink: 0;
   }
 
   &__composer-file-input {
@@ -467,7 +461,6 @@
     color: #8c8c8c;
     font-size: 13px;
     text-align: center;
-    flex-shrink: 0;
   }
 
   &__back-to-list {
@@ -481,39 +474,20 @@
 
 @media (max-width: 1023px) {
   .support-inbox {
-    padding: 0 12px 12px;
-
-    &__header-block {
-      margin-bottom: 10px;
-    }
-
-    &__toolbar {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    &__toolbar-stats {
-      justify-content: space-between;
-      width: 100%;
-    }
-
-    &__status-select {
-      width: 100%;
-      min-width: 0;
-    }
+    padding: 0 12px 24px;
 
     &__layout {
       grid-template-columns: 1fr;
-      gap: 0;
+      gap: 12px;
     }
 
     &__sidebar {
-      height: 100%;
+      min-height: 0;
     }
 
     &__main {
       display: none;
-      height: 100%;
+      min-height: 0;
     }
 
     &--mobile-chat {
@@ -522,14 +496,22 @@
       }
 
       .support-inbox__main {
-        display: flex;
-        flex-direction: column;
+        display: block;
+        min-height: 0;
+      }
+
+      .support-inbox__chat {
+        min-height: 0;
+      }
+
+      .support-inbox__messages,
+      .support-inbox__messages-loading {
+        min-height: 280px;
       }
     }
 
     &__chat-header {
       padding: 12px 14px 10px;
-      flex-shrink: 0;
       background: #fff;
     }
 
@@ -547,7 +529,6 @@
 
     &__composer {
       padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
-      flex-shrink: 0;
       background: #fff;
     }
 
@@ -566,7 +547,7 @@
 
 @media (max-width: 640px) {
   .support-inbox {
-    padding: 0 8px 8px;
+    padding: 0 8px 16px;
 
     &__toolbar .ant-segmented {
       width: 100%;
