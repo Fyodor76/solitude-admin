@@ -70,7 +70,9 @@ const EditCategoryModal = ({
 
   const checkChild = (categoryId: string, categories: BaseCategoryTree[]) => {
     let result: BaseCategoryTree[] = []
-    const childCategories = categories.filter(cat => cat.entity?.parentId === categoryId)
+    const childCategories = categories.filter(
+      cat => (cat.parentId ?? cat.entity?.parentId) === categoryId
+    )
     result = [...childCategories]
     childCategories.forEach(cat => {
       result = [...result, ...checkChild(cat.id, categories)]

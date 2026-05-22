@@ -48,12 +48,18 @@ const Categories = () => {
     return null
   }
 
-  const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
+  const getAllCategories = (
+    categories: BaseCategoryTree[],
+    parentId: string | null = null
+  ): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
     for (const category of categories) {
-      result.push(category)
+      result.push({
+        ...category,
+        parentId: category.parentId ?? category.entity?.parentId ?? parentId,
+      })
       if (category.children?.length) {
-        result = [...result, ...getAllCategories(category.children)]
+        result = [...result, ...getAllCategories(category.children, category.id)]
       }
     }
     return result

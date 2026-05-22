@@ -1,5 +1,35 @@
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 
+export type CategoryDisplayState = {
+  isShownAsActive: boolean
+  statusLabel: string | null
+}
+
+/** Учитывает isActive категории и всех предков в дереве админки */
+export function getCategoryDisplayState(
+  category: BaseCategoryTree,
+  parentIsActive: boolean
+): CategoryDisplayState {
+  if (!parentIsActive) {
+    return {
+      isShownAsActive: false,
+      statusLabel: 'Скрыта (родитель)',
+    }
+  }
+
+  if (!category.isActive) {
+    return {
+      isShownAsActive: false,
+      statusLabel: 'Скрыта',
+    }
+  }
+
+  return {
+    isShownAsActive: true,
+    statusLabel: null,
+  }
+}
+
 export const sortCategoryTree = (tree: BaseCategoryTree[]): BaseCategoryTree[] => {
   return [...tree]
     .sort((a, b) => {

@@ -5,20 +5,28 @@ import { FolderOutlined } from '@ant-design/icons'
 
 interface CategoryTitleProps {
   name: string
-  isActive?: boolean
+  isShownAsActive?: boolean
+  statusLabel?: string | null
   onEdit: () => void
   onDelete: () => void
   onCreate: () => void
 }
 
 const CategoryTitle = React.memo(
-  ({ name, isActive = true, onEdit, onDelete, onCreate }: CategoryTitleProps) => {
+  ({
+    name,
+    isShownAsActive = true,
+    statusLabel = null,
+    onEdit,
+    onDelete,
+    onCreate,
+  }: CategoryTitleProps) => {
     return (
-      <div className={`category${isActive ? '' : ' category--inactive'}`}>
+      <div className={`category${isShownAsActive ? '' : ' category--inactive'}`}>
         <div className="category-main">
           <FolderOutlined className="category-icon" />
           <span className="category-name">{name}</span>
-          {!isActive ? <span className="category-status">Скрыта</span> : null}
+          {statusLabel ? <span className="category-status">{statusLabel}</span> : null}
         </div>
         <div className="btn-category">
           <button type="button" className="btn-edit" onClick={onEdit}>
@@ -36,7 +44,8 @@ const CategoryTitle = React.memo(
   },
   (prevProps, nextProps) =>
     prevProps.name === nextProps.name &&
-    prevProps.isActive === nextProps.isActive &&
+    prevProps.isShownAsActive === nextProps.isShownAsActive &&
+    prevProps.statusLabel === nextProps.statusLabel &&
     prevProps.onEdit === nextProps.onEdit &&
     prevProps.onDelete === nextProps.onDelete &&
     prevProps.onCreate === nextProps.onCreate

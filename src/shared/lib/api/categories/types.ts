@@ -9,7 +9,9 @@ export interface BaseCategoryTree {
   isActive: boolean
   sortOrder: number
   type: 'category'
+  parentId?: string | null
   children: BaseCategoryTree[] | []
+  /** @deprecated используйте parentId */
   entity?: CategoryMenuItem
 }
 
