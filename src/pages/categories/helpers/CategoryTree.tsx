@@ -68,6 +68,7 @@ const CategoryTreeNode = ({
 
         <CategoryTitle
           name={category.name}
+          isActive={category.isActive}
           onEdit={() => onEdit(category.id)}
           onDelete={() => onDelete(category.id, category.imageId ?? undefined, 'products')}
           onCreate={() => onCreate(category.id)}
