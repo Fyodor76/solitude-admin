@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { BaseCategoryTree, CategoryRequest } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import UniversalUploadButton from '@/shared/ui/upload-image-btn/UniversalUploadButton'
-import { Input, message, Modal, Select, Switch } from 'antd'
+import { Input, message, Modal, Select } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -11,6 +11,11 @@ import { CategoryType, InitialFormData } from '../const/constans'
 import { mapFormToRequest } from '../mappers/categoryMappers'
 import { FormData } from '../types/type'
 import './EditCategoryModal.scss'
+
+const CATEGORY_VISIBILITY_OPTIONS = [
+  { value: 'visible', label: 'Показывается на сайте' },
+  { value: 'hidden', label: 'Скрыта с сайта' },
+] as const
 
 interface EditCategoryModalProps {
   isOpen: boolean
@@ -26,6 +31,25 @@ interface EditCategoryModalProps {
   onSaveEdit: (id: string, data: CategoryRequest) => void
   onSaveCreate: (data: CategoryRequest) => void
   setFormDataModal: React.Dispatch<React.SetStateAction<FormData>>
+}
+
+type EditModalFieldProps = {
+  label: string
+  hint?: string
+  htmlFor?: string
+  children: React.ReactNode
+}
+
+function EditModalField({ label, hint, htmlFor, children }: EditModalFieldProps) {
+  return (
+    <div className="editModal-field">
+      <label className="editModal-label" htmlFor={htmlFor}>
+        {label}
+      </label>
+      {children}
+      {hint ? <span className="editModal-hint">{hint}</span> : null}
+    </div>
+  )
 }
 
 const EditCategoryModal = ({
@@ -101,20 +125,20 @@ const EditCategoryModal = ({
         }))
         return
       }
-      let value = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
+      let nextValue = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
 
       setFormDataModal(prev => {
         return {
           ...prev,
-          [field]: field === 'parentId' && value === '' ? null : value,
+          [field]: field === 'parentId' && nextValue === '' ? null : nextValue,
         }
       })
     }
   }
 
   const handleNumberChange = (field: keyof FormData) => {
-    return (value: React.ChangeEvent<HTMLInputElement>) => {
-      let stringValue = value.target.value
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      let stringValue = event.target.value
       let numValue = parseInt(stringValue, 10)
 
       if (isNaN(numValue) || numValue < 0) {
@@ -144,11 +168,8 @@ const EditCategoryModal = ({
   const handleSave = async () => {
     try {
       if (isEdit) {
-        console.log('Вызов handleSaveEdit для категории:', category?.id)
         await handleSaveEdit()
       } else {
-        console.log('Вызов handleSaveCreate')
-
         await handleSaveCreate()
       }
       setMode(edit)
@@ -163,10 +184,13 @@ const EditCategoryModal = ({
     <Modal
       className="categoryModal"
       open={isOpen}
+      width={560}
+      centered
+      destroyOnClose
+      okText="Сохранить"
+      cancelText="Отмена"
       onCancel={handleClose}
-      onOk={async () => {
-        await handleSave()
-      }}
+      onOk={handleSave}
       title={
         <span className="mainTitle">
           {isEdit ? 'Редактировать категорию' : 'Создать новую категорию'}
@@ -174,116 +198,141 @@ const EditCategoryModal = ({
       }
     >
       <div className="editModal">
-        <span className="editModal-title">Название</span>
-        <Input
-          type="text"
-          id="category-name"
-          value={value.name}
-          onChange={handleStringAndSelectChange('name')}
-        />
-        <span className="editModal-title">Описание</span>{' '}
-        <Input
-          type="text"
-          id="category-description"
-          value={value.description}
-          onChange={handleStringAndSelectChange('description')}
-        />
-        <span className="editModal-title">Порядок сортировки</span>
-        <Input
-          type="number"
-          id="category-sort-order"
-          value={value.sortOrder}
-          onChange={handleNumberChange('sortOrder')}
-          min="0"
-          step="1"
-        />
-        <div className="editModal-field editModal-field--switch">
-          <span className="editModal-title">Показывать на сайте</span>
-          <Switch
-            checked={value.isActive}
-            onChange={checked =>
+        <EditModalField label="Название" htmlFor="category-name">
+          <Input
+            id="category-name"
+            size="large"
+            placeholder="Например, Футболки"
+            value={value.name}
+            onChange={handleStringAndSelectChange('name')}
+          />
+        </EditModalField>
+
+        <EditModalField label="Описание" htmlFor="category-description">
+          <Input
+            id="category-description"
+            size="large"
+            placeholder="Краткое описание для админки (необязательно)"
+            value={value.description}
+            onChange={handleStringAndSelectChange('description')}
+          />
+        </EditModalField>
+
+        <EditModalField
+          label="Порядок сортировки"
+          htmlFor="category-sort-order"
+          hint="Меньшее число — выше в списке"
+        >
+          <Input
+            id="category-sort-order"
+            size="large"
+            type="number"
+            placeholder="0"
+            value={value.sortOrder}
+            onChange={handleNumberChange('sortOrder')}
+            min={0}
+            step={1}
+          />
+        </EditModalField>
+
+        <EditModalField label="Видимость на сайте">
+          <Select
+            size="large"
+            className="editModal-control"
+            value={value.isActive ? 'visible' : 'hidden'}
+            options={[...CATEGORY_VISIBILITY_OPTIONS]}
+            onChange={visibility =>
               setFormDataModal(prev => ({
                 ...prev,
-                isActive: checked,
+                isActive: visibility === 'visible',
               }))
             }
           />
-        </div>
-        <span className="editModal-title">Назначить родительскую категорию</span>
-        <Select
-          className="ant-input"
-          id="category-parent"
-          value={value.parentId}
-          placeholder="Выберете родительскую категорию"
-          onChange={handleStringAndSelectChange('parentId')}
-          allowClear
-          getPopupContainer={trigger => trigger.parentNode}
-          placement="bottomLeft"
-          showSearch={{
-            filterOption: (input, option) =>
-              String(option?.label ?? '')
-                .toLowerCase()
-                .includes(input.toLowerCase()),
-          }}
-        >
-          {select &&
-            select.map(cat => (
-              <Select.Option key={cat.id} value={cat.id} label={cat.name}>
-                {cat.name}
-              </Select.Option>
-            ))}
-        </Select>
-        {isCreate && (
-          <>
-            <span className="editModal-title">тип</span>
+        </EditModalField>
+
+        <EditModalField label="Родительская категория">
+          <Select
+            size="large"
+            className="editModal-control"
+            id="category-parent"
+            value={value.parentId}
+            placeholder="Без родителя — корневая категория"
+            onChange={handleStringAndSelectChange('parentId')}
+            allowClear
+            getPopupContainer={trigger => trigger.parentNode}
+            placement="bottomLeft"
+            showSearch={{
+              filterOption: (input, option) =>
+                String(option?.label ?? '')
+                  .toLowerCase()
+                  .includes(input.toLowerCase()),
+            }}
+            options={
+              select?.map(cat => ({
+                value: cat.id,
+                label: cat.name,
+              })) ?? []
+            }
+          />
+        </EditModalField>
+
+        {isCreate ? (
+          <EditModalField label="Тип">
             <Select
-              defaultValue={categoryTypeOptions[0].value}
-              value={value.type}
+              size="large"
+              className="editModal-control"
+              placeholder="Выберите тип"
+              value={value.type || categoryTypeOptions[0]?.value}
               onChange={handleStringAndSelectChange('type')}
-            >
-              {categoryTypeOptions.map(option => (
-                <Select.Option key={option.value} value={option.value}>
-                  {option.label}
-                </Select.Option>
-              ))}
-            </Select>
-          </>
-        )}
-        <span className="editModal-title">Изображение категории</span>
-        <UniversalUploadButton
-          folder=""
-          key={isEdit ? `edit-${category?.id}` : 'create'}
-          buttonClassName="ant-input"
-          buttonText="Загрузить"
-          onFileRemoved={() => {
-            setFormDataModal(prev => ({
-              ...prev,
-              imageId: null,
-            }))
-            setUploadImg(null)
-            setImgError(true)
-            message.info('Файл удален')
-          }}
-          onFileUploaded={(fileId, fileData) => {
-            setUploadImg(fileData)
-            if (isEdit) {
+              options={categoryTypeOptions.map(option => ({
+                value: option.value,
+                label: option.label,
+              }))}
+            />
+          </EditModalField>
+        ) : null}
+
+        <EditModalField label="Изображение категории">
+          <UniversalUploadButton
+            folder=""
+            key={isEdit ? `edit-${category?.id}` : 'create'}
+            buttonClassName="editModal-upload-btn"
+            buttonText="Загрузить изображение"
+            onFileRemoved={() => {
               setFormDataModal(prev => ({
                 ...prev,
-                imageId: fileId || null,
+                imageId: null,
               }))
-            }
+              setUploadImg(null)
+              setImgError(true)
+              message.info('Файл удален')
+            }}
+            onFileUploaded={(fileId, fileData) => {
+              setUploadImg(fileData)
+              if (isEdit) {
+                setFormDataModal(prev => ({
+                  ...prev,
+                  imageId: fileId || null,
+                }))
+              }
 
-            setImgError(false)
-            message.success('Файл загружен successfully')
-          }}
-          onFileError={() => {
-            message.error('Ошибка загрузки файла.')
-          }}
-        />
-        {currentUrl && !imgError && (
-          <img onError={handleImageError} src={currentUrl} alt="Category preview" />
-        )}
-        {imgError && <div className="img-error">⚠️ Изображение не найдено</div>}
+              setImgError(false)
+              message.success('Файл загружен')
+            }}
+            onFileError={() => {
+              message.error('Ошибка загрузки файла.')
+            }}
+          />
+          {currentUrl && !imgError ? (
+            <img
+              className="editModal-preview"
+              onError={handleImageError}
+              src={currentUrl}
+              alt="Превью категории"
+            />
+          ) : null}
+          {imgError ? <div className="editModal-img-error">Изображение не найдено</div> : null}
+        </EditModalField>
       </div>
     </Modal>
   )

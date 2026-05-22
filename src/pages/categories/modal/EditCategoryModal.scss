@@ -6,6 +6,10 @@
       text-align: center !important;
     }
 
+    .ant-modal-body {
+      padding-top: 20px !important;
+    }
+
     .mainTitle {
       font-size: 20px !important;
       color: var(--color-grey-2);
@@ -14,33 +18,71 @@
     .editModal {
       display: flex;
       flex-direction: column;
-      gap: 0px;
+      gap: 20px;
+    }
 
-      &-title {
-        font-size: 14px;
-        color: var(--color-grey-3);
-      }
+    .editModal-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 0;
+    }
 
-      .ant-input {
-        color: var(--color-grey-2);
-        margin-bottom: 10px;
-      }
+    .editModal-label {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: var(--color-grey-2);
+    }
 
-      &-field--switch {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 10px;
-      }
+    .editModal-hint {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--color-grey-3);
+      margin-top: -2px;
+    }
 
-      .img-error {
-        color: red;
-        padding: 10px;
-        border: 1px solid #ffccc7;
-        background: #fff2f0;
-        margin-top: 10px;
-      }
+    .editModal-control,
+    .editModal-field .ant-input,
+    .editModal-field .ant-input-affix-wrapper,
+    .editModal-field .ant-select {
+      width: 100%;
+    }
+
+    .editModal-field .ant-input,
+    .editModal-field .ant-input-affix-wrapper,
+    .editModal-field .ant-select .ant-select-selector {
+      min-height: 40px;
+      border-radius: 8px;
+    }
+
+    .editModal-field .ant-input::placeholder {
+      color: var(--color-grey-placeholder);
+    }
+
+    .editModal-upload-btn {
+      width: 100%;
+      min-height: 40px;
+      border-radius: 8px;
+    }
+
+    .editModal-preview {
+      display: block;
+      width: 100%;
+      max-height: 200px;
+      margin-top: 4px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--color-grey-8, #e8e8e8);
+    }
+
+    .editModal-img-error {
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #cf1322;
+      background: #fff2f0;
+      border: 1px solid #ffccc7;
+      border-radius: 8px;
     }
   }
 }
