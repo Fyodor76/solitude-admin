@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { ApiResponse } from '@/shared/lib/api/baseApi'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
