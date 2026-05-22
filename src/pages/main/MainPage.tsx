@@ -1,6 +1,5 @@
 import Container from '@/shared/ui/container/Container'
 import Icon from '@/shared/ui/icons/Icon'
-import { PageHeader } from '@/shared/ui/page-header'
 import { Link } from 'react-router-dom'
 
 import { MenuItem } from '@/app/components/sidebar/sidebarType'
@@ -13,6 +12,7 @@ const MENU_DESCRIPTIONS: Record<string, string> = {
   'size-charts': 'Размерные сетки и параметры для категорий.',
   'platform-images': 'Загрузка и управление изображениями платформы.',
   heatmap: 'Тепловая карта кликов и просмотр страниц магазина.',
+  support: 'Поддержка и обратная связь с клиентами.',
 }
 
 function getNavigableMenuItems(items: MenuItem[]): MenuItem[] {

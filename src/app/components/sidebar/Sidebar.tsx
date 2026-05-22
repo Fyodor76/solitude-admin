@@ -4,13 +4,14 @@ import { Button, Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 
-import defaultLogo from '@/app/assets/images/image.png'
 import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../../../shared/ui/icons/Icon'
 import './Sidebar.scss'
 import { SidebarProps } from './sidebarType'
+
+const defaultLogo = '/icons/favicon-96x96.png'
 
 /** Подсветка пункта по текущему URL (точное совпадение или вложенный путь). */
 function isSidebarHrefActive(href: string | undefined, pathname: string): boolean {
@@ -33,7 +34,7 @@ const Sidebar = ({
   logo = {
     imageUrl: defaultLogo,
     altText: 'логотип',
-    title: 'AdminLTE 3',
+    title: 'Solitude Admin 1.0',
   },
   user = {
     href: '#profile',

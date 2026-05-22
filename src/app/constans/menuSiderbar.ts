@@ -33,7 +33,7 @@ export const menuSidebar: MenuItem[] = [
     id: 'support',
     text: 'Обращения',
     href: '/support',
-    icon: 'message',
+    icon: 'support',
     hasArrow: false,
   },
   /*{
