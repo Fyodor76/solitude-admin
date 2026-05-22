@@ -1,5 +1,6 @@
 import { Categories } from '@/pages/categories'
 import { MainPage } from '@/pages/main'
+import { NotificationsPage } from '@/pages/notifications'
 import { PlatformImages } from '@/pages/platform-images'
 import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
@@ -94,6 +95,14 @@ export const Router: RouteObject[] = [
         element: (
           <ProtectedRouter>
             <SupportInbox />
+          </ProtectedRouter>
+        ),
+      },
+      {
+        path: '/notifications',
+        element: (
+          <ProtectedRouter>
+            <NotificationsPage />
           </ProtectedRouter>
         ),
       },

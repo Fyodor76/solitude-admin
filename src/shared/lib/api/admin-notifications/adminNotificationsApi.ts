@@ -2,13 +2,14 @@ import { ApiResponse, baseApi } from '../baseApi'
 import type {
   AdminNotificationDto,
   AdminNotificationsListParams,
+  AdminNotificationsPaginationMeta,
   AdminNotificationsSummary,
 } from './types'
 
 export const adminNotificationsApi = baseApi.injectEndpoints({
   endpoints: builder => ({
     getAdminNotifications: builder.query<
-      ApiResponse<AdminNotificationDto[], unknown>,
+      ApiResponse<AdminNotificationDto[], AdminNotificationsPaginationMeta>,
       AdminNotificationsListParams | void
     >({
       query: params => ({

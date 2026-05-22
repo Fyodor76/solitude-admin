@@ -1,15 +1,16 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import {
   useMarkAdminNotificationReadMutation,
   useMarkAllAdminNotificationsReadMutation,
 } from '@/shared/lib/api/admin-notifications/adminNotificationsApi'
 import {
-  ADMIN_NOTIFICATION_KIND,
   ADMIN_NOTIFICATION_KIND_LABELS,
   type AdminNotificationItem,
   NOTIFICATION_BELL_COPY,
 } from '@/shared/lib/notifications'
+import { formatNotificationTime } from '@/shared/lib/notifications/formatNotificationTime'
+import { formatUnreadCount } from '@/shared/lib/notifications/formatUnreadCount'
 import { Badge, Button, Empty, Popover, Typography } from 'antd'
 import { Link } from 'react-router-dom'
 
@@ -17,19 +18,6 @@ import { ROUTES } from '@/app/lib/config/navigation'
 
 import Icon from '../icons/Icon'
 import './NotificationBell.scss'
-
-function formatNotificationTime(value: string): string {
-  try {
-    return new Date(value).toLocaleString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  } catch {
-    return value
-  }
-}
 
 function getKindLabel(kind: AdminNotificationItem['kind']): string {
   return ADMIN_NOTIFICATION_KIND_LABELS[kind] ?? ''
@@ -45,21 +33,12 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
   const [markRead] = useMarkAdminNotificationReadMutation()
   const [markAllRead, { isLoading: markingAll }] = useMarkAllAdminNotificationsReadMutation()
 
-  const hasSupportItems = useMemo(
-    () => items.some(item => item.kind === ADMIN_NOTIFICATION_KIND.SUPPORT),
-    [items]
-  )
-
   const handleItemClick = (item: AdminNotificationItem) => {
     setOpen(false)
     const numericId = Number(item.id)
     if (Number.isFinite(numericId)) {
       void markRead(numericId)
     }
-  }
-
-  const handleMarkAllRead = () => {
-    void markAllRead()
   }
 
   const content = (
@@ -71,12 +50,12 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
           </Typography.Text>
           {count > 0 ? (
             <Typography.Text type="secondary" className="notification-bell-panel__count">
-              {NOTIFICATION_BELL_COPY.unreadCount(count)}
+              {formatUnreadCount(count)}
             </Typography.Text>
           ) : null}
         </div>
         {count > 0 ? (
-          <Button type="link" size="small" loading={markingAll} onClick={handleMarkAllRead}>
+          <Button type="link" size="small" loading={markingAll} onClick={() => void markAllRead()}>
             {NOTIFICATION_BELL_COPY.MARK_ALL_READ}
           </Button>
         ) : null}
@@ -111,15 +90,13 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
         </ul>
       )}
 
-      {hasSupportItems ? (
-        <Link
-          to={ROUTES.SUPPORT.path}
-          className="notification-bell-panel__footer"
-          onClick={() => setOpen(false)}
-        >
-          {NOTIFICATION_BELL_COPY.SUPPORT_FOOTER}
-        </Link>
-      ) : null}
+      <Link
+        to={ROUTES.NOTIFICATIONS.path}
+        className="notification-bell-panel__footer"
+        onClick={() => setOpen(false)}
+      >
+        {NOTIFICATION_BELL_COPY.ALL_NOTIFICATIONS_FOOTER}
+      </Link>
     </div>
   )
 

@@ -20,6 +20,15 @@ export type AdminNotificationsSummary = {
   supportUnreadCount: number
 }
 
+export type AdminNotificationsPaginationMeta = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
 export type AdminNotificationsListParams = {
   unreadOnly?: boolean
   type?: AdminNotificationKind

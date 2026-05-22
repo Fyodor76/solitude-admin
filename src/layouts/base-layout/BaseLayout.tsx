@@ -3,28 +3,25 @@ import { ReactNode, useMemo, useState } from 'react'
 import {
   AdminNotificationsProvider,
   applySidebarNotificationBadges,
-  DocumentTitleSync,
   useAdminNotifications,
 } from '@/shared/lib/notifications'
 import { useSupportRealtime } from '@/shared/lib/support/useSupportRealtime'
-import { Header } from '@/shared/ui/header'
-import classNames from 'classnames'
-import { useLocation } from 'react-router-dom'
 
-import Sidebar from '@/app/components/sidebar/Sidebar'
 import { menuSidebar } from '@/app/constans/menuSiderbar'
 
-import './BaseLayout.scss'
+import { AdminLayoutShell } from './AdminLayoutShell'
+import { useAdminLayoutRoute } from './useAdminLayoutRoute'
 
 interface BaseLayoutProps {
   children: ReactNode
 }
 
-function BaseLayoutContent({
-  children,
-  onSupportPage,
-}: BaseLayoutProps & { onSupportPage: boolean }) {
-  const [isOpen, setIsOpen] = useState(false)
+type BaseLayoutContentProps = BaseLayoutProps & {
+  isSupportPage: boolean
+}
+
+function BaseLayoutContent({ children, isSupportPage }: BaseLayoutContentProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { supportUnreadCount } = useAdminNotifications()
 
   const menuItems = useMemo(
@@ -32,34 +29,26 @@ function BaseLayoutContent({
     [supportUnreadCount]
   )
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen)
-  }
-
   return (
-    <div className="wrapper" style={{ display: 'flex' }}>
-      <DocumentTitleSync />
-      <Sidebar menuItems={menuItems} toggleSidebar={toggleSidebar} isOpen={isOpen} />
-
-      <div
-        className={classNames('main-page', { 'main-page--support': onSupportPage })}
-        style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}
-      >
-        <Header />
-        <div className="main-page__body">{children}</div>
-      </div>
-    </div>
+    <AdminLayoutShell
+      menuItems={menuItems}
+      isSidebarOpen={isSidebarOpen}
+      isSupportPage={isSupportPage}
+      onToggleSidebar={() => setIsSidebarOpen(open => !open)}
+    >
+      {children}
+    </AdminLayoutShell>
   )
 }
 
 export const BaseLayout = ({ children }: BaseLayoutProps) => {
-  const { pathname } = useLocation()
-  const onSupportPage = pathname === '/support' || pathname.startsWith('/support/')
+  const { isSupportPage, enableNotificationAlerts } = useAdminLayoutRoute()
+
   useSupportRealtime(true)
 
   return (
-    <AdminNotificationsProvider enableAlerts={!onSupportPage}>
-      <BaseLayoutContent onSupportPage={onSupportPage}>{children}</BaseLayoutContent>
+    <AdminNotificationsProvider enableAlerts={enableNotificationAlerts}>
+      <BaseLayoutContent isSupportPage={isSupportPage}>{children}</BaseLayoutContent>
     </AdminNotificationsProvider>
   )
 }

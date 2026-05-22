@@ -1,3 +1,17 @@
+.admin-layout {
+  display: flex;
+}
+
+.admin-layout__main {
+  flex: 1;
+  min-width: 0;
+  margin-left: 70px;
+}
+
+.admin-layout__body {
+  display: block;
+}
+
 .main-page {
   display: flex;
   flex-direction: column;

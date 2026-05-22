@@ -14,7 +14,11 @@ export {
   ADMIN_NOTIFICATIONS_LIST_LIMIT,
   ADMIN_NOTIFICATIONS_POLL_MS,
   NOTIFICATION_BELL_COPY,
+  NOTIFICATIONS_PAGE_COPY,
+  ADMIN_NOTIFICATIONS_PAGE_SIZE,
 } from './constants'
+export { formatUnreadCount } from './formatUnreadCount'
+export { formatNotificationTime } from './formatNotificationTime'
 export type { AdminNotificationItem, AdminNotificationKind } from './types'
 export { buildSupportNotificationSourceId } from './supportSourceId'
 export { APP_DOCUMENT_TITLE, buildDocumentTitle, getRouteDocumentLabel } from './documentTitle'
