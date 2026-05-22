@@ -1,6 +1,5 @@
-import { FormData } from '@/pages/categories/types/type'
-
 import { useCreateCategoryMutation, useDeleteCategoryMutation } from '../api/categories/Categories'
+import { CategoryRequest } from '../api/categories/types'
 import { useLazyGetProductsByCategoryIdQuery } from '../api/products/Products'
 import { useDeleteFileByIdMutation } from '../api/upload-files/uploadFiles'
 
@@ -10,9 +9,9 @@ export const useServerActions = () => {
   const [triggerGetProducts] = useLazyGetProductsByCategoryIdQuery()
   const [deleteFileById] = useDeleteFileByIdMutation()
 
-  const createNewCategory = async (formDataModal: FormData): Promise<void> => {
+  const createNewCategory = async (payload: CategoryRequest): Promise<void> => {
     try {
-      await createCategory(formDataModal).unwrap()
+      await createCategory(payload).unwrap()
       console.log('✅ Категория создана, обновляем данные...')
     } catch (error) {
       console.log('Ошибка создания категории!', error)

@@ -4,6 +4,7 @@ export const InitialFormData = {
   parentId: null,
   imageId: null,
   sortOrder: 0,
+  isActive: true,
   type: '',
 }
 

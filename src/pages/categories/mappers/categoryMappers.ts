@@ -11,6 +11,8 @@ export const mapTreeToForm = (category: BaseCategoryTree): FormData => {
     sortOrder: category.sortOrder,
     parentId: category.entity?.parentId ?? null,
     imageId: category.imageId,
+    isActive: category.isActive,
+    type: category.type,
   }
 }
 
@@ -21,6 +23,8 @@ export const mapFormToRequest = (formData: FormData, cdnData?: imgUpload | null)
     sortOrder: Number(formData.sortOrder),
     parentId: formData.parentId,
     imageId: cdnData?.fileId || formData.imageId,
+    isActive: formData.isActive,
+    ...(formData.type ? { type: formData.type } : {}),
   }
 }
 

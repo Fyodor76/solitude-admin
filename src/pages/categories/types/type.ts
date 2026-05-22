@@ -11,5 +11,6 @@ export interface FormData {
   parentId: string | null
   imageId: string | null
   sortOrder: number
+  isActive: boolean
   type?: string
 }

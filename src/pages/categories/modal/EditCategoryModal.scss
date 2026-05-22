@@ -26,6 +26,14 @@
         margin-bottom: 10px;
       }
 
+      &-field--switch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
       .img-error {
         color: red;
         padding: 10px;

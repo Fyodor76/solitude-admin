@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
+import { BaseCategoryTree, CategoryRequest } from '@/shared/lib/api/categories/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import UniversalUploadButton from '@/shared/ui/upload-image-btn/UniversalUploadButton'
-import { Input, message, Modal, Select } from 'antd'
+import { Input, message, Modal, Select, Switch } from 'antd'
 
 import { CDN_URL } from '@/app/constans/url'
 
@@ -23,8 +23,8 @@ interface EditCategoryModalProps {
   categoryTypeOptions: { value: CategoryType; label: string }[]
   setMode: React.Dispatch<React.SetStateAction<string>>
   onClose: () => void
-  onSaveEdit: (id: string, data: FormData) => void
-  onSaveCreate: (data: FormData) => void
+  onSaveEdit: (id: string, data: CategoryRequest) => void
+  onSaveCreate: (data: CategoryRequest) => void
   setFormDataModal: React.Dispatch<React.SetStateAction<FormData>>
 }
 
@@ -197,6 +197,18 @@ const EditCategoryModal = ({
           min="0"
           step="1"
         />
+        <div className="editModal-field editModal-field--switch">
+          <span className="editModal-title">Показывать на сайте</span>
+          <Switch
+            checked={value.isActive}
+            onChange={checked =>
+              setFormDataModal(prev => ({
+                ...prev,
+                isActive: checked,
+              }))
+            }
+          />
+        </div>
         <span className="editModal-title">Назначить родительскую категорию</span>
         <Select
           className="ant-input"

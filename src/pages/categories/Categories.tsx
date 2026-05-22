@@ -5,6 +5,7 @@ import {
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
+import { CategoryRequest } from '@/shared/lib/api/categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
 import Icon from '@/shared/ui/icons/Icon'
@@ -92,8 +93,7 @@ const Categories = () => {
     [editModal]
   )
 
-  const handleUpdateCategory = async (id: string, editInput: FormData) => {
-    console.log('handleUpdateCategory получил:', editInput)
+  const handleUpdateCategory = async (id: string, editInput: CategoryRequest) => {
     try {
       await updateCategory({ id, data: editInput }).unwrap()
       refetch()
