@@ -1,6 +1,8 @@
 import { useLogoutMutation } from '@/shared/lib/api/auth/auth'
+import { useAdminNotifications } from '@/shared/lib/notifications'
+import { NotificationBell } from '@/shared/ui/notification-bell'
 import { Button, ConfigProvider } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import Breadcrumbs from '../breadcrumbs/Breadcrumbs'
 import Icon from '../icons/Icon'
@@ -8,9 +10,8 @@ import './Header.scss'
 
 export const Header = () => {
   const [logout] = useLogoutMutation()
-
   const navigate = useNavigate()
-  const notification = 3
+  const { unreadCount, notificationItems } = useAdminNotifications()
 
   const handleLogout = async () => {
     try {
@@ -31,10 +32,7 @@ export const Header = () => {
         <div className="header-container">
           <div className="btn-container">
             <div className="links">
-              <Link to="#" className="link-notify">
-                <Icon name="notify"></Icon>
-                {notification > 0 && <span className="badge">{notification}</span>}
-              </Link>
+              <NotificationBell items={notificationItems} count={unreadCount} />
             </div>
 
             <ConfigProvider wave={{ disabled: true }}>

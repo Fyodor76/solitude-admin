@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import { adminNotificationsApi } from '@/shared/lib/api/admin-notifications/adminNotificationsApi'
 import { supportApi } from '@/shared/lib/api/support/supportApi'
 import { io, Socket } from 'socket.io-client'
 
@@ -8,6 +9,7 @@ import { useAppDispatch } from '@/app/store/hook'
 const SUPPORT_WS_EVENTS = {
   inbox: 'support:inbox',
   conversation: 'support:conversation',
+  adminNotification: 'admin:notification',
 } as const
 
 function getWsBaseUrl(): string {
@@ -39,19 +41,41 @@ export function useSupportRealtime(enabled = true) {
     socket.on('connect', () => setConnected(true))
     socket.on('disconnect', () => setConnected(false))
 
-    socket.on(SUPPORT_WS_EVENTS.inbox, () => {
-      dispatch(supportApi.util.invalidateTags(['SupportInbox']))
-    })
-
-    socket.on(SUPPORT_WS_EVENTS.conversation, (payload: { conversationId?: number }) => {
-      const id = payload?.conversationId
+    const invalidateSupport = (conversationId?: number) => {
       dispatch(
         supportApi.util.invalidateTags(
-          id
-            ? ['SupportInbox', { type: 'SupportConversation', id }, { type: 'SupportMessages', id }]
+          conversationId
+            ? [
+                'SupportInbox',
+                { type: 'SupportConversation', id: conversationId },
+                { type: 'SupportMessages', id: conversationId },
+              ]
             : ['SupportInbox']
         )
       )
+    }
+
+    const invalidateNotifications = () => {
+      dispatch(
+        adminNotificationsApi.util.invalidateTags([
+          'AdminNotifications',
+          'AdminNotificationsSummary',
+        ])
+      )
+    }
+
+    socket.on(SUPPORT_WS_EVENTS.inbox, () => {
+      invalidateSupport()
+      invalidateNotifications()
+    })
+
+    socket.on(SUPPORT_WS_EVENTS.conversation, (payload: { conversationId?: number }) => {
+      invalidateSupport(payload?.conversationId)
+      invalidateNotifications()
+    })
+
+    socket.on(SUPPORT_WS_EVENTS.adminNotification, () => {
+      invalidateNotifications()
     })
 
     return () => {

@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
+import { useMarkAdminNotificationReadBySourceMutation } from '@/shared/lib/api/admin-notifications/adminNotificationsApi'
 import { SUPPORT_CONVERSATION_STATUS } from '@/shared/lib/api/support/constants'
 import {
   useCloseSupportConversationMutation,
   useGetSupportInboxQuery,
   useOpenSupportConversationMutation,
 } from '@/shared/lib/api/support/supportApi'
+import { buildSupportNotificationSourceId } from '@/shared/lib/notifications/supportSourceId'
+import { useSearchParams } from 'react-router-dom'
 
 import {
   SUPPORT_INBOX_CHANNEL_FILTER,
@@ -37,6 +40,7 @@ export function useSupportInbox() {
   )
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [searchParams] = useSearchParams()
 
   const isMobileLayout = useMatchMedia(SUPPORT_INBOX_MOBILE_MEDIA_QUERY)
   const showMobileChat = isMobileLayout && selectedId !== null
@@ -67,6 +71,7 @@ export function useSupportInbox() {
 
   const [openConversation, { isLoading: opening }] = useOpenSupportConversationMutation()
   const [closeConversation, { isLoading: closing }] = useCloseSupportConversationMutation()
+  const [markNotificationReadBySource] = useMarkAdminNotificationReadBySourceMutation()
 
   const filteredConversations = useMemo(
     () => filterSupportConversations(sortConversationsByLastMessage(conversations), searchQuery),
@@ -86,6 +91,15 @@ export function useSupportInbox() {
   const emptyDescription = getEmptyListDescription(searchQuery, isClosedTab)
 
   useEffect(() => {
+    const raw = searchParams.get('c')
+    if (!raw) return
+    const id = Number(raw)
+    if (Number.isFinite(id) && id > 0) {
+      setSelectedId(id)
+    }
+  }, [searchParams])
+
+  useEffect(() => {
     if (selectedId && !conversations.some(c => c.id === selectedId)) {
       setSelectedId(null)
     }
@@ -101,6 +115,7 @@ export function useSupportInbox() {
 
   const handleSelect = (id: number) => {
     setSelectedId(id)
+    void markNotificationReadBySource(buildSupportNotificationSourceId(id))
     requestAnimationFrame(() => scrollSupportInboxChatIntoView('smooth'))
   }
 
