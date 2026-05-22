@@ -3,6 +3,7 @@ import { ReactNode, useMemo, useState } from 'react'
 import {
   AdminNotificationsProvider,
   applySidebarNotificationBadges,
+  DocumentTitleSync,
   useAdminNotifications,
 } from '@/shared/lib/notifications'
 import { useSupportRealtime } from '@/shared/lib/support/useSupportRealtime'
@@ -37,6 +38,7 @@ function BaseLayoutContent({
 
   return (
     <div className="wrapper" style={{ display: 'flex' }}>
+      <DocumentTitleSync />
       <Sidebar menuItems={menuItems} toggleSidebar={toggleSidebar} isOpen={isOpen} />
 
       <div

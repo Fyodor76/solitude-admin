@@ -17,3 +17,16 @@ export {
 } from './constants'
 export type { AdminNotificationItem, AdminNotificationKind } from './types'
 export { buildSupportNotificationSourceId } from './supportSourceId'
+export { APP_DOCUMENT_TITLE, buildDocumentTitle, getRouteDocumentLabel } from './documentTitle'
+export { useDocumentTitleWithUnreadCount } from './useDocumentTitleWithUnreadCount'
+export { DocumentTitleSync } from './DocumentTitleSync'
+export {
+  applyFaviconBadge,
+  startFaviconBadgeBlink,
+  stopFaviconBadgeBlink,
+  restoreDefaultFavicon,
+  DEFAULT_FAVICON_URL,
+  FAVICON_BADGE_STYLE,
+  FAVICON_BLINK_INTERVAL_MS,
+} from './faviconBadge'
+export { useFaviconBadge } from './useFaviconBadge'
