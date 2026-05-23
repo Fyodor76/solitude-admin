@@ -17,6 +17,8 @@ export const ADMIN_NOTIFICATION_KIND_LABELS: Record<AdminNotificationKind, strin
   [ADMIN_NOTIFICATION_KIND.SYSTEM]: 'Система',
 }
 
+export const NOTIFICATION_BELL_MOBILE_MEDIA_QUERY = '(max-width: 640px)'
+
 export const NOTIFICATION_BELL_COPY = {
   TITLE: 'Уведомления',
   EMPTY: 'Нет новых уведомлений',
