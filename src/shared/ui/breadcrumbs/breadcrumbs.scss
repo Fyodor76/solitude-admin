@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   background-color: var(--color-grey-background-breadcrumbs);
-
+  padding-left: 12px;
   animation: gentleAppear 0.4s ease forwards;
 
   .breadcrumbs {

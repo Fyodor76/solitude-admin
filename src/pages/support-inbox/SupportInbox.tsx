@@ -1,12 +1,9 @@
-import { PageHeader } from '@/shared/ui/page-header'
-import { Button } from 'antd'
 import classNames from 'classnames'
 
 import { SupportInboxChatPanel } from './components/SupportInboxChatPanel'
 import { SupportInboxSidebar } from './components/SupportInboxSidebar'
 import { SupportInboxToolbar } from './components/SupportInboxToolbar'
 import {
-  SUPPORT_INBOX_COPY,
   SUPPORT_INBOX_LAYOUT_CLASS,
   type SupportInboxChannelFilter,
   type SupportInboxListTab,
@@ -40,14 +37,6 @@ export function SupportInbox() {
       })}
     >
       <div className="support-inbox__header-block">
-        <PageHeader
-          title={SUPPORT_INBOX_COPY.PAGE_TITLE}
-          subtitle={SUPPORT_INBOX_COPY.PAGE_SUBTITLE}
-          actions={
-            <Button onClick={() => inbox.refetchInbox()}>{SUPPORT_INBOX_COPY.REFRESH_LIST}</Button>
-          }
-        />
-
         <SupportInboxToolbar
           listTab={inbox.listTab}
           channelFilter={inbox.channelFilter}

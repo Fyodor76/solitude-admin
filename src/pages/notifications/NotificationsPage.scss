@@ -1,0 +1,119 @@
+.notifications-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.notifications-page__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.notifications-page__type-filter {
+  min-width: 160px;
+}
+
+.notifications-page__total {
+  margin: 0;
+  font-size: 13px;
+  color: #7a8a9c;
+}
+
+.notifications-page__pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.notifications-page__loading,
+.notifications-page__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 48px 16px;
+}
+
+.notifications-page__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notifications-page__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid #e6ebf2;
+  border-radius: 12px;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-blue);
+    box-shadow: 0 4px 14px rgba(16, 114, 213, 0.1);
+    background: #fafcff;
+  }
+
+  &--unread {
+    border-color: rgba(16, 114, 213, 0.35);
+    background: #f8fbff;
+  }
+}
+
+.notifications-page__item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notifications-page__item-kind {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-blue);
+}
+
+.notifications-page__item-time {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: #7a8a9c;
+}
+
+.notifications-page__item-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #223041;
+}
+
+.notifications-page__item-desc {
+  font-size: 14px;
+  line-height: 1.45;
+  color: #556476;
+}
+
+.notifications-page__item-badge {
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-blue);
+  background: var(--color-blue-background-hover);
+}

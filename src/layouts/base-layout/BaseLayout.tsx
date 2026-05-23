@@ -1,52 +1,54 @@
 import { ReactNode, useMemo, useState } from 'react'
 
-import { useSupportInboxAlerts } from '@/shared/lib/support/useSupportInboxAlerts'
+import {
+  AdminNotificationsProvider,
+  applySidebarNotificationBadges,
+  useAdminNotifications,
+} from '@/shared/lib/notifications'
 import { useSupportRealtime } from '@/shared/lib/support/useSupportRealtime'
-import { Header } from '@/shared/ui/header'
-import { useLocation } from 'react-router-dom'
 
-import Sidebar from '@/app/components/sidebar/Sidebar'
 import { menuSidebar } from '@/app/constans/menuSiderbar'
+
+import { AdminLayoutShell } from './AdminLayoutShell'
+import { useAdminLayoutRoute } from './useAdminLayoutRoute'
 
 interface BaseLayoutProps {
   children: ReactNode
 }
 
-export const BaseLayout = ({ children }: BaseLayoutProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const { pathname } = useLocation()
-  const onSupportPage = pathname === '/support' || pathname.startsWith('/support/')
-  useSupportRealtime(true)
-  const { waitingCount } = useSupportInboxAlerts({ enableSound: !onSupportPage })
+type BaseLayoutContentProps = BaseLayoutProps & {
+  isSupportPage: boolean
+}
+
+function BaseLayoutContent({ children, isSupportPage }: BaseLayoutContentProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const { supportUnreadCount } = useAdminNotifications()
 
   const menuItems = useMemo(
-    () =>
-      menuSidebar.map(item =>
-        item.id === 'support' && waitingCount > 0
-          ? { ...item, badgeCount: waitingCount }
-          : { ...item, badgeCount: undefined }
-      ),
-    [waitingCount]
+    () => applySidebarNotificationBadges(menuSidebar, { supportUnreadCount }),
+    [supportUnreadCount]
   )
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen)
-  }
   return (
-    <div className="wrapper" style={{ display: 'flex' }}>
-      <Sidebar menuItems={menuItems} toggleSidebar={toggleSidebar} isOpen={isOpen} />
+    <AdminLayoutShell
+      menuItems={menuItems}
+      isSidebarOpen={isSidebarOpen}
+      isSupportPage={isSupportPage}
+      onToggleSidebar={() => setIsSidebarOpen(open => !open)}
+    >
+      {children}
+    </AdminLayoutShell>
+  )
+}
 
-      <div className="main-page" style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}>
-        <Header />
-        {/*{' '}
-        <Link to="/catalog">
-          <h1 style={{ textAlign: 'center', color: 'green' }}>
-            Перейти в каталог(протестируем работу breadcrumbs)
-          </h1>
-        </Link>
-  */}
-        <div>{children}</div>
-      </div>
-    </div>
+export const BaseLayout = ({ children }: BaseLayoutProps) => {
+  const { isSupportPage, enableNotificationAlerts } = useAdminLayoutRoute()
+
+  useSupportRealtime(true)
+
+  return (
+    <AdminNotificationsProvider enableAlerts={enableNotificationAlerts}>
+      <BaseLayoutContent isSupportPage={isSupportPage}>{children}</BaseLayoutContent>
+    </AdminNotificationsProvider>
   )
 }

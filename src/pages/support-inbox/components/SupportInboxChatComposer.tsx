@@ -1,7 +1,8 @@
-import { CloseOutlined, PictureOutlined } from '@ant-design/icons'
-import { Button, Input } from 'antd'
+import { CloseOutlined } from '@ant-design/icons'
+import { Input, Spin } from 'antd'
 
 import { SUPPORT_INBOX_COPY } from '../constants'
+import { SupportInboxPaperclipIcon, SupportInboxSendIcon } from '../support-inbox.icons'
 
 const { TextArea } = Input
 
@@ -34,6 +35,8 @@ export function SupportInboxChatComposer({
   onClearPendingPhoto,
   onReply,
 }: SupportInboxChatComposerProps) {
+  const isBusy = replying || uploadingPhoto
+
   return (
     <footer className="support-inbox__composer">
       <input
@@ -47,33 +50,30 @@ export function SupportInboxChatComposer({
         }}
       />
 
-      {pendingPreviewUrl && (
+      {pendingPreviewUrl ? (
         <div className="support-inbox__composer-preview">
-          <img src={pendingPreviewUrl} alt="" />
-          <button
-            type="button"
-            className="support-inbox__composer-preview-remove"
-            onClick={onClearPendingPhoto}
-            aria-label={SUPPORT_INBOX_COPY.REMOVE_PHOTO}
-          >
-            <CloseOutlined />
-          </button>
+          <div className="support-inbox__composer-preview-thumb">
+            <img src={pendingPreviewUrl} alt="" />
+            <button
+              type="button"
+              className="support-inbox__composer-preview-remove"
+              onClick={onClearPendingPhoto}
+              aria-label={SUPPORT_INBOX_COPY.REMOVE_PHOTO}
+            >
+              <CloseOutlined />
+            </button>
+          </div>
         </div>
-      )}
+      ) : null}
 
-      <div className="support-inbox__composer-row">
-        <Button
-          type="text"
-          icon={<PictureOutlined />}
-          loading={uploadingPhoto}
-          onClick={onPickPhoto}
-          aria-label={SUPPORT_INBOX_COPY.ATTACH_PHOTO}
-        />
+      <div className="support-inbox__composer-main">
         <TextArea
+          className="support-inbox__composer-input"
           rows={3}
           value={replyText}
           onChange={e => onReplyTextChange(e.target.value)}
           placeholder={SUPPORT_INBOX_COPY.REPLY_PLACEHOLDER}
+          disabled={isBusy}
           onPressEnter={e => {
             if (!e.shiftKey) {
               e.preventDefault()
@@ -81,11 +81,27 @@ export function SupportInboxChatComposer({
             }
           }}
         />
+        <div className="support-inbox__composer-actions">
+          <button
+            type="button"
+            className="support-inbox__composer-btn support-inbox__composer-btn--attach"
+            onClick={onPickPhoto}
+            disabled={isBusy}
+            aria-label={SUPPORT_INBOX_COPY.ATTACH_PHOTO}
+          >
+            {uploadingPhoto ? <Spin size="small" /> : <SupportInboxPaperclipIcon />}
+          </button>
+          <button
+            type="button"
+            className="support-inbox__composer-btn support-inbox__composer-btn--send"
+            disabled={!canSend}
+            onClick={onReply}
+            aria-label={SUPPORT_INBOX_COPY.SEND_REPLY}
+          >
+            {replying ? <Spin size="small" /> : <SupportInboxSendIcon />}
+          </button>
+        </div>
       </div>
-
-      <Button type="primary" loading={replying} disabled={!canSend} onClick={onReply}>
-        {SUPPORT_INBOX_COPY.SEND_REPLY}
-      </Button>
     </footer>
   )
 }

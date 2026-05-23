@@ -54,7 +54,7 @@ export const PlatformImagesToolbar = ({
             Применить
           </CustomButton>
           <CustomButton onClick={onUploadOpen} type="primary" disabled={disabled}>
-            Добавить
+            Добавить фото
           </CustomButton>
         </>
       }

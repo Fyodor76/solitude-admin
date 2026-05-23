@@ -17,9 +17,6 @@ const HeaderSidebar = () => {
       <Link to="/" className="text-home">
         Home
       </Link>
-      <Link to="#" className="text-contact">
-        Contact
-      </Link>
     </div>
   )
 }

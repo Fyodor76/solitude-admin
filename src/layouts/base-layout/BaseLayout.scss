@@ -1,3 +1,57 @@
-.layout {
-  background: #1e1e1e;
+.admin-layout {
+  display: flex;
+}
+
+.admin-layout__main {
+  flex: 1;
+  min-width: 0;
+  margin-left: 70px;
+}
+
+.admin-layout__body {
+  display: block;
+}
+
+.main-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  &__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* Обращения: обычный скролл страницы, без обрезки */
+  &--support {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+
+    .header {
+      flex-shrink: 0;
+    }
+
+    .main-page__body {
+      overflow: visible;
+      display: block;
+      flex: none;
+      min-height: auto;
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-page--support .main-page__body,
+  .support-inbox__messages,
+  .support-inbox__list,
+  .support-widget__messages {
+    scroll-behavior: auto;
+  }
 }

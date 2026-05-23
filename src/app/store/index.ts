@@ -1,3 +1,4 @@
+import '@/shared/lib/api/admin-notifications/adminNotificationsApi'
 import { baseApi } from '@/shared/lib/api/baseApi'
 import '@/shared/lib/api/support/supportApi'
 import { rtkQueryErrorMiddleware } from '@/store/middleware/rtkQueryErrorMiddleware'

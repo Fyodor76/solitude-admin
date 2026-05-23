@@ -8,4 +8,6 @@ export const ROUTES = {
   SIZE_CHARTS: { label: 'Таблицы размеров', path: '/size-charts' },
   PLATFORM_IMAGES: { label: 'Изображения платформы', path: '/platform-images' },
   HEATMAP: { label: 'Тепловая карта сайта', path: '/heatmap' },
+  SUPPORT: { label: 'Обращения', path: '/support' },
+  NOTIFICATIONS: { label: 'Уведомления', path: '/notifications' },
 } as const

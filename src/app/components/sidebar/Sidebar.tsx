@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react'
 
-import { Badge, Button, Tooltip } from 'antd'
+import { Button, Tooltip } from 'antd'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 
-import defaultLogo from '@/app/assets/images/image.png'
 import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { overlayVariants, sidebarVariants, subMenuVariant } from '@/app/constans/sidebarVariants'
 
 import Icon from '../../../shared/ui/icons/Icon'
 import './Sidebar.scss'
 import { SidebarProps } from './sidebarType'
+
+const defaultLogo = '/icons/favicon-96x96.png'
 
 /** Подсветка пункта по текущему URL (точное совпадение или вложенный путь). */
 function isSidebarHrefActive(href: string | undefined, pathname: string): boolean {
@@ -33,7 +34,7 @@ const Sidebar = ({
   logo = {
     imageUrl: defaultLogo,
     altText: 'логотип',
-    title: 'AdminLTE 3',
+    title: 'Solitude Admin 1.0',
   },
   user = {
     href: '#profile',
@@ -188,16 +189,19 @@ const Sidebar = ({
                       >
                         <div className="icon-and-text">
                           {item.icon && (
-                            <Badge
-                              count={item.badgeCount}
-                              size="small"
-                              offset={isOpen ? [6, 0] : [4, 4]}
-                              className="sidebar-menu-badge"
-                            >
+                            <span className="menu-item-icon-wrap">
                               <span className="menu-item-icon">
                                 <Icon name={item.icon} />
                               </span>
-                            </Badge>
+                              {item.badgeCount != null && item.badgeCount > 0 ? (
+                                <span
+                                  className="sidebar-menu-badge-count"
+                                  aria-label={`Новых обращений: ${item.badgeCount}`}
+                                >
+                                  {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                                </span>
+                              ) : null}
+                            </span>
                           )}
                           {isOpen && (
                             <span className={`menu-item-text ${menuTextActive ? 'active' : ''}`}>

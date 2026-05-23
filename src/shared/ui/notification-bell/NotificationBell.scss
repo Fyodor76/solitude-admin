@@ -1,0 +1,141 @@
+.notification-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  svg path {
+    fill: none;
+  }
+
+  &:hover svg path {
+    stroke: var(--color-blue) !important;
+  }
+
+  .ant-badge-count {
+    background: var(--color-blue) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.notification-bell-popover {
+  .ant-popover-inner {
+    padding: 0;
+  }
+}
+
+.notification-bell-panel {
+  width: 320px;
+  max-width: min(320px, calc(100vw - 24px));
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-grey-header-border);
+  }
+
+  &__header-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  &__title,
+  &__count {
+    display: block;
+    margin: 0;
+    line-height: 1.35;
+  }
+
+  &__title {
+    font-size: 15px;
+  }
+
+  &__count {
+    font-size: 12px;
+  }
+
+  &__empty {
+    margin: 16px 0;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 360px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid var(--color-grey-header-border);
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: var(--color-blue-background-hover, #f0f7ff);
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__item-kind {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-blue);
+  }
+
+  &__item-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.3;
+    color: var(--color-text, #1a1a1a);
+  }
+
+  &__item-desc {
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--color-grey-text, #666);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__item-time {
+    font-size: 11px;
+  }
+
+  &__footer {
+    display: block;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-blue);
+    border-top: 1px solid var(--color-grey-header-border);
+    text-decoration: none;
+
+    &:hover {
+      background-color: var(--color-blue-background-hover, #f0f7ff);
+    }
+  }
+}

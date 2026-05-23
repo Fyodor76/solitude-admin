@@ -229,6 +229,9 @@ export const baseApi = createApi({
     'SupportInbox',
     'SupportConversation',
     'SupportMessages',
+    'AdminNotifications',
+    'AdminNotificationsSummary',
+    'AdminNotification',
   ],
   endpoints: () => ({}),
 })
