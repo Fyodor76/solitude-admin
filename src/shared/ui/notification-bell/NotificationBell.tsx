@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import {
   useMarkAdminNotificationReadMutation,
   useMarkAllAdminNotificationsReadMutation,
@@ -8,6 +9,7 @@ import {
   ADMIN_NOTIFICATION_KIND_LABELS,
   type AdminNotificationItem,
   NOTIFICATION_BELL_COPY,
+  NOTIFICATION_BELL_MOBILE_MEDIA_QUERY,
 } from '@/shared/lib/notifications'
 import { formatNotificationTime } from '@/shared/lib/notifications/formatNotificationTime'
 import { formatUnreadCount } from '@/shared/lib/notifications/formatUnreadCount'
@@ -30,6 +32,7 @@ type NotificationBellProps = {
 
 export function NotificationBell({ items, count }: NotificationBellProps) {
   const [open, setOpen] = useState(false)
+  const isMobile = useMatchMedia(NOTIFICATION_BELL_MOBILE_MEDIA_QUERY)
   const [markRead] = useMarkAdminNotificationReadMutation()
   const [markAllRead, { isLoading: markingAll }] = useMarkAllAdminNotificationsReadMutation()
 
@@ -104,11 +107,17 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
     <Popover
       content={content}
       trigger="click"
-      placement="bottomRight"
+      placement={isMobile ? 'bottom' : 'bottomRight'}
       open={open}
       onOpenChange={setOpen}
       overlayClassName="notification-bell-popover"
       arrow={false}
+      destroyOnHidden
+      styles={{
+        root: {
+          maxWidth: 'calc(100vw - 16px)',
+        },
+      }}
     >
       <button type="button" className="notification-bell" aria-label={NOTIFICATION_BELL_COPY.TITLE}>
         <Badge count={count > 0 ? (count > 99 ? '99+' : count) : 0} size="small" offset={[-2, 2]}>
