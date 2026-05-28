@@ -8,14 +8,12 @@ import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useSizeChartActions } from '@/shared/lib/hooks/useSizeChartActions'
 import { useSizeParameterActions } from '@/shared/lib/hooks/useSizeParameterActions'
-import { Spin } from 'antd'
+import { message, Spin } from 'antd'
 import { useSearchParams } from 'react-router-dom'
 
 import { CDN_URL } from '@/app/constans/url'
 
 import { MODES } from '../categories/const/constans'
-import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from '../size-parameters/constans/const'
-import SizeParameters from '../size-parameters/SizeParameters'
 import ChoosingCategory from './components/ChoosingCategory'
 import SizeChartButtons from './components/SizeChartButtons'
 import SizeChartCreate from './components/SizeChartCreate'
@@ -31,6 +29,8 @@ import {
 import { getAllCategories } from './helpers/SizeChartHelper'
 import { useSizeParameters } from './hooks/useSizeParameters'
 import SizeChartModal from './size-charts-modal/SizeChartModal'
+import { ALL_RU_SIZES, DEFAULT_MEASUREMENTS } from './size-parameters/constans/const'
+import SizeParameters from './size-parameters/SizeParameters'
 import './SizeChart.scss'
 
 const SizeChart = () => {
@@ -109,7 +109,7 @@ const SizeChart = () => {
 
   const handleCreateSizeChart = () => {
     if (!formSizeChart.categoryId) {
-      alert('Выберете категорию!')
+      message.warning('Выберете категорию!')
       return
     }
     setUploadImg(null)
@@ -128,15 +128,15 @@ const SizeChart = () => {
       await refetch()
       setFormSizeChart(result.data)
       editModal.onClose()
-      alert('✅ Таблица размеров создана!')
+      message.success('✅ Таблица размеров создана!')
     } catch (error) {
-      alert('Ошибка создания таблицы размеров')
+      message.error('Ошибка создания таблицы размеров')
     }
   }
 
   const createNewSizeParameter = async () => {
     if (!selectedSizeToAdd) {
-      alert('Выберите размер для добавления!')
+      message.warning('Выберите размер для добавления!')
       return
     }
 
@@ -197,33 +197,37 @@ const SizeChart = () => {
 
   const onSaveAllChanges = async (data: Partial<SizeChartRequest>) => {
     if (!sizeChartId) {
-      alert('Нет таблицы для сохранения')
+      message.warning('Нет таблицы для сохранения')
       return
     }
     const hasData = hasAnyData(parameters, formSizeChart)
     if (!hasData) {
-      alert('Нет данных для сохранения')
+      message.warning('Нет данных для сохранения')
       return
     }
     const hasInvalid = isValidateParemeters(parameters)
     if (hasInvalid) {
-      alert('Есть некорректные значения! Проверьте длину (20-150 см) и обхват груди (40-200 см)')
+      message.error(
+        'Есть некорректные значения! Проверьте длину (20-150 см) и обхват груди (40-200 см)'
+      )
       return
     }
 
     try {
-      for (const id of deleteIds) {
-        try {
-          await deleteParameter(id)
-          console.log(`Удалён размер с id: ${id}`)
-        } catch (error) {
-          console.error(`Ошибка удаления размера ${id}:`, error)
-        }
+      if (deleteIds.length > 0) {
+        await Promise.all(
+          deleteIds.map(id =>
+            deleteParameter(id).catch(error =>
+              console.error(`Ошибка удаления размера ${id}:`, error)
+            )
+          )
+        )
+        console.log(`✅ Удалено ${deleteIds.length} параметров`)
       }
 
       await updateSizeChartData(sizeChartId, prepareUpdateData(data, parameters))
-      await refetch()
-      alert('✅ Изменения сохранены!')
+      message.success('✅ Изменения сохранены!')
+      refetch().catch(console.error)
       clearChanges()
       setDeleteIds([])
     } catch (error) {

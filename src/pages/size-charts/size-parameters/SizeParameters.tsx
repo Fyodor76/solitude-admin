@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
-import { Button, Table } from 'antd'
+import { Button, message, Table } from 'antd'
 
 import { getColumns } from './components/Columns'
 import { ALL_SIZES } from './constans/const'
@@ -60,13 +60,16 @@ const SizeParameters = ({
 
   const existingParameters = editParameter.map(p => p.internationalSize)
   const filterParameters = ALL_SIZES.filter(size => !existingParameters.includes(size))
-  const sortedData = [...editParameter].sort((a, b) => {
-    return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
-  })
+  const sortedData = useMemo(() => {
+    return [...editParameter].sort((a, b) => {
+      return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
+    })
+  }, [editParameter])
+  console.log(sortedData)
 
   const handleAddSize = () => {
     if (filterParameters.length === 0) {
-      alert(
+      message.warning(
         'Все возможные размеры уже добавлены. Удалите хотя бы один размер, чтобы добавить новый.'
       )
       return
@@ -102,4 +105,4 @@ const SizeParameters = ({
   )
 }
 
-export default SizeParameters
+export default React.memo(SizeParameters)
