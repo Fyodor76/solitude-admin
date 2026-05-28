@@ -19,9 +19,19 @@ const MENU_DESCRIPTIONS: Record<string, string> = {
 function getNavigableMenuItems(items: MenuItem[]): MenuItem[] {
   return items.flatMap(item => {
     if (item.subItems?.length) {
-      return item.subItems.filter(subItem => subItem.href)
+      return item.subItems
+        .filter(subItem => subItem.href)
+        .map(subItem => ({
+          ...subItem,
+          icon: subItem.icon ?? item.icon,
+        }))
     }
-    return item.href ? [item] : []
+
+    if (!item.href || item.href === '#') {
+      return []
+    }
+
+    return [item]
   })
 }
 
