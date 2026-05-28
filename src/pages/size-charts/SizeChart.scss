@@ -362,8 +362,13 @@
     }
   }
   .size-chart-wrapper {
+    max-width: 100%;
+    overflow-x: hidden; // убираем горизонтальный скролл
+    overflow-y: auto; // оставляем вертикальный
     .size-chart-container-in-wrapper {
       margin: 12px;
+      width: 100%;
+      overflow-x: hidden;
       width: 100%;
 
       .size-chart-header {

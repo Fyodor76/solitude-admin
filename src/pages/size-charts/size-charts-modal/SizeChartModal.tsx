@@ -21,7 +21,7 @@ interface SizeChartModalProps {
   setFormSizeChart: React.Dispatch<React.SetStateAction<SizeChartRequest>>
   saveAllChanges: (data: Partial<SizeChartRequest>) => Promise<void>
   onClose: () => void
-  createNewSizeChart: (data: SizeChartRequest) => Promise<ApiResponse<SizeChartRequest, any>>
+  createNewSizeChart: (data: SizeChartRequest) => Promise<void>
 }
 const SizeChartModal = ({
   isOpen,

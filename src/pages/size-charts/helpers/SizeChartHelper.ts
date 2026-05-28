@@ -8,6 +8,8 @@ import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 
+import { SizeChartResponse } from '@/app/types/size-chart'
+
 export const prepareUpdateData = (
   data: Partial<SizeChartRequest>,
   editParameter: EditableSizeParameter[]
@@ -24,6 +26,14 @@ export const prepareUpdateData = (
     chestCircumferenceCm: Number(p.chestCircumferenceCm),
     order: Number(p.order),
   })),
+})
+
+export const prepareResetData = (sizeChart: SizeChartRequest | null) => ({
+  name: sizeChart?.name || '',
+  description: sizeChart?.description || '',
+  metricsText: sizeChart?.metricsText || '',
+  productType: sizeChart?.productType || '',
+  imageId: sizeChart?.imageId || null,
 })
 
 export const hasAnyData = (
