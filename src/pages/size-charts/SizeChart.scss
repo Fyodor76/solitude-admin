@@ -211,12 +211,6 @@
                 justify-content: center;
                 transition: background 0.2s;
               }
-              /* img {
-                color: #f2f2fdff;
-                width: 274px;
-                height: 182px;
-                border-radius: 0px 0px 0px 0px;
-              }*/
             }
 
             .size-chart-text-container {
@@ -362,9 +356,19 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    .btn-container {
+      width: 20%;
+    }
+  }
   .size-chart-wrapper {
+    max-width: 100%;
+    overflow-x: hidden; // убираем горизонтальный скролл
+    overflow-y: auto; // оставляем вертикальный
     .size-chart-container-in-wrapper {
       margin: 12px;
+      width: 100%;
+      overflow-x: hidden;
       width: 100%;
 
       .size-chart-header {
@@ -386,6 +390,9 @@
 
       .size-chart-select-empty-container {
         padding: 12px;
+        .empty-table {
+          margin-bottom: 10px;
+        }
 
         .main-info {
           gap: 16px;
@@ -400,6 +407,9 @@
             font-size: 12px;
             text-align: center;
           }
+          .ant-btn {
+            width: 15%;
+          }
         }
       }
     }
@@ -412,7 +422,11 @@
 }
 
 @media (max-width: 580px) {
-  // Запрещаем скролл на всей странице
+  .header {
+    .btn-container {
+      width: 30%;
+    }
+  }
   .size-chart-wrapper,
   .size-chart-container-in-wrapper,
   .size-chart-table-container {
@@ -434,6 +448,10 @@
   .size-chart-select-empty-container,
   .size-charts-parameters {
     width: 100%;
+  }
+
+  .size-chart-select-empty-container .information .ant-btn {
+    width: 30% !important;
   }
 }
 @media (max-width: 480px) {

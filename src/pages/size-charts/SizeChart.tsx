@@ -1,20 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
-import {
-  useCreateSizeChartMutation,
-  useDeleteSizeChartByIdMutation,
-  useGetSizeChartByCategoryIdQuery,
-  useUpdateSizeChartByIdMutation,
-} from '@/shared/lib/api/size-charts/SizeCharts'
+import { useGetSizeChartByCategoryIdQuery } from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
-import {
-  useCreateSizeParameterBySizeChartIdMutation,
-  useDeleteSizeParameterByIdMutation,
-} from '@/shared/lib/api/size-parameters/SizeParameters'
 import { SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
+import { useSizeChartActions } from '@/shared/lib/hooks/useSizeChartActions'
+import { useSizeParameterActions } from '@/shared/lib/hooks/useSizeParameterActions'
 import { Spin } from 'antd'
 import { useSearchParams } from 'react-router-dom'
 
@@ -29,7 +22,12 @@ import SizeChartCreate from './components/SizeChartCreate'
 import SizeChartEmpty from './components/SizeChartEmpty'
 import SizeChartMainInfo from './components/SizeChartMainInfo'
 import { initialData } from './constans/const'
-import { hasAnyData, isValidateParemeters, prepareUpdateData } from './helpers/SizeChartHelper'
+import {
+  hasAnyData,
+  isValidateParemeters,
+  prepareResetData,
+  prepareUpdateData,
+} from './helpers/SizeChartHelper'
 import { getAllCategories } from './helpers/SizeChartHelper'
 import { useSizeParameters } from './hooks/useSizeParameters'
 import SizeChartModal from './size-charts-modal/SizeChartModal'
@@ -40,19 +38,17 @@ const SizeChart = () => {
   const addSizeModal = useModal()
   const [searchParams, setSearchParams] = useSearchParams()
   const categoryIdFromUrl = searchParams.get('categoryId')
-  const [createSizeChart] = useCreateSizeChartMutation()
-  const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
-  const [createNewParameter] = useCreateSizeParameterBySizeChartIdMutation()
-  const [deleteSizeParameter] = useDeleteSizeParameterByIdMutation()
-  const [updateSizeChart] = useUpdateSizeChartByIdMutation()
-
   const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(() => ({
     ...initialData,
     categoryId: categoryIdFromUrl || '',
   }))
-
   const [selectedSizeToAdd, setSelectedSizeToAdd] = useState<string | null>(null)
   const [changedRows, setChangedRows] = useState<Record<string, boolean>>({})
+  const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
+
+  const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
+  const { createNewSizeChart, updateSizeChartData, deleteSizeChartData } = useSizeChartActions()
+  const { createParameter, deleteParameter } = useSizeParameterActions()
 
   const {
     data: sizeChartResponse,
@@ -66,16 +62,6 @@ const SizeChart = () => {
     sizeChartResponse?.data?.categoryId === formSizeChart.categoryId
       ? sizeChartResponse?.data
       : null
-
-  const [deleteSizeChartById] = useDeleteSizeChartByIdMutation()
-  const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
-
-  const mode = editModal.mode
-  const isCreate = mode === MODES.CREATE
-  const isEdit = mode === MODES.EDIT
-  const imageUrl = formSizeChart.imageId ? `${CDN_URL}/${formSizeChart.imageId}` : null
-
-  const dataParameters = sizeChart?.sizeParameters
   const sizeChartId = sizeChart?.id
   const {
     parameters,
@@ -86,6 +72,12 @@ const SizeChart = () => {
     recalculateOrder,
     setDeleteIds,
   } = useSizeParameters(sizeChartId)
+
+  const mode = editModal.mode
+  const isCreate = mode === MODES.CREATE
+  const isEdit = mode === MODES.EDIT
+  const imageUrl = formSizeChart.imageId ? `${CDN_URL}/${formSizeChart.imageId}` : null
+  const dataParameters = sizeChart?.sizeParameters
 
   useEffect(() => {
     if (formSizeChart.categoryId) {
@@ -129,20 +121,16 @@ const SizeChart = () => {
     editModal.setMode(MODES.CREATE)
     editModal.onOpen()
   }
-  const createNewSizeChart = async (data: SizeChartRequest) => {
+
+  const handleCreateSizeChartSubmit = async (data: SizeChartRequest) => {
     try {
-      const result = await createSizeChart(data).unwrap()
-      console.log('✅ Таблица размеров создана, обновляем данные...')
-      refetch()
-      setFormSizeChart({
-        ...data,
-        categoryId: formSizeChart.categoryId,
-        imageId: formSizeChart.imageId || uploadImg?.fileId || null,
-      })
-      return result
+      const result = await createNewSizeChart(data)
+      await refetch()
+      setFormSizeChart(result.data)
+      editModal.onClose()
+      alert('✅ Таблица размеров создана!')
     } catch (error) {
-      console.log('Ошибка создания таблицы категории!', error)
-      throw error
+      alert('Ошибка создания таблицы размеров')
     }
   }
 
@@ -164,10 +152,7 @@ const SizeChart = () => {
       order: (parameters?.length || 0) + 1,
     }
     try {
-      const result = await createNewParameter({
-        data: newSize,
-        sizeChartId: sizeChartId,
-      }).unwrap()
+      const result = await createParameter(sizeChartId, newSize)
       addParameter(result.data)
       recalculateOrder()
       setSelectedSizeToAdd(null)
@@ -181,7 +166,7 @@ const SizeChart = () => {
     const isConfirmed = confirm('Удалить таблицу с размерами?')
     if (!isConfirmed) return
     try {
-      if (id) await deleteSizeChartById(id).unwrap()
+      if (id) await deleteSizeChartData(id)
       setFormSizeChart({
         ...initialData,
         categoryId: formSizeChart.categoryId,
@@ -200,10 +185,8 @@ const SizeChart = () => {
       return
     }
     const sizeToDelete = parameters.find(p => p.id === id)
-
     const isConfirmed = confirm(`Удалить размер "${sizeToDelete?.internationalSize}"?`)
     if (!isConfirmed) return
-
     removeParameter(id)
     recalculateOrder()
   }
@@ -231,17 +214,14 @@ const SizeChart = () => {
     try {
       for (const id of deleteIds) {
         try {
-          await deleteSizeParameter(id).unwrap()
+          await deleteParameter(id)
           console.log(`Удалён размер с id: ${id}`)
         } catch (error) {
           console.error(`Ошибка удаления размера ${id}:`, error)
         }
       }
 
-      await updateSizeChart({
-        id: sizeChartId,
-        data: prepareUpdateData(data, parameters),
-      }).unwrap()
+      await updateSizeChartData(sizeChartId, prepareUpdateData(data, parameters))
       await refetch()
       alert('✅ Изменения сохранены!')
       clearChanges()
@@ -261,14 +241,12 @@ const SizeChart = () => {
   }
 
   const handleCancel = () => {
-    setFormSizeChart(prev => ({
-      ...prev,
-      name: sizeChart?.name || '',
-      description: sizeChart?.description || '',
-      metricsText: sizeChart?.metricsText || '',
-      productType: sizeChart?.productType || '',
-      imageId: sizeChart?.imageId || null,
-    }))
+    if (sizeChart) {
+      setFormSizeChart(prev => ({
+        ...prev,
+        ...prepareResetData(sizeChart),
+      }))
+    }
     setParameters(sizeChart?.sizeParameters || [])
     setChangedRows({})
     setSelectedSizeToAdd(null)
@@ -349,7 +327,7 @@ const SizeChart = () => {
           setFormSizeChart={setFormSizeChart}
           saveAllChanges={onSaveAllChanges}
           setModes={editModal.setMode}
-          createNewSizeChart={createNewSizeChart}
+          createNewSizeChart={handleCreateSizeChartSubmit}
         />
       </div>
     </div>

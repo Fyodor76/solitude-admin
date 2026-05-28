@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { ApiResponse } from '@/shared/lib/api/baseApi'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
@@ -21,7 +21,7 @@ interface SizeChartModalProps {
   setFormSizeChart: React.Dispatch<React.SetStateAction<SizeChartRequest>>
   saveAllChanges: (data: Partial<SizeChartRequest>) => Promise<void>
   onClose: () => void
-  createNewSizeChart: (data: SizeChartRequest) => Promise<ApiResponse<SizeChartRequest, any>>
+  createNewSizeChart: (data: SizeChartRequest) => Promise<void>
 }
 const SizeChartModal = ({
   isOpen,
