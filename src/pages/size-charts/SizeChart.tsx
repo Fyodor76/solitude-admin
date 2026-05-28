@@ -7,7 +7,7 @@ import { SizeParameter } from '@/shared/lib/api/size-parameters/type'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useSizeChartActions } from '@/shared/lib/hooks/useSizeChartActions'
-import { useSizeParameterAction } from '@/shared/lib/hooks/useSizeParameterAction'
+import { useSizeParameterActions } from '@/shared/lib/hooks/useSizeParameterActions'
 import { Spin } from 'antd'
 import { useSearchParams } from 'react-router-dom'
 
@@ -48,7 +48,7 @@ const SizeChart = () => {
 
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
   const { createNewSizeChart, updateSizeChartData, deleteSizeChartData } = useSizeChartActions()
-  const { createParameter, deleteParameter } = useSizeParameterAction()
+  const { createParameter, deleteParameter } = useSizeParameterActions()
 
   const {
     data: sizeChartResponse,

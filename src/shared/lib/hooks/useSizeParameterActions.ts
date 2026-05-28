@@ -6,7 +6,7 @@ import {
 } from '../api/size-parameters/SizeParameters'
 import { SizeParameter } from '../api/size-parameters/type'
 
-export const useSizeParameterAction = () => {
+export const useSizeParameterActions = () => {
   const [createNewParameter] = useCreateSizeParameterBySizeChartIdMutation()
   const [deleteSizeParameter] = useDeleteSizeParameterByIdMutation()
   const createParameter = async (sizeChartId: string, data: SizeParameter) => {
