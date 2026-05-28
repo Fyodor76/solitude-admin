@@ -232,6 +232,9 @@ export const baseApi = createApi({
     'AdminNotifications',
     'AdminNotificationsSummary',
     'AdminNotification',
+    'FormSubmissions',
+    'FormSubmissionsStats',
+    'FormSubmission',
   ],
   endpoints: () => ({}),
 })

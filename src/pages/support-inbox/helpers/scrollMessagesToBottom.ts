@@ -2,6 +2,15 @@ import { SUPPORT_INBOX_SCROLL } from '../constants'
 
 const IMAGE_LOAD_SCROLL_DELAYS_MS = SUPPORT_INBOX_SCROLL.IMAGE_LOAD_DELAYS_MS
 
+export function isMessagesContainerNearBottom(
+  container: HTMLElement | null,
+  thresholdPx = SUPPORT_INBOX_SCROLL.NEAR_BOTTOM_THRESHOLD_PX
+): boolean {
+  if (!container) return true
+  const distanceFromBottom = container.scrollHeight - container.clientHeight - container.scrollTop
+  return distanceFromBottom <= thresholdPx
+}
+
 export function scrollMessagesToBottom(
   container: HTMLElement | null,
   behavior: ScrollBehavior = 'smooth'
@@ -39,26 +48,37 @@ export function scrollSupportInboxPageToChat(behavior: ScrollBehavior = 'smooth'
   }
 }
 
+export type ScrollMessagesToBottomSoonOptions = {
+  behavior?: ScrollBehavior
+  /** Если задан — каждая попытка скролла выполняется только при true (например, пользователь у низа). */
+  shouldScroll?: () => boolean
+}
+
 export function scrollMessagesToBottomSoon(
   container: HTMLElement | null,
-  behavior: ScrollBehavior = 'smooth'
-) {
-  scrollMessagesToBottom(container, behavior)
+  behaviorOrOptions: ScrollBehavior | ScrollMessagesToBottomSoonOptions = 'smooth',
+  legacyShouldScroll?: () => boolean
+): () => void {
+  const options: ScrollMessagesToBottomSoonOptions =
+    typeof behaviorOrOptions === 'string'
+      ? { behavior: behaviorOrOptions, shouldScroll: legacyShouldScroll }
+      : behaviorOrOptions
 
-  requestAnimationFrame(() => scrollMessagesToBottom(container, behavior))
+  const { behavior = 'smooth', shouldScroll } = options
 
-  window.setTimeout(
-    () => scrollMessagesToBottom(container, behavior),
-    IMAGE_LOAD_SCROLL_DELAYS_MS[0]
-  )
-  window.setTimeout(
-    () => scrollMessagesToBottom(container, behavior),
-    IMAGE_LOAD_SCROLL_DELAYS_MS[1]
-  )
-  window.setTimeout(
-    () => scrollMessagesToBottom(container, behavior),
-    IMAGE_LOAD_SCROLL_DELAYS_MS[2]
-  )
+  const attempt = () => {
+    if (shouldScroll && !shouldScroll()) return
+    scrollMessagesToBottom(container, behavior)
+  }
+
+  attempt()
+  const rafId = requestAnimationFrame(attempt)
+  const timeoutIds = IMAGE_LOAD_SCROLL_DELAYS_MS.map(delay => window.setTimeout(attempt, delay))
+
+  return () => {
+    cancelAnimationFrame(rafId)
+    timeoutIds.forEach(id => window.clearTimeout(id))
+  }
 }
 
 export function scrollSupportInboxChatIntoView(behavior: ScrollBehavior = 'smooth') {

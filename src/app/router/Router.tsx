@@ -1,4 +1,5 @@
 import { Categories } from '@/pages/categories'
+import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
 import { NotificationsPage } from '@/pages/notifications'
 import { PlatformImages } from '@/pages/platform-images'
@@ -103,6 +104,14 @@ export const Router: RouteObject[] = [
         element: (
           <ProtectedRouter>
             <NotificationsPage />
+          </ProtectedRouter>
+        ),
+      },
+      {
+        path: '/forms/callback',
+        element: (
+          <ProtectedRouter>
+            <CallbackFormPage />
           </ProtectedRouter>
         ),
       },

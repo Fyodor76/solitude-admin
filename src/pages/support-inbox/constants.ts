@@ -58,6 +58,8 @@ export const SUPPORT_INBOX_LAYOUT = {
 
 export const SUPPORT_INBOX_SCROLL = {
   IMAGE_LOAD_DELAYS_MS: [150, 450, 900] as const,
+  /** Если пользователь выше этого порога от низа — не подскролливать автоматически. */
+  NEAR_BOTTOM_THRESHOLD_PX: 80,
 } as const
 
 export const SUPPORT_STATUS_LABELS: Record<SupportConversationStatus | string, string> = {

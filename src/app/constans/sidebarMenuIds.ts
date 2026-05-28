@@ -5,6 +5,8 @@ export const SIDEBAR_MENU_ITEM_ID = {
   PLATFORM_IMAGES: 'platform-images',
   HEATMAP: 'heatmap',
   SUPPORT: 'support',
+  FORMS: 'forms',
+  CALLBACK_FORM: 'callback-form',
 } as const
 
 export type SidebarMenuItemId = (typeof SIDEBAR_MENU_ITEM_ID)[keyof typeof SIDEBAR_MENU_ITEM_ID]

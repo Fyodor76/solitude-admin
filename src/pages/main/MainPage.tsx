@@ -13,6 +13,7 @@ const MENU_DESCRIPTIONS: Record<string, string> = {
   'platform-images': 'Загрузка и управление изображениями платформы.',
   heatmap: 'Тепловая карта кликов и просмотр страниц магазина.',
   support: 'Поддержка и обратная связь с клиентами.',
+  'callback-form': 'Заявки с формы обратной связи на сайте.',
 }
 
 function getNavigableMenuItems(items: MenuItem[]): MenuItem[] {

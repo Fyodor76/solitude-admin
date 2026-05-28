@@ -38,6 +38,20 @@ export const menuSidebar: MenuItem[] = [
     icon: 'support',
     hasArrow: false,
   },
+  {
+    id: SIDEBAR_MENU_ITEM_ID.FORMS,
+    text: 'Формы',
+    href: '#',
+    icon: 'forms',
+    hasArrow: true,
+    subItems: [
+      {
+        id: SIDEBAR_MENU_ITEM_ID.CALLBACK_FORM,
+        text: 'Форма обратной связи',
+        href: '/forms/callback',
+      },
+    ],
+  },
   /*{
     id: 'dashboard',
     text: 'Dashboard',

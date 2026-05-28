@@ -10,4 +10,5 @@ export const ROUTES = {
   HEATMAP: { label: 'Тепловая карта сайта', path: '/heatmap' },
   SUPPORT: { label: 'Обращения', path: '/support' },
   NOTIFICATIONS: { label: 'Уведомления', path: '/notifications' },
+  FORMS_CALLBACK: { label: 'Форма обратной связи', path: '/forms/callback' },
 } as const
