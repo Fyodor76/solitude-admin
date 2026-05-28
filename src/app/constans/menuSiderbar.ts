@@ -49,6 +49,7 @@ export const menuSidebar: MenuItem[] = [
         id: SIDEBAR_MENU_ITEM_ID.CALLBACK_FORM,
         text: 'Форма обратной связи',
         href: '/forms/callback',
+        icon: 'forms',
       },
     ],
   },

@@ -9,15 +9,16 @@ export const useBreadcrumbs = (): BreadcrumbsItemProps[] => {
   const pathnames = location.pathname.split('/').filter(x => x)
 
   const crumbs: BreadcrumbsItemProps[] = [{ label: ROUTES.HOME.label, href: ROUTES.HOME.path }]
-  pathnames.forEach((segment, index) => {
+  pathnames.forEach((_, index) => {
     const path = '/' + pathnames.slice(0, index + 1).join('/')
     const route = Object.values(ROUTES).find(r => r.path === path)
-    const decodedSegment = decodeURIComponent(segment)
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, char => char.toUpperCase())
+
+    if (!route) {
+      return
+    }
 
     crumbs.push({
-      label: route ? route.label : decodedSegment,
+      label: route.label,
       href: path,
     })
   })
