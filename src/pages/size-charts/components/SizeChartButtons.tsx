@@ -14,15 +14,7 @@ const SizeChartButtons = ({
   handleCancel,
 }: SizeChartButtonsProps) => {
   return (
-    <Space
-      className="saveAndCancelBtn"
-      style={{
-        marginTop: 16,
-        marginBottom: 16,
-        display: 'flex',
-        justifyContent: 'flex-end',
-      }}
-    >
+    <Space className="saveAndCancelBtn">
       <Button onClick={handleCancel} className="cancelBtn" type="link">
         Отмена
       </Button>

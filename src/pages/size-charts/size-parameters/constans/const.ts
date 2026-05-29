@@ -10,6 +10,14 @@ export const ALL_RU_SIZES: Record<string, string> = {
   XXXL: '52-54',
 }
 
+export const FIELDS = {
+  LENGTH_CM: 'lengthCm',
+  CHEST_CIRCUMFERENCE_CM: 'chestCircumferenceCm',
+  INTERNATIONAL_SIZE: 'internationalSize',
+  RUSSIAN_SIZE: 'russianSize',
+  ORDER: 'order',
+} as const
+
 export const DEFAULT_MEASUREMENTS: Record<
   string,
   { lengthCm: number; chestCircumferenceCm: number }

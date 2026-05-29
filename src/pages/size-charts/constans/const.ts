@@ -1,4 +1,4 @@
-export const initialData = {
+export const INITIAL_DATA = {
   categoryId: '',
   name: '',
   description: '',

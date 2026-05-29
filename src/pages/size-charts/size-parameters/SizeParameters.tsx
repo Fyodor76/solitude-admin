@@ -4,7 +4,7 @@ import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-para
 import { Button, message, Table } from 'antd'
 
 import { getColumns } from './components/Columns'
-import { ALL_SIZES } from './constans/const'
+import { ALL_SIZES, FIELDS } from './constans/const'
 import SizeParameterAddModal from './modal/SizeParameterAddModal'
 import './SizeParameters.scss'
 
@@ -42,7 +42,10 @@ const SizeParameters = ({
       p.id === id || p.tempId === id
         ? {
             ...p,
-            [field]: field === 'lengthCm' || field === 'chestCircumferenceCm' ? numValue : value,
+            [field]:
+              field === FIELDS.LENGTH_CM || field === FIELDS.CHEST_CIRCUMFERENCE_CM
+                ? numValue
+                : value,
           }
         : p
     )

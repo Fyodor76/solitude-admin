@@ -5,7 +5,7 @@ import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 import { Select } from 'antd'
 
-import { initialData } from '../constans/const'
+import { INITIAL_DATA } from '../constans/const'
 
 interface ChoosingCategoryProps {
   formSizeChart: SizeChartRequest
@@ -32,7 +32,7 @@ const ChoosingCategory = ({
           placeholder="Выберете категорию"
           onChange={value => {
             setFormSizeChart({
-              ...initialData,
+              ...INITIAL_DATA,
               categoryId: value,
             })
             setEditParameter([])
