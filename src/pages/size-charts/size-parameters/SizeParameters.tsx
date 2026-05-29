@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { EditableSizeParameter, SizeParameter } from '@/shared/lib/api/size-parameters/type'
-import { Button, Table } from 'antd'
+import { Button, message, Table } from 'antd'
 
 import { getColumns } from './components/Columns'
-import { ALL_SIZES } from './constans/const'
+import { ALL_SIZES, FIELDS } from './constans/const'
 import SizeParameterAddModal from './modal/SizeParameterAddModal'
 import './SizeParameters.scss'
 
@@ -42,7 +42,10 @@ const SizeParameters = ({
       p.id === id || p.tempId === id
         ? {
             ...p,
-            [field]: field === 'lengthCm' || field === 'chestCircumferenceCm' ? numValue : value,
+            [field]:
+              field === FIELDS.LENGTH_CM || field === FIELDS.CHEST_CIRCUMFERENCE_CM
+                ? numValue
+                : value,
           }
         : p
     )
@@ -58,15 +61,19 @@ const SizeParameters = ({
 
   const columns = getColumns(handleParameterChange, deleteSize)
 
-  const existingParameters = editParameter.map(p => p.internationalSize)
-  const filterParameters = ALL_SIZES.filter(size => !existingParameters.includes(size))
-  const sortedData = [...editParameter].sort((a, b) => {
-    return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
-  })
+  const filterParameters = useMemo(() => {
+    const existingParameters = editParameter.map(p => p.internationalSize)
+    return ALL_SIZES.filter(size => !existingParameters.includes(size))
+  }, [editParameter])
+  const sortedData = useMemo(() => {
+    return [...editParameter].sort((a, b) => {
+      return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
+    })
+  }, [editParameter])
 
   const handleAddSize = () => {
     if (filterParameters.length === 0) {
-      alert(
+      message.warning(
         'Все возможные размеры уже добавлены. Удалите хотя бы один размер, чтобы добавить новый.'
       )
       return
@@ -102,4 +109,4 @@ const SizeParameters = ({
   )
 }
 
-export default SizeParameters
+export default React.memo(SizeParameters)

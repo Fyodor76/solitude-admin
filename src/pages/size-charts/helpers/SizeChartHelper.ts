@@ -1,14 +1,8 @@
-import {
-  MAX_CHEST,
-  MAX_LENGTH,
-  MIN_CHEST,
-  MIN_LENGTH,
-} from '@/pages/size-parameters/constans/const'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 
-import { SizeChartResponse } from '@/app/types/size-chart'
+import { MAX_CHEST, MAX_LENGTH, MIN_CHEST, MIN_LENGTH } from '../size-parameters/constans/const'
 
 export const prepareUpdateData = (
   data: Partial<SizeChartRequest>,

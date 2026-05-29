@@ -34,16 +34,13 @@ export const useSizeChartActions = () => {
     }
   }
 
-  const deleteSizeChartData = async (id: string | undefined, onSuccess?: () => void) => {
+  const deleteSizeChartData = async (id: string | undefined) => {
     if (!id) return
-
-    const isConfirmed = confirm('Удалить таблицу с размерами?')
-    if (!isConfirmed) return
 
     try {
       const result = await deleteSizeChartById(id).unwrap()
       console.log('✅ Таблица размеров удалена')
-      onSuccess?.()
+
       return result
     } catch (error) {
       console.log('Ошибка удаления таблицы!', error)
