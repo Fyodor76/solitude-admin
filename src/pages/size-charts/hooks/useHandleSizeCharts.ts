@@ -162,10 +162,12 @@ export const useHandleSizeCharts = ({
       setFormSizeChart({
         ...INITIAL_DATA,
         categoryId: formSizeChart.categoryId,
+        id: undefined,
       })
       setParameters([])
       setSelectedSizeToAdd(null)
       refetch()
+
       console.log('Удаление прошло успешно!')
     } catch (error) {
       console.log('Ошибка удаления таблицы!', error)

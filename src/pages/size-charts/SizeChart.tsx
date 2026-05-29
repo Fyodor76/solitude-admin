@@ -115,7 +115,6 @@ const SizeChart = () => {
 
   useEffect(() => {
     if (sizeChart?.id) {
-      console.log('Данные с сервера - imageId:', sizeChart.imageId)
       setFormSizeChart(sizeChart)
       setParameters([...(sizeChart?.sizeParameters || [])])
     } else {
@@ -155,11 +154,11 @@ const SizeChart = () => {
                 <Spin size="large" />
               </div>
             )}
-            {!isFetching && sizeChart?.id && (
+            {!isFetching && formSizeChart?.id && (
               <>
                 <SizeChartMainInfo
                   isEdit={isEdit}
-                  sizeChart={sizeChart}
+                  sizeChart={formSizeChart}
                   formSizeChart={formSizeChart}
                   imageUrl={imageUrl}
                   handleSizeChartChange={handleSizeChartChange}
@@ -191,7 +190,7 @@ const SizeChart = () => {
                 />
               </>
             )}
-            {!isFetching && !sizeChart?.id && (
+            {!isFetching && !formSizeChart?.id && (
               <SizeChartCreate handleCreateSizeChart={handleCreateSizeChart} />
             )}
           </div>

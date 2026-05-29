@@ -61,14 +61,15 @@ const SizeParameters = ({
 
   const columns = getColumns(handleParameterChange, deleteSize)
 
-  const existingParameters = editParameter.map(p => p.internationalSize)
-  const filterParameters = ALL_SIZES.filter(size => !existingParameters.includes(size))
+  const filterParameters = useMemo(() => {
+    const existingParameters = editParameter.map(p => p.internationalSize)
+    return ALL_SIZES.filter(size => !existingParameters.includes(size))
+  }, [editParameter])
   const sortedData = useMemo(() => {
     return [...editParameter].sort((a, b) => {
       return ALL_SIZES.indexOf(a.internationalSize) - ALL_SIZES.indexOf(b.internationalSize)
     })
   }, [editParameter])
-  console.log(sortedData)
 
   const handleAddSize = () => {
     if (filterParameters.length === 0) {
