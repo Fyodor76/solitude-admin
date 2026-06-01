@@ -8,6 +8,12 @@
   margin-left: 70px;
 }
 
+@media (max-width: 640px) {
+  .admin-layout__main {
+    margin-left: 0;
+  }
+}
+
 .admin-layout__body {
   display: block;
 }
