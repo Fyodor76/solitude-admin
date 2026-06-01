@@ -12,46 +12,64 @@
     display: flex;
     width: 100%;
     justify-content: flex-end;
-    padding: 10px 0;
+    padding: 10px 16px 10px 0;
+    box-sizing: border-box;
+
     .btn-container {
       display: flex;
-      .links {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+    }
 
-        gap: 12px;
+    .btn-logout {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      padding: 0;
+      border: none;
+      box-shadow: none;
 
-        .link-message {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-
-          svg path {
-            fill: none;
-          }
-          &:hover svg path {
-            stroke: var(--color-blue) !important;
-          }
-        }
+      .icon {
+        width: 22px;
+        height: 22px;
       }
-      .btn-logout {
-        border: none;
-        box-shadow: none;
-        &:hover,
-        &:focus {
-          border: none;
-        }
 
-        svg path {
-          fill: none;
-        }
-        &:hover svg path {
-          stroke: var(--color-blue) !important;
-        }
+      &:hover,
+      &:focus {
+        border: none;
+      }
+
+      svg path {
+        fill: none;
+      }
+
+      &:hover svg path {
+        stroke: var(--color-blue) !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .header-container {
+    padding: 8px 12px 8px 56px;
+
+    .btn-container {
+      gap: 2px;
+    }
+
+    .btn-logout {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+
+      .icon {
+        width: 24px;
+        height: 24px;
       }
     }
   }

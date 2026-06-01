@@ -31,13 +31,11 @@ export const Header = () => {
       <div className="header">
         <div className="header-container">
           <div className="btn-container">
-            <div className="links">
-              <NotificationBell items={notificationItems} count={unreadCount} />
-            </div>
+            <NotificationBell items={notificationItems} count={unreadCount} />
 
             <ConfigProvider wave={{ disabled: true }}>
-              <Button onClick={handleLogout} className="btn-logout">
-                <Icon name="logout"></Icon>
+              <Button onClick={handleLogout} className="btn-logout" type="text" aria-label="Выйти">
+                <Icon name="logout" />
               </Button>
             </ConfigProvider>
           </div>

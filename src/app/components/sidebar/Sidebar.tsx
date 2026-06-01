@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
+import { useMobileSidebarSwipe } from '@/shared/hooks/useMobileSidebarSwipe'
 import { Button, Tooltip } from 'antd'
 import classNames from 'classnames'
 import { motion } from 'framer-motion'
@@ -47,6 +48,11 @@ const Sidebar = ({
 }: SidebarProps) => {
   const { pathname } = useLocation()
   const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
+  const { swipeHandlers, swipeStyle, isDragging } = useMobileSidebarSwipe({
+    enabled: isMobile,
+    isOpen,
+    onClose: toggleSidebar,
+  })
   const prevPathnameRef = useRef(pathname)
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
@@ -158,10 +164,12 @@ const Sidebar = ({
             'sidebar',
             `sidebar-${position}`,
             'sidebar--mobile',
-            isOpen ? 'sidebar--mobile-open' : 'sidebar--mobile-closed'
+            isOpen ? 'sidebar--mobile-open' : 'sidebar--mobile-closed',
+            isDragging && 'sidebar--mobile-dragging'
           )}
-          style={{ width }}
+          style={{ width, ...swipeStyle }}
           onClick={e => e.stopPropagation()}
+          {...swipeHandlers}
         >
           {renderSidebarContent()}
         </aside>
