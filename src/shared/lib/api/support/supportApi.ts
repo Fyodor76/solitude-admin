@@ -82,6 +82,7 @@ export const supportApi = baseApi.injectEndpoints({
 
 export const {
   useGetSupportInboxQuery,
+  useGetSupportConversationQuery,
   useGetSupportMessagesQuery,
   useLazyGetSupportTelegramMediaUrlQuery,
   useOpenSupportConversationMutation,

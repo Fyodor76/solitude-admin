@@ -5,6 +5,7 @@ import { useMarkAdminNotificationReadBySourceMutation } from '@/shared/lib/api/a
 import { SUPPORT_CONVERSATION_STATUS } from '@/shared/lib/api/support/constants'
 import {
   useCloseSupportConversationMutation,
+  useGetSupportConversationQuery,
   useGetSupportInboxQuery,
   useOpenSupportConversationMutation,
 } from '@/shared/lib/api/support/supportApi'
@@ -28,7 +29,7 @@ import { scrollSupportInboxChatIntoView } from '../helpers/scrollMessagesToBotto
 import { sortConversationsByLastMessage } from '../helpers/sortConversations'
 import { useSupportInboxMessages } from './useSupportInboxMessages'
 
-const DEFAULT_CHANNEL_FILTER = SUPPORT_INBOX_CHANNEL_FILTER.WEB
+const DEFAULT_CHANNEL_FILTER = SUPPORT_INBOX_CHANNEL_FILTER.ALL
 const DEFAULT_LIST_TAB = SUPPORT_INBOX_LIST_TAB.ACTIVE
 
 export function useSupportInbox() {
@@ -41,6 +42,15 @@ export function useSupportInbox() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [searchParams] = useSearchParams()
+
+  const deepLinkId = useMemo(() => {
+    const raw = searchParams.get('c')
+    if (!raw) {
+      return null
+    }
+    const id = Number(raw)
+    return Number.isFinite(id) && id > 0 ? id : null
+  }, [searchParams])
 
   const isMobileLayout = useMatchMedia(SUPPORT_INBOX_MOBILE_MEDIA_QUERY)
   const showMobileChat = isMobileLayout && selectedId !== null
@@ -61,10 +71,30 @@ export function useSupportInbox() {
 
   const conversations = inboxResponse?.data ?? []
 
-  const selected = useMemo(
-    () => conversations.find(c => c.id === selectedId) ?? null,
-    [conversations, selectedId]
-  )
+  const {
+    data: deepLinkConversationResponse,
+    isLoading: deepLinkLoading,
+    isError: deepLinkError,
+  } = useGetSupportConversationQuery(deepLinkId ?? 0, {
+    skip: !deepLinkId,
+  })
+
+  const selected = useMemo(() => {
+    if (selectedId === null) {
+      return null
+    }
+
+    const fromInbox = conversations.find(c => c.id === selectedId)
+    if (fromInbox) {
+      return fromInbox
+    }
+
+    if (deepLinkId === selectedId && deepLinkConversationResponse?.data) {
+      return deepLinkConversationResponse.data
+    }
+
+    return null
+  }, [conversations, deepLinkConversationResponse?.data, deepLinkId, selectedId])
 
   const { messagesLoading, messagesSwitching, visibleMessages } =
     useSupportInboxMessages(selectedId)
@@ -91,19 +121,70 @@ export function useSupportInbox() {
   const emptyDescription = getEmptyListDescription(searchQuery, isClosedTab)
 
   useEffect(() => {
-    const raw = searchParams.get('c')
-    if (!raw) return
-    const id = Number(raw)
-    if (Number.isFinite(id) && id > 0) {
-      setSelectedId(id)
+    if (!deepLinkId) {
+      return
     }
-  }, [searchParams])
+
+    setSelectedId(deepLinkId)
+    void markNotificationReadBySource(buildSupportNotificationSourceId(deepLinkId))
+  }, [deepLinkId, markNotificationReadBySource])
 
   useEffect(() => {
-    if (selectedId && !conversations.some(c => c.id === selectedId)) {
-      setSelectedId(null)
+    const conversation = deepLinkConversationResponse?.data
+    if (!conversation || deepLinkId !== conversation.id) {
+      return
     }
-  }, [conversations, selectedId])
+
+    if (conversation.channel === 'telegram') {
+      setChannelFilter(SUPPORT_INBOX_CHANNEL_FILTER.TELEGRAM)
+    } else if (conversation.channel === 'web') {
+      setChannelFilter(SUPPORT_INBOX_CHANNEL_FILTER.WEB)
+    }
+
+    if (conversation.status === SUPPORT_CONVERSATION_STATUS.CLOSED) {
+      setListTab(SUPPORT_INBOX_LIST_TAB.CLOSED)
+    } else {
+      setListTab(SUPPORT_INBOX_LIST_TAB.ACTIVE)
+    }
+
+    requestAnimationFrame(() => scrollSupportInboxChatIntoView('smooth'))
+  }, [deepLinkConversationResponse?.data, deepLinkId])
+
+  useEffect(() => {
+    if (!selectedId) {
+      return
+    }
+
+    if (conversations.some(c => c.id === selectedId)) {
+      return
+    }
+
+    if (deepLinkId === selectedId) {
+      if (deepLinkLoading || inboxLoading) {
+        return
+      }
+
+      if (deepLinkConversationResponse?.data) {
+        return
+      }
+
+      if (deepLinkError) {
+        setSelectedId(null)
+      }
+
+      return
+    }
+
+    setSelectedId(null)
+  }, [
+    conversations,
+    deepLinkConversationResponse?.data,
+    deepLinkError,
+    deepLinkId,
+    deepLinkLoading,
+    inboxLoading,
+    selectedId,
+  ])
 
   const resetSelection = () => {
     setSelectedId(null)
