@@ -1,6 +1,8 @@
 import { ReactNode } from 'react'
 
+import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import { DocumentTitleSync } from '@/shared/lib/notifications'
+import { PullToRefreshIndicator, usePullToRefresh } from '@/shared/lib/pull-to-refresh'
 import { AdminPushPrompt } from '@/shared/lib/push'
 import { Header } from '@/shared/ui/header'
 import classNames from 'classnames'
@@ -25,18 +27,24 @@ export function AdminLayoutShell({
   isSupportPage,
   onToggleSidebar,
 }: AdminLayoutShellProps) {
+  const isMobile = useMatchMedia('(max-width: 640px)')
+  const { pullDistance, refreshing } = usePullToRefresh({
+    enabled: isMobile,
+  })
+
   return (
     <div className="admin-layout">
       <DocumentTitleSync />
       <Sidebar menuItems={menuItems} toggleSidebar={onToggleSidebar} isOpen={isSidebarOpen} />
 
       <div
-        className={classNames('admin-layout__main', 'main-page', {
-          'main-page--support': isSupportPage,
+        className={classNames('admin-layout__main', 'admin-layout__shell', {
+          'admin-layout__shell--support': isSupportPage,
         })}
       >
+        <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
         <Header />
-        <main className="admin-layout__body main-page__body">
+        <main className="admin-layout__body admin-layout__shell__body">
           <AdminPushPrompt />
           {children}
         </main>

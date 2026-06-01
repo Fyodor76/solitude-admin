@@ -1,16 +1,16 @@
-.main-page {
+.admin-home {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.main-page__grid {
+.admin-home__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 16px;
 }
 
-.main-page__card {
+.admin-home__card {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -37,14 +37,14 @@
   }
 }
 
-.main-page__card-header {
+.admin-home__card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.main-page__card-icon {
+.admin-home__card-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -54,18 +54,18 @@
   background: var(--color-blue-background-hover);
 }
 
-.main-page__card-arrow {
+.admin-home__card-arrow {
   color: #9aa8b8;
   font-size: 18px;
   line-height: 1;
   transition: color 0.2s ease;
 }
 
-.main-page__card:hover .main-page__card-arrow {
+.admin-home__card:hover .admin-home__card-arrow {
   color: var(--color-blue);
 }
 
-.main-page__card-title {
+.admin-home__card-title {
   margin: 0;
   color: #223041;
   font-size: 18px;
@@ -73,7 +73,7 @@
   line-height: 1.3;
 }
 
-.main-page__card-description {
+.admin-home__card-description {
   margin: 0;
   color: #556476;
   font-size: 14px;
@@ -81,12 +81,13 @@
 }
 
 @media (max-width: 640px) {
-  .main-page {
+  .admin-home {
     padding-top: 16px;
     gap: 20px;
+    padding-bottom: 24px;
   }
 
-  .main-page__grid {
+  .admin-home__grid {
     grid-template-columns: 1fr;
   }
 }

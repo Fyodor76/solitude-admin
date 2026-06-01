@@ -18,11 +18,12 @@
   display: block;
 }
 
-.main-page {
+.admin-layout__shell {
   display: flex;
   flex-direction: column;
   min-height: 0;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   box-sizing: border-box;
 
@@ -31,19 +32,21 @@
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Обращения: обычный скролл страницы, без обрезки */
   &--support {
     height: auto;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow: visible;
 
     .header {
       flex-shrink: 0;
     }
 
-    .main-page__body {
+    .admin-layout__shell__body {
       overflow: visible;
       display: block;
       flex: none;
@@ -53,8 +56,22 @@
   }
 }
 
+@media (max-width: 640px) {
+  .admin-layout__shell {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+
+    &__body {
+      overflow: visible;
+      flex: none;
+      min-height: auto;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .main-page--support .main-page__body,
+  .admin-layout__shell--support .admin-layout__shell__body,
   .support-inbox__messages,
   .support-inbox__list,
   .support-widget__messages {

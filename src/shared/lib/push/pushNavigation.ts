@@ -21,6 +21,15 @@ export function normalizePushHref(href: string): string {
     return '/'
   }
 
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    try {
+      const url = new URL(trimmed)
+      return `${url.pathname}${url.search}${url.hash}`.replace(/#.*$/, '')
+    } catch {
+      return '/'
+    }
+  }
+
   return trimmed.startsWith('/') ? trimmed : `/${trimmed}`
 }
 

@@ -32,7 +32,9 @@ export function scrollSupportInboxPageToChat(behavior: ScrollBehavior = 'smooth'
     main.scrollIntoView({ behavior, block: 'nearest' })
   }
 
-  const pageBody = document.querySelector('.main-page--support .main-page__body')
+  const pageBody = document.querySelector(
+    '.admin-layout__shell--support .admin-layout__shell__body'
+  )
   if (pageBody instanceof HTMLElement) {
     try {
       pageBody.scrollTo({ top: pageBody.scrollHeight, behavior })

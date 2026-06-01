@@ -1,0 +1,17 @@
+@media (max-width: 640px) {
+  input,
+  textarea,
+  select,
+  .ant-input,
+  .ant-input-affix-wrapper input,
+  .ant-input-number-input,
+  .ant-select-selection-search-input,
+  .ant-select-selector,
+  .ant-picker-input input {
+    font-size: 16px !important;
+  }
+}
+
+html {
+  touch-action: manipulation;
+}

@@ -4,3 +4,10 @@
 @use 'tokens';
 @use 'typography';
 @use 'admin-mobile-modals';
+@use 'admin-mobile-inputs';
+
+html,
+body,
+#root {
+  font-family: var(--font-primary);
+}

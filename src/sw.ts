@@ -31,6 +31,9 @@ async function focusClientWithNavigation(client: WindowClient, href: string, tar
   if ('navigate' in client && typeof client.navigate === 'function') {
     await client.focus()
     await client.navigate(withPushHash(targetUrl, href))
+    await new Promise<void>(resolve => {
+      setTimeout(resolve, 300)
+    })
     client.postMessage({ type: PUSH_NAVIGATE_MESSAGE, href })
     return true
   }

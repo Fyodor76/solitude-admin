@@ -39,22 +39,22 @@ const MainPage = () => {
   const navigableItems = getNavigableMenuItems(menuSidebar)
 
   return (
-    <Container className="main-page">
-      <nav className="main-page__grid" aria-label="Разделы админ-панели">
+    <Container className="admin-home">
+      <nav className="admin-home__grid" aria-label="Разделы админ-панели">
         {navigableItems.map(item => (
-          <Link key={item.id} to={item.href!} className="main-page__card">
-            <div className="main-page__card-header">
+          <Link key={item.id} to={item.href!} className="admin-home__card">
+            <div className="admin-home__card-header">
               {item.icon ? (
-                <span className="main-page__card-icon">
+                <span className="admin-home__card-icon">
                   <Icon name={item.icon} color="#1072d5" width="24px" height="24px" />
                 </span>
               ) : null}
-              <span className="main-page__card-arrow" aria-hidden="true">
+              <span className="admin-home__card-arrow" aria-hidden="true">
                 →
               </span>
             </div>
-            <h2 className="main-page__card-title">{item.text}</h2>
-            <p className="main-page__card-description">
+            <h2 className="admin-home__card-title">{item.text}</h2>
+            <p className="admin-home__card-description">
               {MENU_DESCRIPTIONS[item.id] ?? 'Перейти в раздел.'}
             </p>
           </Link>
