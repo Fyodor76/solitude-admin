@@ -1,0 +1,34 @@
+.admin-push-prompt {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(17, 17, 17, 0.08);
+}
+
+.admin-push-prompt__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.admin-push-prompt__description {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(17, 17, 17, 0.72);
+}
+
+.admin-push-prompt__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
