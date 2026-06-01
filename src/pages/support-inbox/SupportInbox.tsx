@@ -1,9 +1,11 @@
+import { PageHeader } from '@/shared/ui/page-header'
 import classNames from 'classnames'
 
 import { SupportInboxChatPanel } from './components/SupportInboxChatPanel'
 import { SupportInboxSidebar } from './components/SupportInboxSidebar'
 import { SupportInboxToolbar } from './components/SupportInboxToolbar'
 import {
+  SUPPORT_INBOX_COPY,
   SUPPORT_INBOX_LAYOUT_CLASS,
   type SupportInboxChannelFilter,
   type SupportInboxListTab,
@@ -32,10 +34,15 @@ export function SupportInbox() {
 
   return (
     <div
-      className={classNames(SUPPORT_INBOX_LAYOUT_CLASS.ROOT, {
+      className={classNames(SUPPORT_INBOX_LAYOUT_CLASS.ROOT, 'admin-page', {
         [SUPPORT_INBOX_LAYOUT_CLASS.MOBILE_CHAT]: inbox.showMobileChat,
       })}
     >
+      <PageHeader
+        title={SUPPORT_INBOX_COPY.PAGE_TITLE}
+        subtitle={SUPPORT_INBOX_COPY.PAGE_SUBTITLE}
+      />
+
       <div className="support-inbox__header-block">
         <SupportInboxToolbar
           listTab={inbox.listTab}

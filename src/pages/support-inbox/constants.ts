@@ -84,6 +84,7 @@ export const SUPPORT_CHANNEL_LABELS = {
 } as const
 
 export const SUPPORT_INBOX_COPY = {
+  PAGE_TITLE: 'Обращения',
   PAGE_SUBTITLE: 'Чаты с сайта и Telegram',
   REFRESH_LIST: 'Обновить список',
   SEARCH_PLACEHOLDER: 'Имя, email, телефон…',

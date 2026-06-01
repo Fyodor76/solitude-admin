@@ -4,9 +4,9 @@
   justify-content: space-between;
   gap: 16px;
   padding: 18px 20px;
-  border: 1px solid #e6ebf2;
-  border-radius: 16px;
-  background: #fff;
+  border: 1px solid var(--admin-color-border);
+  border-radius: var(--admin-radius-surface);
+  background: var(--admin-color-surface);
 }
 
 .page-header__content {
@@ -15,16 +15,17 @@
 
 .page-header__title {
   margin: 0;
-  color: #223041;
-  font-size: 24px;
-  font-weight: 600;
+  color: var(--admin-color-text);
+  font-size: var(--admin-font-page-title);
+  font-weight: var(--admin-weight-title);
+  line-height: 1.25;
 }
 
 .page-header__subtitle {
   margin-top: 6px;
-  color: #556476;
-  font-size: 14px;
-  line-height: 1.4;
+  color: var(--admin-color-text-secondary);
+  font-size: var(--admin-font-body);
+  line-height: var(--admin-line-body);
 }
 
 .page-header__actions {
@@ -48,9 +49,10 @@
 @media (max-width: 640px) {
   .page-header {
     padding: 16px;
+    border-radius: var(--admin-radius-surface-mobile);
   }
 
   .page-header__title {
-    font-size: 20px;
+    font-size: var(--admin-font-page-title-mobile);
   }
 }

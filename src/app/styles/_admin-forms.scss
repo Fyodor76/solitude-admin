@@ -1,0 +1,92 @@
+@use 'admin-tokens' as *;
+
+/* Единые стили форм Ant Design во всей админке */
+.ant-form-item-label > label {
+  height: auto;
+  font-size: var(--admin-font-caption);
+  font-weight: var(--admin-weight-label);
+  color: var(--admin-color-text-secondary);
+}
+
+.ant-form-item-extra {
+  min-height: auto;
+  margin-top: 2px;
+  font-size: var(--admin-font-caption);
+  line-height: var(--admin-line-caption);
+  color: var(--admin-color-text-muted);
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-number,
+.ant-input-number-input,
+.ant-select .ant-select-selector,
+.ant-select-selection-search-input,
+.ant-select-selection-item,
+.ant-picker-input input {
+  font-size: var(--admin-font-input) !important;
+  color: var(--admin-color-text);
+}
+
+.ant-input::placeholder,
+.ant-input-affix-wrapper input::placeholder,
+.ant-select-selection-placeholder {
+  font-size: var(--admin-font-input);
+  color: var(--admin-color-placeholder) !important;
+}
+
+.ant-modal .ant-modal-title {
+  font-size: var(--admin-font-section-title);
+  font-weight: var(--admin-weight-title);
+  color: var(--admin-color-text);
+}
+
+@media (max-width: 640px) {
+  .ant-modal-root,
+  .ant-modal,
+  .ant-drawer {
+    input,
+    textarea,
+    select,
+    .ant-input,
+    .ant-input-affix-wrapper,
+    .ant-input-affix-wrapper input,
+    .ant-input-number-input,
+    .ant-select-selection-search-input,
+    .ant-select .ant-select-selector,
+    .ant-select-selection-item,
+    .ant-picker-input input {
+      font-size: var(--admin-font-input-mobile) !important;
+    }
+
+    .ant-input::placeholder,
+    .ant-input-affix-wrapper input::placeholder,
+    .ant-select-selection-placeholder {
+      font-size: var(--admin-font-input-mobile);
+    }
+  }
+
+  input,
+  textarea,
+  select,
+  .ant-input,
+  .ant-input-affix-wrapper input,
+  .ant-input-number-input,
+  .ant-select-selection-search-input,
+  .ant-select .ant-select-selector,
+  .ant-picker-input input {
+    font-size: var(--admin-font-input-mobile) !important;
+  }
+}
+
+html {
+  touch-action: manipulation;
+}
+
+html.fonts-loading body {
+  visibility: hidden;
+}
+
+html.fonts-ready body {
+  visibility: visible;
+}

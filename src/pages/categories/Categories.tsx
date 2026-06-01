@@ -118,7 +118,7 @@ const Categories = () => {
   }, [categoriesTreeData])
 
   return (
-    <Container className="categories-page">
+    <Container className="categories-page admin-page">
       <PageHeader
         title="Категории товаров"
         actions={

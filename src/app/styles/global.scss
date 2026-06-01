@@ -3,11 +3,16 @@
 @use 'fonts' as f;
 @use 'tokens';
 @use 'typography';
+@use 'admin-tokens';
+@use 'admin-typography';
+@use 'admin-forms';
 @use 'admin-mobile-modals';
-@use 'admin-mobile-inputs';
 
 html,
 body,
 #root {
   font-family: var(--font-primary);
+  font-size: var(--admin-font-body);
+  line-height: var(--admin-line-body);
+  color: var(--admin-color-text);
 }

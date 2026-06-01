@@ -210,7 +210,7 @@ export const PlatformImages = () => {
   }
 
   return (
-    <div className="platform-images-page">
+    <div className="platform-images-page admin-page">
       {contextHolder}
 
       <PlatformImagesToolbar

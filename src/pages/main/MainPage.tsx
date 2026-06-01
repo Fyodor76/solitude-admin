@@ -39,7 +39,7 @@ const MainPage = () => {
   const navigableItems = getNavigableMenuItems(menuSidebar)
 
   return (
-    <Container className="admin-home">
+    <Container className="admin-home admin-page">
       <nav className="admin-home__grid" aria-label="Разделы админ-панели">
         {navigableItems.map(item => (
           <Link key={item.id} to={item.href!} className="admin-home__card">

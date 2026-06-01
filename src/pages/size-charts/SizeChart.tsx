@@ -7,6 +7,8 @@ import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useSizeChartActions } from '@/shared/lib/hooks/useSizeChartActions'
 import { useSizeParameterActions } from '@/shared/lib/hooks/useSizeParameterActions'
+import Container from '@/shared/ui/container/Container'
+import { PageHeader } from '@/shared/ui/page-header'
 import { Spin } from 'antd'
 import { useSearchParams } from 'react-router-dom'
 
@@ -134,10 +136,8 @@ const SizeChart = () => {
 
   return (
     <div className="size-chart-wrapper">
-      <div className="size-chart-container-in-wrapper">
-        <div className="size-chart-header">
-          <h1 className="size-chart-title"> Управление таблицами размеров</h1>
-        </div>
+      <Container className="size-chart-page admin-page">
+        <PageHeader title="Управление таблицами размеров" />
         <ChoosingCategory
           formSizeChart={formSizeChart}
           allCategories={allCategories}
@@ -209,7 +209,7 @@ const SizeChart = () => {
           setModes={editModal.setMode}
           createNewSizeChart={handleCreateSizeChartSubmit}
         />
-      </div>
+      </Container>
     </div>
   )
 }

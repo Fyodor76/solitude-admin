@@ -12,7 +12,7 @@ const NotificationsPage = () => {
   const page = useNotificationsPage()
 
   return (
-    <Container className="notifications-page">
+    <Container className="notifications-page admin-page">
       <PageHeader
         title={NOTIFICATIONS_PAGE_COPY.TITLE}
         subtitle={page.subtitle}

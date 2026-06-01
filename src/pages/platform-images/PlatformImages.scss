@@ -25,8 +25,8 @@
   gap: 16px;
   flex-wrap: wrap;
   padding: 0;
-  color: #556476;
-  font-size: 14px;
+  color: var(--admin-color-text-secondary);
+  font-size: var(--admin-font-body);
 
   strong {
     color: #223041;

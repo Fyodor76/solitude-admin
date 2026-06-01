@@ -10,7 +10,7 @@ const StorePreview = () => {
   const preview = useStorePreview()
 
   return (
-    <div className="storePreview">
+    <div className="storePreview admin-page">
       <PageHeader
         title="Тепловая карта сайта"
         subtitle={

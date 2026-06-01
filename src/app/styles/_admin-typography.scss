@@ -1,0 +1,41 @@
+@use 'admin-tokens' as *;
+
+.admin-text-section-title {
+  margin: 0;
+  font-size: var(--admin-font-section-title);
+  font-weight: var(--admin-weight-title);
+  line-height: var(--admin-line-body);
+  color: var(--admin-color-text);
+}
+
+.admin-text-body {
+  margin: 0;
+  font-size: var(--admin-font-body);
+  font-weight: var(--admin-weight-body);
+  line-height: var(--admin-line-body);
+  color: var(--admin-color-text-secondary);
+}
+
+.admin-text-caption {
+  margin: 0;
+  font-size: var(--admin-font-caption);
+  font-weight: var(--admin-weight-body);
+  line-height: var(--admin-line-caption);
+  color: var(--admin-color-text-muted);
+}
+
+.admin-text-muted {
+  color: var(--admin-color-text-muted);
+}
+
+.admin-surface {
+  background: var(--admin-color-surface);
+  border: 1px solid var(--admin-color-border);
+  border-radius: var(--admin-radius-surface);
+}
+
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-gap-page);
+}

@@ -39,7 +39,7 @@ const CallbackFormPage = () => {
   ]
 
   return (
-    <Container className="callback-form-page">
+    <Container className="callback-form-page admin-page">
       <PageHeader
         title="Форма обратной связи"
         subtitle={page.subtitle}

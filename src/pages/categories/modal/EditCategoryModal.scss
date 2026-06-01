@@ -16,12 +16,6 @@
     padding: 6px 4px 10px !important;
   }
 
-  .mainTitle {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-grey-1);
-  }
-
   .ant-form-item {
     margin-bottom: 8px;
   }
@@ -34,46 +28,14 @@
     padding-bottom: 2px !important;
   }
 
-  .ant-form-item-label > label {
-    height: auto;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--color-grey-3);
-  }
-
-  .ant-form-item-extra {
-    min-height: auto;
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--color-grey-4);
-  }
-
   .ant-input,
   .ant-input-affix-wrapper,
   .ant-select .ant-select-selector {
     min-height: 32px !important;
     border-radius: 4px !important;
-    font-size: 13px !important;
-  }
-
-  @media (max-width: 640px) {
-    .ant-input,
-    .ant-input-affix-wrapper,
-    .ant-select .ant-select-selector,
-    .ant-select-selection-item,
-    .ant-select-selection-search-input {
-      font-size: 16px !important;
-    }
-  }
-
-  .ant-input::placeholder,
-  .ant-select-selection-placeholder {
-    font-size: 12px !important;
-    color: var(--color-grey-placeholder) !important;
   }
 
   .ant-select-selection-item {
-    font-size: 13px !important;
     line-height: 30px !important;
   }
 }
@@ -104,13 +66,13 @@
   margin-top: 6px;
   object-fit: cover;
   border-radius: 4px;
-  border: 1px solid var(--color-grey-8);
+  border: 1px solid var(--admin-color-border);
 }
 
 .category-edit-modal__img-error {
   margin-top: 6px;
   padding: 4px 8px;
-  font-size: 12px;
+  font-size: var(--admin-font-caption);
   color: #cf1322;
   background: #fff2f0;
   border: 1px solid #ffccc7;
