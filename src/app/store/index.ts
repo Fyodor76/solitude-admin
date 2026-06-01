@@ -1,4 +1,5 @@
 import '@/shared/lib/api/admin-notifications/adminNotificationsApi'
+import '@/shared/lib/api/admin-push/adminPushApi'
 import { baseApi } from '@/shared/lib/api/baseApi'
 import '@/shared/lib/api/form-submissions/formSubmissionsApi'
 import '@/shared/lib/api/support/supportApi'

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 
 import { DocumentTitleSync } from '@/shared/lib/notifications'
+import { AdminPushPrompt } from '@/shared/lib/push'
 import { Header } from '@/shared/ui/header'
 import classNames from 'classnames'
 
@@ -35,7 +36,10 @@ export function AdminLayoutShell({
         })}
       >
         <Header />
-        <main className="admin-layout__body main-page__body">{children}</main>
+        <main className="admin-layout__body main-page__body">
+          <AdminPushPrompt />
+          {children}
+        </main>
       </div>
     </div>
   )
