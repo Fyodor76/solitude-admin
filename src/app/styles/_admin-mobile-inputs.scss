@@ -1,4 +1,21 @@
 @media (max-width: 640px) {
+  .ant-modal-root,
+  .ant-modal {
+    input,
+    textarea,
+    select,
+    .ant-input,
+    .ant-input-affix-wrapper,
+    .ant-input-affix-wrapper input,
+    .ant-input-number-input,
+    .ant-select-selection-search-input,
+    .ant-select-selector,
+    .ant-select-selection-item,
+    .ant-picker-input input {
+      font-size: 16px !important;
+    }
+  }
+
   input,
   textarea,
   select,
@@ -14,4 +31,12 @@
 
 html {
   touch-action: manipulation;
+}
+
+html.fonts-loading body {
+  visibility: hidden;
+}
+
+html.fonts-ready body {
+  visibility: visible;
 }

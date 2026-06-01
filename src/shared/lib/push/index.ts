@@ -1,7 +1,7 @@
 export { AdminPushPrompt } from './AdminPushPrompt'
 export { PushNavigationSync } from './PushNavigationSync'
 export { useAdminPushSubscription } from './useAdminPushSubscription'
-export { usePushNotificationDeepLink } from './usePushNotificationDeepLink'
+export { usePushNavigation } from './usePushNavigation'
 export {
   ADMIN_PUSH_NAVIGATE_MESSAGE,
   ADMIN_PUSH_PENDING_HREF_KEY,

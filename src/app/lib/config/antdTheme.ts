@@ -6,6 +6,7 @@ const appFontFamily = "'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Sego
 export const antdTheme: ThemeConfig = {
   token: {
     fontFamily: appFontFamily,
+    fontSize: 16,
     zIndexPopupBase: 1100,
   },
 }

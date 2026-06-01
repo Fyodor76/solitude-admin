@@ -56,6 +56,16 @@
     font-size: 13px !important;
   }
 
+  @media (max-width: 640px) {
+    .ant-input,
+    .ant-input-affix-wrapper,
+    .ant-select .ant-select-selector,
+    .ant-select-selection-item,
+    .ant-select-selection-search-input {
+      font-size: 16px !important;
+    }
+  }
+
   .ant-input::placeholder,
   .ant-select-selection-placeholder {
     font-size: 12px !important;
