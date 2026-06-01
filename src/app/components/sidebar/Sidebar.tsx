@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
+import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import { Button, Tooltip } from 'antd'
+import classNames from 'classnames'
 import { motion } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 
 import defaultUserLogo from '@/app/assets/images/user.jpg'
+import { ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY } from '@/app/constans/layout'
 import { overlayVariants, sidebarVariants } from '@/app/constans/sidebarVariants'
 
 import Icon from '../../../shared/ui/icons/Icon'
@@ -43,6 +46,8 @@ const Sidebar = ({
   },
 }: SidebarProps) => {
   const { pathname } = useLocation()
+  const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
+  const prevPathnameRef = useRef(pathname)
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
   useEffect(() => {
@@ -80,6 +85,28 @@ const Sidebar = ({
     }
   }, [isOpen, toggleSidebar])
 
+  useEffect(() => {
+    if (!isMobile || !isOpen || prevPathnameRef.current === pathname) {
+      prevPathnameRef.current = pathname
+      return
+    }
+
+    prevPathnameRef.current = pathname
+    toggleSidebar()
+  }, [isMobile, isOpen, pathname, toggleSidebar])
+
+  useEffect(() => {
+    if (!isMobile || !isOpen) {
+      document.body.style.removeProperty('overflow')
+      return
+    }
+
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.removeProperty('overflow')
+    }
+  }, [isMobile, isOpen])
+
   const toggleSubMenuItem = (menuItemId: string) => {
     const newOpenSubMenuItem = new Set(openSubMenuItem)
     if (newOpenSubMenuItem.has(menuItemId)) {
@@ -92,24 +119,70 @@ const Sidebar = ({
 
   return (
     <>
-      {isOpen && (
-        <motion.div
-          className={`sidebar-overlay ${isOpen ? 'active' : ''}`}
-          variants={overlayVariants}
-          initial="closed"
-          animate="open"
-          exit="closed"
-          onClick={closeOnOutsideClick ? toggleSidebar : undefined}
-        ></motion.div>
+      {isMobile && !isOpen && (
+        <button
+          type="button"
+          className="sidebar-mobile-toggle"
+          onClick={toggleSidebar}
+          aria-label="Открыть меню"
+          aria-expanded={false}
+        >
+          <span className="sidebar-mobile-toggle__icon">
+            <Icon name="arrow" />
+          </span>
+        </button>
       )}
-      <motion.aside
-        className={`sidebar sidebar-${position} ${!isOpen ? 'collapsed' : ''}`}
-        style={{ width }}
-        variants={sidebarVariants}
-        initial={isOpen ? 'open' : 'collapsed'}
-        animate={isOpen ? 'open' : 'collapsed'}
-        onClick={e => e.stopPropagation()}
-      >
+
+      {isMobile ? (
+        <div
+          className={classNames('sidebar-overlay', { active: isOpen })}
+          onClick={isOpen && closeOnOutsideClick ? toggleSidebar : undefined}
+          aria-hidden={!isOpen}
+        />
+      ) : (
+        isOpen && (
+          <motion.div
+            className="sidebar-overlay active"
+            variants={overlayVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            onClick={closeOnOutsideClick ? toggleSidebar : undefined}
+          />
+        )
+      )}
+
+      {isMobile ? (
+        <aside
+          className={classNames(
+            'sidebar',
+            `sidebar-${position}`,
+            'sidebar--mobile',
+            isOpen ? 'sidebar--mobile-open' : 'sidebar--mobile-closed'
+          )}
+          style={{ width }}
+          onClick={e => e.stopPropagation()}
+        >
+          {renderSidebarContent()}
+        </aside>
+      ) : (
+        <motion.aside
+          className={classNames('sidebar', `sidebar-${position}`, { collapsed: !isOpen })}
+          style={{ width }}
+          variants={sidebarVariants}
+          initial={isOpen ? 'open' : 'collapsed'}
+          animate={isOpen ? 'open' : 'collapsed'}
+          onClick={e => e.stopPropagation()}
+        >
+          {renderSidebarContent()}
+        </motion.aside>
+      )}
+    </>
+  )
+
+  function renderSidebarContent() {
+    return (
+      <>
         <div className="sidebar-header-container">
           {logo && (
             <a href="/" className="sidebar-header">
@@ -121,23 +194,13 @@ const Sidebar = ({
             <motion.div
               id="header-sidebar"
               className={isOpen ? 'sidebar-open' : ''}
-              transition={{
-                type: 'spring',
-                stiffness: 300,
-                damping: 30,
-              }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <div className="headerSidebar">
                 <motion.div
                   className={`burger-arrow ${isOpen ? 'open' : ''}`}
-                  animate={{
-                    rotate: isOpen ? 180 : 0,
-                  }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 30,
-                  }}
+                  animate={{ rotate: isOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
                 >
                   <Button
                     onClick={toggleSidebar}
@@ -149,7 +212,6 @@ const Sidebar = ({
                   </Button>
                 </motion.div>
               </div>
-              {/*<Portal containerId="header-sidebar"></Portal>*/}
             </motion.div>
           </div>
         </div>
@@ -214,6 +276,11 @@ const Sidebar = ({
                             if (item.onClick) {
                               item.onClick()
                             }
+                            return
+                          }
+
+                          if (isMobile && isOpen) {
+                            toggleSidebar()
                           }
                         }}
                       >
@@ -266,7 +333,12 @@ const Sidebar = ({
                                 ]
                                   .filter(Boolean)
                                   .join(' ')}
-                                onClick={subItem.onClick}
+                                onClick={() => {
+                                  subItem.onClick?.()
+                                  if (isMobile && isOpen) {
+                                    toggleSidebar()
+                                  }
+                                }}
                               >
                                 <span
                                   className={`menu-item-text ${subRouteActive ? 'is-highlighted' : ''}`}
@@ -285,9 +357,9 @@ const Sidebar = ({
             </ul>
           </nav>
         </div>
-      </motion.aside>
-    </>
-  )
+      </>
+    )
+  }
 }
 
 export default Sidebar
