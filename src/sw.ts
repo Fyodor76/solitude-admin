@@ -50,12 +50,9 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
       for (const client of clients) {
+        client.postMessage({ type: 'admin-push-navigate', href })
         if ('focus' in client) {
-          void client.focus()
-          if ('navigate' in client && typeof client.navigate === 'function') {
-            return client.navigate(targetUrl)
-          }
-          return undefined
+          return client.focus()
         }
       }
 

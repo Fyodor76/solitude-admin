@@ -13,7 +13,7 @@ import {
 } from '@/shared/lib/notifications'
 import { formatNotificationTime } from '@/shared/lib/notifications/formatNotificationTime'
 import { formatUnreadCount } from '@/shared/lib/notifications/formatUnreadCount'
-import { Badge, Button, Empty, Popover, Typography } from 'antd'
+import { Badge, Button, Drawer, Empty, Popover, Typography } from 'antd'
 import { Link } from 'react-router-dom'
 
 import { ROUTES } from '@/app/lib/config/navigation'
@@ -44,7 +44,7 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
     }
   }
 
-  const content = (
+  const panel = (
     <div className="notification-bell-panel">
       <div className="notification-bell-panel__header">
         <div className="notification-bell-panel__header-main">
@@ -103,11 +103,69 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
     </div>
   )
 
+  const trigger = (
+    <button type="button" className="notification-bell" aria-label={NOTIFICATION_BELL_COPY.TITLE}>
+      <Badge
+        count={count > 0 ? (count > 99 ? '99+' : count) : 0}
+        size="small"
+        offset={isMobile ? [0, 0] : [-2, 2]}
+      >
+        <Icon name="notify" />
+      </Badge>
+    </button>
+  )
+
+  if (isMobile) {
+    return (
+      <>
+        <button
+          type="button"
+          className="notification-bell"
+          aria-label={NOTIFICATION_BELL_COPY.TITLE}
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+        >
+          <Badge count={count > 0 ? (count > 99 ? '99+' : count) : 0} size="small" offset={[0, 0]}>
+            <Icon name="notify" />
+          </Badge>
+        </button>
+
+        <Drawer
+          open={open}
+          onClose={() => setOpen(false)}
+          placement="bottom"
+          height="auto"
+          closable
+          title={NOTIFICATION_BELL_COPY.TITLE}
+          className="notification-bell-drawer"
+          extra={
+            count > 0 ? (
+              <Button
+                type="link"
+                size="small"
+                loading={markingAll}
+                onClick={() => void markAllRead()}
+              >
+                {NOTIFICATION_BELL_COPY.MARK_ALL_READ}
+              </Button>
+            ) : null
+          }
+          styles={{
+            body: { padding: 0 },
+            header: { padding: '12px 16px' },
+          }}
+        >
+          {panel}
+        </Drawer>
+      </>
+    )
+  }
+
   return (
     <Popover
-      content={content}
+      content={panel}
       trigger="click"
-      placement={isMobile ? 'bottom' : 'bottomRight'}
+      placement="bottomRight"
       open={open}
       onOpenChange={setOpen}
       overlayClassName="notification-bell-popover"
@@ -119,11 +177,7 @@ export function NotificationBell({ items, count }: NotificationBellProps) {
         },
       }}
     >
-      <button type="button" className="notification-bell" aria-label={NOTIFICATION_BELL_COPY.TITLE}>
-        <Badge count={count > 0 ? (count > 99 ? '99+' : count) : 0} size="small" offset={[-2, 2]}>
-          <Icon name="notify" />
-        </Badge>
-      </button>
+      {trigger}
     </Popover>
   )
 }

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 
 import { DocumentTitleSync } from '@/shared/lib/notifications'
-import { AdminPushPrompt } from '@/shared/lib/push'
+import { AdminPushPrompt, usePushNotificationDeepLink } from '@/shared/lib/push'
 import { Header } from '@/shared/ui/header'
 import classNames from 'classnames'
 
@@ -25,6 +25,8 @@ export function AdminLayoutShell({
   isSupportPage,
   onToggleSidebar,
 }: AdminLayoutShellProps) {
+  usePushNotificationDeepLink()
+
   return (
     <div className="admin-layout">
       <DocumentTitleSync />

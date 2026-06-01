@@ -44,6 +44,10 @@
     &.sidebar--mobile-open {
       transform: translate3d(0, 0, 0);
     }
+
+    &.sidebar--mobile-dragging {
+      transition: none !important;
+    }
   }
 
   &.sidebar-left {
