@@ -14,9 +14,30 @@ type AdminPushMessage = {
   kind?: string
 }
 
+const PUSH_NAVIGATE_MESSAGE = 'admin-push-navigate'
+
 function resolveAdminUrl(href: string): string {
   const normalized = href.startsWith('/') ? href : `/${href}`
   return new URL(normalized, self.registration.scope).toString()
+}
+
+function withPushHash(targetUrl: string, href: string): string {
+  const url = new URL(targetUrl)
+  url.hash = `push-nav=${encodeURIComponent(href)}`
+  return url.toString()
+}
+
+async function focusClientWithNavigation(client: WindowClient, href: string, targetUrl: string) {
+  if ('navigate' in client && typeof client.navigate === 'function') {
+    await client.focus()
+    await client.navigate(withPushHash(targetUrl, href))
+    client.postMessage({ type: PUSH_NAVIGATE_MESSAGE, href })
+    return true
+  }
+
+  await client.focus()
+  client.postMessage({ type: PUSH_NAVIGATE_MESSAGE, href })
+  return true
 }
 
 self.addEventListener('push', event => {
@@ -46,18 +67,28 @@ self.addEventListener('notificationclick', event => {
 
   const href = (event.notification.data?.href as string | undefined) ?? '/'
   const targetUrl = resolveAdminUrl(href)
+  const launchUrl = withPushHash(targetUrl, href)
 
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
+    (async () => {
+      const clients = await self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      })
+
       for (const client of clients) {
-        client.postMessage({ type: 'admin-push-navigate', href })
-        if ('focus' in client) {
-          return client.focus()
+        try {
+          const handled = await focusClientWithNavigation(client, href, targetUrl)
+          if (handled) {
+            return
+          }
+        } catch {
+          // try next client or open a new window
         }
       }
 
-      return self.clients.openWindow(targetUrl)
-    })
+      await self.clients.openWindow(launchUrl)
+    })()
   )
 })
 
