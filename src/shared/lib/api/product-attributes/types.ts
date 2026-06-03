@@ -15,7 +15,7 @@ export interface AttributeValueResponse extends AttributeValueRequest {
 export interface ProductAttributeRequest {
   name: string
   slug: string
-  type: string
+  type: 'color' | 'size' | 'volume' | 'weight' | 'dimension' | 'other'
   description: string
   sortOrder: number
 }

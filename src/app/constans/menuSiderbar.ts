@@ -53,6 +53,13 @@ export const menuSidebar: MenuItem[] = [
       },
     ],
   },
+  {
+    id: SIDEBAR_MENU_ITEM_ID.PRODUCT_ATTRIBUTES,
+    text: 'Аттрибуты товара',
+    href: '/product-attributes',
+    icon: 'uiElements',
+    hasArrow: false,
+  },
   /*{
     id: 'dashboard',
     text: 'Dashboard',

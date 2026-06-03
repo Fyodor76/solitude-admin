@@ -1,4 +1,5 @@
 import { ApiResponse, baseApi } from '../baseApi'
+import { deleteResponse } from '../size-charts/types'
 import { AttributeValueRequest, AttributeValueResponse } from './types'
 
 export const AttributeValues = baseApi.injectEndpoints({
@@ -40,5 +41,27 @@ export const AttributeValues = baseApi.injectEndpoints({
         { type: 'Product-attributes', id: 'ALL_PRODUCT-ATTRIBUTES' },
       ],
     }),
+    deleteAttributeValueById: builder.mutation<
+      ApiResponse<deleteResponse, any>,
+      { attrId: string; valueId: string }
+    >({
+      query: ({ attrId, valueId }) => ({
+        url: `/product-attributes/${attrId}/values/${valueId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, { attrId }) => [
+        { type: 'Product-attributes', id: attrId },
+        {
+          type: 'Product-attributes',
+          id: 'ALL_PRODUCT-ATTRIBUTES',
+        },
+      ],
+    }),
   }),
 })
+export const {
+  useCreateAttributeValueMutation,
+  useGetAttributeValuesQuery,
+  useUpdateAttributeValueMutation,
+  useDeleteAttributeValueByIdMutation,
+} = AttributeValues

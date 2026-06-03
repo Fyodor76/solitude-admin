@@ -59,5 +59,28 @@ export const ProductAttributes = baseApi.injectEndpoints({
         { type: 'Product-attributes', id: productAttributeType },
       ],
     }),
+    updateProductAttributes: builder.mutation<
+      ApiResponse<ProductAttributeResponse, any>,
+      { data: Partial<ProductAttributeRequest>; id: string }
+    >({
+      query: ({ data, id }) => ({
+        url: `/product-attributes/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'Product-attributes', id },
+        { type: 'Product-attributes', id: 'ALL_PRODUCT-ATTRIBUTES' },
+      ],
+    }),
   }),
 })
+export const {
+  useCreateProductAttributesMutation,
+  useDeleteProductAttributeByIdMutation,
+  useGetAllProductAttributesQuery,
+  useGetProductAttributeByIdQuery,
+  useGetProductAttributeBySlugQuery,
+  useGetProductAttributeByTypeQuery,
+  useUpdateProductAttributesMutation,
+} = ProductAttributes
