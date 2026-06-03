@@ -1,5 +1,5 @@
-import { ApiResponse, baseApi } from '../../baseApi'
-import { AttributeValueRequest, AttributeValueResponse } from '../types'
+import { ApiResponse, baseApi } from '../baseApi'
+import { AttributeValueRequest, AttributeValueResponse } from './types'
 
 export const AttributeValues = baseApi.injectEndpoints({
   endpoints: builder => ({
