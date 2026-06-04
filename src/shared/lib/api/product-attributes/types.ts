@@ -11,11 +11,12 @@ export interface AttributeValueResponse extends AttributeValueRequest {
   id: string
   attributeId: string
 }
+export type AttributeType = 'color' | 'size' | 'volume' | 'weight' | 'dimension' | 'other'
 
 export interface ProductAttributeRequest {
   name: string
   slug: string
-  type: 'color' | 'size' | 'volume' | 'weight' | 'dimension' | 'other'
+  type: AttributeType
   description: string
   sortOrder: number
 }
