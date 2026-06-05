@@ -1,3 +1,4 @@
+import { ValidationProvider } from '@/context/validation/provider'
 import { Categories } from '@/pages/categories'
 import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
@@ -34,17 +35,21 @@ export const Router: RouteObject[] = [
       {
         path: '/login',
         element: (
-          <PublicRouter>
-            <Login />
-          </PublicRouter>
+          <ValidationProvider>
+            <PublicRouter>
+              <Login />
+            </PublicRouter>
+          </ValidationProvider>
         ),
       },
       {
         path: '/registration',
         element: (
-          <PublicRouter>
-            <Registration />
-          </PublicRouter>
+          <ValidationProvider>
+            <PublicRouter>
+              <Registration />
+            </PublicRouter>
+          </ValidationProvider>
         ),
       },
       {
@@ -58,9 +63,11 @@ export const Router: RouteObject[] = [
       {
         path: '/categories',
         element: (
-          <ProtectedRouter>
-            <Categories />
-          </ProtectedRouter>
+          <ValidationProvider>
+            <ProtectedRouter>
+              <Categories />
+            </ProtectedRouter>
+          </ValidationProvider>
         ),
       },
       {

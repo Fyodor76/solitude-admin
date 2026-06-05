@@ -1,10 +1,20 @@
 import { ChangeEvent, useState } from 'react'
 
-export const useForm = <T extends Record<string, string>>(initialState: T) => {
+import { merge } from 'lodash'
+
+type NestedRecord = { [key: string]: NestedRecord | string }
+
+type ReducerAcc = string | { [key: string]: ReducerAcc }
+
+export const useForm = <T extends NestedRecord>(initialState: T) => {
   const [form, setForm] = useState<T>(initialState)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    const currentField = e.target.name.split('.').reduceRight<ReducerAcc>((acc, key) => {
+      return { [key]: acc }
+    }, e.target.value)
+
+    setForm(prev => merge({}, prev, currentField))
   }
 
   const clearAllFormFields = () => {

@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent } from 'react'
 
+import { ValidationField } from '@/context/validation/types'
 import { Checkbox, Form, Input } from 'antd'
 import classNames from 'classnames'
 import { Link } from 'react-router-dom'
@@ -10,9 +11,10 @@ import { configFormType } from './types'
 
 interface CustomFormProps<T extends Record<string, string>> {
   formData: T
-  configForm: configFormType
+  configForm: configFormType<T>
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
   onFinish: () => void
+  errors?: ValidationField[]
 }
 
 export const CustomForm = <T extends Record<string, string>>({
@@ -20,6 +22,7 @@ export const CustomForm = <T extends Record<string, string>>({
   configForm,
   onChange,
   onFinish,
+  errors,
 }: CustomFormProps<T>) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -32,39 +35,57 @@ export const CustomForm = <T extends Record<string, string>>({
 
       {configForm.sections.map((section, sectionIndex) => (
         <div key={sectionIndex} className={classNames('form-section', section.className)}>
-          {section.fields.map((field, fieldIndex) => (
-            <div key={fieldIndex}>
-              {field.typeField === 'input' && (
-                <Input
-                  type={field.type}
-                  size={field.size}
-                  placeholder={field.placeholder}
-                  name={field.name}
-                  onChange={e => onChange(e)}
-                  value={formData[field.name]}
-                />
-              )}
+          {section.fields.map((field, fieldIndex) => {
+            let fieldError
+            if (field.typeField === 'input') {
+              fieldError = errors?.find(error => error.route === field.name)
+            }
 
-              {field.typeField === 'checkbox' && <Checkbox>{field.children}</Checkbox>}
+            return (
+              <div key={fieldIndex}>
+                {field.typeField === 'input' && (
+                  <Form.Item
+                    validateStatus={fieldError ? 'error' : undefined}
+                    help={fieldError?.text?.map((text, index) => (
+                      <div key={index}>{text}</div>
+                    ))}
+                  >
+                    <Input
+                      type={field.type}
+                      size={field.size}
+                      placeholder={field.placeholder}
+                      name={field.name}
+                      onChange={onChange}
+                      value={formData[field.name]}
+                    />
+                  </Form.Item>
+                )}
 
-              {field.typeField === 'button' && (
-                <CustomButton
-                  size={field.size}
-                  type={field.type}
-                  block={field.block}
-                  onClick={onFinish}
-                >
-                  {field.children}
-                </CustomButton>
-              )}
+                {field.typeField === 'checkbox' && <Checkbox>{field.children}</Checkbox>}
 
-              {field.typeField === 'link' && (
-                <div>
-                  <Link to={field.link || '#'}>{field.children}</Link>
-                </div>
-              )}
-            </div>
-          ))}
+                {field.typeField === 'button' && (
+                  <CustomButton
+                    size={field.size}
+                    type={field.type}
+                    block={field.block}
+                    onClick={() => {
+                      const isValid = configForm.validate?.(formData)
+                      if (!isValid) return
+                      onFinish()
+                    }}
+                  >
+                    {field.children}
+                  </CustomButton>
+                )}
+
+                {field.typeField === 'link' && (
+                  <div>
+                    <Link to={field.link || '#'}>{field.children}</Link>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       ))}
     </Form>
