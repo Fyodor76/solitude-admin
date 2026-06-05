@@ -8,27 +8,15 @@ import { useNavigate } from 'react-router-dom'
 
 import { configLogin } from './const/config-login'
 import './Login.scss'
-
-type formLoginProps = {
-  login: string
-  password: string
-}
+import { LoginType } from './types'
 
 const Login = () => {
   const navigate = useNavigate()
 
   const [login, { isLoading }] = useLoginMutation()
-  const { form, handleChange } = useForm<formLoginProps>({
+  const { form, handleChange } = useForm<LoginType>({
     login: '',
     password: '',
-    house: {
-      name: '1',
-    },
-    people: {
-      user: {
-        name: 'fydor',
-      },
-    },
   })
   const { errors, applyServerErrors } = useValidation()
 
@@ -42,15 +30,10 @@ const Login = () => {
       localStorage.setItem('access', response.accessToken)
 
       navigate('/')
-    } catch (error) {
+    } catch (error: any) {
       const { error: dataError } = error
       applyServerErrors({
         ...dataError,
-        ['house.name']: { id: '222', titles: ['какая нибудь пися, ну писяяяяяя'] },
-        ['people.user.name']: {
-          id: '333',
-          titles: ['какая нибудь пися, ну писяяяяяя2222222222222'],
-        },
       })
     }
   }

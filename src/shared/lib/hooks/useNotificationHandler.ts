@@ -7,9 +7,6 @@ const styleFn: NotificationArgsProps['styles'] = ({ props }) => {
     return {
       root: {
         backgroundColor: `rgba(255, 200, 200, 0.3)`,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '5px',
       },
     } satisfies NotificationArgsProps['styles']
   }
@@ -17,6 +14,14 @@ const styleFn: NotificationArgsProps['styles'] = ({ props }) => {
     return {
       root: {
         borderRadius: 8,
+      },
+    } satisfies NotificationArgsProps['styles']
+  }
+
+  if (props.type === 'success') {
+    return {
+      root: {
+        backgroundColor: `rgba(200, 255, 215, 0.3)`,
       },
     } satisfies NotificationArgsProps['styles']
   }
@@ -34,16 +39,10 @@ export const useNotificationHandler = () => {
 
   const openNotification = (
     type: NotificationType,
-    notificationText: string[],
+    notificationText: string,
     duration: number | false = 3,
     onClose?: () => void
   ) => {
-    let error = ''
-
-    notificationText.forEach(element => {})
-
-    console.log(notificationText, 'notificationText')
-
     api[type]({
       ...sharedProps,
       title: '',

@@ -5,6 +5,13 @@ export const configLogin: ConfigLoginType = {
   innerTitle: 'Авторизация',
   subtitle: '',
   className: '',
+  validate: formData => {
+    if (!formData.login && !formData.password) {
+      return false
+    } else {
+      return true
+    }
+  },
   sections: [
     {
       className: 'input-container',
@@ -23,22 +30,6 @@ export const configLogin: ConfigLoginType = {
           size: 'large',
           placeholder: 'Пароль',
           type: 'password',
-          status: '',
-        },
-        {
-          name: 'house.name',
-          typeField: 'input',
-          size: 'large',
-          placeholder: 'Название дома',
-          type: 'text',
-          status: '',
-        },
-        {
-          name: 'people.user.name',
-          typeField: 'input',
-          size: 'large',
-          placeholder: 'Название people',
-          type: 'text',
           status: '',
         },
       ],

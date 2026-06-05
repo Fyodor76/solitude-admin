@@ -180,6 +180,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
     return buildErrorResponse(
       currentPath,
       result.error.status === 'FETCH_ERROR' ? 500 : Number(result.error.status) || 500,
+
       getErrorMessage(result.error)
     )
   }
@@ -187,16 +188,15 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
   return result
 }
 
-const getErrorMessage = (error: FetchBaseQueryError): string => {
+const getErrorMessage = (error: FetchBaseQueryError) => {
   if (error.data && typeof error.data === 'object') {
     const data = error.data as any
-    return data.fieldErrors || 'Произошла ошибка'
+    if (Object.keys(data.fieldErrors).length || data.fieldErrors.length) {
+      return data.fieldErrors
+    } else {
+      return data.generalErrors
+    }
   }
-
-  if (error.status === 'FETCH_ERROR') return 'Ошибка сети'
-  if (error.status === 'PARSING_ERROR') return 'Ошибка обработки ответа'
-
-  return 'Произошла ошибка'
 }
 
 export const baseApi = createApi({

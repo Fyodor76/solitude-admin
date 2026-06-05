@@ -27,12 +27,13 @@ interface LinkField {
   typeField: 'link'
 }
 
-export interface configFormType {
+export interface configFormType<T> {
   title: string
   innerTitle: string
   subtitle: string
   className?: string
   sections: SectionType[]
+  validate?: (formData: T) => boolean
 }
 
 interface SectionType {

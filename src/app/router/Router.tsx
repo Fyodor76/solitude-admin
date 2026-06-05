@@ -39,9 +39,11 @@ export const Router: RouteObject[] = [
       {
         path: '/registration',
         element: (
-          <PublicRouter>
-            <Registration />
-          </PublicRouter>
+          <ValidationProvider>
+            <PublicRouter>
+              <Registration />
+            </PublicRouter>
+          </ValidationProvider>
         ),
       },
       {
@@ -71,9 +73,11 @@ export const Router: RouteObject[] = [
       {
         path: '/categories',
         element: (
-          <ProtectedRouter>
-            <Categories />
-          </ProtectedRouter>
+          <ValidationProvider>
+            <ProtectedRouter>
+              <Categories />
+            </ProtectedRouter>
+          </ValidationProvider>
         ),
       },
     ],

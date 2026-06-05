@@ -3,17 +3,11 @@ export type ConfigRegistrationsType = {
   innerTitle: string
   subtitle: string
   className: string
+  validate: (formData: RegistrationType) => boolean
   sections: [
     {
       className: string
       fields: [
-        // {
-        //   name: string
-        //   typeField: 'input'
-        //   size: 'large'
-        //   placeholder: string
-        //   type: string
-        // },
         {
           name: string
           typeField: 'input'
@@ -28,22 +22,11 @@ export type ConfigRegistrationsType = {
           placeholder: string
           type: string
         },
-        // {
-        //   name: string
-        //   typeField: 'input'
-        //   size: 'large'
-        //   placeholder: string
-        //   type: string
-        // },
       ]
     },
     {
       className: string
       fields: [
-        // {
-        //   typeField: 'checkbox'
-        //   children: string
-        // },
         {
           typeField: 'link'
           children: string
@@ -62,4 +45,9 @@ export type ConfigRegistrationsType = {
       fields: []
     },
   ]
+}
+
+export type RegistrationType = {
+  login: string
+  password: string
 }

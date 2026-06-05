@@ -5,19 +5,19 @@ export const configRegistrations: ConfigRegistrationsType = {
   innerTitle: 'Регистрация',
   subtitle: '',
   className: '',
+  validate: formData => {
+    if (!formData.login && !formData.password) {
+      return false
+    } else {
+      return true
+    }
+  },
   sections: [
     {
       className: 'input-container',
       fields: [
-        // {
-        //   name: 'name',
-        //   typeField: 'input',
-        //   size: 'large',
-        //   placeholder: 'Full name',
-        //   type: 'name',
-        // },
         {
-          name: 'email',
+          name: 'login',
           typeField: 'input',
           size: 'large',
           placeholder: 'Логин',
@@ -30,23 +30,11 @@ export const configRegistrations: ConfigRegistrationsType = {
           placeholder: 'Пароль',
           type: 'password',
         },
-        // {
-        //   name: 'repeat_password',
-        //   typeField: 'input',
-        //   size: 'large',
-        //   placeholder: 'Retype password',
-        //   type: 'password',
-        // },
       ],
     },
     {
       className: 'btns-container',
       fields: [
-        // {
-        //   typeField: 'checkbox',
-        //   children: 'I agree to the terms',
-        // },
-
         {
           typeField: 'link',
           children: 'У меня есть аккаунт',

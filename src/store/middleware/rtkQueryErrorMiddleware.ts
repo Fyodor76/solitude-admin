@@ -1,13 +1,33 @@
-import { isRejectedWithValue } from '@reduxjs/toolkit'
-import type { Middleware } from '@reduxjs/toolkit'
+import { isFulfilled, isRejectedWithValue } from '@reduxjs/toolkit'
+import type { Middleware, UnknownAction } from '@reduxjs/toolkit'
 
 import { addNotification } from '../slices/notificationsSlice'
 
 const ignoredEndpoints = new Set(['refresh'])
 
-type RtkQueryRejectedAction = {
+const includeEndpoints = new Set(['updateCategoryById', 'deleteCategory', 'createCategory'])
+
+interface ValueError {
+  id: string
+  code: string
+  titles: string[]
+  params: Record<string, unknown>
+}
+
+type RtkQueryRejectedAction = UnknownAction & {
   payload: {
-    error: string[]
+    error: Record<string, ValueError>
+  }
+  meta: {
+    arg: {
+      endpointName: string
+    }
+  }
+}
+
+type RtkQueryFulfilledAction = UnknownAction & {
+  payload: {
+    message: string
   }
   meta: {
     arg: {
@@ -20,6 +40,11 @@ const isRtkQueryRejectedAction = (action: unknown): action is RtkQueryRejectedAc
   isRejectedWithValue(action) &&
   typeof (action as RtkQueryRejectedAction).meta?.arg?.endpointName === 'string'
 
+const isRtkQueryFulfilledAction = (action: unknown): action is RtkQueryFulfilledAction =>
+  isFulfilled(action) &&
+  typeof (action as RtkQueryFulfilledAction).meta?.arg?.endpointName === 'string' &&
+  typeof (action as RtkQueryFulfilledAction).payload?.message === 'string'
+
 export const rtkQueryErrorMiddleware: Middleware =
   ({ dispatch }) =>
   next =>
@@ -31,15 +56,42 @@ export const rtkQueryErrorMiddleware: Middleware =
         return next(action)
       }
 
-      const messagesWithErrors = Object.entries(action.payload.error).map(([key, value]) => {
-        console.log(value, 'value value value')
-        return {
-          type: 'error',
-          message: value.titles,
-        }
-      })
+      const messagesWithErrors = Object.values(action.payload.error).reduce<string[]>(
+        (acc, cur) => {
+          cur.titles.forEach(title => {
+            acc.push(title)
+          })
 
-      dispatch(addNotification(messagesWithErrors))
+          return acc
+        },
+        []
+      )
+
+      messagesWithErrors.forEach(textError => {
+        dispatch(
+          addNotification({
+            type: 'error',
+            message: textError,
+            duration: 5,
+          })
+        )
+      })
+    }
+
+    if (isRtkQueryFulfilledAction(action)) {
+      const endpointName = action.meta.arg.endpointName
+
+      if (!includeEndpoints.has(endpointName)) {
+        return next(action)
+      }
+
+      dispatch(
+        addNotification({
+          type: 'success',
+          message: action.payload.message,
+          duration: 3,
+        })
+      )
     }
 
     return next(action)

@@ -10,13 +10,10 @@ export const NotificationHost = () => {
   const { openNotification, contextHolder } = useNotificationHandler()
   const notifications = useSelector((state: RootState) => state.notifications.items)
   const dispatch = useDispatch()
-
-  console.log(notifications, 'notifications')
-
   useEffect(() => {
     if (notifications?.length) {
       notifications.forEach(notification => {
-        openNotification(notification.type, notification.messages, 8, () =>
+        openNotification(notification.type, notification.message, notification.duration, () =>
           dispatch(clearNotifications())
         )
       })

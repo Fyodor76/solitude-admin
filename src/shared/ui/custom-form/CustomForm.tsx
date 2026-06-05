@@ -1,5 +1,6 @@
 import { ChangeEvent, FormEvent } from 'react'
 
+import { ValidationField } from '@/context/validation/types'
 import { Checkbox, Form, Input } from 'antd'
 import classNames from 'classnames'
 import { Link } from 'react-router-dom'
@@ -10,10 +11,10 @@ import { configFormType } from './types'
 
 interface CustomFormProps<T extends Record<string, string>> {
   formData: T
-  configForm: configFormType
+  configForm: configFormType<T>
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
   onFinish: () => void
-  errors?: any
+  errors?: ValidationField[]
 }
 
 export const CustomForm = <T extends Record<string, string>>({
@@ -35,7 +36,10 @@ export const CustomForm = <T extends Record<string, string>>({
       {configForm.sections.map((section, sectionIndex) => (
         <div key={sectionIndex} className={classNames('form-section', section.className)}>
           {section.fields.map((field, fieldIndex) => {
-            const fieldError = errors?.find(error => error.route === field.name)
+            let fieldError
+            if (field.typeField === 'input') {
+              fieldError = errors?.find(error => error.route === field.name)
+            }
 
             return (
               <div key={fieldIndex}>
@@ -64,7 +68,11 @@ export const CustomForm = <T extends Record<string, string>>({
                     size={field.size}
                     type={field.type}
                     block={field.block}
-                    onClick={onFinish}
+                    onClick={() => {
+                      const isValid = configForm.validate?.(formData)
+                      if (!isValid) return
+                      onFinish()
+                    }}
                   >
                     {field.children}
                   </CustomButton>

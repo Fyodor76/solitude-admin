@@ -3,6 +3,7 @@ export type ConfigLoginType = {
   innerTitle: string
   subtitle: string
   className: string
+  validate: (formData: LoginType) => boolean
   sections: [
     {
       className: string
@@ -28,10 +29,6 @@ export type ConfigLoginType = {
     {
       className: string
       fields: [
-        // {
-        //   typeField: 'checkbox'
-        //   children: string
-        // },
         {
           typeField: 'link'
           children: string
@@ -47,13 +44,12 @@ export type ConfigLoginType = {
     },
     {
       className: string
-      fields: [
-        // {
-        //   typeField: 'link'
-        //   children: string
-        //   link: string
-        // },
-      ]
+      fields: []
     },
   ]
+}
+
+export type LoginType = {
+  login: string
+  password: string
 }

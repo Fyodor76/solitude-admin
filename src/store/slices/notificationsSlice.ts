@@ -4,7 +4,7 @@ export type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
 export type AppNotification = {
   type: NotificationType
-  message: string[]
+  message: string
   duration?: number | false
 }
 
@@ -20,8 +20,8 @@ const notificationsSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    addNotification: (state, action: PayloadAction<AppNotification[]>) => {
-      state.items = action.payload
+    addNotification: (state, action: PayloadAction<AppNotification>) => {
+      state.items.push(action.payload)
     },
     clearNotifications: state => {
       state.items = []
