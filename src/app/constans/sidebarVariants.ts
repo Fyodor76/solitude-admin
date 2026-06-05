@@ -6,36 +6,29 @@ const collapsedWidth = 70
 export const sidebarVariants: Variants = {
   collapsed: {
     width: collapsedWidth,
+    x: 0,
     transition: {
-      type: 'spring',
-      stiffness: 300,
-      damping: 30,
+      duration: 0.22,
+      ease: [0.4, 0, 0.2, 1],
     },
   },
   open: {
     width: sidebarWidth,
+    x: 0,
     transition: {
-      type: 'spring',
-      stiffness: 300,
-      damping: 30,
+      duration: 0.22,
+      ease: [0.4, 0, 0.2, 1],
     },
   },
 }
 
 export const overlayVariants: Variants = {
-  closed: { opacity: 0 },
-  open: { opacity: 1 },
-}
-
-export const subMenuVariant: Variants = {
-  close: {
+  closed: {
     opacity: 0,
-    height: 0,
-    transition: { duration: 0.3 },
+    transition: { duration: 0.15, ease: 'easeOut' },
   },
   open: {
     opacity: 1,
-    height: 'auto',
-    transition: { duration: 0.3 },
+    transition: { duration: 0.15, ease: 'easeOut' },
   },
 }

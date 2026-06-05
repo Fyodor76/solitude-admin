@@ -1,118 +1,215 @@
-import React, { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
-import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
-import {
-  useCreateSizeChartMutation,
-  useGetSizeChartByCategoryIdQuery,
-} from '@/shared/lib/api/size-charts/SizeCharts'
+import { useGetSizeChartByCategoryIdQuery } from '@/shared/lib/api/size-charts/SizeCharts'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
-import { Button, Select } from 'antd'
+import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
+import { useModal } from '@/shared/lib/hooks/useModal'
+import { useSizeChartActions } from '@/shared/lib/hooks/useSizeChartActions'
+import { useSizeParameterActions } from '@/shared/lib/hooks/useSizeParameterActions'
+import Container from '@/shared/ui/container/Container'
+import { PageHeader } from '@/shared/ui/page-header'
+import { Spin } from 'antd'
+import { useSearchParams } from 'react-router-dom'
 
+import { CDN_URL } from '@/app/constans/url'
+
+import { MODES } from '../categories/const/constans'
+import ChoosingCategory from './components/ChoosingCategory'
+import SizeChartButtons from './components/SizeChartButtons'
+import SizeChartCreate from './components/SizeChartCreate'
+import SizeChartEmpty from './components/SizeChartEmpty'
+import SizeChartMainInfo from './components/SizeChartMainInfo'
+import { INITIAL_DATA } from './constans/const'
+import { getAllCategories } from './helpers/SizeChartHelper'
+import { useHandleSizeCharts } from './hooks/useHandleSizeCharts'
+import { useSizeParameters } from './hooks/useSizeParameters'
+import SizeChartModal from './size-charts-modal/SizeChartModal'
+import SizeParameters from './size-parameters/SizeParameters'
 import './SizeChart.scss'
 
-const initialData = {
-  categoryId: '',
-  name: 'Тестовая таблица ',
-  description: 'Тестовая таблица размеров',
-  imageId: 'test-id',
-  productType: 'switshorts',
-  metricsText: 'A - длина\nB - грудь',
-  sizeParameters: [
-    {
-      internationalSize: 'S',
-      russianSize: '44',
-      lengthCm: 68,
-      chestCircumferenceCm: 92,
-      order: 1,
-    },
-  ],
-}
 const SizeChart = () => {
-  const [createSizeChart] = useCreateSizeChartMutation()
+  const editModal = useModal()
+  const addSizeModal = useModal()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const categoryIdFromUrl = searchParams.get('categoryId')
+  const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(() => ({
+    ...INITIAL_DATA,
+    categoryId: categoryIdFromUrl || '',
+  }))
+  const [selectedSizeToAdd, setSelectedSizeToAdd] = useState<string | null>(null)
+  const [changedRows, setChangedRows] = useState<Record<string, boolean>>({})
+  const [uploadImg, setUploadImg] = useState<imgUpload | null>(null)
 
   const { data: categoriesTreeData } = useGetCategoriesTreeQuery()
-  const [formSizeChart, setFormSizeChart] = useState<SizeChartRequest>(initialData)
-  const { data: sizeChartByCategory, isFetching } = useGetSizeChartByCategoryIdQuery(
-    formSizeChart.categoryId || '',
-    { skip: !formSizeChart.categoryId }
-  )
+  const { createNewSizeChart, updateSizeChartData, deleteSizeChartData } = useSizeChartActions()
+  const { createParameter, deleteParameter } = useSizeParameterActions()
 
-  const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
-    let result: BaseCategoryTree[] = []
-    for (const category of categories) {
-      result.push(category)
-      if (category.children?.length) {
-        result = [...result, ...getAllCategories(category.children)]
-      }
+  const {
+    data: sizeChartResponse,
+    isFetching,
+    refetch,
+  } = useGetSizeChartByCategoryIdQuery(formSizeChart.categoryId || '', {
+    skip: !formSizeChart.categoryId,
+  })
+
+  const sizeChart =
+    sizeChartResponse?.data?.categoryId === formSizeChart.categoryId
+      ? sizeChartResponse?.data
+      : null
+  const sizeChartId = sizeChart?.id
+  const {
+    parameters,
+    deleteIds,
+    setParameters,
+    addParameter,
+    removeParameter,
+    recalculateOrder,
+    setDeleteIds,
+  } = useSizeParameters(sizeChartId)
+
+  const {
+    handleCreateSizeChart,
+    onSaveAllChanges,
+    deleteSizeChart,
+    handleCancel,
+    handleSizeChartChange,
+    handleCreateSizeChartSubmit,
+    deleteSize,
+    createNewSizeParameter,
+  } = useHandleSizeCharts({
+    formSizeChart,
+    parameters,
+    deleteIds,
+    sizeChartId,
+    editModal,
+    sizeChart,
+    selectedSizeToAdd,
+    addParameter,
+    createParameter,
+    setFormSizeChart,
+    setParameters,
+    refetch,
+    setDeleteIds,
+    setUploadImg,
+    setChangedRows,
+    setSelectedSizeToAdd,
+    deleteParameter,
+    updateSizeChartData,
+    deleteSizeChartData,
+    createNewSizeChart,
+    removeParameter,
+    recalculateOrder,
+  })
+  const mode = editModal.mode
+  const isCreate = mode === MODES.CREATE
+  const isEdit = mode === MODES.EDIT
+  const imageUrl = formSizeChart.imageId ? `${CDN_URL}/${formSizeChart.imageId}` : null
+  const dataParameters = sizeChart?.sizeParameters
+
+  useEffect(() => {
+    if (formSizeChart.categoryId) {
+      setSearchParams({ categoryId: formSizeChart.categoryId })
+    } else {
+      setSearchParams({})
     }
-    return result
-  }
+  }, [formSizeChart.categoryId, setParameters])
+
+  useEffect(() => {
+    if (sizeChart?.id) {
+      setFormSizeChart(sizeChart)
+      setParameters([...(sizeChart?.sizeParameters || [])])
+    } else {
+      setFormSizeChart(prev => ({
+        ...INITIAL_DATA,
+        categoryId: prev.categoryId,
+        id: undefined,
+      }))
+      setParameters([])
+    }
+  }, [sizeChart?.id, setParameters])
+
   const allCategories = useMemo(() => {
     if (!categoriesTreeData?.data) return []
     return getAllCategories(categoriesTreeData.data)
   }, [categoriesTreeData])
 
-  const createNewSizeChart = async () => {
-    if (!formSizeChart.categoryId) {
-      alert('Выберете категорию!')
-      return
-    }
-    try {
-      await createSizeChart(formSizeChart).unwrap()
-    } catch (error) {
-      throw error
-    }
-  }
   return (
     <div className="size-chart-wrapper">
-      <span className="size-chart-title"> Тест страница для размеров</span>
-      <Select
-        className="size-chart-select"
-        value={formSizeChart.categoryId || undefined}
-        placeholder="Выберете категорию"
-        onChange={value =>
-          setFormSizeChart({
-            ...formSizeChart,
-            categoryId: value,
-          })
-        }
-        allowClear
-      >
-        {allCategories &&
-          allCategories.map(cat => (
-            <Select.Option key={cat.id} value={cat.id}>
-              {cat.name}
-            </Select.Option>
-          ))}
-      </Select>
+      <Container className="size-chart-page admin-page">
+        <PageHeader title="Управление таблицами размеров" />
+        <ChoosingCategory
+          formSizeChart={formSizeChart}
+          allCategories={allCategories}
+          setFormSizeChart={setFormSizeChart}
+          setEditParameter={setParameters}
+          setSelectedSizeToAdd={setSelectedSizeToAdd}
+        />
+        {!formSizeChart.id && !formSizeChart.categoryId && <SizeChartEmpty />}
 
-      {formSizeChart.categoryId && (
-        <span>
-          {' '}
-          Выбрано: {allCategories.find(cat => cat.id === formSizeChart.categoryId)?.name}
-        </span>
-      )}
+        {formSizeChart.categoryId && (
+          <div className="size-chart-table-container">
+            {isFetching && !sizeChart?.id && (
+              <div className="spin-centered-size">
+                <Spin size="large" />
+              </div>
+            )}
+            {!isFetching && formSizeChart?.id && (
+              <>
+                <SizeChartMainInfo
+                  isEdit={isEdit}
+                  sizeChart={formSizeChart}
+                  formSizeChart={formSizeChart}
+                  imageUrl={imageUrl}
+                  handleSizeChartChange={handleSizeChartChange}
+                  deleteSizeChart={deleteSizeChart}
+                  setFormSizeChart={setFormSizeChart}
+                  setUploadImg={setUploadImg}
+                />
 
-      <Button className="size-chart-btn" onClick={createNewSizeChart}>
-        Создать таблицу размеров для категории
-      </Button>
-      {formSizeChart.categoryId && (
-        <>
-          {isFetching && <span> Загружаю таблицу! Ждите...</span>}
-          {!isFetching && sizeChartByCategory?.data?.id && (
-            <>
-              <h2> {sizeChartByCategory.data.name}</h2>
-              <span>{sizeChartByCategory.data.description}</span>
-              <span>{sizeChartByCategory.data.metricsText}</span>
-              <span>{sizeChartByCategory.data.imageId}</span>
-            </>
-          )}
-          {!isFetching && !sizeChartByCategory?.data && (
-            <span>У данной категории еще нет таблицы размеров...</span>
-          )}
-        </>
-      )}
+                <div className="size-charts-parameters">
+                  <SizeParameters
+                    isOpen={addSizeModal.isOpen}
+                    dataParameters={dataParameters}
+                    editParameter={parameters}
+                    selectedSizeToAdd={selectedSizeToAdd}
+                    changedRows={changedRows}
+                    onOpen={addSizeModal.onOpen}
+                    onClose={addSizeModal.onClose}
+                    setChangedRows={setChangedRows}
+                    setSelectedSizeToAdd={setSelectedSizeToAdd}
+                    setEditParameter={setParameters}
+                    deleteSize={deleteSize}
+                    createNewSizeParameter={createNewSizeParameter}
+                  />
+                </div>
+                <SizeChartButtons
+                  formSizeChart={formSizeChart}
+                  handleCancel={handleCancel}
+                  onSaveAllChanges={onSaveAllChanges}
+                />
+              </>
+            )}
+            {!isFetching && !formSizeChart?.id && (
+              <SizeChartCreate handleCreateSizeChart={handleCreateSizeChart} />
+            )}
+          </div>
+        )}
+        <SizeChartModal
+          isCreated={isCreate}
+          isEdit={isEdit}
+          uploadImg={uploadImg}
+          isOpen={editModal.isOpen}
+          formSizeChart={formSizeChart}
+          imageUrl={imageUrl}
+          onClose={editModal.onClose}
+          setUploadImg={setUploadImg}
+          setFormSizeChart={setFormSizeChart}
+          saveAllChanges={onSaveAllChanges}
+          setModes={editModal.setMode}
+          createNewSizeChart={handleCreateSizeChartSubmit}
+        />
+      </Container>
     </div>
   )
 }

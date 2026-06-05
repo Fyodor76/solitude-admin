@@ -20,10 +20,10 @@ export interface ApiResponse<T, M> {
   message?: string
 }
 
-const baseUrl = import.meta.env.VITE_API_URL
+const API_BASE_URL = import.meta.env.VITE_API_URL
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: baseUrl,
+  baseUrl: API_BASE_URL,
   prepareHeaders: headers => {
     const token = localStorage.getItem('access')
 
@@ -68,7 +68,7 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error('No refresh token')
   }
 
-  const response = await fetch(`${baseUrl}/auth/refresh`, {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
 
         try {
           const retryResult = await fetchBaseQuery({
-            baseUrl: baseUrl,
+            baseUrl: API_BASE_URL,
             prepareHeaders: headers => {
               headers.set('Accept', 'application/json')
               headers.set('Content-Type', 'application/json')
@@ -163,7 +163,14 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
 
-            onRefreshed(null)
+            resolve({
+              error: {
+                statusCode: 401,
+                timestamp: new Date().toISOString(),
+                path: currentPath,
+                error: 'Session expired',
+              },
+            })
 
             if (!window.location.pathname.includes('/login')) {
               window.location.href = '/login'
@@ -202,6 +209,22 @@ const getErrorMessage = (error: FetchBaseQueryError) => {
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['File', 'Category', 'Collection', 'Product', 'Size-chart', 'Size-parameter'],
+  tagTypes: [
+    'File',
+    'Category',
+    'Collection',
+    'Product',
+    'Size-chart',
+    'Size-parameter',
+    'SupportInbox',
+    'SupportConversation',
+    'SupportMessages',
+    'AdminNotifications',
+    'AdminNotificationsSummary',
+    'AdminNotification',
+    'FormSubmissions',
+    'FormSubmissionsStats',
+    'FormSubmission',
+  ],
   endpoints: () => ({}),
 })

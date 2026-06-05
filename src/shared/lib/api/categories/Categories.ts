@@ -1,6 +1,7 @@
 import { CategoryMenuItem } from '@/app/types/categories'
 
 import { ApiResponse, baseApi } from '../baseApi'
+import { ADMIN_IS_ACTIVE_FILTER } from '../shared/isActiveFilter'
 import { BaseCategoryTree, CategoryRequest, CollectionItem, DeleteCategoryResponse } from './types'
 
 export const apiCategories = baseApi.injectEndpoints({
@@ -18,6 +19,7 @@ export const apiCategories = baseApi.injectEndpoints({
       query: () => ({
         url: `/categories`,
         method: 'GET',
+        params: { isActiveFilter: ADMIN_IS_ACTIVE_FILTER },
       }),
       providesTags: result => {
         const tags = [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }]
@@ -34,6 +36,7 @@ export const apiCategories = baseApi.injectEndpoints({
       query: () => ({
         url: `/categories/tree`,
         method: 'GET',
+        params: { isActiveFilter: ADMIN_IS_ACTIVE_FILTER },
       }),
       providesTags: result => [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }],
     }),
@@ -42,6 +45,7 @@ export const apiCategories = baseApi.injectEndpoints({
       query: () => ({
         url: `/categories/collections`,
         method: 'GET',
+        params: { isActiveFilter: ADMIN_IS_ACTIVE_FILTER },
       }),
       providesTags: [{ type: 'Collection', id: 'ALL_COLLECTIONS' }],
     }),
@@ -90,6 +94,7 @@ export const apiCategories = baseApi.injectEndpoints({
       query: (id: string) => ({
         url: `/categories/${id}/children`,
         method: 'GET',
+        params: { isActiveFilter: ADMIN_IS_ACTIVE_FILTER },
       }),
       providesTags: (result, error, id) => [{ type: 'Category', id: `CHILDREN_OF_${id}` }],
     }),

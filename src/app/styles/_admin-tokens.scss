@@ -1,0 +1,32 @@
+:root {
+  /* Text colors */
+  --admin-color-text: #223041;
+  --admin-color-text-secondary: #556476;
+  --admin-color-text-muted: #8c8c8c;
+  --admin-color-placeholder: #939ba2;
+  --admin-color-border: #e6ebf2;
+  --admin-color-surface: #ffffff;
+
+  /* Font sizes */
+  --admin-font-page-title: 24px;
+  --admin-font-page-title-mobile: 20px;
+  --admin-font-section-title: 16px;
+  --admin-font-body: 14px;
+  --admin-font-caption: 12px;
+  --admin-font-input: 14px;
+  --admin-font-input-mobile: 16px;
+
+  /* Font weights */
+  --admin-weight-title: 600;
+  --admin-weight-label: 500;
+  --admin-weight-body: 400;
+
+  /* Line heights */
+  --admin-line-body: 1.45;
+  --admin-line-caption: 1.33;
+
+  /* Layout */
+  --admin-radius-surface: 16px;
+  --admin-radius-surface-mobile: 12px;
+  --admin-gap-page: 16px;
+}

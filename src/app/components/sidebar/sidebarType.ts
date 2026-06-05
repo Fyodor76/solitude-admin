@@ -18,6 +18,8 @@ export interface MenuItem {
   hasArrow?: boolean
   subItems?: MenuItem[]
   onClick?: () => void
+  /** Счётчик на пункте меню (например, ожидающие оператора). */
+  badgeCount?: number
 }
 export interface SidebarProps {
   isOpen: boolean

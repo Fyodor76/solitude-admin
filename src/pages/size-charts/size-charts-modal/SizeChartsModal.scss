@@ -1,0 +1,15 @@
+.ant-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .btn-upload-img-size {
+    margin-top: 8px;
+  }
+}
+
+.ant-modal-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}

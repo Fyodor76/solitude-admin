@@ -105,6 +105,22 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: var(--admin-font-body);
+    color: var(--admin-color-text);
+  }
+
+  .category-status {
+    flex-shrink: 0;
+    font-size: var(--admin-font-caption);
+    color: var(--admin-color-text-muted);
+  }
+
+  &--inactive {
+    opacity: 0.6;
+
+    .category-name {
+      color: var(--color-grey-3);
+    }
   }
 
   .btn-category {

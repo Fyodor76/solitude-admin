@@ -1,37 +1,54 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
 
-import Categories from '@/pages/categories/Categories'
-import { Header } from '@/shared/ui/header'
-import { Link } from 'react-router-dom'
+import {
+  AdminNotificationsProvider,
+  applySidebarNotificationBadges,
+  useAdminNotifications,
+} from '@/shared/lib/notifications'
+import { useSupportRealtime } from '@/shared/lib/support/useSupportRealtime'
 
-import Sidebar from '@/app/components/sidebar/Sidebar'
 import { menuSidebar } from '@/app/constans/menuSiderbar'
+
+import { AdminLayoutShell } from './AdminLayoutShell'
+import { useAdminLayoutRoute } from './useAdminLayoutRoute'
 
 interface BaseLayoutProps {
   children: ReactNode
 }
 
-export const BaseLayout = ({ children }: BaseLayoutProps) => {
-  const [isOpen, setIsOpen] = useState(false)
+type BaseLayoutContentProps = BaseLayoutProps & {
+  isSupportPage: boolean
+}
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen)
-  }
+function BaseLayoutContent({ children, isSupportPage }: BaseLayoutContentProps) {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const { supportUnreadCount } = useAdminNotifications()
+
+  const menuItems = useMemo(
+    () => applySidebarNotificationBadges(menuSidebar, { supportUnreadCount }),
+    [supportUnreadCount]
+  )
+
   return (
-    <div className="wrapper" style={{ display: 'flex' }}>
-      <Sidebar menuItems={menuSidebar} toggleSidebar={toggleSidebar} isOpen={isOpen} />
+    <AdminLayoutShell
+      menuItems={menuItems}
+      isSidebarOpen={isSidebarOpen}
+      isSupportPage={isSupportPage}
+      onToggleSidebar={() => setIsSidebarOpen(open => !open)}
+    >
+      {children}
+    </AdminLayoutShell>
+  )
+}
 
-      <div className="main-page" style={{ minWidth: '0', flex: '1', marginLeft: '70px' }}>
-        <Header />
-        {/*{' '}
-        <Link to="/catalog">
-          <h1 style={{ textAlign: 'center', color: 'green' }}>
-            Перейти в каталог(протестируем работу breadcrumbs)
-          </h1>
-        </Link>
-  */}
-        <div>{children}</div>
-      </div>
-    </div>
+export const BaseLayout = ({ children }: BaseLayoutProps) => {
+  const { isSupportPage, enableNotificationAlerts } = useAdminLayoutRoute()
+
+  useSupportRealtime(true)
+
+  return (
+    <AdminNotificationsProvider enableAlerts={enableNotificationAlerts}>
+      <BaseLayoutContent isSupportPage={isSupportPage}>{children}</BaseLayoutContent>
+    </AdminNotificationsProvider>
   )
 }

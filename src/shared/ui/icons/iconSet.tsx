@@ -76,8 +76,8 @@ export const iconSet = {
   ),
   layoutOptions: (
     <svg
-      width="800px"
-      height="800px"
+      width="28px"
+      height="28px"
       viewBox="0 0 28 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -105,8 +105,8 @@ export const iconSet = {
 
   tables: (
     <svg
-      width="20"
-      height="20"
+      width="24px"
+      height="24px"
       viewBox="0 0 16 16"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -380,6 +380,17 @@ export const iconSet = {
       />
     </svg>
   ),
+  support: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height="24px"
+      viewBox="0 -960 960 960"
+      width="24px"
+      fill="#1f1f1f"
+    >
+      <path d="M240-400h320v-80H240v80Zm0-120h480v-80H240v80Zm0-120h480v-80H240v80ZM80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z" />
+    </svg>
+  ),
 
   notify: (
     <svg
@@ -417,7 +428,7 @@ export const iconSet = {
       xmlns="http://www.w3.org/2000/svg"
       width="20"
       height="18"
-      fill="currentColor"
+      //fill="currentColor"
       viewBox="0 0 16 16"
     >
       <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
@@ -490,6 +501,29 @@ export const iconSet = {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path d="M27,22.1414V18a2,2,0,0,0-2-2H17V12h2a2.0023,2.0023,0,0,0,2-2V4a2.0023,2.0023,0,0,0-2-2H13a2.002,2.002,0,0,0-2,2v6a2.002,2.002,0,0,0,2,2h2v4H7a2,2,0,0,0-2,2v4.1421a4,4,0,1,0,2,0V18h8v4.142a4,4,0,1,0,2,0V18h8v4.1414a4,4,0,1,0,2,0ZM13,4h6l.001,6H13ZM8,26a2,2,0,1,1-2-2A2.0023,2.0023,0,0,1,8,26Zm10,0a2,2,0,1,1-2-2A2.0027,2.0027,0,0,1,18,26Zm8,2a2,2,0,1,1,2-2A2.0023,2.0023,0,0,1,26,28Z" />
+    </svg>
+  ),
+  save: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="100"
+      height="100"
+      viewBox="0 0 100 100"
+      id="save"
+    >
+      <g id="_x37_7_Essential_Icons">
+        <path
+          id="Save"
+          d="M82.4 24.3l-9.8-9.8c-.4-.4-.9-.6-1.4-.6H19c-1.1 0-2 .9-2 2v68c0 1.1.9 2 2 2h62c1.1 0 2-.9 2-2V25.8c0-.6-.2-1.1-.6-1.5zM31 18h38v32H31V18zm48 64H21V18h6v34c0 1.1.9 2 2 2h42c1.1 0 2-.9 2-2V20.6l6 6V82zM64.8 24.5v19c0 1.1-.9 2-2 2s-2-.9-2-2v-19c0-1.1.9-2 2-2s2 .9 2 2z"
+        ></path>
+      </g>
+      <g id="Info">
+        <path
+          id="BORDER"
+          fill="#00F"
+          d="M1504-930V754H-280V-930h1784m8-8H-288V762h1800V-938z"
+        ></path>
+      </g>
     </svg>
   ),
 }

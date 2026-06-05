@@ -9,7 +9,9 @@ export interface BaseCategoryTree {
   isActive: boolean
   sortOrder: number
   type: 'category'
+  parentId?: string | null
   children: BaseCategoryTree[] | []
+  /** @deprecated используйте parentId */
   entity?: CategoryMenuItem
 }
 
@@ -20,6 +22,8 @@ export interface CategoryRequest {
   parentId: null | string
   imageId?: string | null
   sortOrder: number
+  isActive?: boolean
+  type?: string
 }
 
 export interface CollectionItem {

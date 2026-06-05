@@ -5,9 +5,12 @@ import {
   useUpdateCategoryByIdMutation,
 } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
+import { CategoryRequest } from '@/shared/lib/api/categories/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { useServerActions } from '@/shared/lib/hooks/useSeverActions'
+import Container from '@/shared/ui/container/Container'
 import Icon from '@/shared/ui/icons/Icon'
+import { PageHeader } from '@/shared/ui/page-header'
 import { Button, Spin } from 'antd'
 
 import './Categories.scss'
@@ -47,12 +50,18 @@ const Categories = () => {
     return null
   }
 
-  const getAllCategories = (categories: BaseCategoryTree[]): BaseCategoryTree[] => {
+  const getAllCategories = (
+    categories: BaseCategoryTree[],
+    parentId: string | null = null
+  ): BaseCategoryTree[] => {
     let result: BaseCategoryTree[] = []
     for (const category of categories) {
-      result.push(category)
+      result.push({
+        ...category,
+        parentId: category.parentId ?? category.entity?.parentId ?? parentId,
+      })
       if (category.children?.length) {
-        result = [...result, ...getAllCategories(category.children)]
+        result = [...result, ...getAllCategories(category.children, category.id)]
       }
     }
     return result
@@ -92,8 +101,7 @@ const Categories = () => {
     [editModal]
   )
 
-  const handleUpdateCategory = async (id: string, editInput: FormData) => {
-    console.log('handleUpdateCategory получил:', editInput)
+  const handleUpdateCategory = async (id: string, editInput: CategoryRequest) => {
     try {
       await updateCategory({ id, data: editInput }).unwrap()
       refetch()
@@ -110,16 +118,20 @@ const Categories = () => {
   }, [categoriesTreeData])
 
   return (
-    <div className="containerCategories">
-      <div className="titleCategories">
-        <h2 className="title-h2">Категории товаров</h2>
-        <Button onClick={() => handleCreateCategory()} className="btn-title-add">
-          <Icon name="add"></Icon> Добавить категорию
-        </Button>
-      </div>
-      <div className="allCategories">
+    <Container className="categories-page admin-page">
+      <PageHeader
+        title="Категории товаров"
+        actions={
+          <Button type="primary" onClick={() => handleCreateCategory()}>
+            <Icon name="add" />
+            Добавить категорию
+          </Button>
+        }
+      />
+
+      <div className="categories-page__content">
         {isLoading ? (
-          <div className="spin-centered">
+          <div className="categories-page__loading">
             <Spin size="large" />
           </div>
         ) : categories.length > 0 ? (
@@ -130,7 +142,7 @@ const Categories = () => {
             onCreate={handleCreateCategory}
           />
         ) : (
-          <div className="empty-state">Нет категорий для отображения</div>
+          <div className="categories-page__empty">Нет категорий для отображения</div>
         )}
       </div>
       <EditCategoryModal
@@ -148,7 +160,7 @@ const Categories = () => {
         onSaveCreate={createNewCategory}
         categoryTypeOptions={categoryTypeOptions}
       />
-    </div>
+    </Container>
   )
 }
 

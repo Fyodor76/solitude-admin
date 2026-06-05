@@ -1,6 +1,7 @@
 import { useValidation } from '@/context/validation/use-validation'
 import { useLoginMutation } from '@/shared/lib/api/auth/auth'
 import { useForm } from '@/shared/lib/hooks/useForm'
+import { consumePendingPushHref } from '@/shared/lib/push/pushNavigation'
 import { Card } from '@/shared/ui/card'
 import { CustomForm } from '@/shared/ui/custom-form/CustomForm'
 import { Spinner } from '@/shared/ui/spinner/Spinner'
@@ -29,7 +30,8 @@ const Login = () => {
       localStorage.setItem('refresh', response.refreshToken)
       localStorage.setItem('access', response.accessToken)
 
-      navigate('/')
+      const pendingHref = consumePendingPushHref()
+      navigate(pendingHref ?? '/')
     } catch (error: any) {
       const { error: dataError } = error
       applyServerErrors({

@@ -4,7 +4,11 @@ import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { DownOutlined, RightOutlined } from '@ant-design/icons'
 
 import CategoryTitle from './CategoryTitle'
-import { collectExpandableIds, sortCategoryTree } from './categoryTreeHelper'
+import {
+  collectExpandableIds,
+  getCategoryDisplayState,
+  sortCategoryTree,
+} from './categoryTreeHelper'
 import './CategoryTreeHelper.scss'
 
 interface CategoryTreeProps {
@@ -16,6 +20,7 @@ interface CategoryTreeProps {
 
 interface CategoryTreeNodeProps extends Omit<CategoryTreeProps, 'categories'> {
   category: BaseCategoryTree
+  parentIsActive: boolean
   expandedIds: string[]
   isLast: boolean
   onToggle: (id: string) => void
@@ -23,6 +28,7 @@ interface CategoryTreeNodeProps extends Omit<CategoryTreeProps, 'categories'> {
 
 const CategoryTreeNode = ({
   category,
+  parentIsActive,
   expandedIds,
   isLast,
   onToggle,
@@ -32,6 +38,8 @@ const CategoryTreeNode = ({
 }: CategoryTreeNodeProps) => {
   const hasChildren = category.children.length > 0
   const isExpanded = hasChildren && expandedIds.includes(category.id)
+  const display = getCategoryDisplayState(category, parentIsActive)
+  const branchIsActive = category.isActive && parentIsActive
 
   return (
     <div
@@ -58,7 +66,7 @@ const CategoryTreeNode = ({
                 : 'category-tree-node__toggle--collapsed',
             ].join(' ')}
             onClick={() => onToggle(category.id)}
-            aria-label={isExpanded ? 'Collapse category' : 'Expand category'}
+            aria-label={isExpanded ? 'Свернуть' : 'Развернуть'}
           >
             {isExpanded ? <DownOutlined /> : <RightOutlined />}
           </button>
@@ -68,6 +76,8 @@ const CategoryTreeNode = ({
 
         <CategoryTitle
           name={category.name}
+          isShownAsActive={display.isShownAsActive}
+          statusLabel={display.statusLabel}
           onEdit={() => onEdit(category.id)}
           onDelete={() => onDelete(category.id, category.imageId ?? undefined, 'products')}
           onCreate={() => onCreate(category.id)}
@@ -80,6 +90,7 @@ const CategoryTreeNode = ({
             <CategoryTreeNode
               key={child.id}
               category={child}
+              parentIsActive={branchIsActive}
               expandedIds={expandedIds}
               isLast={index === category.children.length - 1}
               onToggle={onToggle}
@@ -116,6 +127,7 @@ const CategoryTree = ({ categories, onEdit, onDelete, onCreate }: CategoryTreePr
         <CategoryTreeNode
           key={category.id}
           category={category}
+          parentIsActive
           expandedIds={expandedIds}
           isLast={index === sortedCategories.length - 1}
           onToggle={handleToggle}

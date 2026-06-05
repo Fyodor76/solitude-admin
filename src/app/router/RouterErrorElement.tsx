@@ -1,5 +1,5 @@
 const RouterErrorElement = () => {
-  return <div>Ошибка загрузки...</div>;
-};
+  return <div>Ошибка загрузки...</div>
+}
 
-export default RouterErrorElement;
+export default RouterErrorElement
