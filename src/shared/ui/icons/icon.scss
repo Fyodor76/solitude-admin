@@ -12,6 +12,17 @@
       fill: #d8d3d3;
     }
   }
+  &--settings {
+    svg {
+      path,
+      g,
+      circle {
+        fill: none !important;
+        stroke: currentColor !important;
+      }
+    }
+  }
+
   &--dynamic-color {
     svg {
       fill: currentColor;

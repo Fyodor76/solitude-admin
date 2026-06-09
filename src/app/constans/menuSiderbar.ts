@@ -55,9 +55,9 @@ export const menuSidebar: MenuItem[] = [
   },
   {
     id: SIDEBAR_MENU_ITEM_ID.PRODUCT_ATTRIBUTES,
-    text: 'Аттрибуты товара',
+    text: 'Опции товаров',
     href: '/product-attributes',
-    icon: 'uiElements',
+    icon: 'settings',
     hasArrow: false,
   },
   /*{

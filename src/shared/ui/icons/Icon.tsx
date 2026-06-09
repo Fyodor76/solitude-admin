@@ -24,12 +24,12 @@ const Icon = React.memo(
       ...(width && { width }),
       ...(height && { height }),
     }
-
+    const isSettings = name === 'settings'
     const dynamicClass = color !== '#ffffff' ? 'icon--dynamic-color' : ''
-
+    const settingsClass = isSettings ? 'icon--settings' : ''
     return (
       <span
-        className={`icon ${dynamicClass} ${className || ''}`.trim()}
+        className={`icon ${dynamicClass}  ${settingsClass} ${className || ''}`.trim()}
         style={style}
         onClick={onClick}
         role={onClick ? 'button' : 'img'}

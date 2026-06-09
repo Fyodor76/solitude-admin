@@ -3,7 +3,7 @@ import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
 import { NotificationsPage } from '@/pages/notifications'
 import { PlatformImages } from '@/pages/platform-images'
-import { Test } from '@/pages/product-attributes'
+import { ProductAttribute } from '@/pages/product-attributes'
 import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
 import { SupportInbox } from '@/pages/support-inbox'
@@ -120,7 +120,7 @@ export const Router: RouteObject[] = [
         path: '/product-attributes',
         element: (
           <ProtectedRouter>
-            <Test />
+            <ProductAttribute />
           </ProtectedRouter>
         ),
       },
