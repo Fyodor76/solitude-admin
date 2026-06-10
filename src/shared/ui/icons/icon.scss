@@ -6,33 +6,8 @@
   svg {
     width: 100%;
     height: 100%;
-    fill: currentColor;
-    path,
-    g {
-      fill: #d8d3d3;
-    }
-  }
-  &--settings {
-    svg {
-      path,
-      g,
-      circle {
-        fill: none !important;
-        stroke: currentColor !important;
-      }
-    }
   }
 
-  &--dynamic-color {
-    svg {
-      fill: currentColor;
-
-      path,
-      g {
-        fill: currentColor;
-      }
-    }
-  }
   &[role='button'] {
     cursor: pointer;
 

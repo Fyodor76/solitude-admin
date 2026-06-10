@@ -2,14 +2,19 @@
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
-  height: 100%;
   font-family: var(--font-primary);
+  gap: 12px;
+  .main-title {
+    color: #262c33;
+    margin-left: 33px;
+    margin-top: 20px;
+  }
   .product-attributes-main {
     display: flex;
-    .main-title {
-      color: #262c33;
-    }
+    gap: 30px;
+
     .all-product-attributes {
+      margin-top: 20px;
       .middle-title {
         font-size: 18px;
         color: #262c33;
@@ -23,23 +28,68 @@
       margin-left: 33px;
       width: 40%;
       gap: 20px;
-      .prodAttr {
+      .prod-attr {
         font-size: 14px;
         display: flex;
         justify-content: space-between;
         cursor: pointer;
+        .prod-name-with-img {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
       }
     }
-    .product-attributes-info {
+    .product-attribute-info {
+      width: 60%;
+      margin-top: 20px;
+      margin-right: 33px;
       display: flex;
       flex-direction: column;
+      gap: 30px;
 
       .product-attribute {
+        display: flex;
+        gap: 20px;
+        flex-direction: column;
+        background-color: var(--color-white);
+        border: 1px solid var(--admin-color-border);
+        border-radius: var(--admin-radius-surface);
+        padding: 20px;
+        .title-and-btns {
+          display: flex;
+          justify-content: space-between;
+          .middle-title {
+            font-size: 18px;
+            color: #262c33;
+          }
+          .product-attribute-btns {
+            display: flex;
+            gap: 12px;
+          }
+        }
+        .select-attr-main-info {
+          display: flex;
+          gap: 30px;
+        }
       }
       .attribute-value {
+        background-color: var(--color-white);
+        border: 1px solid var(--admin-color-border);
+        border-radius: var(--admin-radius-surface);
+        padding: 20px;
+        .middle-title {
+          font-size: 18px;
+          color: #262c33;
+        }
       }
     }
   }
   .product-attributes-btn {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-right: 33px;
+    margin-bottom: 20px;
   }
 }

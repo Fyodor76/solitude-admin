@@ -21,6 +21,7 @@ const Icon = React.memo(
       alignItems: 'center',
       justifyContent: 'center',
       color: color,
+      cursor: onClick ? 'pointer' : 'default',
       ...(width && { width }),
       ...(height && { height }),
     }

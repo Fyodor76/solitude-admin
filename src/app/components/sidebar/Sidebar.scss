@@ -398,6 +398,15 @@
                       stroke: none !important;
                     }
                   }
+                  &.icon--settings {
+                    svg,
+                    svg path,
+                    svg circle,
+                    svg g {
+                      fill: none !important;
+                      stroke: currentColor !important;
+                    }
+                  }
 
                   svg[stroke='#fbc913'],
                   svg[stroke='#ff0000'],
