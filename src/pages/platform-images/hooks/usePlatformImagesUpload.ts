@@ -69,22 +69,23 @@ export function usePlatformImagesUpload(options: { onUploaded: () => Promise<voi
       if (successCount === totalValid && failedCount === 0 && skippedCount === 0) {
         openNotification(
           'success',
-          successCount === 1 ? 'Изображение загружено.' : `Загружено изображений: ${successCount}.`
+          successCount === 1
+            ? ['Изображение загружено.']
+            : [`Загружено изображений: ${successCount}.`]
         )
         return
       }
 
       if (successCount > 0) {
-        openNotification(
-          'warning',
+        openNotification('warning', [
           `Загружено: ${successCount}. Ошибок: ${failedCount}${
             skippedCount > 0 ? `, пропущено не-изображений: ${skippedCount}` : ''
-          }.`
-        )
+          }.`,
+        ])
         return
       }
 
-      openNotification('error', 'Не удалось загрузить изображения.')
+      openNotification('error', ['Не удалось загрузить изображения.'])
     },
     [openNotification]
   )
@@ -159,10 +160,9 @@ export function usePlatformImagesUpload(options: { onUploaded: () => Promise<voi
       const validFiles = filterPlatformImageFiles(files)
 
       if (validFiles.length === 0) {
-        openNotification(
-          'warning',
-          'Не найдено подходящих изображений. Поддерживаются JPEG, PNG, WebP, GIF.'
-        )
+        openNotification('warning', [
+          'Не найдено подходящих изображений. Поддерживаются JPEG, PNG, WebP, GIF.',
+        ])
         return
       }
 
@@ -174,20 +174,18 @@ export function usePlatformImagesUpload(options: { onUploaded: () => Promise<voi
 
         if (addedCount === 0) {
           if (previous.length >= PLATFORM_IMAGE_MAX_BATCH) {
-            openNotification(
-              'warning',
-              `Можно добавить не больше ${PLATFORM_IMAGE_MAX_BATCH} файлов.`
-            )
+            openNotification('warning', [
+              `Можно добавить не больше ${PLATFORM_IMAGE_MAX_BATCH} файлов.`,
+            ])
           }
 
           return previous
         }
 
         if (skippedCount > 0) {
-          openNotification(
-            'warning',
-            `Добавлено ${addedCount} фото. Пропущено не-изображений: ${skippedCount}.`
-          )
+          openNotification('warning', [
+            `Добавлено ${addedCount} фото. Пропущено не-изображений: ${skippedCount}.`,
+          ])
         }
 
         return merged
@@ -227,10 +225,9 @@ export function usePlatformImagesUpload(options: { onUploaded: () => Promise<voi
       const validFiles = filterPlatformImageFiles(files)
 
       if (validFiles.length === 0) {
-        openNotification(
-          'warning',
-          'Не найдено подходящих изображений. Поддерживаются JPEG, PNG, WebP, GIF.'
-        )
+        openNotification('warning', [
+          'Не найдено подходящих изображений. Поддерживаются JPEG, PNG, WebP, GIF.',
+        ])
         return false
       }
 
@@ -243,10 +240,9 @@ export function usePlatformImagesUpload(options: { onUploaded: () => Promise<voi
   )
 
   const notifyInvalidFiles = useCallback(() => {
-    openNotification(
-      'warning',
-      'Не найдено подходящих изображений. Поддерживаются JPEG, PNG, WebP, GIF.'
-    )
+    openNotification('warning', [
+      'Не найдено подходящих изображений. Поддерживаются JPEG, PNG, WebP, GIF.',
+    ])
   }, [openNotification])
 
   return {

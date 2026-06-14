@@ -1,7 +1,7 @@
 import { isFulfilled, isRejectedWithValue } from '@reduxjs/toolkit'
 import type { Middleware, UnknownAction } from '@reduxjs/toolkit'
 
-import { addNotification } from '../slices/notificationsSlice'
+import { addNotification, clearNotifications } from '../slices/notificationsSlice'
 
 const ignoredEndpoints = new Set(['refresh'])
 
@@ -56,26 +56,21 @@ export const rtkQueryErrorMiddleware: Middleware =
         return next(action)
       }
 
-      const messagesWithErrors = Object.values(action.payload.error).reduce<string[]>(
-        (acc, cur) => {
-          cur.titles.forEach(title => {
-            acc.push(title)
-          })
-
-          return acc
-        },
-        []
+      const messagesWithErrors = Object.values(action.payload.error).map<string[]>(
+        err => err.titles
       )
 
-      messagesWithErrors.forEach(textError => {
+      dispatch(clearNotifications())
+
+      messagesWithErrors.forEach(messageError =>
         dispatch(
           addNotification({
             type: 'error',
-            message: textError,
+            messages: messageError,
             duration: 5,
           })
         )
-      })
+      )
     }
 
     if (isRtkQueryFulfilledAction(action)) {
@@ -88,7 +83,7 @@ export const rtkQueryErrorMiddleware: Middleware =
       dispatch(
         addNotification({
           type: 'success',
-          message: action.payload.message,
+          messages: [action.payload.message],
           duration: 3,
         })
       )
