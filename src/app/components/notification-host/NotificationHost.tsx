@@ -13,9 +13,8 @@ export const NotificationHost = () => {
   useEffect(() => {
     if (notifications?.length) {
       notifications.forEach(notification => {
-        openNotification(notification.type, notification.message, notification.duration, () =>
-          dispatch(clearNotifications())
-        )
+        const { type, messages, duration } = notification
+        openNotification(type, messages, duration, () => dispatch(clearNotifications()))
       })
     }
   }, [notifications])

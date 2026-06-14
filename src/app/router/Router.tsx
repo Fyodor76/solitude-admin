@@ -17,6 +17,24 @@ import ProtectedRouter from './ProtectedRouter'
 import PublicRouter from './PublickRouter'
 import RouterErrorElement from './RouterErrorElement'
 
+const LoginPage = () => (
+  <ValidationProvider>
+    <Login />
+  </ValidationProvider>
+)
+
+const RegistrationPage = () => (
+  <ValidationProvider>
+    <Registration />
+  </ValidationProvider>
+)
+
+const CategoriesPage = () => (
+  <ValidationProvider>
+    <Categories />
+  </ValidationProvider>
+)
+
 export const Router: RouteObject[] = [
   {
     path: '/',
@@ -35,21 +53,17 @@ export const Router: RouteObject[] = [
       {
         path: '/login',
         element: (
-          <ValidationProvider>
-            <PublicRouter>
-              <Login />
-            </PublicRouter>
-          </ValidationProvider>
+          <PublicRouter>
+            <LoginPage />
+          </PublicRouter>
         ),
       },
       {
         path: '/registration',
         element: (
-          <ValidationProvider>
-            <PublicRouter>
-              <Registration />
-            </PublicRouter>
-          </ValidationProvider>
+          <PublicRouter>
+            <RegistrationPage />
+          </PublicRouter>
         ),
       },
       {
@@ -63,11 +77,9 @@ export const Router: RouteObject[] = [
       {
         path: '/categories',
         element: (
-          <ValidationProvider>
-            <ProtectedRouter>
-              <Categories />
-            </ProtectedRouter>
-          </ValidationProvider>
+          <ProtectedRouter>
+            <CategoriesPage />
+          </ProtectedRouter>
         ),
       },
       {
