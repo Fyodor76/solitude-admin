@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react'
 import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, Input } from 'antd'
+import { Button, Input, Table } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { div } from 'framer-motion/client'
 
 import { getIconForAttribute } from '@/app/constans/getIconForAttribute'
 
+import { valueColumns } from './helpers/ColumnsAttr'
 import './ProductAttributes.scss'
 
 const ProductAttribute = () => {
@@ -33,10 +33,12 @@ const ProductAttribute = () => {
       <div className="product-attributes-main">
         <div className="all-product-attributes">
           <h4 className="middle-title">Опции</h4>
-          <Input
-            suffix={<Icon name="search" color="#87898D" onClick={() => console.log('клик')} />}
-            placeholder="Поиск опции..."
-          ></Input>
+          <div className="input-search">
+            <Input
+              suffix={<Icon name="search" color="#87898D" onClick={() => console.log('клик')} />}
+              placeholder="Поиск опции..."
+            ></Input>
+          </div>
 
           {allProdAttr &&
             allProdAttr.map(prodAttr => (
@@ -49,10 +51,12 @@ const ProductAttribute = () => {
                   <Icon name={getIconForAttribute(prodAttr.type)} />
                   <span>{prodAttr.name}</span>
                 </div>
-                <span>{prodAttr.values.length}</span>
+                <span className="values-length">{prodAttr.values.length}</span>
               </div>
             ))}
-          <Button type="dashed">+ Создать опцию</Button>
+          <div className="createdOptionBtn">
+            <Button type="link">+ Создать опцию</Button>
+          </div>
         </div>
         <div className="product-attribute-info">
           <div className="product-attribute">
@@ -60,8 +64,8 @@ const ProductAttribute = () => {
               <h4 className="middle-title">Информация об опции</h4>
               {selectedAttributeId && (
                 <div className="product-attribute-btns">
-                  <Button>Удалить</Button>
-                  <Button>
+                  <Button className="product-attribute-btns-delete">Удалить</Button>
+                  <Button className="product-attribute-btns-edite">
                     <Icon name="editing" /> Редактировать
                   </Button>
                 </div>
@@ -70,26 +74,26 @@ const ProductAttribute = () => {
             {selectedAttributeId && selectAttr ? (
               <div className="select-attr-main-info">
                 <div className="select-attr-inputs">
-                  <div>
-                    <span>Название</span>
+                  <div className="select-attr-inputs-title-and-input">
+                    <span className="select-attr-inputs-title">Название</span>
                     <Input value={selectAttr?.name} />
                   </div>
-                  <div>
-                    <span>Slug</span>
+                  <div className="select-attr-inputs-title-and-input">
+                    <span className="select-attr-inputs-title">Slug</span>
                     <Input value={selectAttr?.slug} />
                   </div>
-                  <div>
-                    <span>Тип</span>
+                  <div className="select-attr-inputs-title-and-input">
+                    <span className="select-attr-inputs-title">Тип</span>
                     <Input value={selectAttr?.type} />
                   </div>
-                  <div>
-                    <span>Порядок сортировки</span>
+                  <div className="select-attr-inputs-title-and-input">
+                    <span className="select-attr-inputs-title">Порядок сортировки</span>
                     <Input value={selectAttr?.sortOrder} />
                   </div>
                 </div>
                 <div className="select-attr-description">
-                  <span>Описание</span>
-                  <TextArea value={selectAttr?.description} rows={6} />
+                  <span className="select-attr-inputs-title-description">Описание</span>
+                  <TextArea value={selectAttr?.description} rows={11} />
                 </div>
               </div>
             ) : (
@@ -97,13 +101,32 @@ const ProductAttribute = () => {
             )}
           </div>
           <div className="attribute-value">
-            <h4 className="middle-title">Значение опции</h4>
+            <div className="title-and-btn">
+              <h4 className="middle-title">Значение опции</h4>
+              <Button type="link">+ Добавить значение</Button>
+            </div>
+            {selectedAttributeId && selectAttr ? (
+              <Table
+                dataSource={selectAttr?.values}
+                columns={valueColumns}
+                loading={isLoading}
+                rowKey={selectAttr.id}
+                scroll={{ x: 'max-content' }}
+                pagination={false}
+              />
+            ) : (
+              'Ничего не выбрано'
+            )}
           </div>
         </div>
       </div>
       <div className="product-attributes-btn">
-        <Button type="text">Отмена</Button>
-        <Button type="primary">Сохранить изменения</Button>
+        <Button className="product-attributes-btn-cancel" type="text">
+          Отмена
+        </Button>
+        <Button className="product-attributes-btn-save" type="primary">
+          Сохранить изменения
+        </Button>
       </div>
     </div>
   )

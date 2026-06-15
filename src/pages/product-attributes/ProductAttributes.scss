@@ -1,9 +1,20 @@
+:global {
+  .ant-table-wrapper {
+    overflow-x: auto;
+  }
+  .ant-input-affix-wrapper {
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+    width: 80% !important;
+  }
+}
 .product-attributes-wrap {
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
   font-family: var(--font-primary);
   gap: 12px;
+  margin-top: 16px;
   .main-title {
     color: #262c33;
     margin-left: 33px;
@@ -14,29 +25,56 @@
     gap: 30px;
 
     .all-product-attributes {
-      margin-top: 20px;
       .middle-title {
         font-size: 18px;
         color: #262c33;
+        width: 100%;
+        padding-left: 20px;
+        padding-top: 20px;
       }
+      margin-top: 20px;
       display: flex;
       flex-direction: column;
       background-color: var(--color-white);
       border: 1px solid var(--admin-color-border);
       border-radius: var(--admin-radius-surface);
-      padding: 20px;
       margin-left: 33px;
       width: 40%;
       gap: 20px;
+      .input-search {
+        padding: 0px 20px;
+      }
       .prod-attr {
         font-size: 14px;
         display: flex;
         justify-content: space-between;
+        padding: 10px 20px;
         cursor: pointer;
+
+        &.active {
+          background-color: #f2f7fd;
+          border-right: 2px solid var(--color-blue);
+        }
+        &:hover {
+          background-color: #f8f9fa;
+        }
         .prod-name-with-img {
           display: flex;
           align-items: center;
           gap: 10px;
+        }
+        .values-length {
+          color: var(--color-blue);
+          font-weight: bold;
+        }
+      }
+      .createdOptionBtn {
+        display: flex;
+        width: 100%;
+        padding: 20px;
+        Button {
+          width: 100%;
+          background-color: #f8f9fa;
         }
       }
     }
@@ -52,7 +90,7 @@
         display: flex;
         gap: 20px;
         flex-direction: column;
-        background-color: var(--color-white);
+        background-color: rgb(255, 253, 253);
         border: 1px solid var(--admin-color-border);
         border-radius: var(--admin-radius-surface);
         padding: 20px;
@@ -66,21 +104,63 @@
           .product-attribute-btns {
             display: flex;
             gap: 12px;
+            &-delete {
+              color: red !important;
+              border-color: red !important;
+              padding: 5px 30px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            &-edite {
+              background-color: #f8f9fa;
+              padding: 5px 20px;
+            }
           }
         }
         .select-attr-main-info {
           display: flex;
           gap: 30px;
+          .select-attr-inputs,
+          .select-attr-description {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 50%;
+            height: 100%;
+            &-title-and-input {
+              display: flex;
+              flex-direction: column;
+              gap: 10px;
+              flex: 1;
+
+              .select-attr-inputs-title {
+                color: var(--admin-color-text-muted);
+                font-size: var(--admin-font-caption);
+              }
+            }
+            .select-attr-inputs-title-description {
+              color: var(--admin-color-text-muted);
+              font-size: var(--admin-font-caption);
+            }
+          }
         }
       }
       .attribute-value {
+        display: flex;
+        flex-direction: column;
         background-color: var(--color-white);
         border: 1px solid var(--admin-color-border);
         border-radius: var(--admin-radius-surface);
         padding: 20px;
-        .middle-title {
-          font-size: 18px;
-          color: #262c33;
+        gap: 20px;
+        .title-and-btn {
+          display: flex;
+          justify-content: space-between;
+          .middle-title {
+            font-size: 18px;
+            color: #262c33;
+          }
         }
       }
     }
@@ -91,5 +171,8 @@
     gap: 12px;
     margin-right: 33px;
     margin-bottom: 20px;
+    &-cancel {
+      color: #a4a7a9;
+    }
   }
 }
