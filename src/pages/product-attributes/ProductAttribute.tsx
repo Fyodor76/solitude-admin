@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react'
 
 import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
-import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
+import {
+  ProductAttributeRequest,
+  ProductAttributeResponse,
+} from '@/shared/lib/api/product-attributes/types'
+import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input, Table } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 
 import { getIconForAttribute } from '@/app/constans/getIconForAttribute'
 
+import { initialState } from './const/const'
 import { valueColumns } from './helpers/ColumnsAttr'
 import './ProductAttributes.scss'
 
@@ -15,10 +20,16 @@ const ProductAttribute = () => {
   const [allProdAttr, setAllProdAttr] = useState<ProductAttributeResponse[]>([])
   const { data: productAttributes, isLoading, isError, refetch } = useGetAllProductAttributesQuery()
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null)
+  const [searchOption, setSearchOption] = useState<string>('')
+  const [filteredOptions, setFilteredOptions] = useState<ProductAttributeResponse[]>([])
+  const [formOption, setFormOption] = useState<ProductAttributeRequest>(initialState)
+
+  const modal = useModal()
 
   useEffect(() => {
     if (productAttributes?.data) {
       setAllProdAttr(productAttributes?.data)
+      setFilteredOptions(productAttributes.data)
     }
   }, [productAttributes?.data])
   console.log(productAttributes?.data)
@@ -27,6 +38,23 @@ const ProductAttribute = () => {
   }
 
   const selectAttr = allProdAttr.find(prodAttr => prodAttr.id === selectedAttributeId)
+
+  const handlerSearch = () => {
+    if (searchOption.trim() === '') {
+      setFilteredOptions(allProdAttr)
+      return
+    } else {
+      const filterOptions = allProdAttr.filter(option =>
+        option.name.toLowerCase().includes(searchOption.toLowerCase())
+      )
+      setFilteredOptions(filterOptions)
+    }
+  }
+
+  const handlerCreateOption = () => {
+    modal.onOpen(formOption)
+  }
+
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -35,13 +63,17 @@ const ProductAttribute = () => {
           <h4 className="middle-title">Опции</h4>
           <div className="input-search">
             <Input
-              suffix={<Icon name="search" color="#87898D" onClick={() => console.log('клик')} />}
+              suffix={<Icon name="search" color="#87898D" onClick={handlerSearch} />}
               placeholder="Поиск опции..."
+              onChange={e => setSearchOption(e.target.value)}
+              onPressEnter={handlerSearch}
             ></Input>
           </div>
 
-          {allProdAttr &&
-            allProdAttr.map(prodAttr => (
+          {filteredOptions.length === 0 ? (
+            <div className="no-results">Опции не найдены...</div>
+          ) : (
+            filteredOptions.map(prodAttr => (
               <div
                 onClick={() => handlerClickOption(prodAttr.id)}
                 key={prodAttr.id}
@@ -53,9 +85,12 @@ const ProductAttribute = () => {
                 </div>
                 <span className="values-length">{prodAttr.values.length}</span>
               </div>
-            ))}
+            ))
+          )}
           <div className="createdOptionBtn">
-            <Button type="link">+ Создать опцию</Button>
+            <Button onClick={handlerCreateOption} type="link">
+              + Создать опцию
+            </Button>
           </div>
         </div>
         <div className="product-attribute-info">
