@@ -1,9 +1,68 @@
 import React from 'react'
 
-import { Modal } from 'antd'
+import { ProductAttributeRequest } from '@/shared/lib/api/product-attributes/types'
+import { Input, Modal, Select } from 'antd'
+import TextArea from 'antd/es/input/TextArea'
 
-const ProductAttributeModal = () => {
-  return <Modal></Modal>
+import { typeOptions } from '../const/const'
+
+interface ProductAttributeModalProp {
+  formOption: ProductAttributeRequest
+  isOpen: boolean
+  onClose: () => void
+  setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
+  onSave: () => Promise<void>
+}
+const ProductAttributeModal = ({
+  formOption,
+  isOpen,
+  onClose,
+  setFormOption,
+  onSave,
+}: ProductAttributeModalProp) => {
+  const handlerSelect = (failed: keyof ProductAttributeRequest, value: any) => {
+    setFormOption({
+      ...formOption,
+      [failed]: value,
+    })
+  }
+
+  return (
+    <Modal open={isOpen} onCancel={onClose} onOk={onSave} title="Создать опцию">
+      <span>Название *</span>
+      <Input
+        value={formOption.name}
+        placeholder="Введите название..."
+        onChange={e => handlerSelect('name', e.target.value)}
+      />
+      <span>Slug *</span>
+      <Input
+        value={formOption.slug}
+        placeholder="Введите slug"
+        onChange={e => handlerSelect('slug', e.target.value)}
+      />
+      <span>Только латинские буквы, цифры и дефисы</span>
+      <span>Тип *</span>
+      <Select
+        value={formOption.type}
+        placeholder="Выберете тип опции"
+        options={typeOptions}
+        onChange={v => handlerSelect('type', v)}
+      />
+      <span>Описание</span>
+      <TextArea
+        value={formOption.description}
+        placeholder="Введите описание (необязательно)"
+        onChange={e => handlerSelect('description', e.target.value)}
+      />
+      <span>Порядок сортировки</span>
+      <Input
+        value={formOption.sortOrder}
+        onChange={e => handlerSelect('sortOrder', e.target.value)}
+      />
+      <span>Меньшее значение имеет больший преоритет</span>
+    </Modal>
+  )
 }
 
-export default ProductAttributeModal
+export default React.memo(ProductAttributeModal)

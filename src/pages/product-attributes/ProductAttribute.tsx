@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
-import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
+import {
+  useCreateProductAttributesMutation,
+  useGetAllProductAttributesQuery,
+} from '@/shared/lib/api/product-attributes/ProductAttributes'
 import {
   ProductAttributeRequest,
   ProductAttributeResponse,
@@ -14,11 +17,13 @@ import { getIconForAttribute } from '@/app/constans/getIconForAttribute'
 
 import { initialState } from './const/const'
 import { valueColumns } from './helpers/ColumnsAttr'
+import ProductAttributeModal from './product-attribute-modal/ProductAttributeModal'
 import './ProductAttributes.scss'
 
 const ProductAttribute = () => {
   const [allProdAttr, setAllProdAttr] = useState<ProductAttributeResponse[]>([])
   const { data: productAttributes, isLoading, isError, refetch } = useGetAllProductAttributesQuery()
+  const [createProductAttributes] = useCreateProductAttributesMutation()
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null)
   const [searchOption, setSearchOption] = useState<string>('')
   const [filteredOptions, setFilteredOptions] = useState<ProductAttributeResponse[]>([])
@@ -39,7 +44,7 @@ const ProductAttribute = () => {
 
   const selectAttr = allProdAttr.find(prodAttr => prodAttr.id === selectedAttributeId)
 
-  const handlerSearch = () => {
+  const handlerSearch = useCallback(() => {
     if (searchOption.trim() === '') {
       setFilteredOptions(allProdAttr)
       return
@@ -49,12 +54,33 @@ const ProductAttribute = () => {
       )
       setFilteredOptions(filterOptions)
     }
-  }
+  }, [filteredOptions])
 
   const handlerCreateOption = () => {
     modal.onOpen(formOption)
   }
 
+  const onSaveCreated = async () => {
+    try {
+      const newOption: ProductAttributeRequest = {
+        name: formOption.name,
+        slug: formOption.slug,
+        type: formOption.type,
+        description: formOption.description,
+        sortOrder: formOption.sortOrder,
+      }
+      const response = await createProductAttributes({ data: newOption }).unwrap()
+      setAllProdAttr(prev => {
+        return [...prev, response.data]
+      })
+      setFormOption(initialState)
+
+      modal.onClose()
+      console.log('Создала новую опцию!')
+    } catch (error) {
+      console.log('Ошибка создания новой опции...', error)
+    }
+  }
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -67,6 +93,7 @@ const ProductAttribute = () => {
               placeholder="Поиск опции..."
               onChange={e => setSearchOption(e.target.value)}
               onPressEnter={handlerSearch}
+              value={searchOption}
             ></Input>
           </div>
 
@@ -163,6 +190,13 @@ const ProductAttribute = () => {
           Сохранить изменения
         </Button>
       </div>
+      <ProductAttributeModal
+        formOption={formOption}
+        isOpen={modal.isOpen}
+        onClose={modal.onClose}
+        setFormOption={setFormOption}
+        onSave={onSaveCreated}
+      />
     </div>
   )
 }

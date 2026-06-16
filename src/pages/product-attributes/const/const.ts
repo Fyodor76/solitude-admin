@@ -7,3 +7,12 @@ export const initialState: ProductAttributeRequest = {
   description: '',
   sortOrder: 0,
 }
+
+export const typeOptions = [
+  { value: 'color', label: 'Цвет' },
+  { value: 'size', label: 'Размер' },
+  { value: 'volume', label: 'Объем' },
+  { value: 'weight', label: 'Вес' },
+  { value: 'dimension', label: 'Габариты' },
+  { value: 'other', label: 'Другое' },
+]

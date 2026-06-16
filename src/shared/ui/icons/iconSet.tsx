@@ -119,15 +119,15 @@ export const iconSet = {
   ),
   uiElements: (
     <svg
-      width="800px"
-      height="800px"
+      width="26px"
+      height="26px"
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
         d="M19 17H5L12 2L19 17ZM19 17L8 11M16 11.5L9.5 8M9 22H15M12 22V17"
-        stroke="currentColor"
+        stroke="#87898D"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -229,14 +229,14 @@ export const iconSet = {
   ),
   extras: (
     <svg
-      fill="#000000"
-      width="800px"
-      height="800px"
+      fill="none"
+      stroke="#87898D"
+      width="24px"
+      height="24px"
       viewBox="0 0 32 32"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <title>home-medical</title>
       <path d="M30.488 13.431l-14-12c-0.13-0.112-0.301-0.18-0.488-0.18s-0.358 0.068-0.489 0.181l0.001-0.001-14 12c-0.161 0.138-0.262 0.342-0.262 0.569v16c0 0.414 0.336 0.75 0.75 0.75h28c0.414-0 0.75-0.336 0.75-0.75v0-16c-0-0.227-0.101-0.431-0.261-0.569l-0.001-0.001zM29.25 29.25h-26.5v-14.905l13.25-11.356 13.25 11.356zM14.5 11v5.5h-5.5v3h5.5v5.5h3v-5.5h5.5v-3h-5.5v-5.5h-3z"></path>
     </svg>
   ),
@@ -566,7 +566,7 @@ export const iconSet = {
       width="24"
       height="24"
       viewBox="0 0 24 24"
-      fill="#87898D"
+      fill="none"
       stroke="#87898D"
       strokeWidth="2"
       strokeLinecap="round"
@@ -587,7 +587,7 @@ export const iconSet = {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke="#87898D"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -604,7 +604,7 @@ export const iconSet = {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke="#87898D"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -621,7 +621,7 @@ export const iconSet = {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke="#87898D"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -643,7 +643,7 @@ export const iconSet = {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke="#87898D"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -659,7 +659,7 @@ export const iconSet = {
       height="24"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
+      stroke="#87898D"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
