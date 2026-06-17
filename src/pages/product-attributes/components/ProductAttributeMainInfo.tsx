@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   ProductAttributeRequest,
@@ -47,6 +47,12 @@ const ProductAttributeMainInfo = ({
   const [editFormLocal, setEditFormLocal] = useState<ProductAttributeResponse | undefined>(
     selectAttr
   )
+
+  useEffect(() => {
+    if (selectAttr) {
+      setEditFormLocal(selectAttr)
+    }
+  }, [selectAttr])
   const handlerInputsSelect = (failed: keyof ProductAttributeResponse, value: any) => {
     setEditFormLocal(prev => ({
       ...prev!,
