@@ -23,6 +23,7 @@ const ProductAttributeOptions = ({
   handlerCreateOption,
 }: ProductAttributeOptionsProps) => {
   const [searchOption, setSearchOption] = useState<string>('')
+
   const handlerClickOption = (attributeId: string) => {
     setSelectedAttributeId(attributeId)
   }

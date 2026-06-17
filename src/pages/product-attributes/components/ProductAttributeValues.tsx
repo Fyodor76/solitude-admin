@@ -26,7 +26,7 @@ const ProductAttributeValues = ({
           dataSource={selectAttr?.values}
           columns={valueColumns}
           loading={isLoading}
-          rowKey={selectAttr.id}
+          rowKey="id"
           scroll={{ x: 'max-content' }}
           pagination={false}
         />

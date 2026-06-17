@@ -9,16 +9,22 @@ import { typeOptions } from '../const/const'
 interface ProductAttributeModalProp {
   formOption: ProductAttributeRequest
   isOpen: boolean
+  isCreate: boolean
+  selectedAttributeId: string | null
   onClose: () => void
   setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
-  onSave: () => Promise<void>
+  onSaveCreated: () => Promise<void>
+  onSaveEdited: (data: Partial<ProductAttributeRequest>, id: string) => Promise<void>
 }
 const ProductAttributeModal = ({
   formOption,
   isOpen,
+  isCreate,
+  selectedAttributeId,
   onClose,
   setFormOption,
-  onSave,
+  onSaveCreated,
+  onSaveEdited,
 }: ProductAttributeModalProp) => {
   const handlerSelect = (failed: keyof ProductAttributeRequest, value: any) => {
     setFormOption({
@@ -28,7 +34,19 @@ const ProductAttributeModal = ({
   }
 
   return (
-    <Modal open={isOpen} onCancel={onClose} onOk={onSave} title="Создать опцию">
+    <Modal
+      open={isOpen}
+      onCancel={onClose}
+      onOk={async () => {
+        if (isCreate) {
+          await onSaveCreated()
+        } else {
+          if (!selectedAttributeId) return
+          await onSaveEdited(formOption, selectedAttributeId)
+        }
+      }}
+      title={isCreate ? 'Создать опцию' : 'Редактировать опцию'}
+    >
       <span>Название *</span>
       <Input
         value={formOption.name}
