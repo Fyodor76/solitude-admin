@@ -98,18 +98,7 @@ const ProductAttribute = () => {
     })
     modal.onOpen(formOption)
   }
-  const handlerInputsSelect = (
-    failed: keyof ProductAttributeRequest,
-    value: any,
-    data: ProductAttributeResponse
-  ) => {
-    console.log('handlerInputsSelect вызвана:', { failed, value, data }) // ← добавить лог
-    setFormOption({
-      ...data,
-      [failed]: value,
-    })
-  }
-  console.log('handlerInputsSelect определена:', typeof handlerInputsSelect)
+
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -126,13 +115,13 @@ const ProductAttribute = () => {
           <ProductAttributeMainInfo
             allProdAttr={allProdAttr}
             selectedAttributeId={selectedAttributeId}
+            formOption={formOption}
             isLoading={isLoading}
             setAllProdAttr={setAllProdAttr}
             setFilteredOptions={setFilteredOptions}
             setSelectedAttributeId={setSelectedAttributeId}
             handlerEditOption={handlerEditOption}
             isEdit={isEdit}
-            handlerInputsSelect={handlerInputsSelect}
           />
         </div>
       </div>

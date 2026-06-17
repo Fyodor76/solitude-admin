@@ -17,11 +17,8 @@ interface ProductAttributeMainInfoProps {
   selectedAttributeId: string | null
   isLoading: boolean
   isEdit: boolean
-  handlerInputsSelect: (
-    failed: keyof ProductAttributeRequest,
-    value: any,
-    data: ProductAttributeResponse
-  ) => void
+  formOption: ProductAttributeRequest
+
   setAllProdAttr: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string | null>>
   setFilteredOptions: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
@@ -29,6 +26,7 @@ interface ProductAttributeMainInfoProps {
 }
 const ProductAttributeMainInfo = ({
   allProdAttr,
+
   selectedAttributeId,
   isLoading,
   isEdit,
@@ -36,7 +34,6 @@ const ProductAttributeMainInfo = ({
   setFilteredOptions,
   setSelectedAttributeId,
   handlerEditOption,
-  handlerInputsSelect,
 }: ProductAttributeMainInfoProps) => {
   const { deleteProdAttr } = useHandlerPoductAttribute({
     allProdAttr,
@@ -47,7 +44,15 @@ const ProductAttributeMainInfo = ({
   })
 
   const selectAttr = allProdAttr.find(prodAttr => prodAttr.id === selectedAttributeId)
-
+  const [editFormLocal, setEditFormLocal] = useState<ProductAttributeResponse | undefined>(
+    selectAttr
+  )
+  const handlerInputsSelect = (failed: keyof ProductAttributeResponse, value: any) => {
+    setEditFormLocal(prev => ({
+      ...prev!,
+      [failed]: value,
+    }))
+  }
   return (
     <>
       <div className="product-attribute">
@@ -76,39 +81,39 @@ const ProductAttributeMainInfo = ({
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Название</span>
                 <Input
-                  value={selectAttr?.name}
-                  onChange={e => handlerInputsSelect('name', e.target.value, selectAttr)}
+                  value={editFormLocal?.name}
+                  onChange={e => handlerInputsSelect('name', e.target.value)}
                 />
               </div>
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Slug</span>
                 <Input
-                  value={selectAttr?.slug}
-                  onChange={e => handlerInputsSelect('slug', e.target.value, selectAttr)}
+                  value={editFormLocal?.slug}
+                  onChange={e => handlerInputsSelect('slug', e.target.value)}
                 />
               </div>
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Тип</span>
                 <Select
-                  value={selectAttr?.type}
-                  onChange={v => handlerInputsSelect('type', v, selectAttr)}
+                  value={editFormLocal?.type}
+                  onChange={v => handlerInputsSelect('type', v)}
                   options={typeOptions}
                 />
               </div>
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Порядок сортировки</span>
                 <Input
-                  value={selectAttr?.sortOrder}
-                  onChange={e => handlerInputsSelect('sortOrder', e.target.value, selectAttr)}
+                  value={editFormLocal?.sortOrder}
+                  onChange={e => handlerInputsSelect('sortOrder', e.target.value)}
                 />
               </div>
             </div>
             <div className="select-attr-description">
               <span className="select-attr-inputs-title-description">Описание</span>
               <TextArea
-                value={selectAttr?.description}
+                value={editFormLocal?.description}
                 rows={11}
-                onChange={e => handlerInputsSelect('description', e.target.value, selectAttr)}
+                onChange={e => handlerInputsSelect('description', e.target.value)}
               />
             </div>
           </div>
