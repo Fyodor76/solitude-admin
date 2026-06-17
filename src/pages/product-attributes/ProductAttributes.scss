@@ -44,6 +44,11 @@
       .input-search {
         padding: 0px 20px;
       }
+      .no-results {
+        font-family: var(--font-primary);
+        font-size: 14px;
+        text-align: center;
+      }
       .prod-attr {
         font-size: 14px;
         display: flex;
