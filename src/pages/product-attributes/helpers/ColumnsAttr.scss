@@ -1,13 +1,32 @@
 .table-color-container {
   display: flex;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #d9d9d9;
+  cursor: pointer;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  background-color: transparent;
 
-  .table-color {
-    width: 22px;
-    height: 22px;
-    border-radius: 12px;
-    border: 1px solid #d9d9d9;
+  input[type='color'].circle-color-picker {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    cursor: pointer;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0 !important;
+      border-radius: 50% !important;
+    }
+
+    &::-webkit-color-swatch {
+      border: none !important;
+      border-radius: 50% !important;
+    }
   }
 }
 .active-true {
@@ -16,14 +35,7 @@
 .table-actions {
   display: flex;
   gap: 8px;
-  &-edit {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    border: 1px solid #d9d9d9;
-    border-radius: 8px;
-  }
+
   &-delete {
     display: flex;
     align-items: center;

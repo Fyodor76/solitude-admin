@@ -13,46 +13,27 @@ import { useHandlerPoductAttribute } from '../hooks/useHandlerProductAttribute'
 import ProductAttributeValues from './ProductAttributeValues'
 
 interface ProductAttributeMainInfoProps {
-  allProdAttr: ProductAttributeResponse[]
+  editFormLocal: ProductAttributeResponse | undefined
   selectedAttributeId: string | null
   isLoading: boolean
-  isEdit: boolean
   formOption: ProductAttributeRequest
-
+  valueId: string | null
+  setEditFormLocal: React.Dispatch<React.SetStateAction<ProductAttributeResponse | undefined>>
+  setValueId: React.Dispatch<React.SetStateAction<string | null>>
+  deleteOption: (id: string) => Promise<void>
   setAllProdAttr: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string | null>>
   setFilteredOptions: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
-  handlerEditOption: (selectAttr: ProductAttributeResponse | undefined) => void
 }
 const ProductAttributeMainInfo = ({
-  allProdAttr,
-
+  editFormLocal,
   selectedAttributeId,
   isLoading,
-  isEdit,
-  setAllProdAttr,
-  setFilteredOptions,
-  setSelectedAttributeId,
-  handlerEditOption,
+  valueId,
+  setEditFormLocal,
+  setValueId,
+  deleteOption,
 }: ProductAttributeMainInfoProps) => {
-  const { deleteProdAttr } = useHandlerPoductAttribute({
-    allProdAttr,
-    selectedAttributeId,
-    setAllProdAttr,
-    setFilteredOptions,
-    setSelectedAttributeId,
-  })
-
-  const selectAttr = allProdAttr.find(prodAttr => prodAttr.id === selectedAttributeId)
-  const [editFormLocal, setEditFormLocal] = useState<ProductAttributeResponse | undefined>(
-    selectAttr
-  )
-
-  useEffect(() => {
-    if (selectAttr) {
-      setEditFormLocal(selectAttr)
-    }
-  }, [selectAttr])
   const handlerInputsSelect = (failed: keyof ProductAttributeResponse, value: any) => {
     setEditFormLocal(prev => ({
       ...prev!,
@@ -68,20 +49,14 @@ const ProductAttributeMainInfo = ({
             <div className="product-attribute-btns">
               <Button
                 className="product-attribute-btns-delete"
-                onClick={() => deleteProdAttr(selectedAttributeId)}
+                onClick={() => deleteOption(selectedAttributeId)}
               >
                 Удалить
-              </Button>
-              <Button
-                className="product-attribute-btns-edite"
-                onClick={() => handlerEditOption(selectAttr)}
-              >
-                <Icon name="editing" /> Редактировать
               </Button>
             </div>
           )}
         </div>
-        {selectedAttributeId && selectAttr ? (
+        {selectedAttributeId && editFormLocal ? (
           <div className="select-attr-main-info">
             <div className="select-attr-inputs">
               <div className="select-attr-inputs-title-and-input">
@@ -129,8 +104,11 @@ const ProductAttributeMainInfo = ({
       </div>
       <ProductAttributeValues
         isLoading={isLoading}
-        selectAttr={selectAttr}
+        editFormLocal={editFormLocal}
         selectedAttributeId={selectedAttributeId}
+        valueId={valueId}
+        setValueId={setValueId}
+        setEditFormLocal={setEditFormLocal}
       />
     </>
   )

@@ -1,10 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import {
-  useCreateProductAttributesMutation,
-  useGetAllProductAttributesQuery,
-  useUpdateProductAttributesMutation,
-} from '@/shared/lib/api/product-attributes/ProductAttributes'
+import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
 import {
   ProductAttributeRequest,
   ProductAttributeResponse,
@@ -12,27 +8,44 @@ import {
 import { useModal } from '@/shared/lib/hooks/useModal'
 
 import { MODES } from '../categories/const/constans'
+import EditCategoryModal from '../categories/modal/EditCategoryModal'
 import ProductAttributeBtns from './components/ProductAttributeBtns'
 import ProductAttributeMainInfo from './components/ProductAttributeMainInfo'
 import ProductAttributeOptions from './components/ProductAttributeOptions'
 import { initialState } from './const/const'
 import { useHandlerPoductAttribute } from './hooks/useHandlerProductAttribute'
+import { useHandlerProductAttributeValues } from './hooks/useHandlerProductAttributeValues'
 import ProductAttributeModal from './product-attribute-modal/ProductAttributeModal'
 import './ProductAttributes.scss'
 
 const ProductAttribute = () => {
   const { data: productAttributes, isLoading, isError, refetch } = useGetAllProductAttributesQuery()
-  const [createProductAttributes] = useCreateProductAttributesMutation()
-  const [updateProductAttributes] = useUpdateProductAttributesMutation()
+
   const [allProdAttr, setAllProdAttr] = useState<ProductAttributeResponse[]>([])
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null)
   const [filteredOptions, setFilteredOptions] = useState<ProductAttributeResponse[]>([])
   const [formOption, setFormOption] = useState<ProductAttributeRequest>(initialState)
+  const [valueId, setValueId] = useState<string | null>(null)
+  const selectAttr = allProdAttr.find(prodAttr => prodAttr.id === selectedAttributeId)
+  const [editFormLocal, setEditFormLocal] = useState<ProductAttributeResponse | undefined>(
+    selectAttr
+  )
   const modal = useModal()
   const mode = modal.mode
   const isCreate = mode === MODES.CREATE
   const isEdit = mode === MODES.EDIT
+  const { onSaveCreatedOption, onSaveEditedOption, deleteOption } = useHandlerPoductAttribute({
+    allProdAttr,
+    selectedAttributeId,
+    formOption,
+    setAllProdAttr,
+    setFilteredOptions,
+    setSelectedAttributeId,
+    setEditFormLocal,
+    setFormOption,
+  })
 
+  const { onSaveEditedValue } = useHandlerProductAttributeValues({ setValueId, setEditFormLocal })
   useEffect(() => {
     if (productAttributes?.data) {
       setAllProdAttr(productAttributes?.data)
@@ -40,45 +53,15 @@ const ProductAttribute = () => {
     }
   }, [productAttributes?.data])
 
+  useEffect(() => {
+    if (selectAttr) {
+      setEditFormLocal(selectAttr)
+    } else {
+      setEditFormLocal(undefined)
+    }
+  }, [selectAttr])
+
   console.log(productAttributes?.data)
-
-  const onSaveCreated = async () => {
-    try {
-      const newOption: ProductAttributeRequest = {
-        name: formOption.name,
-        slug: formOption.slug,
-        type: formOption.type,
-        description: formOption.description,
-        sortOrder: formOption.sortOrder,
-      }
-      const response = await createProductAttributes({ data: newOption }).unwrap()
-      setAllProdAttr(prev => {
-        return [...prev, response.data]
-      })
-      setFilteredOptions(prev => [...prev, response.data])
-      setFormOption(initialState)
-
-      modal.onClose()
-      console.log('Создала новую опцию!')
-    } catch (error) {
-      console.log('Ошибка создания новой опции...', error)
-    }
-  }
-
-  const onSaveEdited = async (data: Partial<ProductAttributeRequest>, id: string) => {
-    try {
-      const response = await updateProductAttributes({ data, id }).unwrap()
-      setAllProdAttr(prev => prev.map(prodAttr => (prodAttr.id === id ? response.data : prodAttr)))
-      setFilteredOptions(prev =>
-        prev.map(filterProdAttr => (filterProdAttr.id === id ? response.data : filterProdAttr))
-      )
-      setFormOption(initialState)
-      console.log(`Отредактировала опцию: ${response.data.name}`)
-      modal.onClose()
-    } catch (error) {
-      console.log('Ошибка редактирования опции...', error)
-    }
-  }
 
   const handlerCreateOption = () => {
     modal.setMode(MODES.CREATE)
@@ -86,17 +69,19 @@ const ProductAttribute = () => {
     modal.onOpen(formOption)
   }
 
-  const handlerEditOption = (selectAttr: ProductAttributeResponse | undefined) => {
-    if (!selectAttr) return
-    modal.setMode(MODES.EDIT)
-    setFormOption({
-      name: selectAttr.name,
-      slug: selectAttr.slug,
-      type: selectAttr.type,
-      description: selectAttr.description,
-      sortOrder: selectAttr.sortOrder,
-    })
-    modal.onOpen(formOption)
+  const saveAllChanges = async () => {
+    try {
+      if (selectedAttributeId && editFormLocal) {
+        const { id, values, isActive, createdAt, updatedAt, ...optionData } = editFormLocal
+        await onSaveEditedOption(optionData, selectedAttributeId)
+      }
+      if (selectedAttributeId && editFormLocal) {
+        await onSaveEditedValue(selectedAttributeId, editFormLocal)
+      }
+      console.log('Все изменения сохранены!')
+    } catch (error) {
+      console.error('Ошибка сохранения:', error)
+    }
   }
 
   return (
@@ -113,19 +98,21 @@ const ProductAttribute = () => {
         />
         <div className="product-attribute-info">
           <ProductAttributeMainInfo
-            allProdAttr={allProdAttr}
             selectedAttributeId={selectedAttributeId}
             formOption={formOption}
             isLoading={isLoading}
+            editFormLocal={editFormLocal}
+            setEditFormLocal={setEditFormLocal}
             setAllProdAttr={setAllProdAttr}
             setFilteredOptions={setFilteredOptions}
             setSelectedAttributeId={setSelectedAttributeId}
-            handlerEditOption={handlerEditOption}
-            isEdit={isEdit}
+            deleteOption={deleteOption}
+            valueId={valueId}
+            setValueId={setValueId}
           />
         </div>
       </div>
-      <ProductAttributeBtns />
+      <ProductAttributeBtns saveAllChanges={saveAllChanges} />
       <ProductAttributeModal
         isCreate={isCreate}
         selectedAttributeId={selectedAttributeId}
@@ -133,8 +120,7 @@ const ProductAttribute = () => {
         isOpen={modal.isOpen}
         onClose={modal.onClose}
         setFormOption={setFormOption}
-        onSaveCreated={onSaveCreated}
-        onSaveEdited={onSaveEdited}
+        onSaveCreatedOption={onSaveCreatedOption}
       />
     </div>
   )

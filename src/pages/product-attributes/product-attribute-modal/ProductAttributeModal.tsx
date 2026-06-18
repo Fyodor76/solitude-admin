@@ -13,8 +13,7 @@ interface ProductAttributeModalProp {
   selectedAttributeId: string | null
   onClose: () => void
   setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
-  onSaveCreated: () => Promise<void>
-  onSaveEdited: (data: Partial<ProductAttributeRequest>, id: string) => Promise<void>
+  onSaveCreatedOption: () => Promise<void>
 }
 const ProductAttributeModal = ({
   formOption,
@@ -23,8 +22,7 @@ const ProductAttributeModal = ({
   selectedAttributeId,
   onClose,
   setFormOption,
-  onSaveCreated,
-  onSaveEdited,
+  onSaveCreatedOption,
 }: ProductAttributeModalProp) => {
   const handlerSelect = (failed: keyof ProductAttributeRequest, value: any) => {
     setFormOption({
@@ -37,15 +35,8 @@ const ProductAttributeModal = ({
     <Modal
       open={isOpen}
       onCancel={onClose}
-      onOk={async () => {
-        if (isCreate) {
-          await onSaveCreated()
-        } else {
-          if (!selectedAttributeId) return
-          await onSaveEdited(formOption, selectedAttributeId)
-        }
-      }}
-      title={isCreate ? 'Создать опцию' : 'Редактировать опцию'}
+      title="Создать опцию"
+      onOk={async () => await onSaveCreatedOption()}
     >
       <span>Название *</span>
       <Input
