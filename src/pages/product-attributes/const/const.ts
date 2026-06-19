@@ -1,4 +1,9 @@
-import { ProductAttributeRequest } from '@/shared/lib/api/product-attributes/types'
+import {
+  AttributeValueRequest,
+  ProductAttributeRequest,
+} from '@/shared/lib/api/product-attributes/types'
+
+import { AttributeValue } from '@/app/types/product'
 
 export const initialState: ProductAttributeRequest = {
   name: '',
@@ -6,6 +11,15 @@ export const initialState: ProductAttributeRequest = {
   type: 'color' || 'size' || 'volume' || 'weight' || 'dimension' || 'other',
   description: '',
   sortOrder: 0,
+}
+
+export const initialStateValue: AttributeValueRequest = {
+  value: '',
+  displayName: '',
+  slug: '',
+  sortOrder: 0,
+  hexCode: '#000000',
+  isActive: true,
 }
 
 export const typeOptions = [

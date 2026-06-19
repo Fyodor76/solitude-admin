@@ -1,8 +1,8 @@
 export interface AttributeValueRequest {
   value: string
   displayName: string
-  slug: string
-  sortOrder: number
+  slug?: string
+  sortOrder?: number
   hexCode?: string
   isActive: boolean
 }

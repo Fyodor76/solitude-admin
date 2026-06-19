@@ -2,17 +2,17 @@ import { useEffect, useState } from 'react'
 
 import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
 import {
+  AttributeValueRequest,
   ProductAttributeRequest,
   ProductAttributeResponse,
 } from '@/shared/lib/api/product-attributes/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 
 import { MODES } from '../categories/const/constans'
-import EditCategoryModal from '../categories/modal/EditCategoryModal'
 import ProductAttributeBtns from './components/ProductAttributeBtns'
 import ProductAttributeMainInfo from './components/ProductAttributeMainInfo'
 import ProductAttributeOptions from './components/ProductAttributeOptions'
-import { initialState } from './const/const'
+import { initialState, initialStateValue } from './const/const'
 import { useHandlerPoductAttribute } from './hooks/useHandlerProductAttribute'
 import { useHandlerProductAttributeValues } from './hooks/useHandlerProductAttributeValues'
 import ProductAttributeModal from './product-attribute-modal/ProductAttributeModal'
@@ -25,6 +25,7 @@ const ProductAttribute = () => {
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null)
   const [filteredOptions, setFilteredOptions] = useState<ProductAttributeResponse[]>([])
   const [formOption, setFormOption] = useState<ProductAttributeRequest>(initialState)
+  const [formValue, setFormValue] = useState<AttributeValueRequest>(initialStateValue)
   const [valueId, setValueId] = useState<string | null>(null)
   const selectAttr = allProdAttr.find(prodAttr => prodAttr.id === selectedAttributeId)
   const [editFormLocal, setEditFormLocal] = useState<ProductAttributeResponse | undefined>(
@@ -32,8 +33,8 @@ const ProductAttribute = () => {
   )
   const modal = useModal()
   const mode = modal.mode
-  const isCreate = mode === MODES.CREATE
-  const isEdit = mode === MODES.EDIT
+  const isCreateOption = mode === MODES.CREATE
+
   const { onSaveCreatedOption, onSaveEditedOption, deleteOption } = useHandlerPoductAttribute({
     allProdAttr,
     selectedAttributeId,
@@ -45,7 +46,17 @@ const ProductAttribute = () => {
     setFormOption,
   })
 
-  const { onSaveEditedValue } = useHandlerProductAttributeValues({ setValueId, setEditFormLocal })
+  const { onSaveEditedValue, localDeleteValue, localEditValue, onSaveCreatedValue } =
+    useHandlerProductAttributeValues({
+      editFormLocal,
+      formValue,
+      selectedAttributeId,
+      modal,
+      setFormValue,
+      setValueId,
+      setEditFormLocal,
+      setAllProdAttr,
+    })
   useEffect(() => {
     if (productAttributes?.data) {
       setAllProdAttr(productAttributes?.data)
@@ -64,7 +75,6 @@ const ProductAttribute = () => {
   console.log(productAttributes?.data)
 
   const handlerCreateOption = () => {
-    modal.setMode(MODES.CREATE)
     setFormOption(initialState)
     modal.onOpen(formOption)
   }
@@ -73,6 +83,7 @@ const ProductAttribute = () => {
     try {
       if (selectedAttributeId && editFormLocal) {
         const { id, values, isActive, createdAt, updatedAt, ...optionData } = editFormLocal
+
         await onSaveEditedOption(optionData, selectedAttributeId)
       }
       if (selectedAttributeId && editFormLocal) {
@@ -84,6 +95,10 @@ const ProductAttribute = () => {
     }
   }
 
+  const addValue = () => {
+    setFormValue(initialStateValue)
+    modal.onOpen(formValue)
+  }
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -102,6 +117,8 @@ const ProductAttribute = () => {
             formOption={formOption}
             isLoading={isLoading}
             editFormLocal={editFormLocal}
+            localDeleteValue={localDeleteValue}
+            localEditValue={localEditValue}
             setEditFormLocal={setEditFormLocal}
             setAllProdAttr={setAllProdAttr}
             setFilteredOptions={setFilteredOptions}
@@ -109,18 +126,22 @@ const ProductAttribute = () => {
             deleteOption={deleteOption}
             valueId={valueId}
             setValueId={setValueId}
+            addValue={addValue}
           />
         </div>
       </div>
       <ProductAttributeBtns saveAllChanges={saveAllChanges} />
       <ProductAttributeModal
-        isCreate={isCreate}
+        isCreateOption={isCreateOption}
         selectedAttributeId={selectedAttributeId}
         formOption={formOption}
+        formValue={formValue}
+        setFormValue={setFormValue}
         isOpen={modal.isOpen}
         onClose={modal.onClose}
         setFormOption={setFormOption}
         onSaveCreatedOption={onSaveCreatedOption}
+        onSaveCreatedValue={onSaveCreatedValue}
       />
     </div>
   )

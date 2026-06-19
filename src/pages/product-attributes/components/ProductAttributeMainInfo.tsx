@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import {
   ProductAttributeRequest,
   ProductAttributeResponse,
 } from '@/shared/lib/api/product-attributes/types'
-import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 
+import { AttributeValue } from '@/app/types/product'
+
 import { typeOptions } from '../const/const'
-import { useHandlerPoductAttribute } from '../hooks/useHandlerProductAttribute'
 import ProductAttributeValues from './ProductAttributeValues'
 
 interface ProductAttributeMainInfoProps {
@@ -18,6 +18,9 @@ interface ProductAttributeMainInfoProps {
   isLoading: boolean
   formOption: ProductAttributeRequest
   valueId: string | null
+  addValue: () => void
+  localDeleteValue: (id: string) => void
+  localEditValue: (id: string, failed: keyof AttributeValue, value: any) => void
   setEditFormLocal: React.Dispatch<React.SetStateAction<ProductAttributeResponse | undefined>>
   setValueId: React.Dispatch<React.SetStateAction<string | null>>
   deleteOption: (id: string) => Promise<void>
@@ -30,6 +33,9 @@ const ProductAttributeMainInfo = ({
   selectedAttributeId,
   isLoading,
   valueId,
+  addValue,
+  localDeleteValue,
+  localEditValue,
   setEditFormLocal,
   setValueId,
   deleteOption,
@@ -37,7 +43,7 @@ const ProductAttributeMainInfo = ({
   const handlerInputsSelect = (failed: keyof ProductAttributeResponse, value: any) => {
     setEditFormLocal(prev => ({
       ...prev!,
-      [failed]: value,
+      [failed]: failed === 'sortOrder' ? Number(value) : value,
     }))
   }
   return (
@@ -107,8 +113,11 @@ const ProductAttributeMainInfo = ({
         editFormLocal={editFormLocal}
         selectedAttributeId={selectedAttributeId}
         valueId={valueId}
+        addValue={addValue}
         setValueId={setValueId}
         setEditFormLocal={setEditFormLocal}
+        localDeleteValue={localDeleteValue}
+        localEditValue={localEditValue}
       />
     </>
   )
