@@ -156,12 +156,38 @@ export const useHandlerProductAttributeValues = ({
 
   const onSaveCreatedValue = async () => {
     try {
+      const slug =
+        formValue.value
+          .toLowerCase()
+          .replace(/[^a-z0-9-]/g, '-')
+          .replace(/-+/g, '-') +
+        '-' +
+        Date.now()
+
+      let hexCode = formValue.hexCode || '#000000'
+      if (hexCode.startsWith('rgb')) {
+        const rgb = hexCode.match(/\d+/g)
+        if (rgb && rgb.length === 3) {
+          const [r, g, b] = rgb.map(Number)
+          hexCode = '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')
+          console.log('🔄 RGB → HEX:', hexCode) // ← проверь в консоли
+        }
+      }
+
       const newValue: AttributeValueRequest = {
         value: formValue.value,
         displayName: formValue.displayName,
-        hexCode: formValue.hexCode,
+        slug: slug,
+        hexCode: hexCode,
         isActive: formValue.isActive,
       }
+
+      console.log('📤 Второе создание:')
+      console.log('  selectedAttributeId:', selectedAttributeId)
+      console.log('  formValue:', formValue)
+      console.log('  editFormLocal:', editFormLocal)
+      console.log('  editFormLocal.values:', editFormLocal?.values)
+      console.log('📤 Отправляем:', newValue)
       const response = await createAttributeValue({
         data: newValue,
         attributeId: selectedAttributeId!,
@@ -176,11 +202,20 @@ export const useHandlerProductAttributeValues = ({
             : prodAttr
         )
       )
+      setEditFormLocal(prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          values: [...prev.values, response.data],
+        }
+      })
 
       setFormValue(initialStateValue)
       modal.onClose()
       console.log('Создала новое значение!')
-    } catch (error) {
+    } catch (error: any) {
+      console.log('Ошибка создания значения:', error)
+      console.log('Детали ошибки:', error?.data)
       console.log('Ошибка создания новой опции...', error)
     }
   }

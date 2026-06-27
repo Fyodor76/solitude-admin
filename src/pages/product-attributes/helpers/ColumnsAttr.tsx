@@ -1,6 +1,6 @@
 import { AttributeValueResponse } from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, ColorPicker, Input } from 'antd'
+import { Button, Input } from 'antd'
 
 import './ColumnsAttr.scss'
 
