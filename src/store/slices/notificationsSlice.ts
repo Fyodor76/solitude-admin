@@ -4,7 +4,7 @@ export type NotificationType = 'success' | 'info' | 'warning' | 'error'
 
 export type AppNotification = {
   type: NotificationType
-  message: string
+  messages: string[]
   duration?: number | false
 }
 

@@ -5,16 +5,24 @@ export const configLogin: ConfigLoginType = {
   innerTitle: 'Авторизация',
   subtitle: '',
   className: '',
+  validate: formData => {
+    if (!formData.login && !formData.password) {
+      return false
+    } else {
+      return true
+    }
+  },
   sections: [
     {
       className: 'input-container',
       fields: [
         {
-          name: 'email',
+          name: 'login',
           typeField: 'input',
           size: 'large',
           placeholder: 'Логин',
           type: 'email',
+          status: '',
         },
         {
           name: 'password',
@@ -22,6 +30,7 @@ export const configLogin: ConfigLoginType = {
           size: 'large',
           placeholder: 'Пароль',
           type: 'password',
+          status: '',
         },
       ],
     },

@@ -83,7 +83,7 @@ export function useAdminNotificationsCenter(options?: UseAdminNotificationsCente
         dispatch(
           addNotification({
             type: 'info',
-            message: `${latest.title}: ${latest.description}`,
+            messages: [`${latest.title}: ${latest.description}`],
             duration: 5,
           })
         )

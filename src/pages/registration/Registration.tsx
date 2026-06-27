@@ -1,3 +1,4 @@
+import { useValidation } from '@/context/validation/use-validation'
 import { useRegisterMutation } from '@/shared/lib/api/auth/auth'
 import { useForm } from '@/shared/lib/hooks/useForm'
 import { CustomForm } from '@/shared/ui/custom-form/CustomForm'
@@ -7,21 +8,27 @@ import { useNavigate } from 'react-router-dom'
 
 import { configRegistrations } from './const/config-registrations'
 import './Registration.scss'
+import { RegistrationType } from './types'
 
 const Registration = () => {
   const navigate = useNavigate()
   const [register, { isLoading }] = useRegisterMutation()
-  const { form, handleChange } = useForm({
-    name: '',
-    email: '',
+  const { errors, applyServerErrors } = useValidation()
+
+  const { form, handleChange } = useForm<RegistrationType>({
+    login: '',
     password: '',
-    repeat_passord: '',
   })
 
-  const onRegistrationFinish = () => {
-    register({ login: form.email, password: form.password }).unwrap()
+  const onRegistrationFinish = async () => {
+    try {
+      await register({ login: form.login, password: form.password }).unwrap()
 
-    navigate('/login')
+      navigate('/login')
+    } catch (error: any) {
+      const { error: dataError } = error
+      applyServerErrors({ ...dataError })
+    }
   }
 
   return (
@@ -37,6 +44,7 @@ const Registration = () => {
               configForm={configRegistrations}
               onChange={handleChange}
               onFinish={onRegistrationFinish}
+              errors={errors}
             />
           </Card>
         </>

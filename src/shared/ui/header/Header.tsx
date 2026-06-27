@@ -34,7 +34,13 @@ export const Header = () => {
             <NotificationBell items={notificationItems} count={unreadCount} />
 
             <ConfigProvider wave={{ disabled: true }}>
-              <Button onClick={handleLogout} className="btn-logout" type="text" aria-label="Выйти">
+              <Button
+                onClick={handleLogout}
+                className="btn-logout"
+                type="text"
+                size="middle"
+                aria-label="Выйти"
+              >
                 <Icon name="logout" />
               </Button>
             </ConfigProvider>

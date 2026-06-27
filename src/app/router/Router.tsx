@@ -1,3 +1,4 @@
+import { ValidationProvider } from '@/context/validation/provider'
 import { Categories } from '@/pages/categories'
 import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
@@ -16,6 +17,24 @@ import App from '../App'
 import ProtectedRouter from './ProtectedRouter'
 import PublicRouter from './PublickRouter'
 import RouterErrorElement from './RouterErrorElement'
+
+const LoginPage = () => (
+  <ValidationProvider>
+    <Login />
+  </ValidationProvider>
+)
+
+const RegistrationPage = () => (
+  <ValidationProvider>
+    <Registration />
+  </ValidationProvider>
+)
+
+const CategoriesPage = () => (
+  <ValidationProvider>
+    <Categories />
+  </ValidationProvider>
+)
 
 export const Router: RouteObject[] = [
   {
@@ -36,7 +55,7 @@ export const Router: RouteObject[] = [
         path: '/login',
         element: (
           <PublicRouter>
-            <Login />
+            <LoginPage />
           </PublicRouter>
         ),
       },
@@ -44,7 +63,7 @@ export const Router: RouteObject[] = [
         path: '/registration',
         element: (
           <PublicRouter>
-            <Registration />
+            <RegistrationPage />
           </PublicRouter>
         ),
       },
@@ -60,7 +79,7 @@ export const Router: RouteObject[] = [
         path: '/categories',
         element: (
           <ProtectedRouter>
-            <Categories />
+            <CategoriesPage />
           </ProtectedRouter>
         ),
       },

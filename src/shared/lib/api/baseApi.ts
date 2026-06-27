@@ -39,14 +39,25 @@ const baseQuery = fetchBaseQuery({
 })
 
 let isRefreshing = false
-let subscribers: ((token: string) => void)[] = []
+let subscribers: ((token: string | null) => void)[] = []
 
-function onRefreshed(token: string) {
+function buildErrorResponse(path: string, statusCode: number, error: string) {
+  return {
+    error: {
+      statusCode,
+      timestamp: new Date().toISOString(),
+      path,
+      error,
+    },
+  }
+}
+
+function onRefreshed(token: string | null) {
   subscribers.forEach(callback => callback(token))
   subscribers = []
 }
 
-function subscribeTokenRefresh(callback: (token: string) => void) {
+function subscribeTokenRefresh(callback: (token: string | null) => void) {
   subscribers.push(callback)
 }
 
@@ -90,13 +101,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
   extraOptions
 ) => {
   let result = await baseQuery(args, api, extraOptions)
+  const currentPath = typeof args === 'string' ? args : args.url || ''
 
-  if (
-    result.error?.status === 401 &&
-    !(typeof args === 'string' ? args : args.url).includes('/auth/refresh')
-  ) {
+  if (result.error?.status === 401 && !currentPath.includes('/auth/refresh')) {
     const refreshToken = localStorage.getItem('refresh')
-    const currentPath = typeof args === 'string' ? args : args.url || ''
 
     if (!refreshToken) {
       localStorage.removeItem('access')
@@ -106,18 +114,16 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
         window.location.href = '/login'
       }
 
-      return {
-        error: {
-          statusCode: 401,
-          timestamp: new Date().toISOString(),
-          path: currentPath,
-          error: getErrorMessage(result.error),
-        },
-      }
+      return buildErrorResponse(currentPath, 401, getErrorMessage(result.error))
     }
 
-    return new Promise((resolve, reject) => {
-      subscribeTokenRefresh(async (newToken: string) => {
+    return new Promise(resolve => {
+      subscribeTokenRefresh(async newToken => {
+        if (!newToken) {
+          resolve(buildErrorResponse(currentPath, 401, 'Session expired'))
+          return
+        }
+
         try {
           const retryResult = await fetchBaseQuery({
             baseUrl: API_BASE_URL,
@@ -130,29 +136,20 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
           })(args, api, extraOptions)
 
           if (retryResult.error) {
-            reject({
-              error: {
-                statusCode:
-                  retryResult.error.status === 'FETCH_ERROR'
-                    ? 500
-                    : Number(retryResult.error.status) || 500,
-                timestamp: new Date().toISOString(),
-                path: currentPath,
-                error: getErrorMessage(retryResult.error),
-              },
-            })
+            resolve(
+              buildErrorResponse(
+                currentPath,
+                retryResult.error.status === 'FETCH_ERROR'
+                  ? 500
+                  : Number(retryResult.error.status) || 500,
+                getErrorMessage(retryResult.error)
+              )
+            )
           } else {
             resolve(retryResult)
           }
-        } catch (error) {
-          reject({
-            error: {
-              statusCode: 500,
-              timestamp: new Date().toISOString(),
-              path: currentPath,
-              error: 'Request failed',
-            },
-          })
+        } catch {
+          resolve(buildErrorResponse(currentPath, 500, 'Request failed'))
         }
       })
 
@@ -163,7 +160,6 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
             onRefreshed(newToken)
           })
           .catch(() => {
-            subscribers = []
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
 
@@ -188,32 +184,26 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, HttpErrorRes
   }
 
   if (result.error) {
-    const currentPath = typeof args === 'string' ? args : args.url || ''
+    return buildErrorResponse(
+      currentPath,
+      result.error.status === 'FETCH_ERROR' ? 500 : Number(result.error.status) || 500,
 
-    return {
-      error: {
-        statusCode:
-          result.error.status === 'FETCH_ERROR' ? 500 : Number(result.error.status) || 500,
-        timestamp: new Date().toISOString(),
-        path: currentPath,
-        error: getErrorMessage(result.error),
-      },
-    }
+      getErrorMessage(result.error)
+    )
   }
 
   return result
 }
 
-const getErrorMessage = (error: FetchBaseQueryError): string => {
+const getErrorMessage = (error: FetchBaseQueryError) => {
   if (error.data && typeof error.data === 'object') {
     const data = error.data as any
-    return data.error || data.message || 'Произошла ошибка'
+    if (Object.keys(data.fieldErrors).length || data.fieldErrors.length) {
+      return data.fieldErrors
+    } else {
+      return data.generalErrors
+    }
   }
-
-  if (error.status === 'FETCH_ERROR') return 'Ошибка сети'
-  if (error.status === 'PARSING_ERROR') return 'Ошибка обработки ответа'
-
-  return 'Произошла ошибка'
 }
 
 export const baseApi = createApi({

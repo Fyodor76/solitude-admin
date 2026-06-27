@@ -1,3 +1,4 @@
+import { useValidation } from '@/context/validation/use-validation'
 import { useLoginMutation } from '@/shared/lib/api/auth/auth'
 import { useForm } from '@/shared/lib/hooks/useForm'
 import { consumePendingPushHref } from '@/shared/lib/push/pushNavigation'
@@ -8,33 +9,34 @@ import { useNavigate } from 'react-router-dom'
 
 import { configLogin } from './const/config-login'
 import './Login.scss'
-
-type formLoginProps = {
-  email: string
-  password: string
-}
+import { LoginType } from './types'
 
 const Login = () => {
   const navigate = useNavigate()
 
   const [login, { isLoading }] = useLoginMutation()
-  const { form, handleChange } = useForm<formLoginProps>({
-    email: '',
+  const { form, handleChange } = useForm<LoginType>({
+    login: '',
     password: '',
   })
+  const { errors, applyServerErrors } = useValidation()
 
   const onLoginFinish = async () => {
     try {
-      if (form.email === '' && form.password === '') return
-      const response = await login({ login: form.email, password: form.password }).unwrap()
+      const payload = { login: form.login, password: form.password }
+
+      const response = await login(payload).unwrap()
 
       localStorage.setItem('refresh', response.refreshToken)
       localStorage.setItem('access', response.accessToken)
 
       const pendingHref = consumePendingPushHref()
       navigate(pendingHref ?? '/')
-    } catch (error) {
-      console.log(error, 'error')
+    } catch (error: any) {
+      const { error: dataError } = error
+      applyServerErrors({
+        ...dataError,
+      })
     }
   }
 
@@ -51,6 +53,7 @@ const Login = () => {
           configForm={configLogin}
           onChange={handleChange}
           onFinish={onLoginFinish}
+          errors={errors}
         />
       </Card>
     </div>

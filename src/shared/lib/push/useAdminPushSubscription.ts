@@ -56,7 +56,7 @@ export function useAdminPushSubscription(options?: UseAdminPushSubscriptionOptio
         dispatch(
           addNotification({
             type: 'warning',
-            message: ADMIN_PUSH_COPY.DENIED,
+            messages: [ADMIN_PUSH_COPY.DENIED],
             duration: 6,
           })
         )
@@ -82,7 +82,7 @@ export function useAdminPushSubscription(options?: UseAdminPushSubscriptionOptio
       dispatch(
         addNotification({
           type: 'success',
-          message: ADMIN_PUSH_COPY.ENABLED,
+          messages: [ADMIN_PUSH_COPY.ENABLED],
           duration: 4,
         })
       )
@@ -92,7 +92,7 @@ export function useAdminPushSubscription(options?: UseAdminPushSubscriptionOptio
       dispatch(
         addNotification({
           type: 'error',
-          message: ADMIN_PUSH_COPY.ERROR,
+          messages: [ADMIN_PUSH_COPY.ERROR],
           duration: 6,
         })
       )
