@@ -3,8 +3,6 @@ import {
   ProductAttributeRequest,
 } from '@/shared/lib/api/product-attributes/types'
 
-import { AttributeValue } from '@/app/types/product'
-
 export const initialState: ProductAttributeRequest = {
   name: '',
   slug: '',
