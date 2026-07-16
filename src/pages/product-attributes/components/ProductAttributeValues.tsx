@@ -47,7 +47,6 @@ const ProductAttributeValues = ({
           columns={columns}
           loading={isLoading}
           rowKey="id"
-          scroll={{ x: 'max-content' }}
           pagination={false}
         />
       ) : (
