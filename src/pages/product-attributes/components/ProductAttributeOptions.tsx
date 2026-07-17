@@ -3,7 +3,6 @@ import React, { useCallback, useState } from 'react'
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input } from 'antd'
-import { div } from 'framer-motion/client'
 
 import { getIconForAttribute } from '@/app/constans/getIconForAttribute'
 
@@ -54,7 +53,11 @@ const ProductAttributeOptions = ({
       </div>
       <div className="prod-attr-container">
         {filteredOptions.length === 0 ? (
-          <div className="no-results">Опции не найдены...</div>
+          <div className="no-results">
+            <Icon name="boxOpen2" className="no-results-icon"></Icon>
+            <h3>Опции не созданы</h3>
+            <span className="no-results-info">Создайте первую опцию, чтобы начать работу.</span>
+          </div>
         ) : (
           filteredOptions.map(prodAttr => (
             <div

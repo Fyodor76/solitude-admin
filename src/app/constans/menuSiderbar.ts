@@ -57,7 +57,7 @@ export const menuSidebar: MenuItem[] = [
     id: SIDEBAR_MENU_ITEM_ID.PRODUCT_ATTRIBUTES,
     text: 'Опции товаров',
     href: '/product-attributes',
-    icon: 'settings',
+    icon: 'options',
     hasArrow: false,
   },
   /*{

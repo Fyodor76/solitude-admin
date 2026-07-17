@@ -1,7 +1,9 @@
 import React from 'react'
 
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
+import Icon from '@/shared/ui/icons/Icon'
 import { Button, Table } from 'antd'
+import { div } from 'framer-motion/client'
 
 import { AttributeValue } from '@/app/types/product'
 
@@ -33,6 +35,8 @@ const ProductAttributeValues = ({
     editFormLocal?.values || [],
     valueId
   )
+  const hasValues = selectedAttributeId && editFormLocal?.values && editFormLocal.values.length > 0
+
   return (
     <div className="attribute-value">
       <div className="title-and-btn">
@@ -41,7 +45,7 @@ const ProductAttributeValues = ({
           + Добавить значение
         </Button>
       </div>
-      {selectedAttributeId && editFormLocal ? (
+      {hasValues ? (
         <Table
           dataSource={editFormLocal?.values}
           columns={columns}
@@ -50,7 +54,16 @@ const ProductAttributeValues = ({
           pagination={false}
         />
       ) : (
-        'Ничего не выбрано'
+        <div className="attribute-value-empty">
+          <Icon name="boxOpen" className="attribute-value-empty-icon"></Icon>
+          <h3>У этой опции пока нет значений</h3>
+          <span className="attribute-value-empty-info">
+            Добавьте значение, что бы использовать опцию в товарах.
+          </span>
+          <Button onClick={addValue} type="primary">
+            + Добавить значение
+          </Button>
+        </div>
       )}
     </div>
   )

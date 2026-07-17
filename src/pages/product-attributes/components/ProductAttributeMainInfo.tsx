@@ -62,6 +62,7 @@ const ProductAttributeMainInfo = ({
             </div>
           )}
         </div>
+
         {selectedAttributeId && editFormLocal ? (
           <div className="select-attr-main-info">
             <div className="select-attr-inputs">
@@ -105,7 +106,7 @@ const ProductAttributeMainInfo = ({
             </div>
           </div>
         ) : (
-          'Ничего не выбрано'
+          <div className="select-attr-main-info-empty"></div>
         )}
       </div>
       <ProductAttributeValues

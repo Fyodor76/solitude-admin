@@ -7,6 +7,8 @@ import {
   ProductAttributeResponse,
 } from '@/shared/lib/api/product-attributes/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
+import Icon from '@/shared/ui/icons/Icon'
+import { div } from 'framer-motion/client'
 
 import { MODES } from '../categories/const/constans'
 import ProductAttributeBtns from './components/ProductAttributeBtns'
@@ -59,8 +61,13 @@ const ProductAttribute = () => {
     })
   useEffect(() => {
     if (productAttributes?.data) {
-      setAllProdAttr(productAttributes?.data)
-      setFilteredOptions(productAttributes?.data)
+      const data = productAttributes?.data
+      setAllProdAttr(data)
+      setFilteredOptions(data)
+
+      if (data.length > 0 && !selectedAttributeId) {
+        setSelectedAttributeId(data[0].id)
+      }
     }
   }, [productAttributes?.data])
 
@@ -76,6 +83,7 @@ const ProductAttribute = () => {
 
   const handlerCreateOption = () => {
     setFormOption(initialState)
+    modal.setMode(MODES.CREATE)
     modal.onOpen(formOption)
   }
 
@@ -97,6 +105,7 @@ const ProductAttribute = () => {
 
   const addValue = () => {
     setFormValue(initialStateValue)
+    modal.setMode(MODES.EDIT)
     modal.onOpen(formValue)
   }
   return (
@@ -112,22 +121,32 @@ const ProductAttribute = () => {
           handlerCreateOption={handlerCreateOption}
         />
         <div className="product-attribute-info">
-          <ProductAttributeMainInfo
-            selectedAttributeId={selectedAttributeId}
-            formOption={formOption}
-            isLoading={isLoading}
-            editFormLocal={editFormLocal}
-            localDeleteValue={localDeleteValue}
-            localEditValue={localEditValue}
-            setEditFormLocal={setEditFormLocal}
-            setAllProdAttr={setAllProdAttr}
-            setFilteredOptions={setFilteredOptions}
-            setSelectedAttributeId={setSelectedAttributeId}
-            deleteOption={deleteOption}
-            valueId={valueId}
-            setValueId={setValueId}
-            addValue={addValue}
-          />
+          {filteredOptions.length === 0 ? (
+            <div className="product-attribute-info-empty">
+              <Icon name="boxOpen2" className="no-results-icon"></Icon>
+              <h3>Опции товаров отсутствуют</h3>
+              <span className="no-results-info">
+                Создайте первую опцию товара, чтобы начать работу.
+              </span>
+            </div>
+          ) : (
+            <ProductAttributeMainInfo
+              selectedAttributeId={selectedAttributeId}
+              formOption={formOption}
+              isLoading={isLoading}
+              editFormLocal={editFormLocal}
+              localDeleteValue={localDeleteValue}
+              localEditValue={localEditValue}
+              setEditFormLocal={setEditFormLocal}
+              setAllProdAttr={setAllProdAttr}
+              setFilteredOptions={setFilteredOptions}
+              setSelectedAttributeId={setSelectedAttributeId}
+              deleteOption={deleteOption}
+              valueId={valueId}
+              setValueId={setValueId}
+              addValue={addValue}
+            />
+          )}
         </div>
       </div>
       <ProductAttributeBtns saveAllChanges={saveAllChanges} />

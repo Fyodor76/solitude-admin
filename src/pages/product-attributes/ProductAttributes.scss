@@ -56,7 +56,19 @@
         .no-results {
           font-family: var(--font-primary);
           font-size: 14px;
-          text-align: center;
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          margin: 100px 0px;
+          height: 100%;
+          .no-results-icon {
+            height: 80px;
+            width: 80px;
+          }
+          .no-results-info {
+            color: var(--admin-color-text-muted);
+          }
         }
         .prod-attr {
           font-size: 14px;
@@ -101,6 +113,25 @@
       flex-direction: column;
       gap: 30px;
       flex: 1;
+      .product-attribute-info-empty {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background-color: rgb(255, 253, 253);
+        border: 1px solid var(--admin-color-border);
+        border-radius: var(--admin-radius-surface);
+        padding: 20px;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        .no-results-icon {
+          height: 80px;
+          width: 80px;
+        }
+        .no-results-info {
+          color: var(--admin-color-text-muted);
+        }
+      }
 
       .product-attribute {
         display: flex;
@@ -110,6 +141,7 @@
         border: 1px solid var(--admin-color-border);
         border-radius: var(--admin-radius-surface);
         padding: 20px;
+        height: 50%;
         .title-and-btns {
           display: flex;
           justify-content: space-between;
@@ -170,6 +202,7 @@
         border-radius: var(--admin-radius-surface);
         padding: 20px;
         gap: 20px;
+        height: 50%;
 
         .title-and-btn {
           display: flex;
@@ -183,6 +216,25 @@
           height: 400px;
           overflow-y: auto;
           overflow-x: hidden;
+        }
+        .attribute-value-empty {
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 70px;
+          .attribute-value-empty-icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+          }
+          .attribute-value-empty-info {
+            color: var(--admin-color-text-muted);
+            margin-bottom: 20px;
+          }
         }
       }
     }
