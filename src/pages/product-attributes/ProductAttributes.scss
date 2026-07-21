@@ -15,16 +15,19 @@
   font-family: var(--font-primary);
   gap: 20px;
   margin: 20px 0px;
+  max-width: 100%;
 
   .main-title {
     color: #262c33;
     margin-left: 33px;
     margin-top: 20px;
+    max-width: 100%;
   }
   .product-attributes-main {
     display: flex;
     gap: 30px;
     align-items: stretch;
+    max-width: 100%;
     .all-product-attributes {
       .middle-title {
         font-size: 18px;
@@ -34,14 +37,13 @@
         padding-top: 20px;
       }
       margin-top: 20px;
-
       display: flex;
       flex-direction: column;
       background-color: var(--color-white);
       border: 1px solid var(--admin-color-border);
       border-radius: var(--admin-radius-surface);
       margin-left: 33px;
-      width: 40%;
+      width: 35%;
       gap: 20px;
 
       .input-search {
@@ -63,8 +65,8 @@
           margin: 100px 0px;
           height: 100%;
           .no-results-icon {
-            height: 80px;
-            width: 80px;
+            height: 60px;
+            width: 60px;
           }
           .no-results-info {
             color: var(--admin-color-text-muted);
@@ -106,7 +108,7 @@
       }
     }
     .product-attribute-info {
-      width: 60%;
+      width: 65%;
       margin-top: 20px;
       margin-right: 33px;
       display: flex;
@@ -124,9 +126,9 @@
         align-items: center;
         justify-content: center;
         gap: 20px;
-        .no-results-icon {
-          height: 80px;
-          width: 80px;
+        .no-results-icon-options {
+          height: 100px;
+          width: 100px;
         }
         .no-results-info {
           color: var(--admin-color-text-muted);
@@ -230,6 +232,9 @@
             width: 80px;
             height: 80px;
             margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
           .attribute-value-empty-info {
             color: var(--admin-color-text-muted);
@@ -247,6 +252,40 @@
     margin-bottom: 20px;
     &-cancel {
       color: #a4a7a9;
+    }
+  }
+}
+
+@media (max-width: 1300px) {
+  .product-attributes-wrap {
+    .product-attributes-main {
+      .product-attribute-info {
+        .attribute-value {
+          .ant-table-wrapper {
+            overflow-x: auto;
+
+            .ant-table {
+              min-width: 700px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 580px) {
+  .product-attribute-info {
+    max-width: 100%;
+    .product-attribute {
+      max-width: 100%;
+
+      .title-and-btns {
+        max-width: 100%;
+      }
+    }
+    .attribute-value {
+      max-width: 100%;
     }
   }
 }

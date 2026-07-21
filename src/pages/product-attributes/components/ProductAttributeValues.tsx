@@ -3,7 +3,6 @@ import React from 'react'
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Table } from 'antd'
-import { div } from 'framer-motion/client'
 
 import { AttributeValue } from '@/app/types/product'
 

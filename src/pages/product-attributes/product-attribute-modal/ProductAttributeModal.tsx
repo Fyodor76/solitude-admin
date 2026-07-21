@@ -8,6 +8,7 @@ import { ColorPicker, Input, Modal, Select, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 
 import { typeOptions } from '../const/const'
+import './ProductAttributeModal.scss'
 
 interface ProductAttributeModalProp {
   formOption: ProductAttributeRequest
@@ -48,6 +49,7 @@ const ProductAttributeModal = ({
 
   return (
     <Modal
+      className="product-attribute-modal"
       open={isOpen}
       onCancel={onClose}
       title={isCreateOption ? 'Создать опцию' : 'Добавить значение'}
@@ -59,74 +61,76 @@ const ProductAttributeModal = ({
     >
       {isCreateOption ? (
         <>
-          <span>Название *</span>
+          <span className="input-name">Название *</span>
           <Input
             value={formOption.name}
             placeholder="Введите название..."
             onChange={e => handlerInputSelectOption('name', e.target.value)}
           />
-          <span>Slug *</span>
+          <span className="input-name">Slug *</span>
           <Input
             value={formOption.slug}
             placeholder="Введите slug"
             onChange={e => handlerInputSelectOption('slug', e.target.value)}
           />
-          <span>Только латинские буквы, цифры и дефисы</span>
-          <span>Тип *</span>
+          <span className="hint">Только латинские буквы, цифры и дефисы</span>
+          <span className="input-name">Тип *</span>
           <Select
             value={formOption.type}
             placeholder="Выберете тип опции"
             options={typeOptions}
             onChange={v => handlerInputSelectOption('type', v)}
           />
-          <span>Описание</span>
+          <span className="input-name">Описание</span>
           <TextArea
             value={formOption.description}
             placeholder="Введите описание (необязательно)"
             onChange={e => handlerInputSelectOption('description', e.target.value)}
           />
-          <span>Порядок сортировки</span>
+          <span className="input-name">Порядок сортировки</span>
           <Input
             value={formOption.sortOrder}
             onChange={e => handlerInputSelectOption('sortOrder', e.target.value)}
           />
-          <span>Меньшее значение имеет больший преоритет</span>
+          <span className="hint">Меньшее значение имеет больший преоритет</span>
         </>
       ) : (
         <>
-          <span>Значение (латиница) *</span>
+          <span className="input-name">Значение (латиница) *</span>
           <Input
             value={formValue.value}
             placeholder="Введите значение"
             onChange={e => handlerInputSelectValue('value', e.target.value)}
           />
-          <span>Отображаемое имя *</span>
+          <span className="input-name">Отображаемое имя *</span>
           <Input
             value={formValue.displayName}
             placeholder="Введите отображаемое имя"
             onChange={e => handlerInputSelectValue('displayName', e.target.value)}
           />
-          <span>HEX код цвета</span>
+
+          <span className="input-name">HEX код цвета</span>
           <ColorPicker
             value={formValue.hexCode || '#000000'}
             onChange={(color, hex) => handlerInputSelectValue('hexCode', hex)}
-            showText={color => (
-              <span style={{ marginLeft: '8px' }}>{color.toHexString().toUpperCase()}</span>
-            )}
+            showText={color => <span>{color.toHexString().toUpperCase()}</span>}
             size="large"
           />
-          <span>Выберете цвет или укажите HEX код</span>
-          <Switch
-            checked={formValue.isActive === true}
-            onChange={checked => handlerInputSelectValue('isActive', checked)}
-          />
-          <span>Активно</span>
+          <span className="hint">Выберете цвет или укажите HEX код</span>
+          <span className="switch-and-text">
+            <Switch
+              checked={formValue.isActive === true}
+              onChange={checked => handlerInputSelectValue('isActive', checked)}
+              className="switch"
+            />
+            <span>Активно</span>
+          </span>
           {formValue.isActive ? (
-            <span style={{ color: '#52c41a', marginLeft: '8px' }}>
-              ✔ Значение активно и доступно для выбора
+            <span className="hint">
+              <span style={{ color: 'blue' }}>✔</span> Значение активно и доступно для выбора
             </span>
           ) : (
-            <span>Значение неактивно и скрыто для пользователя</span>
+            <span className="hint">Значение неактивно и скрыто для пользователя</span>
           )}
         </>
       )}

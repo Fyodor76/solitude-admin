@@ -8,7 +8,6 @@ import {
 } from '@/shared/lib/api/product-attributes/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
-import { div } from 'framer-motion/client'
 
 import { MODES } from '../categories/const/constans'
 import ProductAttributeBtns from './components/ProductAttributeBtns'
@@ -123,7 +122,7 @@ const ProductAttribute = () => {
         <div className="product-attribute-info">
           {filteredOptions.length === 0 ? (
             <div className="product-attribute-info-empty">
-              <Icon name="boxOpen2" className="no-results-icon"></Icon>
+              <Icon name="boxOpen" className="no-results-icon-options"></Icon>
               <h3>Опции товаров отсутствуют</h3>
               <span className="no-results-info">
                 Создайте первую опцию товара, чтобы начать работу.
