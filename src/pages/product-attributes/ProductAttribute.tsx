@@ -8,6 +8,7 @@ import {
 } from '@/shared/lib/api/product-attributes/types'
 import { useModal } from '@/shared/lib/hooks/useModal'
 import Icon from '@/shared/ui/icons/Icon'
+import { message } from 'antd'
 
 import { MODES } from '../categories/const/constans'
 import ProductAttributeBtns from './components/ProductAttributeBtns'
@@ -35,7 +36,9 @@ const ProductAttribute = () => {
   const modal = useModal()
   const mode = modal.mode
   const isCreateOption = mode === MODES.CREATE
-
+  console.log(editFormLocal)
+  console.log(formOption)
+  console.log(formValue)
   const { onSaveCreatedOption, onSaveEditedOption, deleteOption } = useHandlerPoductAttribute({
     allProdAttr,
     selectedAttributeId,
@@ -108,6 +111,15 @@ const ProductAttribute = () => {
     modal.setMode(MODES.EDIT)
     modal.onOpen(formValue)
   }
+
+  const handleCancel = () => {
+    if (selectAttr) {
+      setEditFormLocal(selectAttr)
+
+      message.info('Все изменения отменены')
+    }
+  }
+
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -149,7 +161,7 @@ const ProductAttribute = () => {
           )}
         </div>
       </div>
-      <ProductAttributeBtns saveAllChanges={saveAllChanges} />
+      <ProductAttributeBtns saveAllChanges={saveAllChanges} handleCancel={handleCancel} />
       <ProductAttributeModal
         isCreateOption={isCreateOption}
         selectedAttributeId={selectedAttributeId}
