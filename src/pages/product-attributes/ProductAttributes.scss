@@ -118,6 +118,9 @@
       flex-direction: column;
       gap: 30px;
       flex: 1;
+      min-width: 0; // 👈 ДОБАВИТЬ
+      overflow: hidden; // 👈 ДОБАВИТЬ
+
       .product-attribute-info-empty {
         display: flex;
         flex-direction: column;
@@ -147,6 +150,8 @@
         border-radius: var(--admin-radius-surface);
         padding: 20px;
         height: 50%;
+        min-width: 0; // 👈 ДОБАВИТЬ
+        overflow: hidden; // 👈 ДОБАВИТЬ
         .title-and-btns {
           display: flex;
           justify-content: space-between;
@@ -221,7 +226,9 @@
         .ant-table-wrapper {
           height: 400px;
           overflow-y: auto;
-          overflow-x: hidden;
+          // overflow-x: hidden;
+          overflow-x: auto; // 👈 ИЗМЕНИТЬ С hidden НА auto
+          min-width: 0; // 👈 ДОБАВИТЬ
         }
         .attribute-value-empty {
           width: 100%;
@@ -271,12 +278,16 @@
         min-width: 200px;
       }
       .product-attribute-info {
-        width: 70%;
         margin-right: 0;
+        min-width: 0; // 👈 ДОБАВИТЬ
+        overflow: hidden; // 👈 ДОБАВИТЬ
         .attribute-value {
+          width: 100%;
+          min-width: 0; // 👈 ДОБАВИТЬ
+          overflow: hidden; // 👈 ДОБАВИТЬ
           .ant-table-wrapper {
             overflow-x: auto;
-
+            min-width: 0;
             .ant-table {
               min-width: 700px;
             }

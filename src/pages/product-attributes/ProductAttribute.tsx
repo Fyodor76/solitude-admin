@@ -40,6 +40,7 @@ const ProductAttribute = () => {
     allProdAttr,
     selectedAttributeId,
     formOption,
+    modal,
     setAllProdAttr,
     setFilteredOptions,
     setSelectedAttributeId,

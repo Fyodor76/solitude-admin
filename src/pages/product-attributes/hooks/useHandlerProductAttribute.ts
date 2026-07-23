@@ -16,6 +16,7 @@ interface useHandlerPoductAttributeProps {
   allProdAttr: ProductAttributeResponse[]
   formOption: ProductAttributeRequest
   selectedAttributeId: string | null
+  modal: ReturnType<typeof useModal>
   setEditFormLocal: React.Dispatch<React.SetStateAction<ProductAttributeResponse | undefined>>
   setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
   setAllProdAttr: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
@@ -26,6 +27,7 @@ export const useHandlerPoductAttribute = ({
   allProdAttr,
   selectedAttributeId,
   formOption,
+  modal,
   setEditFormLocal,
   setFormOption,
   setAllProdAttr,
@@ -35,8 +37,6 @@ export const useHandlerPoductAttribute = ({
   const [deleteProductAttributeById] = useDeleteProductAttributeByIdMutation()
   const [updateProductAttributes] = useUpdateProductAttributesMutation()
   const [createProductAttributes] = useCreateProductAttributesMutation()
-
-  const modal = useModal()
 
   const localDeleteOption = (id: string) => {
     const newAllProdAttr = allProdAttr.filter(prodAttr => prodAttr.id !== id)

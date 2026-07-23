@@ -14,6 +14,7 @@ export const valueColumns = (
     title: 'Значение',
     dataIndex: 'value',
     key: 'value',
+    width: 200,
     render: (text: string, record: any) => (
       <Input
         value={valueId === record.id ? (editValues[record.id]?.value ?? text) : text}
@@ -25,6 +26,7 @@ export const valueColumns = (
     title: 'Отображаемое имя',
     dataIndex: 'displayName',
     key: 'displayName',
+    width: 200,
     render: (text: string, record: any) => (
       <Input
         value={valueId === record.id ? (editValues[record.id]?.displayName ?? text) : text}
@@ -36,6 +38,7 @@ export const valueColumns = (
     title: 'Цвет',
     dataIndex: 'hexCode',
     key: 'color',
+    width: 60,
     render: (hexCode: string, record: any) => (
       <div className="table-color-container" style={{}}>
         <input
@@ -61,12 +64,14 @@ export const valueColumns = (
     title: 'HEX код',
     dataIndex: 'hexCode',
     key: 'hexCode',
+    width: 120,
     render: (text: string, record: any) => (
       <Input
         value={editValues[record.id]?.hexCode ?? text}
         onChange={e => handleEditValue(record.id, 'hexCode', e.target.value)}
         placeholder="#000000"
         size="small"
+        style={{ minWidth: 80 }}
       />
     ),
   },
@@ -74,6 +79,7 @@ export const valueColumns = (
     title: 'Активен',
     dataIndex: 'isActive',
     key: 'isActive',
+    width: 100,
     render: (isActive: boolean) => (
       <span className={isActive ? 'active-true' : 'active-false'}>{isActive ? 'Да' : 'Нет'}</span>
     ),
@@ -81,6 +87,7 @@ export const valueColumns = (
   {
     title: 'Действия',
     key: 'actions',
+    width: 80,
     render: (_: any, record: any) => (
       <div className="table-actions">
         <div className="table-actions-delete">
