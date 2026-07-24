@@ -6,6 +6,7 @@ import {
 } from '@/shared/lib/api/product-attributes/types'
 import { ColorPicker, Input, Modal, Select, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
+import { number } from 'framer-motion'
 
 import { typeOptions } from '../const/const'
 import './ProductAttributeModal.scss'
@@ -119,10 +120,15 @@ const ProductAttributeModal = ({
           />
           <span className="input-name">Порядок сортировки</span>
           <Input
+            type="number"
+            min={0}
             value={formOption.sortOrder}
             onChange={e => {
-              handlerInputSelectOption('sortOrder', e.target.value)
-              validateForm('sortOrder', e.target.value)
+              const value = e.target.value
+
+              const numValue = value === '' ? undefined : Number(value)
+              handlerInputSelectOption('sortOrder', numValue)
+              validateForm('sortOrder', numValue)
             }}
             status={errors.sortOrder ? 'error' : ''}
           />

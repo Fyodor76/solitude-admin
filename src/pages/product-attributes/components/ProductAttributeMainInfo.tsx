@@ -18,6 +18,13 @@ interface ProductAttributeMainInfoProps {
   isLoading: boolean
   formOption: ProductAttributeRequest
   valueId: string | null
+  errors: {
+    name?: string
+    slug?: string
+    type?: string
+    sortOrder?: string
+  }
+  validateForm: (field: keyof ProductAttributeRequest, value: any) => void
   addValue: () => void
   localDeleteValue: (id: string) => void
   localEditValue: (id: string, failed: keyof AttributeValue, value: any) => void
@@ -33,7 +40,9 @@ const ProductAttributeMainInfo = ({
   selectedAttributeId,
   isLoading,
   valueId,
+  errors,
   addValue,
+  validateForm,
   localDeleteValue,
   localEditValue,
   setEditFormLocal,
@@ -70,15 +79,25 @@ const ProductAttributeMainInfo = ({
                 <span className="select-attr-inputs-title">Название</span>
                 <Input
                   value={editFormLocal?.name}
-                  onChange={e => handlerInputsSelect('name', e.target.value)}
+                  onChange={e => {
+                    handlerInputsSelect('name', e.target.value)
+                    validateForm('name', e.target.value)
+                  }}
+                  status={errors.name ? 'error' : ''}
                 />
+                {errors.name && <span className="error-text">{errors.name}</span>}
               </div>
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Slug</span>
                 <Input
                   value={editFormLocal?.slug}
-                  onChange={e => handlerInputsSelect('slug', e.target.value)}
+                  onChange={e => {
+                    handlerInputsSelect('slug', e.target.value)
+                    validateForm('slug', e.target.value)
+                  }}
+                  status={errors.slug ? 'error' : ''}
                 />
+                {errors.slug && <span className="error-text">{errors.slug}</span>}
               </div>
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Тип</span>
@@ -91,9 +110,19 @@ const ProductAttributeMainInfo = ({
               <div className="select-attr-inputs-title-and-input">
                 <span className="select-attr-inputs-title">Порядок сортировки</span>
                 <Input
+                  type="number"
+                  min={0}
                   value={editFormLocal?.sortOrder}
-                  onChange={e => handlerInputsSelect('sortOrder', e.target.value)}
+                  onChange={e => {
+                    const value = e.target.value
+
+                    const numValue = value === '' ? undefined : Number(value)
+                    handlerInputsSelect('sortOrder', numValue)
+                    validateForm('sortOrder', numValue)
+                  }}
+                  status={errors.sortOrder ? 'error' : ''}
                 />
+                {errors.sortOrder && <span className="error-text">{errors.sortOrder}</span>}
               </div>
             </div>
             <div className="select-attr-description">

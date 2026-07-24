@@ -224,6 +224,8 @@ const ProductAttribute = () => {
               formOption={formOption}
               isLoading={isLoading}
               editFormLocal={editFormLocal}
+              errors={errors}
+              validateForm={validateForm}
               localDeleteValue={localDeleteValue}
               localEditValue={localEditValue}
               setEditFormLocal={setEditFormLocal}
