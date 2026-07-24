@@ -39,6 +39,11 @@ const ProductAttribute = () => {
     type?: string
     sortOrder?: string
   }>({})
+  const [errorsValue, setErrorsValue] = useState<{
+    value?: string
+    displayName?: string
+    hexCode?: string
+  }>({})
   const modal = useModal()
   const mode = modal.mode
   const isCreateOption = mode === MODES.CREATE
@@ -162,6 +167,36 @@ const ProductAttribute = () => {
     }
     setErrors(newErrors)
   }
+
+  const validateValueForm = (field: keyof AttributeValueRequest, value: any) => {
+    const newErrors = { ...errorsValue }
+    if (field === 'value') {
+      if (!value || value.trim() === '') {
+        newErrors.value = 'Введите значение'
+      } else if (!/^[a-zA-Z0-9-_]+$/.test(value)) {
+        newErrors.value = 'Только латинские буквы, цифры, дефис и подчеркивание'
+      } else {
+        delete newErrors.value
+      }
+    }
+    if (field === 'displayName') {
+      if (!value || value.trim() === '') {
+        newErrors.displayName = 'Введите название на русском языке'
+      } else if (!/^[А-Яа-яёЁ0-9-_]+$/.test(value)) {
+        newErrors.displayName = 'Только русские буквы, цифры, дефис и подчеркивание'
+      } else {
+        delete newErrors.displayName
+      }
+    }
+    if (field === 'hexCode') {
+      if (value && !/^#[0-9A-Fa-f]{6}$/.test(value)) {
+        newErrors.hexCode = 'Введите корректный HEX код (например, #FF0000)'
+      } else {
+        delete newErrors.hexCode
+      }
+    }
+    setErrorsValue(newErrors)
+  }
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -210,7 +245,9 @@ const ProductAttribute = () => {
         formOption={formOption}
         formValue={formValue}
         errors={errors}
+        errorsValue={errorsValue}
         validateForm={validateForm}
+        validateValueForm={validateValueForm}
         setFormValue={setFormValue}
         isOpen={modal.isOpen}
         onClose={modal.onClose}

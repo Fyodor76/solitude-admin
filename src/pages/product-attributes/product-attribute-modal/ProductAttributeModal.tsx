@@ -22,7 +22,13 @@ interface ProductAttributeModalProp {
     type?: string
     sortOrder?: string
   }
+  errorsValue: {
+    value?: string
+    displayName?: string
+    hexCode?: string
+  }
   validateForm: (field: keyof ProductAttributeRequest, value: any) => void
+  validateValueForm: (field: keyof AttributeValueRequest, value: any) => void
   setFormValue: React.Dispatch<React.SetStateAction<AttributeValueRequest>>
   onClose: () => void
   setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
@@ -35,7 +41,9 @@ const ProductAttributeModal = ({
   formValue,
   isCreateOption,
   errors,
+  errorsValue,
   validateForm,
+  validateValueForm,
   setFormValue,
   onSaveCreatedValue,
   onClose,
@@ -127,22 +135,35 @@ const ProductAttributeModal = ({
           <Input
             value={formValue.value}
             placeholder="Введите значение"
-            onChange={e => handlerInputSelectValue('value', e.target.value)}
+            onChange={e => {
+              handlerInputSelectValue('value', e.target.value)
+              validateValueForm('value', e.target.value)
+            }}
+            status={errorsValue.value ? 'error' : ''}
           />
+          {errorsValue.value && <span className="error-text">{errorsValue.value}</span>}
           <span className="input-name">Отображаемое имя *</span>
           <Input
             value={formValue.displayName}
             placeholder="Введите отображаемое имя"
-            onChange={e => handlerInputSelectValue('displayName', e.target.value)}
+            onChange={e => {
+              handlerInputSelectValue('displayName', e.target.value)
+              validateValueForm('displayName', e.target.value)
+            }}
+            status={errorsValue.displayName ? 'error' : ''}
           />
+          {errorsValue.displayName && <span className="error-text">{errorsValue.displayName}</span>}
 
           <span className="input-name">HEX код цвета</span>
           <ColorPicker
             value={formValue.hexCode || '#000000'}
-            onChange={(color, hex) => handlerInputSelectValue('hexCode', hex)}
+            onChange={(color, hex) => {
+              validateValueForm('hexCode', hex)
+            }}
             showText={color => <span>{color.toHexString().toUpperCase()}</span>}
             size="large"
           />
+          {errorsValue.hexCode && <span className="error-text">{errorsValue.hexCode}</span>}
           <span className="hint">Выберете цвет или укажите HEX код</span>
           <span className="switch-and-text">
             <Switch
