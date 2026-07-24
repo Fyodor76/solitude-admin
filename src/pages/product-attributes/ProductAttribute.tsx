@@ -33,6 +33,12 @@ const ProductAttribute = () => {
   const [editFormLocal, setEditFormLocal] = useState<ProductAttributeResponse | undefined>(
     selectAttr
   )
+  const [errors, setErrors] = useState<{
+    name?: string
+    slug?: string
+    type?: string
+    sortOrder?: string
+  }>({})
   const modal = useModal()
   const mode = modal.mode
   const isCreateOption = mode === MODES.CREATE
@@ -87,6 +93,7 @@ const ProductAttribute = () => {
   const handlerCreateOption = () => {
     setFormOption(initialState)
     modal.setMode(MODES.CREATE)
+    setErrors({})
     modal.onOpen(formOption)
   }
 
@@ -115,11 +122,46 @@ const ProductAttribute = () => {
   const handleCancel = () => {
     if (selectAttr) {
       setEditFormLocal(selectAttr)
-
+      setErrors({})
       message.info('Все изменения отменены')
     }
   }
 
+  const validateForm = (field: keyof ProductAttributeRequest, value: any) => {
+    const newErrors = { ...errors }
+    if (field === 'name') {
+      if (!value || value.trim() === '') {
+        newErrors.name = 'Введите название опции'
+      } else {
+        delete newErrors.name
+      }
+    }
+    if (field === 'slug') {
+      if (!value || value.trim() === '') {
+        newErrors.slug = 'Введите slug опции'
+      } else if (!/^[a-zA-Z0-9-]+$/.test(value)) {
+        newErrors.slug = 'Только латинские буквы, цифры и дефисы'
+      } else {
+        delete newErrors.slug
+      }
+    }
+
+    if (field === 'sortOrder') {
+      if (value !== undefined && value !== null && value !== '') {
+        const num = Number(value)
+        if (isNaN(num)) {
+          newErrors.sortOrder = 'Порядок сортировки должен быть числом'
+        } else if (num < 0 || num > 10) {
+          newErrors.sortOrder = 'Номер сортировки не должен быть отрицательным числом или больше 10'
+        } else {
+          delete newErrors.sortOrder
+        }
+      } else {
+        delete newErrors.sortOrder
+      }
+    }
+    setErrors(newErrors)
+  }
   return (
     <div className="product-attributes-wrap">
       <h1 className="main-title">Управление опциями товаров</h1>
@@ -167,6 +209,8 @@ const ProductAttribute = () => {
         selectedAttributeId={selectedAttributeId}
         formOption={formOption}
         formValue={formValue}
+        errors={errors}
+        validateForm={validateForm}
         setFormValue={setFormValue}
         isOpen={modal.isOpen}
         onClose={modal.onClose}

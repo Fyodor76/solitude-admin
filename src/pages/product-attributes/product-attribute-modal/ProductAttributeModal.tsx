@@ -16,6 +16,13 @@ interface ProductAttributeModalProp {
   isCreateOption: boolean
   selectedAttributeId: string | null
   formValue: AttributeValueRequest
+  errors: {
+    name?: string
+    slug?: string
+    type?: string
+    sortOrder?: string
+  }
+  validateForm: (field: keyof ProductAttributeRequest, value: any) => void
   setFormValue: React.Dispatch<React.SetStateAction<AttributeValueRequest>>
   onClose: () => void
   setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
@@ -27,6 +34,8 @@ const ProductAttributeModal = ({
   isOpen,
   formValue,
   isCreateOption,
+  errors,
+  validateForm,
   setFormValue,
   onSaveCreatedValue,
   onClose,
@@ -65,22 +74,35 @@ const ProductAttributeModal = ({
           <Input
             value={formOption.name}
             placeholder="Введите название..."
-            onChange={e => handlerInputSelectOption('name', e.target.value)}
+            onChange={e => {
+              handlerInputSelectOption('name', e.target.value)
+              validateForm('name', e.target.value)
+            }}
+            status={errors.name ? 'error' : ''}
           />
+          {errors.name && <span className="error-text">{errors.name}</span>}
           <span className="input-name">Slug *</span>
           <Input
             value={formOption.slug}
             placeholder="Введите slug"
-            onChange={e => handlerInputSelectOption('slug', e.target.value)}
+            onChange={e => {
+              handlerInputSelectOption('slug', e.target.value)
+              validateForm('slug', e.target.value)
+            }}
+            status={errors.slug ? 'error' : ''}
           />
+          {errors.slug && <span className="error-text">{errors.slug}</span>}
           <span className="hint">Только латинские буквы, цифры и дефисы</span>
           <span className="input-name">Тип *</span>
           <Select
             value={formOption.type}
             placeholder="Выберете тип опции"
             options={typeOptions}
-            onChange={v => handlerInputSelectOption('type', v)}
+            onChange={v => {
+              handlerInputSelectOption('type', v)
+            }}
           />
+
           <span className="input-name">Описание</span>
           <TextArea
             value={formOption.description}
@@ -90,8 +112,13 @@ const ProductAttributeModal = ({
           <span className="input-name">Порядок сортировки</span>
           <Input
             value={formOption.sortOrder}
-            onChange={e => handlerInputSelectOption('sortOrder', e.target.value)}
+            onChange={e => {
+              handlerInputSelectOption('sortOrder', e.target.value)
+              validateForm('sortOrder', e.target.value)
+            }}
+            status={errors.sortOrder ? 'error' : ''}
           />
+          {errors.sortOrder && <span className="error-text">{errors.sortOrder}</span>}
           <span className="hint">Меньшее значение имеет больший преоритет</span>
         </>
       ) : (
