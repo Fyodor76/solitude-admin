@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, Input } from 'antd'
+import { Button, Input, Spin } from 'antd'
 
 import { getIconForAttribute } from '@/app/constans/getIconForAttribute'
 
@@ -10,6 +10,7 @@ interface ProductAttributeOptionsProps {
   filteredOptions: ProductAttributeResponse[]
   allProdAttr: ProductAttributeResponse[]
   selectedAttributeId: string | null
+  isLoading: boolean
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string | null>>
   setFilteredOptions: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
   handlerCreateOption: () => void
@@ -18,6 +19,7 @@ const ProductAttributeOptions = ({
   filteredOptions,
   allProdAttr,
   selectedAttributeId,
+  isLoading,
   setSelectedAttributeId,
   setFilteredOptions,
   handlerCreateOption,

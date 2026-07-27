@@ -1,6 +1,7 @@
 import React from 'react'
 
 import {
+  AttributeValueResponse,
   ProductAttributeRequest,
   ProductAttributeResponse,
 } from '@/shared/lib/api/product-attributes/types'
@@ -10,6 +11,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { AttributeValue } from '@/app/types/product'
 
 import { typeOptions } from '../const/const'
+import { ErrorsProps, RowErrorsProps } from '../productAttributesTypes'
 import ProductAttributeValues from './ProductAttributeValues'
 
 interface ProductAttributeMainInfoProps {
@@ -18,13 +20,11 @@ interface ProductAttributeMainInfoProps {
   isLoading: boolean
   formOption: ProductAttributeRequest
   valueId: string | null
-  errors: {
-    name?: string
-    slug?: string
-    type?: string
-    sortOrder?: string
-  }
+  errors: ErrorsProps
+  rowErrors: RowErrorsProps
+
   validateForm: (field: keyof ProductAttributeRequest, value: any) => void
+  validateRowField: (id: string, field: keyof AttributeValueResponse, value: any) => void
   addValue: () => void
   localDeleteValue: (id: string) => void
   localEditValue: (id: string, failed: keyof AttributeValue, value: any) => void
@@ -41,6 +41,9 @@ const ProductAttributeMainInfo = ({
   isLoading,
   valueId,
   errors,
+  rowErrors,
+  validateRowField,
+
   addValue,
   validateForm,
   localDeleteValue,
@@ -143,6 +146,8 @@ const ProductAttributeMainInfo = ({
         editFormLocal={editFormLocal}
         selectedAttributeId={selectedAttributeId}
         valueId={valueId}
+        rowErrors={rowErrors}
+        validateRowField={validateRowField}
         addValue={addValue}
         setValueId={setValueId}
         setEditFormLocal={setEditFormLocal}

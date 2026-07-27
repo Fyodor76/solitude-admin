@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 
+import { MODES } from '@/pages/categories/const/constans'
 import {
   useCreateAttributeValueMutation,
   useDeleteAttributeValueByIdMutation,
@@ -59,6 +60,12 @@ export const useHandlerProductAttributeValues = ({
         values: updateValues,
       }
     })
+  }
+
+  const addValue = () => {
+    setFormValue(initialStateValue)
+    modal.setMode(MODES.EDIT)
+    modal.onOpen(formValue)
   }
 
   const localDeleteValue = (id: string) => {
@@ -170,7 +177,7 @@ export const useHandlerProductAttributeValues = ({
         if (rgb && rgb.length === 3) {
           const [r, g, b] = rgb.map(Number)
           hexCode = '#' + [r, g, b].map(c => c.toString(16).padStart(2, '0')).join('')
-          console.log('🔄 RGB → HEX:', hexCode) // ← проверь в консоли
+          console.log('🔄 RGB → HEX:', hexCode)
         }
       }
 
@@ -182,12 +189,6 @@ export const useHandlerProductAttributeValues = ({
         isActive: formValue.isActive,
       }
 
-      console.log('📤 Второе создание:')
-      console.log('  selectedAttributeId:', selectedAttributeId)
-      console.log('  formValue:', formValue)
-      console.log('  editFormLocal:', editFormLocal)
-      console.log('  editFormLocal.values:', editFormLocal?.values)
-      console.log('📤 Отправляем:', newValue)
       const response = await createAttributeValue({
         data: newValue,
         attributeId: selectedAttributeId!,
@@ -222,6 +223,7 @@ export const useHandlerProductAttributeValues = ({
   return {
     localDeleteValue,
     localEditValue,
+    addValue,
     onSaveEditedValue,
     onSaveCreatedValue,
   }

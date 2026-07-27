@@ -1,5 +1,6 @@
 import { useState } from 'react'
 
+import { MODES } from '@/pages/categories/const/constans'
 import {
   useCreateProductAttributesMutation,
   useDeleteProductAttributeByIdMutation,
@@ -13,12 +14,14 @@ import { useModal } from '@/shared/lib/hooks/useModal'
 import { message, Modal } from 'antd'
 
 import { initialState } from '../const/const'
+import { ErrorsProps } from '../productAttributesTypes'
 
 interface useHandlerPoductAttributeProps {
   allProdAttr: ProductAttributeResponse[]
   formOption: ProductAttributeRequest
   selectedAttributeId: string | null
   modal: ReturnType<typeof useModal>
+  setErrors: React.Dispatch<React.SetStateAction<ErrorsProps>>
   setEditFormLocal: React.Dispatch<React.SetStateAction<ProductAttributeResponse | undefined>>
   setFormOption: React.Dispatch<React.SetStateAction<ProductAttributeRequest>>
   setAllProdAttr: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
@@ -30,6 +33,7 @@ export const useHandlerPoductAttribute = ({
   selectedAttributeId,
   formOption,
   modal,
+  setErrors,
   setEditFormLocal,
   setFormOption,
   setAllProdAttr,
@@ -47,6 +51,12 @@ export const useHandlerPoductAttribute = ({
     if (selectedAttributeId === id) {
       setSelectedAttributeId(null)
     }
+  }
+  const handlerCreateOption = () => {
+    setFormOption(initialState)
+    modal.setMode(MODES.CREATE)
+    setErrors({})
+    modal.onOpen(formOption)
   }
 
   const deleteOption = async (id: string) => {
@@ -108,5 +118,6 @@ export const useHandlerPoductAttribute = ({
     deleteOption,
     onSaveEditedOption,
     onSaveCreatedOption,
+    handlerCreateOption,
   }
 }

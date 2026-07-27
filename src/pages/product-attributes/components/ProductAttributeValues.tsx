@@ -1,29 +1,38 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
+import {
+  AttributeValueResponse,
+  ProductAttributeResponse,
+} from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Table } from 'antd'
 
 import { AttributeValue } from '@/app/types/product'
 
 import { valueColumns } from '../helpers/ColumnsAttr'
+import { RowErrorsProps } from '../productAttributesTypes'
 
 interface ProductAttributeValuesProps {
   selectedAttributeId: string | null
   isLoading: boolean
   editFormLocal: ProductAttributeResponse | undefined
   valueId: string | null
+  rowErrors: RowErrorsProps
+  validateRowField: (id: string, field: keyof AttributeValueResponse, value: any) => void
   addValue: () => void
   localDeleteValue: (id: string) => void
   localEditValue: (id: string, failed: keyof AttributeValue, value: any) => void
   setValueId: React.Dispatch<React.SetStateAction<string | null>>
   setEditFormLocal: React.Dispatch<React.SetStateAction<ProductAttributeResponse | undefined>>
 }
+
 const ProductAttributeValues = ({
   selectedAttributeId,
   editFormLocal,
   isLoading,
   valueId,
+  rowErrors,
+  validateRowField,
   addValue,
   localDeleteValue,
   localEditValue,
@@ -31,9 +40,12 @@ const ProductAttributeValues = ({
   const columns = valueColumns(
     localDeleteValue,
     localEditValue,
+    validateRowField,
+    rowErrors,
     editFormLocal?.values || [],
     valueId
   )
+
   const hasValues = selectedAttributeId && editFormLocal?.values && editFormLocal.values.length > 0
 
   return (
