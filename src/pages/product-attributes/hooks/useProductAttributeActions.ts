@@ -6,7 +6,7 @@ import {
 } from '@/shared/lib/api/product-attributes/types'
 import { message } from 'antd'
 
-import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from '../productAttributesTypes'
+import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from '../types/productAttributesTypes'
 
 interface useProductAttributeActionsProps {
   editFormLocal: ProductAttributeResponse | undefined

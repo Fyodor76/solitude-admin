@@ -6,7 +6,7 @@ import {
   ProductAttributeRequest,
 } from '@/shared/lib/api/product-attributes/types'
 
-import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from '../productAttributesTypes'
+import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from '../types/productAttributesTypes'
 
 interface useValidateFormsProps {
   errors: ErrorsProps

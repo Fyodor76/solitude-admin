@@ -21,7 +21,7 @@ import useProductAttributeActions from './hooks/useProductAttributeActions'
 import { useValidateForms } from './hooks/useValidateForms'
 import ProductAttributeModal from './product-attribute-modal/ProductAttributeModal'
 import './ProductAttributes.scss'
-import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from './productAttributesTypes'
+import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from './types/productAttributesTypes'
 
 const ProductAttribute = () => {
   const { data: productAttributes, isLoading } = useGetAllProductAttributesQuery()

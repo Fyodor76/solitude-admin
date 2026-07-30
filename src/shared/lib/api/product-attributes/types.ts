@@ -11,8 +11,15 @@ export interface AttributeValueResponse extends AttributeValueRequest {
   id: string
   attributeId: string
 }
-export type AttributeType = 'color' | 'size' | 'volume' | 'weight' | 'dimension' | 'other'
 
+export enum AttributeType {
+  Color = 'color',
+  Size = 'size',
+  Volume = 'volume',
+  Weight = 'weight',
+  Dimension = 'dimension',
+  Other = 'other',
+}
 export interface ProductAttributeRequest {
   name: string
   slug: string

@@ -10,7 +10,7 @@ import { Button, Table } from 'antd'
 import { AttributeValue } from '@/app/types/product'
 
 import { valueColumns } from '../helpers/ColumnsAttr'
-import { RowErrorsProps } from '../productAttributesTypes'
+import { RowErrorsProps } from '../types/productAttributesTypes'
 
 interface ProductAttributeValuesProps {
   selectedAttributeId: string | null

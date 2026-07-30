@@ -11,7 +11,7 @@ import TextArea from 'antd/es/input/TextArea'
 import { AttributeValue } from '@/app/types/product'
 
 import { typeOptions } from '../const/const'
-import { ErrorsProps, RowErrorsProps } from '../productAttributesTypes'
+import { ErrorsProps, RowErrorsProps } from '../types/productAttributesTypes'
 import ProductAttributeValues from './ProductAttributeValues'
 
 interface ProductAttributeMainInfoProps {

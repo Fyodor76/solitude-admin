@@ -14,7 +14,7 @@ import { useModal } from '@/shared/lib/hooks/useModal'
 import { message, Modal } from 'antd'
 
 import { initialState } from '../const/const'
-import { ErrorsProps } from '../productAttributesTypes'
+import { ErrorsProps } from '../types/productAttributesTypes'
 
 interface useHandlerPoductAttributeProps {
   allProdAttr: ProductAttributeResponse[]

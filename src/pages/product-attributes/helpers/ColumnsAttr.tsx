@@ -5,7 +5,7 @@ import {
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, Input } from 'antd'
 
-import { RowErrorsProps } from '../productAttributesTypes'
+import { RowErrorsProps } from '../types/productAttributesTypes'
 import './ColumnsAttr.scss'
 
 export const valueColumns = (
@@ -31,7 +31,7 @@ export const valueColumns = (
           }}
           status={rowErrors[record.id]?.value ? 'error' : ''}
         />
-        {rowErrors[record.id]?.value && ( // 👈 Текст ошибки для этой строки
+        {rowErrors[record.id]?.value && (
           <span className="error-text">{rowErrors[record.id].value}</span>
         )}
       </>
