@@ -19,13 +19,22 @@ export interface Colors {
   hexCode: string
   slug: string
 }
-export interface Editor {
+export interface EditorType {
   id?: string
   categoryId: string
   title: string
-  colors: Colors[]
+  colors?: Colors[]
   variants: Variants[]
   createdAt?: string
   updatedAt?: string
   specifications: Specifications[]
+}
+
+export interface EditorPatchRequest {
+  id: string
+  categoryId?: string
+  title?: string
+  colors?: Colors[]
+  variants?: Variants[]
+  specifications?: Specifications[]
 }

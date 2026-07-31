@@ -211,6 +211,7 @@ export const baseApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: [
     'File',
+    'Editor',
     'Category',
     'Collection',
     'Product',
