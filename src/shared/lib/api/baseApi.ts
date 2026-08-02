@@ -216,6 +216,7 @@ export const baseApi = createApi({
     'Product',
     'Size-chart',
     'Size-parameter',
+    'Product-attributes',
     'SupportInbox',
     'SupportConversation',
     'SupportMessages',
