@@ -1,0 +1,59 @@
+.table-color-container {
+  display: flex;
+  width: 23px;
+  height: 23px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid #d9d9d9;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+
+  input[type='color'].circle-color-picker {
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    cursor: pointer;
+
+    &::-webkit-color-swatch-wrapper {
+      padding: 0 !important;
+      border-radius: 50% !important;
+    }
+
+    &::-webkit-color-swatch {
+      border: none !important;
+      border-radius: 50% !important;
+    }
+  }
+}
+.active-true {
+  color: green;
+}
+.table-actions {
+  display: flex;
+  gap: 8px;
+
+  &-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: red !important;
+    border: 1px solid red;
+    border-radius: 8px;
+    cursor: pointer;
+    .ant-btn-link {
+      color: red !important;
+    }
+
+    .icon,
+    .icon svg,
+    .icon svg path,
+    .icon svg g {
+      color: red !important;
+      fill: red !important;
+    }
+  }
+}

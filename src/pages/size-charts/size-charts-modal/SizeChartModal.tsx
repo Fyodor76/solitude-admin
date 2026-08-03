@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import { ApiResponse } from '@/shared/lib/api/baseApi'
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 import UniversalUploadButton from '@/shared/ui/upload-image-btn/UniversalUploadButton'
