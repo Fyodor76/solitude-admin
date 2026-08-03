@@ -393,6 +393,13 @@
                       stroke: none !important;
                     }
 
+                    svg.icon-constructor {
+                      rect {
+                        fill: transparent !important;
+                        stroke: currentColor !important;
+                        //stroke-width: 1.5px;
+                      }
+                    }
                     svg rect {
                       fill: none !important;
                       stroke: none !important;

@@ -57,7 +57,7 @@ export const menuSidebar: MenuItem[] = [
     id: SIDEBAR_MENU_ITEM_ID.EDITOR,
     text: 'Конструктор товара',
     href: '/editor',
-    icon: 'editing',
+    icon: 'constructor',
     hasArrow: false,
   },
   {
