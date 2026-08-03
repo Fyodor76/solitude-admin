@@ -1,17 +1,8 @@
 export interface Specifications {
+  id: string
   title: string
   content: string
   order: number
-}
-export interface VariantsImage {
-  image: string
-  title: string
-  id?: string
-  order?: number
-}
-export interface Variants {
-  colorId: string
-  variants: VariantsImage[]
 }
 export interface Colors {
   id: string
@@ -19,22 +10,41 @@ export interface Colors {
   hexCode: string
   slug: string
 }
-export interface EditorType {
-  id?: string
+
+export interface Variants {
+  colorId: string
+  variants: VariantsImage[]
+}
+
+export interface VariantsImage {
+  image: string
+  title: string
+  id: string
+  order: number
+}
+
+export interface EditorTypeResponse {
+  id: string
   categoryId: string
   title: string
-  colors?: Colors[]
+  colors: Colors[]
   variants: Variants[]
-  createdAt?: string
-  updatedAt?: string
+  createdAt: string
+  updatedAt: string
   specifications: Specifications[]
+}
+
+export interface EditorTypeRequest {
+  categoryId: string
+  title: string
+  variants: Variants[]
+  specifications: Omit<Specifications, 'id'>[]
 }
 
 export interface EditorPatchRequest {
   id: string
   categoryId?: string
   title?: string
-  colors?: Colors[]
   variants?: Variants[]
   specifications?: Specifications[]
 }

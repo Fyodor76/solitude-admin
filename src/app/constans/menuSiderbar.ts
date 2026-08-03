@@ -53,25 +53,11 @@ export const menuSidebar: MenuItem[] = [
       },
     ],
   },
-  /*{
-    id: 'dashboard',
-    text: 'Dashboard',
-    href: '#',
-    icon: 'dashboards',
-    hasArrow: true,
-    subItems: [
-      {
-        id: 'all-products1',
-        text: 'All Products',
-        href: '/products',
-        icon: 'doc',
-      },
-      {
-        id: 'all-products2',
-        text: 'All Products',
-        href: '/products',
-        icon: 'doc',
-      },
-    ],
-  },*/
+  {
+    id: SIDEBAR_MENU_ITEM_ID.EDITOR,
+    text: 'Конструктор товара',
+    href: '/editor',
+    icon: 'editing',
+    hasArrow: false,
+  },
 ]

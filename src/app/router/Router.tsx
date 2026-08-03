@@ -1,5 +1,6 @@
 import { ValidationProvider } from '@/context/validation/provider'
 import { Categories } from '@/pages/categories'
+import Editor from '@/pages/editor/Editor'
 import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
 import { NotificationsPage } from '@/pages/notifications'
@@ -95,6 +96,14 @@ export const Router: RouteObject[] = [
         element: (
           <ProtectedRouter>
             <SizeChart />
+          </ProtectedRouter>
+        ),
+      },
+      {
+        path: '/editor',
+        element: (
+          <ProtectedRouter>
+            <Editor />
           </ProtectedRouter>
         ),
       },

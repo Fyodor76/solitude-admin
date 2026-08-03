@@ -7,6 +7,7 @@ export const SIDEBAR_MENU_ITEM_ID = {
   SUPPORT: 'support',
   FORMS: 'forms',
   CALLBACK_FORM: 'callback-form',
+  EDITOR: 'editor',
 } as const
 
 export type SidebarMenuItemId = (typeof SIDEBAR_MENU_ITEM_ID)[keyof typeof SIDEBAR_MENU_ITEM_ID]

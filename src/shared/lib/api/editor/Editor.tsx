@@ -1,10 +1,10 @@
 import { ApiResponse, baseApi } from '../baseApi'
 import { deleteResponse } from '../size-charts/types'
-import { EditorPatchRequest, EditorType } from './types'
+import { EditorPatchRequest, EditorTypeRequest, EditorTypeResponse } from './types'
 
 export const Editor = baseApi.injectEndpoints({
   endpoints: builder => ({
-    createNewEditor: builder.mutation<ApiResponse<EditorType, any>, EditorType>({
+    createNewEditor: builder.mutation<ApiResponse<EditorTypeResponse, any>, EditorTypeRequest>({
       query: newEditor => ({
         url: `/editors`,
         method: 'POST',
@@ -12,21 +12,21 @@ export const Editor = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: 'Editor', id: 'LIST' }],
     }),
-    getAllEditors: builder.query<ApiResponse<EditorType[], any>, void>({
+    getAllEditors: builder.query<ApiResponse<EditorTypeResponse[], any>, void>({
       query: () => ({
         url: `/editors`,
         method: 'GET',
       }),
       providesTags: [{ type: 'Editor', id: 'LIST' }],
     }),
-    getEditorById: builder.query<ApiResponse<EditorType, any>, string>({
+    getEditorById: builder.query<ApiResponse<EditorTypeResponse, any>, string>({
       query: id => ({
         url: `/editors/${id}`,
         method: 'GET',
       }),
       providesTags: (result, error, id) => [{ type: 'Editor', id }],
     }),
-    updateEditor: builder.mutation<ApiResponse<EditorType, any>, EditorPatchRequest>({
+    updateEditor: builder.mutation<ApiResponse<EditorTypeResponse, any>, EditorPatchRequest>({
       query: ({ id, ...patchData }) => ({
         url: `/editors/${id}`,
         method: 'PATCH',
