@@ -3,6 +3,7 @@ export const SIDEBAR_MENU_ITEM_ID = {
   PRODUCTS: 'products',
   PRODUCTS_LIST: 'products-list',
   PRODUCT_CREATE: 'product-create',
+  STOCK: 'stock',
   PRODUCT_ATTRIBUTES: 'product-attributes',
   SIZE_CHARTS: 'size-charts',
   CATEGORIES: 'categories',

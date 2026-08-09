@@ -1,0 +1,32 @@
+.stock-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0 32px;
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  &__search {
+    flex: 1 1 280px;
+    max-width: 420px;
+  }
+
+  &__product {
+    width: min(280px, 100%);
+  }
+
+  &__availability {
+    width: min(180px, 100%);
+  }
+
+  &__section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+}

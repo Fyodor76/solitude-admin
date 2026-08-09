@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import {
+  useDeleteProductVariationMutation,
   useGetProductByIdQuery,
   useGetProductVariationByIdQuery,
   useUpdateProductMutation,
@@ -10,7 +11,7 @@ import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandle
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Form, Input, InputNumber, Space } from 'antd'
+import { Button, Form, Input, InputNumber, Modal, Space } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ProductImageUpload } from '../product-create/components/ProductImageUpload'
@@ -56,10 +57,11 @@ export default function VariationEditPage() {
   } = useGetProductVariationByIdQuery(variationId, { skip: !variationId })
   const [updateVariation, { isLoading: isSavingVariation }] = useUpdateProductVariationMutation()
   const [updateProduct, { isLoading: isSavingProduct }] = useUpdateProductMutation()
+  const [deleteVariation, { isLoading: isDeleting }] = useDeleteProductVariationMutation()
 
   const product = productResponse?.data
   const variation = variationResponse?.data
-  const isSaving = isSavingVariation || isSavingProduct
+  const isSaving = isSavingVariation || isSavingProduct || isDeleting
 
   useEffect(() => {
     if (!variation) return
@@ -161,6 +163,33 @@ export default function VariationEditPage() {
     }
   }
 
+  const handleDelete = () => {
+    if (!variation) return
+
+    Modal.confirm({
+      title: 'Удалить вариацию?',
+      content: (
+        <>
+          Будут удалены вариация <strong>{variation.name}</strong> и все её складские позиции.
+          Восстановить будет невозможно.
+        </>
+      ),
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk: async () => {
+        try {
+          await deleteVariation({ id: variationId, productId }).unwrap()
+          openNotification('success', ['Вариация удалена'])
+          navigate(`/products/${productId}`)
+        } catch {
+          openNotification('error', ['Не удалось удалить вариацию'])
+          throw new Error('delete failed')
+        }
+      },
+    })
+  }
+
   if (isError) {
     return (
       <Container className="variation-edit admin-page">
@@ -187,6 +216,9 @@ export default function VariationEditPage() {
               onClick={() => navigate(`/products/${productId}/variations/${variationId}/stock`)}
             >
               Сток
+            </Button>
+            <Button danger loading={isDeleting} onClick={handleDelete}>
+              Удалить
             </Button>
             <Button type="primary" loading={isSaving} onClick={() => void handleSave()}>
               Сохранить
@@ -253,6 +285,9 @@ export default function VariationEditPage() {
       </section>
 
       <div className="variation-edit__footer">
+        <Button danger loading={isDeleting} onClick={handleDelete} style={{ marginRight: 'auto' }}>
+          Удалить
+        </Button>
         <Button onClick={() => navigate(`/products/${productId}`)}>Отмена</Button>
         <Button type="primary" loading={isSaving} onClick={() => void handleSave()}>
           Сохранить

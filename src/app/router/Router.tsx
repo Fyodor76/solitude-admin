@@ -14,6 +14,7 @@ import {
   VariationStockPage,
 } from '@/pages/products'
 import { SizeChart } from '@/pages/size-charts'
+import { StockPage } from '@/pages/stock'
 import { StorePreview } from '@/pages/store-preview'
 import { SupportInbox } from '@/pages/support-inbox'
 import { Navigate, RouteObject } from 'react-router-dom'
@@ -97,6 +98,10 @@ export const Router: RouteObject[] = [
           {
             path: 'products/create',
             element: <ProductCreatePage />,
+          },
+          {
+            path: 'stock',
+            element: <StockPage />,
           },
           {
             path: 'products/:productId',

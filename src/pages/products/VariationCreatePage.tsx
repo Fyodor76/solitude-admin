@@ -4,7 +4,9 @@ import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attrib
 import {
   useCreateProductVariationMutation,
   useCreateStockBulkMutation,
+  useDeleteStockItemMutation,
   useGetProductByIdQuery,
+  useLazyGetStockByVariationQuery,
   useUpdateProductMutation,
 } from '@/shared/lib/api/products/Products'
 import { useGetSizeChartByCategoryIdQuery } from '@/shared/lib/api/size-charts/SizeCharts'
@@ -86,6 +88,8 @@ export default function VariationCreatePage() {
   const [createVariation, { isLoading: isCreating }] = useCreateProductVariationMutation()
   const [updateProduct, { isLoading: isUpdatingProduct }] = useUpdateProductMutation()
   const [createStockBulk, { isLoading: isCreatingStock }] = useCreateStockBulkMutation()
+  const [fetchStockByVariation] = useLazyGetStockByVariationQuery()
+  const [deleteStockItem] = useDeleteStockItemMutation()
 
   const product = productResponse?.data
   const isSaving = isCreating || isUpdatingProduct || isCreatingStock
@@ -407,6 +411,23 @@ export default function VariationCreatePage() {
 
       if (stockItems.length) {
         await createStockBulk({ items: stockItems }).unwrap()
+
+        // createVariation на бэке всегда кладёт EMPTY без размера — удаляем после реальных размеров
+        try {
+          const stockResponse = await fetchStockByVariation(variationId).unwrap()
+          const empties = (stockResponse.data ?? []).filter(
+            item =>
+              !item.sizeId &&
+              (item.quantity ?? 0) === 0 &&
+              (item.reserved ?? 0) === 0 &&
+              String(item.sku || '').startsWith('EMPTY-')
+          )
+          await Promise.all(
+            empties.map(item => deleteStockItem({ id: item.id, variationId }).unwrap())
+          )
+        } catch {
+          // не блокируем создание вариации из‑за очистки placeholder
+        }
       }
 
       clearVariationCreateDraft(productId)

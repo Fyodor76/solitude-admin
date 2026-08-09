@@ -78,15 +78,37 @@ export default function VariationStockPage() {
 
   useEffect(() => {
     const items = stockResponse?.data ?? []
+    const hasSizedRows = items.some(item => Boolean(item.sizeId))
+    const emptyPlaceholders = items.filter(
+      item =>
+        !item.sizeId &&
+        (item.quantity ?? 0) === 0 &&
+        (item.reserved ?? 0) === 0 &&
+        String(item.sku || '').startsWith('EMPTY-')
+    )
+
+    // Бэкенд всегда создаёт пустую позицию без размера — убираем, если уже есть размеры.
+    if (hasSizedRows && emptyPlaceholders.length) {
+      void Promise.all(
+        emptyPlaceholders.map(item => deleteStockItem({ id: item.id, variationId }).unwrap())
+      ).catch(() => {
+        // если не удалось — просто покажем строки как есть
+      })
+    }
+
+    const visible = hasSizedRows
+      ? items.filter(item => !emptyPlaceholders.some(empty => empty.id === item.id))
+      : items
+
     setRows(
-      items.map(item => ({
+      visible.map(item => ({
         ...item,
         draftSku: item.sku || '',
         draftQuantity: item.quantity ?? 0,
         draftLocation: item.location || '',
       }))
     )
-  }, [stockResponse?.data])
+  }, [deleteStockItem, stockResponse?.data, variationId])
 
   const existingSizeIds = useMemo(
     () => new Set(rows.map(row => row.sizeId).filter(Boolean) as string[]),

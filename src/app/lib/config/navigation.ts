@@ -7,6 +7,7 @@ export const ROUTES = {
   CATEGORIES: { label: 'Категории', path: '/categories' },
   PRODUCTS: { label: 'Товары', path: '/products' },
   PRODUCT_CREATE: { label: 'Создание товара', path: '/products/create' },
+  STOCK: { label: 'Склад', path: '/stock' },
   SIZE_CHARTS: { label: 'Таблицы размеров', path: '/size-charts' },
   PRODUCT_ATTRIBUTES: { label: 'Опции товаров', path: '/product-attributes' },
   PLATFORM_IMAGES: { label: 'Изображения платформы', path: '/platform-images' },

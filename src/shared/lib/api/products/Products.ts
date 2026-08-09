@@ -124,6 +124,29 @@ export const apiProducts = baseApi.injectEndpoints({
       ],
     }),
 
+    getStockByProduct: builder.query<ApiResponse<StockItem[], any>, string>({
+      query: productId => ({
+        url: `/stock/product/${productId}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, productId) => [
+        { type: 'Stock', id: `PRODUCT_${productId}` },
+        ...(result?.data?.map(item => ({ type: 'Stock' as const, id: item.id })) ?? []),
+      ],
+    }),
+
+    getStockByVariationIds: builder.query<ApiResponse<StockItem[], any>, string[]>({
+      query: variationIds => ({
+        url: `/stock/batch/variations`,
+        method: 'POST',
+        body: { variationIds },
+      }),
+      providesTags: result => [
+        { type: 'Stock', id: 'LIST' },
+        ...(result?.data?.map(item => ({ type: 'Stock' as const, id: item.id })) ?? []),
+      ],
+    }),
+
     updateStockItem: builder.mutation<
       ApiResponse<StockItem, any>,
       { id: string; body: UpdateStockItemPayload; variationId?: string }
@@ -194,6 +217,23 @@ export const apiProducts = baseApi.injectEndpoints({
       ],
     }),
 
+    deleteProductVariation: builder.mutation<
+      ApiResponse<{ id: string }, any>,
+      { id: string; productId: string }
+    >({
+      query: ({ id }) => ({
+        url: `/product-variations/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, { id, productId }) => [
+        { type: 'Product', id: `VARIATION_${id}` },
+        { type: 'Product', id: productId },
+        { type: 'Product', id: 'LIST' },
+        { type: 'Stock', id },
+        { type: 'Stock', id: 'LIST' },
+      ],
+    }),
+
     reorderProductVariations: builder.mutation<
       ApiResponse<ProductVariation[], any>,
       { productId: string; orderedIds: string[] }
@@ -234,11 +274,15 @@ export const {
   useCreateStockBulkMutation,
   useCreateStockItemMutation,
   useGetStockByVariationQuery,
+  useLazyGetStockByVariationQuery,
+  useGetStockByProductQuery,
+  useGetStockByVariationIdsQuery,
   useUpdateStockItemMutation,
   useDeleteStockItemMutation,
   useGetProductVariationByIdQuery,
   useCreateProductVariationMutation,
   useUpdateProductVariationMutation,
+  useDeleteProductVariationMutation,
   useReorderProductVariationsMutation,
   useReorderProductsMutation,
 } = apiProducts

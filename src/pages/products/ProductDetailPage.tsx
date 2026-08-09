@@ -4,6 +4,7 @@ import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categorie
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import {
   useDeleteProductMutation,
+  useDeleteProductVariationMutation,
   useGetProductByIdQuery,
   useReorderProductVariationsMutation,
   useUpdateProductMutation,
@@ -62,10 +63,12 @@ function VariationSortableRow({
   record,
   productId,
   onDragEnd,
+  onDelete,
 }: {
   record: ProductVariation
   productId: string
   onDragEnd: () => void
+  onDelete: (variation: ProductVariation) => void
 }) {
   const controls = useDragControls()
   const thumb = resolveMediaUrl(record.mainImage || record.images?.[0])
@@ -123,6 +126,9 @@ function VariationSortableRow({
         <Link to={`/products/${productId}/variations/${record.id}/stock`}>
           <Button type="link">Сток</Button>
         </Link>
+        <Button type="link" danger onClick={() => onDelete(record)}>
+          Удалить
+        </Button>
       </Space>
     </Reorder.Item>
   )
@@ -142,6 +148,7 @@ export default function ProductDetailPage() {
   const { data: categoriesResponse } = useGetCategoriesTreeQuery()
   const [updateProduct, { isLoading: isSaving }] = useUpdateProductMutation()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
+  const [deleteVariation] = useDeleteProductVariationMutation()
   const [reorderVariations, { isLoading: isReordering }] = useReorderProductVariationsMutation()
 
   const product = data?.data
@@ -201,6 +208,33 @@ export default function ProductDetailPage() {
   const handleDragEnd = useCallback(() => {
     void persistOrder(orderedRef.current)
   }, [persistOrder])
+
+  const handleDeleteVariation = useCallback(
+    (variation: ProductVariation) => {
+      Modal.confirm({
+        title: 'Удалить вариацию?',
+        content: (
+          <>
+            Будут удалены вариация <strong>{variation.name}</strong> и все её складские позиции.
+            Восстановить будет невозможно.
+          </>
+        ),
+        okText: 'Удалить',
+        okType: 'danger',
+        cancelText: 'Отмена',
+        onOk: async () => {
+          try {
+            await deleteVariation({ id: variation.id, productId }).unwrap()
+            openNotification('success', ['Вариация удалена'])
+          } catch {
+            openNotification('error', ['Не удалось удалить вариацию'])
+            throw new Error('delete failed')
+          }
+        },
+      })
+    },
+    [deleteVariation, openNotification, productId]
+  )
 
   const handleSave = async () => {
     if (!product) return
@@ -417,6 +451,7 @@ export default function ProductDetailPage() {
                   record={record}
                   productId={productId}
                   onDragEnd={handleDragEnd}
+                  onDelete={handleDeleteVariation}
                 />
               ))}
             </Reorder.Group>
