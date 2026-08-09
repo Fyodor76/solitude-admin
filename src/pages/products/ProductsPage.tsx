@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { type DragEvent, useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   useDeleteProductMutation,
@@ -52,7 +52,8 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1)
   const [orderedProducts, setOrderedProducts] = useState<ProductListItem[]>([])
   const [dragIndex, setDragIndex] = useState<number | null>(null)
-  const [overIndex, setOverIndex] = useState<number | null>(null)
+  /** Индекс «вставить перед» (0…length). null — нет цели. */
+  const [dropSlot, setDropSlot] = useState<number | null>(null)
   const { openNotification, contextHolder } = useNotificationHandler()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
   const [reorderProducts, { isLoading: isReordering }] = useReorderProductsMutation()
@@ -119,17 +120,28 @@ export default function ProductsPage() {
     [openNotification, orderedProducts, page, reorderProducts]
   )
 
-  const handleReorder = useCallback(
-    (from: number, to: number) => {
-      if (!canReorder || from === to || from < 0 || to < 0) return
+  const handleInsert = useCallback(
+    (from: number, insertBefore: number) => {
+      if (!canReorder || from < 0 || insertBefore < 0) return
+      // Уже стоит в этом слоте — ничего не делаем
+      if (insertBefore === from || insertBefore === from + 1) return
+
       const next = [...orderedProducts]
       const [moved] = next.splice(from, 1)
       if (!moved) return
+
+      const to = from < insertBefore ? insertBefore - 1 : insertBefore
       next.splice(to, 0, moved)
       void persistOrder(next)
     },
     [canReorder, orderedProducts, persistOrder]
   )
+
+  const resolveDropSlot = useCallback((event: DragEvent, index: number) => {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+    const before = event.clientY < rect.top + rect.height / 2
+    return before ? index : index + 1
+  }, [])
 
   const columns: ColumnsType<ProductListItem> = useMemo(
     () => [
@@ -146,13 +158,14 @@ export default function ProductsPage() {
                   draggable
                   aria-label="Перетащить товар"
                   onDragStart={event => {
+                    event.stopPropagation()
                     setDragIndex(index)
                     event.dataTransfer.effectAllowed = 'move'
                     event.dataTransfer.setData('text/plain', String(index))
                   }}
                   onDragEnd={() => {
                     setDragIndex(null)
-                    setOverIndex(null)
+                    setDropSlot(null)
                   }}
                 >
                   <HolderOutlined />
@@ -261,7 +274,7 @@ export default function ProductsPage() {
             setPage(1)
             setSearch(value.trim())
             setDragIndex(null)
-            setOverIndex(null)
+            setDropSlot(null)
           }}
           enterButton="Найти"
         />
@@ -280,8 +293,9 @@ export default function ProductsPage() {
             if (!canReorder) return ''
             const classes = ['products-page__row']
             if (dragIndex === index) classes.push('is-dragging')
-            if (overIndex === index && dragIndex !== null && dragIndex !== index) {
-              classes.push('is-over')
+            if (dropSlot === index) classes.push('drop-before')
+            if (dropSlot === orderedProducts.length && index === orderedProducts.length - 1) {
+              classes.push('drop-after')
             }
             return classes.join(' ')
           }}
@@ -291,18 +305,18 @@ export default function ProductsPage() {
               onDragOver: event => {
                 event.preventDefault()
                 event.dataTransfer.dropEffect = 'move'
-                if (dragIndex !== null && dragIndex !== index) {
-                  setOverIndex(index)
-                }
+                if (dragIndex === null) return
+                setDropSlot(resolveDropSlot(event, index))
               },
               onDrop: event => {
                 event.preventDefault()
                 const from = dragIndex ?? Number(event.dataTransfer.getData('text/plain'))
+                const slot = resolveDropSlot(event, index)
                 if (!Number.isNaN(from)) {
-                  handleReorder(from, index)
+                  handleInsert(from, slot)
                 }
                 setDragIndex(null)
-                setOverIndex(null)
+                setDropSlot(null)
               },
             }
           }}
@@ -314,7 +328,7 @@ export default function ProductsPage() {
             onChange: nextPage => {
               setPage(nextPage)
               setDragIndex(null)
-              setOverIndex(null)
+              setDropSlot(null)
             },
           }}
         />
