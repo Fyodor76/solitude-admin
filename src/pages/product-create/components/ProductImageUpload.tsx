@@ -212,36 +212,40 @@ export function ProductImageUpload({
                   style={{ objectFit: 'cover' }}
                   preview={{ mask: 'Просмотр' }}
                 />
-                {isMain ? <span className="product-create-images__badge">Главное</span> : null}
-                {showcaseEnabled && isShowcase ? (
-                  <button
-                    type="button"
-                    className="product-create-images__badge product-create-images__badge--showcase"
-                    onClick={() => toggleShowcase(item.fileId)}
-                  >
-                    Витрина
-                  </button>
-                ) : null}
-                {multiple && index > 0 ? (
-                  <Button
-                    type="default"
-                    size="small"
-                    className="product-create-images__make-main"
-                    onClick={() => setAsMain(item.fileId)}
-                  >
-                    Главное
-                  </Button>
-                ) : null}
-                {showcaseEnabled && !isShowcase ? (
-                  <Button
-                    type="default"
-                    size="small"
-                    className="product-create-images__make-showcase"
-                    onClick={() => toggleShowcase(item.fileId)}
-                  >
-                    На витрине
-                  </Button>
-                ) : null}
+                <div className="product-create-images__actions">
+                  {isMain ? (
+                    <span className="product-create-images__badge">Главное</span>
+                  ) : multiple ? (
+                    <Button
+                      type="default"
+                      size="small"
+                      className="product-create-images__action-btn"
+                      onClick={() => setAsMain(item.fileId)}
+                    >
+                      Главное
+                    </Button>
+                  ) : null}
+                  {showcaseEnabled ? (
+                    isShowcase ? (
+                      <button
+                        type="button"
+                        className="product-create-images__badge product-create-images__badge--showcase"
+                        onClick={() => toggleShowcase(item.fileId)}
+                      >
+                        Витрина
+                      </button>
+                    ) : (
+                      <Button
+                        type="default"
+                        size="small"
+                        className="product-create-images__action-btn"
+                        onClick={() => toggleShowcase(item.fileId)}
+                      >
+                        На витрине
+                      </Button>
+                    )
+                  ) : null}
+                </div>
                 <Button
                   type="text"
                   danger

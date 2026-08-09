@@ -36,7 +36,6 @@ export function StepVariations({
       <div className="product-create__toolbar">
         <p className="product-create__hint">
           Добавьте вариации (например, по цвету). Цвет обязателен — из раздела «Опции товаров».
-          Можно менять порядок перетаскиванием.
         </p>
         <Button type="primary" onClick={onAdd}>
           Добавить вариацию

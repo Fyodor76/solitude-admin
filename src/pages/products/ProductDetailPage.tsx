@@ -286,9 +286,6 @@ export default function ProductDetailPage() {
 
       <section className="product-detail__section">
         <h2 className="product-detail__section-title">Вариации</h2>
-        <p className="product-detail__variations-hint">
-          Перетащите строки за иконку, чтобы изменить порядок (сразу сохраняется).
-        </p>
         {isLoading ? (
           <p className="product-detail__variations-empty">Загрузка...</p>
         ) : !orderedVariations.length ? (
@@ -369,9 +366,11 @@ export default function ProductDetailPage() {
                     {record.sku}
                   </span>
                   <span>{Number(record.price || 0).toLocaleString('ru-RU')} ₽</span>
-                  <Tag color={record.isActive ? 'green' : 'default'}>
-                    {record.isActive ? 'Активна' : 'Скрыта'}
-                  </Tag>
+                  <span className="product-detail__status">
+                    <Tag color={record.isActive ? 'green' : 'default'}>
+                      {record.isActive ? 'Активна' : 'Скрыта'}
+                    </Tag>
+                  </span>
                   <Link to={`/products/${productId}/variations/${record.id}`}>
                     <Button type="link">Редактировать</Button>
                   </Link>
