@@ -20,6 +20,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ProductVariation } from '@/app/types/product'
 
 import './ProductsPage.scss'
+import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from './productSwitchLabels'
 
 type ProductFormValues = {
   name: string
@@ -32,6 +33,7 @@ type ProductFormValues = {
   material: string
   isActive: boolean
   isFeatured: boolean
+  showOnLanding: boolean
 }
 
 function flattenCategories(
@@ -92,6 +94,7 @@ export default function ProductDetailPage() {
       material: product.material,
       isActive: product.isActive,
       isFeatured: product.isFeatured,
+      showOnLanding: product.showOnLanding ?? false,
     })
     setOrderedVariations(sortVariations(product.variations ?? []))
   }, [form, product])
@@ -139,6 +142,7 @@ export default function ProductDetailPage() {
         material: values.material.trim(),
         isActive: values.isActive,
         isFeatured: values.isFeatured,
+        showOnLanding: values.showOnLanding,
         images: product.images,
       }
 
@@ -264,10 +268,28 @@ export default function ProductDetailPage() {
             >
               <Input />
             </Form.Item>
-            <Form.Item label="На витрине" name="isActive" valuePropName="checked">
+            <Form.Item
+              label={productSwitchLabel('На витрине', PRODUCT_SWITCH_TOOLTIPS.isActive)}
+              name="isActive"
+              valuePropName="checked"
+            >
               <Switch />
             </Form.Item>
-            <Form.Item label="Рекомендуемый" name="isFeatured" valuePropName="checked">
+            <Form.Item
+              label={productSwitchLabel('Рекомендуемый', PRODUCT_SWITCH_TOOLTIPS.isFeatured)}
+              name="isFeatured"
+              valuePropName="checked"
+            >
+              <Switch />
+            </Form.Item>
+            <Form.Item
+              label={productSwitchLabel(
+                'На главной лендинга',
+                PRODUCT_SWITCH_TOOLTIPS.showOnLanding
+              )}
+              name="showOnLanding"
+              valuePropName="checked"
+            >
               <Switch />
             </Form.Item>
             <Form.Item className="product-detail__full" label="Описание" name="description">

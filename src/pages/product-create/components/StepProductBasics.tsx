@@ -1,6 +1,7 @@
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import { Card, Input, InputNumber, Select, Switch } from 'antd'
 
+import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from '../../products/productSwitchLabels'
 import { flattenCategoryOptions } from '../helpers'
 import { ProductBasicsForm } from '../types'
 
@@ -93,11 +94,18 @@ export function StepProductBasics({ value, categories, onChange }: StepProductBa
         <div className="product-create__switches">
           <label className="product-create__switch">
             <Switch checked={value.isActive} onChange={isActive => onChange({ isActive })} />
-            <span>На витрине</span>
+            {productSwitchLabel('На витрине', PRODUCT_SWITCH_TOOLTIPS.isActive)}
           </label>
           <label className="product-create__switch">
             <Switch checked={value.isFeatured} onChange={isFeatured => onChange({ isFeatured })} />
-            <span>Рекомендуемый</span>
+            {productSwitchLabel('Рекомендуемый', PRODUCT_SWITCH_TOOLTIPS.isFeatured)}
+          </label>
+          <label className="product-create__switch">
+            <Switch
+              checked={value.showOnLanding}
+              onChange={showOnLanding => onChange({ showOnLanding })}
+            />
+            {productSwitchLabel('На главной лендинга', PRODUCT_SWITCH_TOOLTIPS.showOnLanding)}
           </label>
         </div>
       </div>

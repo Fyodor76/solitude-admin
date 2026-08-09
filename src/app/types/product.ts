@@ -85,6 +85,7 @@ export interface Product {
   sku: string
   isActive: boolean
   isFeatured: boolean
+  showOnLanding: boolean
   inStock: boolean
   images: string[]
   attributes: ProductAttribute[]

@@ -323,6 +323,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       material: state.basics.material.trim(),
       isActive: state.basics.isActive,
       isFeatured: state.basics.isFeatured,
+      showOnLanding: state.basics.showOnLanding,
       modelParameters: state.basics.modelParameters.trim() || undefined,
       attributes: state.attributeSelections
         .filter(item => item.valueIds.length > 0)

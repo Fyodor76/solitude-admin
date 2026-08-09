@@ -147,6 +147,7 @@ export default function VariationEditPage() {
           material: product.material,
           isActive: product.isActive,
           isFeatured: product.isFeatured,
+          showOnLanding: product.showOnLanding,
           images: showcaseFileIds,
         },
       }).unwrap()

@@ -36,6 +36,7 @@ export interface ProductCreatePayload {
   material: string
   isActive?: boolean
   isFeatured?: boolean
+  showOnLanding?: boolean
   modelParameters?: string
   attributes?: ProductAttributeCreatePayload[]
   variations?: ProductVariationCreatePayload[]
@@ -61,6 +62,7 @@ export interface ProductSearchFilters {
   categoryIds?: string[]
   brand?: string
   isFeatured?: boolean
+  showOnLanding?: boolean
   inStock?: boolean
   minPrice?: number
   maxPrice?: number

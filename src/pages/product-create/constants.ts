@@ -18,4 +18,5 @@ export const INITIAL_BASICS: ProductBasicsForm = {
   modelParameters: '',
   isActive: false,
   isFeatured: false,
+  showOnLanding: false,
 }

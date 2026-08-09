@@ -16,6 +16,7 @@ export interface ProductBasicsForm {
   modelParameters: string
   isActive: boolean
   isFeatured: boolean
+  showOnLanding: boolean
 }
 
 export interface DraftVariation {
