@@ -44,7 +44,7 @@ export const menuSidebar: MenuItem[] = [
         id: SIDEBAR_MENU_ITEM_ID.STOCK,
         text: 'Склад',
         href: '/stock',
-        icon: 'tables',
+        icon: 'boxOpen',
       },
     ],
   },
