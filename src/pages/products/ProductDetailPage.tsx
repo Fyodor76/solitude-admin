@@ -232,10 +232,10 @@ export default function ProductDetailPage() {
             >
               <Input />
             </Form.Item>
-            <Form.Item label="Активен" name="isActive" valuePropName="checked">
+            <Form.Item label="На витрине" name="isActive" valuePropName="checked">
               <Switch />
             </Form.Item>
-            <Form.Item label="В избранном" name="isFeatured" valuePropName="checked">
+            <Form.Item label="Рекомендуемый" name="isFeatured" valuePropName="checked">
               <Switch />
             </Form.Item>
             <Form.Item className="product-detail__full" label="Описание" name="description">

@@ -3,7 +3,6 @@ import { Card, Input, InputNumber, Select, Switch } from 'antd'
 
 import { flattenCategoryOptions } from '../helpers'
 import { ProductBasicsForm } from '../types'
-import { ProductImageUpload } from './ProductImageUpload'
 
 interface StepProductBasicsProps {
   value: ProductBasicsForm
@@ -91,23 +90,14 @@ export function StepProductBasics({ value, categories, onChange }: StepProductBa
           />
         </div>
 
-        <div className="product-create__field product-create__field--full">
-          <span>Фото товара</span>
-          <ProductImageUpload
-            value={value.images}
-            onChange={images => onChange({ images })}
-            multiple
-          />
-        </div>
-
         <div className="product-create__switches">
           <label className="product-create__switch">
             <Switch checked={value.isActive} onChange={isActive => onChange({ isActive })} />
-            <span>Active (витрина)</span>
+            <span>На витрине</span>
           </label>
           <label className="product-create__switch">
             <Switch checked={value.isFeatured} onChange={isFeatured => onChange({ isFeatured })} />
-            <span>Featured</span>
+            <span>Рекомендуемый</span>
           </label>
         </div>
       </div>

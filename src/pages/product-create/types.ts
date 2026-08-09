@@ -14,7 +14,6 @@ export interface ProductBasicsForm {
   brand: string
   material: string
   modelParameters: string
-  images: ProductImageItem[]
   isActive: boolean
   isFeatured: boolean
 }

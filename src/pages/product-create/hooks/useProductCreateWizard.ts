@@ -248,12 +248,35 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   }, [goToStep, state.step])
 
   const buildCreatePayload = useCallback(() => {
+    const variations = state.variations.map(item => ({
+      productId: '00000000-0000-0000-0000-000000000000',
+      colorId: item.colorId,
+      name: item.name.trim(),
+      slug: item.slug.trim(),
+      sku: item.sku.trim(),
+      price: Number(item.price),
+      comparePrice: item.comparePrice ?? undefined,
+      description: item.description.trim() || undefined,
+      mainImage: item.mainImage?.fileId,
+      images: item.images.map(image => image.fileId),
+      attributes: [],
+    }))
+
+    // Фото только у вариаций; на товар кладём превью первой для каталога/SEO.
+    const firstVariationImages = variations[0]?.images ?? []
+    const firstMain = variations[0]?.mainImage
+    const productImages = firstVariationImages.length
+      ? firstVariationImages
+      : firstMain
+        ? [firstMain]
+        : []
+
     return {
       name: state.basics.name.trim(),
       slug: state.basics.slug.trim() || undefined,
       description: state.basics.description.trim() || undefined,
       price: Number(state.basics.price),
-      images: state.basics.images.map(item => item.fileId),
+      images: productImages,
       categoryId: state.basics.categoryId,
       brand: state.basics.brand.trim(),
       material: state.basics.material.trim(),
@@ -266,19 +289,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
           attributeId: item.attributeId,
           valueIds: item.valueIds,
         })),
-      variations: state.variations.map(item => ({
-        productId: '00000000-0000-0000-0000-000000000000',
-        colorId: item.colorId,
-        name: item.name.trim(),
-        slug: item.slug.trim(),
-        sku: item.sku.trim(),
-        price: Number(item.price),
-        comparePrice: item.comparePrice ?? undefined,
-        description: item.description.trim() || undefined,
-        mainImage: item.mainImage?.fileId,
-        images: item.images.map(image => image.fileId),
-        attributes: [],
-      })),
+      variations,
     }
   }, [state])
 
