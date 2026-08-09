@@ -58,6 +58,12 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
     }
   }
 
+  const setAsMain = (fileId: string) => {
+    const selected = value.find(item => item.fileId === fileId)
+    if (!selected) return
+    onChange([selected, ...value.filter(item => item.fileId !== fileId)])
+  }
+
   return (
     <div className="product-create-images">
       <Upload.Dragger
@@ -77,7 +83,10 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
           <InboxOutlined />
         </p>
         <p className="product-create-images__title">Перетащите фото или нажмите для выбора</p>
-        <p className="product-create-images__hint">JPG, PNG, WEBP, GIF</p>
+        <p className="product-create-images__hint">
+          JPG, PNG, WEBP, GIF
+          {multiple ? ' · первое фото — главное, можно сменить' : ''}
+        </p>
       </Upload.Dragger>
 
       {uploading ? (
@@ -88,28 +97,47 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
 
       {value.length > 0 ? (
         <div className="product-create-images__list">
-          {value.map((item, index) => (
-            <div
-              key={item.fileId}
-              className={[
-                'product-create-images__item',
-                index === 0 ? 'product-create-images__item--main' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-            >
-              <Image src={item.url} alt="" width={96} height={96} style={{ objectFit: 'cover' }} />
-              {index === 0 ? <span className="product-create-images__badge">Главное</span> : null}
-              <Button
-                type="text"
-                danger
-                size="small"
-                className="product-create-images__remove"
-                icon={<DeleteOutlined />}
-                onClick={() => onChange(value.filter(image => image.fileId !== item.fileId))}
-              />
-            </div>
-          ))}
+          {value.map((item, index) => {
+            const isMain = multiple && index === 0
+            return (
+              <div
+                key={item.fileId}
+                className={[
+                  'product-create-images__item',
+                  isMain ? 'product-create-images__item--main' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+              >
+                <Image
+                  src={item.url}
+                  alt=""
+                  width={96}
+                  height={96}
+                  style={{ objectFit: 'cover' }}
+                />
+                {isMain ? <span className="product-create-images__badge">Главное</span> : null}
+                {multiple && index > 0 ? (
+                  <Button
+                    type="default"
+                    size="small"
+                    className="product-create-images__make-main"
+                    onClick={() => setAsMain(item.fileId)}
+                  >
+                    Главное
+                  </Button>
+                ) : null}
+                <Button
+                  type="text"
+                  danger
+                  size="small"
+                  className="product-create-images__remove"
+                  icon={<DeleteOutlined />}
+                  onClick={() => onChange(value.filter(image => image.fileId !== item.fileId))}
+                />
+              </div>
+            )
+          })}
         </div>
       ) : null}
     </div>

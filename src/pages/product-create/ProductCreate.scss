@@ -204,6 +204,18 @@
     line-height: 16px;
   }
 
+  &__make-main {
+    position: absolute;
+    left: 6px;
+    bottom: 6px;
+    z-index: 1;
+    height: 22px;
+    padding: 0 6px !important;
+    font-size: 11px;
+    line-height: 20px;
+    background: rgba(255, 255, 255, 0.92) !important;
+  }
+
   &__remove {
     position: absolute;
     top: 2px;

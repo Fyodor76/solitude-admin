@@ -126,20 +126,23 @@ export function StepVariations({
               </div>
 
               <div className="product-create__field product-create__field--full">
-                <span>Главное фото</span>
+                <span>Фото вариации</span>
                 <ProductImageUpload
-                  value={item.mainImage ? [item.mainImage] : []}
-                  multiple={false}
-                  onChange={images => onChange(item.key, { mainImage: images[0] || null })}
-                />
-              </div>
-
-              <div className="product-create__field product-create__field--full">
-                <span>Доп. фото вариации</span>
-                <ProductImageUpload
-                  value={item.images}
+                  value={
+                    item.mainImage
+                      ? [
+                          item.mainImage,
+                          ...item.images.filter(image => image.fileId !== item.mainImage?.fileId),
+                        ]
+                      : item.images
+                  }
                   multiple
-                  onChange={images => onChange(item.key, { images })}
+                  onChange={images =>
+                    onChange(item.key, {
+                      mainImage: images[0] || null,
+                      images,
+                    })
+                  }
                 />
               </div>
             </div>

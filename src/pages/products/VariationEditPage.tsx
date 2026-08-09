@@ -175,9 +175,8 @@ export default function VariationEditPage() {
                 value={imageItems}
                 onChange={next => {
                   setImageItems(next)
-                  setMainImageId(prev =>
-                    next.some(item => item.fileId === prev) ? prev : next[0]?.fileId
-                  )
+                  // Первое в списке — главное (кнопка «Главное» двигает фото в начало)
+                  setMainImageId(next[0]?.fileId)
                 }}
               />
             </div>
