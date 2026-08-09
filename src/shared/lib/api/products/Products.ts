@@ -129,7 +129,10 @@ export const apiProducts = baseApi.injectEndpoints({
       ],
     }),
 
-    reorderProducts: builder.mutation<ApiResponse<Product[], any>, { orderedIds: string[] }>({
+    reorderProducts: builder.mutation<
+      ApiResponse<Product[], any>,
+      { orderedIds: string[]; startOrder?: number }
+    >({
       query: body => ({
         url: `/products/reorder`,
         method: 'PUT',

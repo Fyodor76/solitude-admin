@@ -10,7 +10,7 @@ import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
-import { Button, Input, Modal, Space, Switch, Table, Tag } from 'antd'
+import { Button, Input, Modal, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link } from 'react-router-dom'
 
@@ -19,7 +19,6 @@ import { Product } from '@/app/types/product'
 import './ProductsPage.scss'
 
 const PAGE_SIZE = 20
-const LANDING_ORDER_LIMIT = 50
 
 /** Ответ search может быть без variations — учитываем. */
 type ProductListItem = Pick<
@@ -51,7 +50,6 @@ export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
-  const [landingOrderMode, setLandingOrderMode] = useState(false)
   const [orderedProducts, setOrderedProducts] = useState<ProductListItem[]>([])
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
@@ -59,13 +57,14 @@ export default function ProductsPage() {
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
   const [reorderProducts, { isLoading: isReordering }] = useReorderProductsMutation()
 
+  const canReorder = !search
+
   const { data, isFetching, isError, refetch } = useSearchProductsQuery({
-    search: landingOrderMode ? undefined : search || undefined,
+    search: search || undefined,
     isActiveFilter: 'all',
-    showOnLanding: landingOrderMode ? true : undefined,
-    sort: landingOrderMode ? 'sort_order' : 'newest',
-    page: landingOrderMode ? 1 : page,
-    limit: landingOrderMode ? LANDING_ORDER_LIMIT : PAGE_SIZE,
+    sort: 'sort_order',
+    page,
+    limit: PAGE_SIZE,
   })
 
   const products = (data?.data ?? []) as ProductListItem[]
@@ -107,31 +106,34 @@ export default function ProductsPage() {
       const previous = orderedProducts
       setOrderedProducts(next)
       try {
-        await reorderProducts({ orderedIds: next.map(item => item.id) }).unwrap()
-        openNotification('success', ['Порядок на главной сохранён'])
+        await reorderProducts({
+          orderedIds: next.map(item => item.id),
+          startOrder: (page - 1) * PAGE_SIZE,
+        }).unwrap()
+        openNotification('success', ['Порядок сохранён'])
       } catch {
         setOrderedProducts(previous)
         openNotification('error', ['Не удалось сохранить порядок'])
       }
     },
-    [openNotification, orderedProducts, reorderProducts]
+    [openNotification, orderedProducts, page, reorderProducts]
   )
 
   const handleReorder = useCallback(
     (from: number, to: number) => {
-      if (from === to || from < 0 || to < 0) return
+      if (!canReorder || from === to || from < 0 || to < 0) return
       const next = [...orderedProducts]
       const [moved] = next.splice(from, 1)
       if (!moved) return
       next.splice(to, 0, moved)
       void persistOrder(next)
     },
-    [orderedProducts, persistOrder]
+    [canReorder, orderedProducts, persistOrder]
   )
 
   const columns: ColumnsType<ProductListItem> = useMemo(
     () => [
-      ...(landingOrderMode
+      ...(canReorder
         ? [
             {
               title: '',
@@ -227,21 +229,15 @@ export default function ProductsPage() {
         ),
       },
     ],
-    [handleDelete, isDeleting, landingOrderMode]
+    [canReorder, handleDelete, isDeleting]
   )
-
-  const tableData = landingOrderMode ? orderedProducts : products
 
   return (
     <Container className="products-page admin-page">
       {contextHolder}
       <PageHeader
         title="Товары"
-        subtitle={
-          landingOrderMode
-            ? 'Перетащите товары — так они пойдут в блоке «Коллекция» на главной (первые 3)'
-            : 'Список товаров каталога: просмотр и редактирование'
-        }
+        subtitle="Перетащите строки, чтобы задать порядок (на главной — товары с флагом «На главной»)"
         actions={
           <Space>
             <Button loading={isFetching} onClick={() => void refetch()}>
@@ -259,27 +255,16 @@ export default function ProductsPage() {
           className="products-page__search"
           placeholder="Поиск по названию, slug, бренду"
           allowClear
-          disabled={landingOrderMode}
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
           onSearch={value => {
             setPage(1)
             setSearch(value.trim())
+            setDragIndex(null)
+            setOverIndex(null)
           }}
           enterButton="Найти"
         />
-        <label className="products-page__landing-order">
-          <Switch
-            checked={landingOrderMode}
-            onChange={checked => {
-              setLandingOrderMode(checked)
-              setPage(1)
-              setDragIndex(null)
-              setOverIndex(null)
-            }}
-          />
-          <span>Порядок на главной</span>
-        </label>
       </div>
 
       {isError ? (
@@ -288,15 +273,11 @@ export default function ProductsPage() {
         <Table<ProductListItem>
           rowKey="id"
           columns={columns}
-          dataSource={tableData}
+          dataSource={orderedProducts}
           loading={isFetching || isReordering}
-          locale={{
-            emptyText: landingOrderMode
-              ? 'Нет товаров с флагом «На главной лендинга»'
-              : 'Товары не найдены',
-          }}
+          locale={{ emptyText: 'Товары не найдены' }}
           rowClassName={(_, index) => {
-            if (!landingOrderMode) return ''
+            if (!canReorder) return ''
             const classes = ['products-page__row']
             if (dragIndex === index) classes.push('is-dragging')
             if (overIndex === index && dragIndex !== null && dragIndex !== index) {
@@ -305,7 +286,7 @@ export default function ProductsPage() {
             return classes.join(' ')
           }}
           onRow={(_, index) => {
-            if (!landingOrderMode || index == null) return {}
+            if (!canReorder || index == null) return {}
             return {
               onDragOver: event => {
                 event.preventDefault()
@@ -325,17 +306,17 @@ export default function ProductsPage() {
               },
             }
           }}
-          pagination={
-            landingOrderMode
-              ? false
-              : {
-                  current: page,
-                  pageSize: PAGE_SIZE,
-                  total: meta?.total ?? 0,
-                  showSizeChanger: false,
-                  onChange: nextPage => setPage(nextPage),
-                }
-          }
+          pagination={{
+            current: page,
+            pageSize: PAGE_SIZE,
+            total: meta?.total ?? 0,
+            showSizeChanger: false,
+            onChange: nextPage => {
+              setPage(nextPage)
+              setDragIndex(null)
+              setOverIndex(null)
+            },
+          }}
         />
       )}
     </Container>
