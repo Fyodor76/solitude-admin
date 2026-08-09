@@ -9,6 +9,7 @@ import {
 } from '@/shared/lib/api/orders/Orders'
 import type { OrderStatus, OrderTrackItem } from '@/shared/lib/api/orders/types'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
+import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import {
@@ -18,11 +19,13 @@ import {
   Form,
   Input,
   InputNumber,
+  Modal,
   Select,
   Space,
   Spin,
   Table,
   Tag,
+  Timeline,
 } from 'antd'
 import { Link, useParams } from 'react-router-dom'
 
@@ -31,6 +34,7 @@ import {
   formatOrderMoney,
   formatOrderShortCode,
   ORDER_STATUS_COLOR,
+  ORDER_STATUS_HISTORY_SOURCE_LABEL,
   ORDER_STATUS_LABEL,
   ORDER_STATUS_TRANSITIONS,
 } from './constants'
@@ -57,6 +61,7 @@ const OrderDetailPage = () => {
   const order = data?.data
   const [shipmentForm] = Form.useForm<ShipmentFormValues>()
   const [pricingDrafts, setPricingDrafts] = useState<Record<string, number | null>>({})
+  const [pricingNotice, setPricingNotice] = useState<string | null>(null)
 
   useEffect(() => {
     if (!order) return
@@ -74,26 +79,88 @@ const OrderDetailPage = () => {
     label: item.label,
   }))
 
-  const handleStatusChange = async (status: OrderStatus) => {
-    if (!order) return
+  const historyItems = useMemo(() => {
+    if (!order) return []
+    const rows = [...(order.statusHistory ?? [])].sort(
+      (a, b) => new Date(a.at).getTime() - new Date(b.at).getTime()
+    )
+    return [
+      {
+        key: 'created',
+        color: 'green' as const,
+        children: (
+          <div>
+            <div>Создан · {ORDER_STATUS_LABEL.created}</div>
+            <div className="orders-page__muted">{formatOrderDate(order.createdAt)}</div>
+          </div>
+        ),
+      },
+      ...rows.map(item => ({
+        key: `${item.at}-${item.to}`,
+        color: item.to === 'cancelled' ? ('red' as const) : ('blue' as const),
+        children: (
+          <div>
+            <div>
+              {ORDER_STATUS_LABEL[item.from]} → {ORDER_STATUS_LABEL[item.to]}
+              {item.source
+                ? ` · ${ORDER_STATUS_HISTORY_SOURCE_LABEL[item.source] || item.source}`
+                : ''}
+            </div>
+            <div className="orders-page__muted">{formatOrderDate(item.at)}</div>
+          </div>
+        ),
+      })),
+    ]
+  }, [order])
+
+  const copyText = async (value: string, successMessage: string) => {
     try {
-      await updateStatus({ orderId: order.id, status }).unwrap()
-      openNotification('success', [`Статус: ${ORDER_STATUS_LABEL[status]}`])
-    } catch (error: any) {
-      openNotification('error', [String(error?.error || 'Не удалось сменить статус')])
+      await navigator.clipboard.writeText(value)
+      openNotification('success', [successMessage])
+    } catch {
+      openNotification('error', ['Не удалось скопировать'])
     }
+  }
+
+  const handleStatusChange = (status: OrderStatus) => {
+    if (!order) return
+
+    const isCancel = status === 'cancelled'
+    Modal.confirm({
+      title: isCancel ? 'Отменить заказ?' : 'Сменить статус?',
+      content: `Новый статус: «${ORDER_STATUS_LABEL[status]}».`,
+      okText: isCancel ? 'Отменить заказ' : 'Подтвердить',
+      okButtonProps: { danger: isCancel },
+      cancelText: 'Назад',
+      onOk: async () => {
+        try {
+          await updateStatus({ orderId: order.id, status }).unwrap()
+          openNotification('success', [`Статус: ${ORDER_STATUS_LABEL[status]}`])
+        } catch (error: any) {
+          openNotification('error', [String(error?.error || 'Не удалось сменить статус')])
+          throw error
+        }
+      },
+    })
   }
 
   const handleShipmentSave = async (values: ShipmentFormValues) => {
     if (!order) return
     try {
-      await updateShipment({
+      const result = await updateShipment({
         orderId: order.id,
         carrierCode: values.carrierCode,
         carrierTrackingNumber: values.carrierTrackingNumber?.trim() || undefined,
         carrierTrackingUrl: values.carrierTrackingUrl?.trim() || undefined,
       }).unwrap()
-      openNotification('success', ['Данные отправления сохранены'])
+      const movedToShipped = order.status === 'paid' && result.data?.status === 'shipped'
+      openNotification(
+        'success',
+        [
+          'Данные отправления сохранены',
+          movedToShipped ? 'Статус автоматически: «В пути»' : '',
+        ].filter(Boolean)
+      )
     } catch (error: any) {
       openNotification('error', [String(error?.error || 'Не удалось сохранить отправление')])
     }
@@ -107,11 +174,17 @@ const OrderDetailPage = () => {
       return
     }
     try {
-      await updatePricing({
+      const result = await updatePricing({
         orderId: order.id,
         lineItemId: item.id,
         price,
       }).unwrap()
+      const newTotal = result.data?.totalAmount
+      setPricingNotice(
+        newTotal != null
+          ? `Цена согласована. Новая сумма заказа: ${formatOrderMoney(newTotal)}. Клиент может оплачивать.`
+          : 'Цена согласована. Сумма заказа пересчитана — клиент может оплачивать.'
+      )
       openNotification('success', ['Цена custom-позиции согласована'])
     } catch (error: any) {
       openNotification('error', [String(error?.error || 'Не удалось сохранить цену')])
@@ -170,6 +243,17 @@ const OrderDetailPage = () => {
         }
       />
 
+      {pricingNotice ? (
+        <Alert
+          className="orders-detail__pricing-alert"
+          type="success"
+          showIcon
+          closable
+          onClose={() => setPricingNotice(null)}
+          message={pricingNotice}
+        />
+      ) : null}
+
       {nextStatuses.length > 0 ? (
         <section className="orders-detail__section">
           <h2 className="orders-detail__title">Смена статуса</h2>
@@ -180,7 +264,7 @@ const OrderDetailPage = () => {
                 type={status === 'cancelled' ? 'default' : 'primary'}
                 danger={status === 'cancelled'}
                 loading={isUpdatingStatus}
-                onClick={() => void handleStatusChange(status)}
+                onClick={() => handleStatusChange(status)}
               >
                 {ORDER_STATUS_LABEL[status]}
               </Button>
@@ -248,7 +332,7 @@ const OrderDetailPage = () => {
           <Alert
             type="info"
             showIcon
-            message="Трек можно указать в статусах «Оплачен · подготовка» или «В пути»."
+            message="Трек можно указать в статусах «Оплачен · подготовка» или «В пути». При сохранении трека из «Подготовка» статус станет «В пути»."
           />
         ) : null}
         <Form
@@ -271,9 +355,25 @@ const OrderDetailPage = () => {
           <Form.Item name="carrierTrackingUrl" label="Ссылка на отслеживание">
             <Input placeholder="https://..." />
           </Form.Item>
-          <Button type="primary" htmlType="submit" loading={isUpdatingShipment}>
-            Сохранить отправление
-          </Button>
+          <Space wrap>
+            <Button type="primary" htmlType="submit" loading={isUpdatingShipment}>
+              Сохранить отправление
+            </Button>
+            {order.carrierTrackingNumber ? (
+              <Button
+                onClick={() => void copyText(order.carrierTrackingNumber!, 'Трек-номер скопирован')}
+              >
+                Копировать трек
+              </Button>
+            ) : null}
+            {order.carrierTrackingUrl ? (
+              <Button
+                onClick={() => void copyText(order.carrierTrackingUrl!, 'Ссылка скопирована')}
+              >
+                Копировать ссылку
+              </Button>
+            ) : null}
+          </Space>
         </Form>
         {order.carrierTrackingUrl ? (
           <p className="orders-detail__track-link">
@@ -291,8 +391,22 @@ const OrderDetailPage = () => {
           rowKey="id"
           dataSource={order.items}
           pagination={false}
-          scroll={{ x: 900 }}
+          scroll={{ x: 980 }}
           columns={[
+            {
+              title: '',
+              key: 'preview',
+              width: 72,
+              render: (_value, row: OrderTrackItem) => {
+                const src = resolveMediaUrl(row.previewImage)
+                if (!src) return null
+                return (
+                  <a href={src} target="_blank" rel="noreferrer" className="orders-detail__thumb">
+                    <img src={src} alt="" />
+                  </a>
+                )
+              },
+            },
             {
               title: 'Название',
               dataIndex: 'name',
@@ -303,17 +417,36 @@ const OrderDetailPage = () => {
                     : row.type === 'product' && row.productId
                       ? `/products/${row.productId}`
                       : null
+                const previewSrc = resolveMediaUrl(row.previewImage)
 
                 return (
                   <Space direction="vertical" size={0}>
                     {productHref ? <Link to={productHref}>{name}</Link> : <span>{name}</span>}
-                    <Space size={4}>
+                    <Space size={4} wrap>
                       <Tag>{row.type === 'custom' ? 'custom' : 'товар'}</Tag>
                       {row.type === 'custom' && !row.customPricingApprovedAt ? (
                         <Tag color="orange">цена не согласована</Tag>
                       ) : null}
                       {row.type === 'custom' && row.customPricingApprovedAt ? (
                         <Tag color="green">цена ок</Tag>
+                      ) : null}
+                      {row.type === 'custom' && row.customProductSlug ? (
+                        <Tag>slug: {row.customProductSlug}</Tag>
+                      ) : null}
+                      {row.type === 'custom' && previewSrc ? (
+                        <a href={previewSrc} target="_blank" rel="noreferrer">
+                          превью
+                        </a>
+                      ) : null}
+                      {row.type === 'custom' ? (
+                        <Button
+                          type="link"
+                          size="small"
+                          className="orders-detail__copy-id"
+                          onClick={() => void copyText(row.itemId, 'ID custom-товара скопирован')}
+                        >
+                          ID
+                        </Button>
                       ) : null}
                     </Space>
                   </Space>
@@ -373,6 +506,11 @@ const OrderDetailPage = () => {
             },
           ]}
         />
+      </section>
+
+      <section className="orders-detail__section">
+        <h2 className="orders-detail__title">История статусов</h2>
+        <Timeline items={historyItems} />
       </section>
 
       {order.refund?.status ? (

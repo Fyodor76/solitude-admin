@@ -1,5 +1,6 @@
 import { ReactNode, useMemo, useState } from 'react'
 
+import { useGetOrdersAttentionQuery } from '@/shared/lib/api/orders/Orders'
 import {
   AdminNotificationsProvider,
   applySidebarNotificationBadges,
@@ -23,10 +24,18 @@ type BaseLayoutContentProps = BaseLayoutProps & {
 function BaseLayoutContent({ children, isSupportPage }: BaseLayoutContentProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { supportUnreadCount } = useAdminNotifications()
+  const { data: ordersAttention } = useGetOrdersAttentionQuery(undefined, {
+    pollingInterval: 60_000,
+  })
+  const ordersAttentionCount = ordersAttention?.data?.badgeCount ?? 0
 
   const menuItems = useMemo(
-    () => applySidebarNotificationBadges(menuSidebar, { supportUnreadCount }),
-    [supportUnreadCount]
+    () =>
+      applySidebarNotificationBadges(menuSidebar, {
+        supportUnreadCount,
+        ordersAttentionCount,
+      }),
+    [supportUnreadCount, ordersAttentionCount]
   )
 
   return (

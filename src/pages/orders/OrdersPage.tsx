@@ -18,6 +18,7 @@ import {
   ORDER_STATUS_COLOR,
   ORDER_STATUS_LABEL,
   ORDER_STATUSES_FILTER,
+  type OrdersListFilter,
 } from './constants'
 import './OrdersPage.scss'
 
@@ -25,7 +26,7 @@ const OrdersPage = () => {
   const navigate = useNavigate()
   const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
   const { data, isLoading, isFetching, refetch } = useGetOrdersQuery()
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
+  const [statusFilter, setStatusFilter] = useState<OrdersListFilter>('all')
   const [search, setSearch] = useState('')
 
   const orders = data?.data ?? []
@@ -41,10 +42,19 @@ const OrdersPage = () => {
     return counts
   }, [orders])
 
+  const needsPricingCount = useMemo(
+    () => orders.filter(order => order.needsCustomPricing).length,
+    [orders]
+  )
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return orders.filter(order => {
-      if (statusFilter !== 'all' && order.status !== statusFilter) return false
+      if (statusFilter === 'needs_pricing') {
+        if (!order.needsCustomPricing) return false
+      } else if (statusFilter !== 'all' && order.status !== statusFilter) {
+        return false
+      }
       if (!q) return true
       const shortCode = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
       const haystack = [
@@ -151,6 +161,10 @@ const OrdersPage = () => {
 
   const statusOptions = [
     { label: `Все (${orders.length})`, value: 'all' as const },
+    {
+      label: `Нужна цена (${needsPricingCount})`,
+      value: 'needs_pricing' as const,
+    },
     ...ORDER_STATUSES_FILTER.map(status => ({
       label: `${ORDER_STATUS_LABEL[status]} (${statusCounts[status]})`,
       value: status,
@@ -174,7 +188,7 @@ const OrdersPage = () => {
           className="orders-page__segmented"
           options={statusOptions}
           value={statusFilter}
-          onChange={value => setStatusFilter(value as OrderStatus | 'all')}
+          onChange={value => setStatusFilter(value as OrdersListFilter)}
         />
         <Input.Search
           allowClear

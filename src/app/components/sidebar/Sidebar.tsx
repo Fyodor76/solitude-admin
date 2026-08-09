@@ -323,7 +323,7 @@ const Sidebar = ({
                                 {item.badgeCount != null && item.badgeCount > 0 ? (
                                   <span
                                     className="sidebar-menu-badge-count"
-                                    aria-label={`Новых обращений: ${item.badgeCount}`}
+                                    aria-label={`Новых: ${item.badgeCount}`}
                                   >
                                     {item.badgeCount > 99 ? '99+' : item.badgeCount}
                                   </span>
@@ -371,7 +371,7 @@ const Sidebar = ({
                                 {item.badgeCount != null && item.badgeCount > 0 ? (
                                   <span
                                     className="sidebar-menu-badge-count"
-                                    aria-label={`Новых обращений: ${item.badgeCount}`}
+                                    aria-label={`Новых: ${item.badgeCount}`}
                                   >
                                     {item.badgeCount > 99 ? '99+' : item.badgeCount}
                                   </span>

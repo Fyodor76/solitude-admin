@@ -52,6 +52,8 @@ export interface OrderTrackItem {
   itemId: string
   productId?: string
   variationId?: string
+  previewImage?: string
+  customProductSlug?: string
   type: OrderItemType
   name: string
   quantity: number
@@ -59,6 +61,19 @@ export interface OrderTrackItem {
   sku?: string
   price: number
   customPricingApprovedAt?: string
+}
+
+export interface OrderStatusHistoryItem {
+  from: OrderStatus
+  to: OrderStatus
+  at: string
+  source?: 'admin' | 'shipment' | 'payment' | 'system' | string
+}
+
+export interface AdminOrdersAttention {
+  createdCount: number
+  needsCustomPricingCount: number
+  badgeCount: number
 }
 
 export interface OrderTrackNotifications {
@@ -93,6 +108,7 @@ export interface AdminOrderDetail {
   wasPaid?: boolean
   paymentInProgress?: boolean
   refund?: OrderTrackRefund
+  statusHistory?: OrderStatusHistoryItem[]
 }
 
 /** Ответ PATCH статуса / доставки / custom pricing (без позиций) */

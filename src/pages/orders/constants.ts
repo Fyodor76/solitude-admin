@@ -2,6 +2,8 @@ import { ORDER_STATUSES, type OrderStatus } from '@/shared/lib/api/orders/types'
 
 export const ORDER_STATUSES_FILTER = ORDER_STATUSES
 
+export type OrdersListFilter = OrderStatus | 'all' | 'needs_pricing'
+
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   created: 'Заявка получена',
   paid: 'Оплачен · подготовка',
@@ -25,6 +27,13 @@ export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   shipped: ['delivered', 'cancelled'],
   delivered: [],
   cancelled: [],
+}
+
+export const ORDER_STATUS_HISTORY_SOURCE_LABEL: Record<string, string> = {
+  admin: 'админ',
+  shipment: 'отправление',
+  payment: 'оплата',
+  system: 'система',
 }
 
 export function formatOrderMoney(value: number): string {

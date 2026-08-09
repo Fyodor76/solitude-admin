@@ -2,6 +2,7 @@ import { ApiResponse, baseApi } from '../baseApi'
 import type {
   AdminOrderDetail,
   AdminOrderListItem,
+  AdminOrdersAttention,
   OrderCarrierOption,
   OrderResponseThin,
   UpdateOrderItemCustomPricingPayload,
@@ -28,6 +29,11 @@ export const ordersApi = baseApi.injectEndpoints({
       query: () => '/orders/meta/carriers',
     }),
 
+    getOrdersAttention: builder.query<ApiResponse<AdminOrdersAttention, unknown>, void>({
+      query: () => '/orders/meta/attention',
+      providesTags: ['OrdersAttention'],
+    }),
+
     updateOrderStatus: builder.mutation<
       ApiResponse<OrderResponseThin, unknown>,
       UpdateOrderStatusPayload
@@ -37,7 +43,11 @@ export const ordersApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: { status },
       }),
-      invalidatesTags: (_result, _error, { orderId }) => ['Orders', { type: 'Order', id: orderId }],
+      invalidatesTags: (_result, _error, { orderId }) => [
+        'Orders',
+        'OrdersAttention',
+        { type: 'Order', id: orderId },
+      ],
     }),
 
     updateOrderShipment: builder.mutation<
@@ -49,7 +59,11 @@ export const ordersApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body,
       }),
-      invalidatesTags: (_result, _error, { orderId }) => ['Orders', { type: 'Order', id: orderId }],
+      invalidatesTags: (_result, _error, { orderId }) => [
+        'Orders',
+        'OrdersAttention',
+        { type: 'Order', id: orderId },
+      ],
     }),
 
     updateOrderItemCustomPricing: builder.mutation<
@@ -61,7 +75,11 @@ export const ordersApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: { price },
       }),
-      invalidatesTags: (_result, _error, { orderId }) => ['Orders', { type: 'Order', id: orderId }],
+      invalidatesTags: (_result, _error, { orderId }) => [
+        'Orders',
+        'OrdersAttention',
+        { type: 'Order', id: orderId },
+      ],
     }),
   }),
 })
@@ -70,6 +88,7 @@ export const {
   useGetOrdersQuery,
   useGetOrderByIdQuery,
   useGetOrderCarriersQuery,
+  useGetOrdersAttentionQuery,
   useUpdateOrderStatusMutation,
   useUpdateOrderShipmentMutation,
   useUpdateOrderItemCustomPricingMutation,
