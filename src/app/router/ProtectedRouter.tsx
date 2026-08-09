@@ -1,17 +1,19 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 
 import { BaseLayout } from '../../layouts/base-layout'
 
-interface ProtectedRouterProps {
-  children: React.ReactNode
-}
-const ProtectedRouter = ({ children }: ProtectedRouterProps) => {
+const ProtectedRouter = () => {
   const isAuth = localStorage.getItem('access')
 
   if (!isAuth) {
     return <Navigate to="/login" replace />
   }
-  return <BaseLayout>{children}</BaseLayout>
+
+  return (
+    <BaseLayout>
+      <Outlet />
+    </BaseLayout>
+  )
 }
 
 export default ProtectedRouter

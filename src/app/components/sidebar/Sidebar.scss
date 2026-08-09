@@ -305,6 +305,11 @@
             padding: 8px 8px 8px 15px;
             border: none;
             outline: none;
+            background: transparent;
+            cursor: pointer;
+            font: inherit;
+            color: inherit;
+            text-align: left;
             text-decoration: none;
             border-radius: 6px;
             transition: background-color 0.15s ease;
