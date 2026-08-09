@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
 import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
@@ -46,6 +46,19 @@ export default function ProductCreatePage() {
 
   const sizeChart = sizeChartResponse?.data
   const sizeParameters = sizeChart?.sizeParameters || []
+
+  const sizeCodeById = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const size of sizeParameters) {
+      if (!size.id) continue
+      map[size.id] = size.internationalSize || size.russianSize || 'SIZE'
+    }
+    return map
+  }, [sizeParameters])
+
+  useEffect(() => {
+    wizard.setSizeCodeById(sizeCodeById)
+  }, [sizeCodeById, wizard.setSizeCodeById])
 
   const [createProduct, { isLoading: isCreatingProduct }] = useCreateProductMutation()
   const [createStockBulk, { isLoading: isCreatingStock }] = useCreateStockBulkMutation()

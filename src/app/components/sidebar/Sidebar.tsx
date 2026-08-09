@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import { useMobileSidebarSwipe } from '@/shared/hooks/useMobileSidebarSwipe'
@@ -13,19 +13,46 @@ import { overlayVariants, sidebarVariants } from '@/app/constans/sidebarVariants
 
 import Icon from '../../../shared/ui/icons/Icon'
 import './Sidebar.scss'
-import { SidebarProps } from './sidebarType'
+import { MenuItem, SidebarProps } from './sidebarType'
 
 const defaultLogo = '/icons/favicon-96x96.png'
 
-/** Подсветка пункта по текущему URL (точное совпадение или вложенный путь). */
-function isSidebarHrefActive(href: string | undefined, pathname: string): boolean {
+function collectLeafHrefs(items: MenuItem[]): string[] {
+  return items.flatMap(item => {
+    if (item.subItems?.length) {
+      return collectLeafHrefs(item.subItems)
+    }
+    if (!item.href || item.href === '#') {
+      return []
+    }
+    return [item.href]
+  })
+}
+
+/** Подсветка пункта: точное совпадение или самый длинный подходящий префикс среди листьев. */
+function isSidebarHrefActive(
+  href: string | undefined,
+  pathname: string,
+  leafHrefs: string[]
+): boolean {
   if (!href || href === '#') {
     return false
   }
   if (pathname === href) {
     return true
   }
-  return pathname.startsWith(`${href}/`)
+  if (!pathname.startsWith(`${href}/`)) {
+    return false
+  }
+
+  const hasMoreSpecificMatch = leafHrefs.some(
+    other =>
+      other !== href &&
+      other.length > href.length &&
+      (pathname === other || pathname.startsWith(`${other}/`))
+  )
+
+  return !hasMoreSpecificMatch
 }
 
 const Sidebar = ({
@@ -56,10 +83,14 @@ const Sidebar = ({
   const prevPathnameRef = useRef(pathname)
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
+  const leafHrefs = useMemo(() => collectLeafHrefs(menuItems), [menuItems])
+
   useEffect(() => {
     const parentIdsToOpen = menuItems
       .filter(
-        item => item.subItems?.some(subItem => isSidebarHrefActive(subItem.href, pathname)) ?? false
+        item =>
+          item.subItems?.some(subItem => isSidebarHrefActive(subItem.href, pathname, leafHrefs)) ??
+          false
       )
       .map(item => item.id)
 
@@ -72,7 +103,7 @@ const Sidebar = ({
       parentIdsToOpen.forEach(id => next.add(id))
       return next
     })
-  }, [menuItems, pathname])
+  }, [leafHrefs, menuItems, pathname])
 
   useEffect(() => {
     if (!isOpen) {
@@ -250,9 +281,12 @@ const Sidebar = ({
                 const subMenuExpanded = hasSubItems && isOpenSubItem
                 const hasActiveChild =
                   hasSubItems &&
-                  (item.subItems?.some(subItem => isSidebarHrefActive(subItem.href, pathname)) ??
+                  (item.subItems?.some(subItem =>
+                    isSidebarHrefActive(subItem.href, pathname, leafHrefs)
+                  ) ??
                     false)
-                const routeMatchesLeaf = !hasSubItems && isSidebarHrefActive(item.href, pathname)
+                const routeMatchesLeaf =
+                  !hasSubItems && isSidebarHrefActive(item.href, pathname, leafHrefs)
                 const menuIconHighlighted = routeMatchesLeaf || hasActiveChild || subMenuExpanded
                 const menuTextHighlighted = menuIconHighlighted
 
@@ -369,7 +403,11 @@ const Sidebar = ({
                     {hasSubItems && isOpenSubItem && isOpen && item.subItems ? (
                       <ul className="sidebar-submenu">
                         {item.subItems.map(subItem => {
-                          const subRouteActive = isSidebarHrefActive(subItem.href, pathname)
+                          const subRouteActive = isSidebarHrefActive(
+                            subItem.href,
+                            pathname,
+                            leafHrefs
+                          )
                           return (
                             <li className="sidebar-submenu-item" key={subItem.id}>
                               <Link

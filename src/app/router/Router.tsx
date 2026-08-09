@@ -6,6 +6,7 @@ import { NotificationsPage } from '@/pages/notifications'
 import { PlatformImages } from '@/pages/platform-images'
 import { ProductAttribute } from '@/pages/product-attributes'
 import { ProductCreatePage } from '@/pages/product-create'
+import { ProductDetailPage, ProductsPage, VariationEditPage } from '@/pages/products'
 import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
 import { SupportInbox } from '@/pages/support-inbox'
@@ -84,8 +85,20 @@ export const Router: RouteObject[] = [
             element: <ProductAttribute />,
           },
           {
+            path: 'products',
+            element: <ProductsPage />,
+          },
+          {
             path: 'products/create',
             element: <ProductCreatePage />,
+          },
+          {
+            path: 'products/:productId',
+            element: <ProductDetailPage />,
+          },
+          {
+            path: 'products/:productId/variations/:variationId',
+            element: <VariationEditPage />,
           },
         ],
       },

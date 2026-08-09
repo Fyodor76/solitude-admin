@@ -5,6 +5,7 @@ export const ROUTES = {
   CATALOG: { label: 'Каталог', path: '/catalog' },
   TSHORTS: { label: 'Футболки', path: '/catalog/tshorts' },
   CATEGORIES: { label: 'Категории', path: '/categories' },
+  PRODUCTS: { label: 'Товары', path: '/products' },
   PRODUCT_CREATE: { label: 'Создание товара', path: '/products/create' },
   SIZE_CHARTS: { label: 'Таблицы размеров', path: '/size-charts' },
   PRODUCT_ATTRIBUTES: { label: 'Опции товаров', path: '/product-attributes' },

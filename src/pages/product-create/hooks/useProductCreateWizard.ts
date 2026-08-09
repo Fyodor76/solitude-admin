@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 
 import { INITIAL_BASICS } from '../constants'
-import { createDraftKey, slugify } from '../helpers'
+import { buildSku, createDraftKey, slugify } from '../helpers'
 import {
   AttributeSelection,
   DraftVariation,
@@ -39,6 +39,7 @@ function isVariationsValid(variations: DraftVariation[]): boolean {
 }
 
 export function useProductCreateWizard(colorAttributes: ProductAttributeResponse[]) {
+  const sizeCodeByIdRef = useRef<Record<string, string>>({})
   const [state, setState] = useState<ProductCreateWizardState>({
     step: 0,
     maxReachedStep: 0,
@@ -48,6 +49,10 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     selectedSizeIds: [],
     stockRows: [],
   })
+
+  const setSizeCodeById = useCallback((sizeCodeById: Record<string, string>) => {
+    sizeCodeByIdRef.current = sizeCodeById
+  }, [])
 
   const colorOptions = useMemo(
     () =>
@@ -97,8 +102,12 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   const updateBasics = useCallback((patch: Partial<ProductBasicsForm>) => {
     setState(prev => {
       const nextBasics = { ...prev.basics, ...patch }
-      if (patch.name !== undefined && !prev.basics.slug.trim()) {
-        nextBasics.slug = slugify(patch.name)
+      if (patch.name !== undefined) {
+        const previousAutoSlug = slugify(prev.basics.name)
+        const slugIsAuto = !prev.basics.slug.trim() || prev.basics.slug === previousAutoSlug
+        if (slugIsAuto) {
+          nextBasics.slug = slugify(patch.name)
+        }
       }
       return { ...prev, basics: nextBasics }
     })
@@ -108,11 +117,12 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     setState(prev => {
       const index = prev.variations.length + 1
       const baseName = prev.basics.name.trim() || 'variation'
+      const baseSlug = prev.basics.slug.trim() || slugify(baseName) || 'item'
       const next: DraftVariation = {
         key: createDraftKey('var'),
         name: `${baseName} ${index}`,
-        slug: slugify(`${prev.basics.slug || baseName}-${index}`),
-        sku: `${slugify(prev.basics.slug || baseName) || 'sku'}-${index}`.toUpperCase(),
+        slug: `${baseSlug}-${index}`,
+        sku: buildSku(baseSlug, String(index)),
         price: prev.basics.price,
         comparePrice: null,
         colorId: colorOptions[0]?.value || '',
@@ -130,8 +140,18 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       variations: prev.variations.map(item => {
         if (item.key !== key) return item
         const next = { ...item, ...patch }
-        if (patch.name !== undefined && !item.slug.trim()) {
-          next.slug = slugify(patch.name)
+        if (patch.name !== undefined) {
+          const previousAutoSlug = slugify(item.name)
+          const slugIsAuto = !item.slug.trim() || item.slug === previousAutoSlug
+          if (slugIsAuto) {
+            next.slug = slugify(patch.name)
+          }
+
+          const previousAutoSku = buildSku(slugify(item.name))
+          const skuIsAuto = !item.sku.trim() || item.sku === previousAutoSku
+          if (skuIsAuto) {
+            next.sku = buildSku(slugify(patch.name))
+          }
         }
         return next
       }),
@@ -188,14 +208,13 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
         for (const sizeId of prev.selectedSizeIds) {
           const key = `${variation.key}:${sizeId}`
           const existing = prev.stockRows.find(row => row.key === key)
+          const sizeCode = sizeCodeByIdRef.current[sizeId] || 'SIZE'
           nextRows.push({
             key,
             variationKey: variation.key,
             sizeId,
             quantity: existing?.quantity ?? 0,
-            sku:
-              existing?.sku ||
-              `${variation.sku}-${sizeId.slice(0, 4)}`.toUpperCase().replace(/[^A-Z0-9\-]/g, ''),
+            sku: buildSku(variation.sku, sizeCode),
           })
         }
       }
@@ -258,6 +277,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
         description: item.description.trim() || undefined,
         mainImage: item.mainImage?.fileId,
         images: item.images.map(image => image.fileId),
+        attributes: [],
       })),
     }
   }, [state])
@@ -277,6 +297,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     setAttributeSelection,
     removeAttributeSelection,
     setSelectedSizeIds,
+    setSizeCodeById,
     updateStockRow,
     rebuildStockRows,
     buildCreatePayload,
