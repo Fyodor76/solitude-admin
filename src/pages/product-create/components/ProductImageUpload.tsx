@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { useUploadImageMutation } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
+import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import { DeleteOutlined, InboxOutlined } from '@ant-design/icons'
 import { Button, Image, Spin, Upload } from 'antd'
 import type { RcFile } from 'antd/es/upload'
@@ -9,18 +10,13 @@ import type { RcFile } from 'antd/es/upload'
 import { ProductImageItem } from '../types'
 
 interface ProductImageUploadProps {
-  folder?: string
   value: ProductImageItem[]
   multiple?: boolean
   onChange: (next: ProductImageItem[]) => void
 }
 
-export function ProductImageUpload({
-  folder = 'products',
-  value,
-  multiple = true,
-  onChange,
-}: ProductImageUploadProps) {
+/** Загрузка в корень CDN: в товар пишем только fileId, без folder. */
+export function ProductImageUpload({ value, multiple = true, onChange }: ProductImageUploadProps) {
   const { openNotification } = useNotificationHandler()
   const [uploadImage] = useUploadImageMutation()
   const [uploading, setUploading] = useState(false)
@@ -33,11 +29,12 @@ export function ProductImageUpload({
       const uploaded: ProductImageItem[] = []
 
       for (const file of files) {
-        const response = await uploadImage({ file, folder }).unwrap()
+        const response = await uploadImage({ file }).unwrap()
         if (response.data?.fileId) {
+          const fileId = response.data.fileId
           uploaded.push({
-            fileId: response.data.fileId,
-            url: response.data.url,
+            fileId,
+            url: response.data.url || resolveMediaUrl(fileId) || fileId,
           })
         }
       }

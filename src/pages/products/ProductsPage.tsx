@@ -63,7 +63,7 @@ export default function ProductsPage() {
         title: '',
         key: 'thumb',
         width: 64,
-        render: (_, record) => <ProductThumb product={record} />,
+        render: (_, record) => <ProductThumb key={record.id} product={record} />,
       },
       {
         title: 'Название',
