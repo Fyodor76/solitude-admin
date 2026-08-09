@@ -182,7 +182,7 @@ const OrderDetailPage = () => {
                 loading={isUpdatingStatus}
                 onClick={() => void handleStatusChange(status)}
               >
-                → {ORDER_STATUS_LABEL[status]}
+                {ORDER_STATUS_LABEL[status]}
               </Button>
             ))}
           </Space>
@@ -209,13 +209,23 @@ const OrderDetailPage = () => {
             <div>{order.contact?.deliveryCity || '—'}</div>
           </div>
           <div>
-            <div className="orders-page__muted">ПВЗ / адрес</div>
-            <div>
-              {order.contact?.pickupPointName ||
-                order.contact?.pickupPointAddress ||
-                order.contact?.address ||
-                '—'}
-            </div>
+            <div className="orders-page__muted">ПВЗ</div>
+            <div>{order.contact?.pickupPointName || '—'}</div>
+          </div>
+          <div className="orders-detail__span">
+            <div className="orders-page__muted">Адрес</div>
+            <div>{order.contact?.pickupPointAddress || order.contact?.address || '—'}</div>
+            {typeof order.contact?.pickupPointLat === 'number' &&
+            typeof order.contact?.pickupPointLon === 'number' ? (
+              <a
+                className="orders-detail__map-link"
+                href={`https://yandex.ru/maps/?pt=${order.contact.pickupPointLon},${order.contact.pickupPointLat}&z=16&l=map`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Открыть на карте
+              </a>
+            ) : null}
           </div>
           <div>
             <div className="orders-page__muted">Предпочтительный перевозчик</div>

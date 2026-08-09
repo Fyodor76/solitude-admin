@@ -111,6 +111,12 @@
     grid-column: 1 / -1;
   }
 
+  &__map-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 13px;
+  }
+
   &__shipment {
     max-width: 480px;
     margin-top: 12px;

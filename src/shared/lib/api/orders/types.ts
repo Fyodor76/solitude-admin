@@ -40,6 +40,8 @@ export interface OrderTrackContact {
   pickupPointId?: string
   pickupPointName?: string
   pickupPointAddress?: string
+  pickupPointLat?: number
+  pickupPointLon?: number
   comment?: string
   preferredCarrierCode?: string
   preferredCarrierLabel?: string
