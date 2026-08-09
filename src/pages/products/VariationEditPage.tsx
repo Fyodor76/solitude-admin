@@ -67,8 +67,16 @@ export default function VariationEditPage() {
       price: variation.price,
       comparePrice: variation.comparePrice,
     })
-    setImageItems(toImageItems(variation.images))
-    setMainImageId(variation.mainImage || variation.images?.[0])
+    const items = toImageItems(variation.images)
+    const mainId = variation.mainImage || items[0]?.fileId
+    const ordered = mainId
+      ? [
+          ...items.filter(item => item.fileId === mainId),
+          ...items.filter(item => item.fileId !== mainId),
+        ]
+      : items
+    setImageItems(ordered)
+    setMainImageId(mainId)
   }, [form, variation])
 
   const previewUrl = useMemo(() => {
