@@ -13,18 +13,22 @@
   flex-direction: column;
   background-color: #f8f9fa;
   font-family: var(--font-primary);
-  gap: 20px;
-  margin: 20px 0px;
+  gap: 16px;
+  margin: 0;
+  padding: 16px 0 12px;
   max-width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: calc(100dvh - 57px);
+  max-height: calc(100dvh - 57px);
+  box-sizing: border-box;
+  overflow: hidden;
 
   .main-title {
     color: #262c33;
     margin-left: 33px;
-    margin-top: 20px;
+    margin-top: 0;
     max-width: 100%;
     word-break: break-word;
+    flex-shrink: 0;
   }
   .product-attributes-main {
     display: flex;
@@ -34,6 +38,7 @@
     padding: 0 clamp(10px, 2vw, 20px);
     flex: 1;
     min-height: 0;
+    overflow: hidden;
 
     .prod-attr-loading {
       display: flex;
@@ -49,8 +54,9 @@
         width: 100%;
         padding-left: 20px;
         padding-top: 20px;
+        flex-shrink: 0;
       }
-      margin-top: 20px;
+      margin-top: 0;
       display: flex;
       flex-direction: column;
       background-color: var(--color-white);
@@ -59,14 +65,14 @@
       margin-left: 33px;
       width: 35%;
       gap: 20px;
-      position: sticky;
-      top: 16px;
-      align-self: flex-start;
-      max-height: calc(100vh - 32px);
+      height: 100%;
+      min-height: 0;
       overflow: hidden;
+      flex-shrink: 0;
 
       .input-search {
         padding: 0px 20px;
+        flex-shrink: 0;
       }
       .prod-attr-container {
         display: flex;
@@ -75,7 +81,6 @@
         overflow: auto;
         flex: 1;
         min-height: 0;
-        max-height: none;
         .no-results {
           font-family: var(--font-primary);
           font-size: 14px;
@@ -122,6 +127,7 @@
         display: flex;
         width: 100%;
         padding: 20px;
+        flex-shrink: 0;
         Button {
           width: 100%;
           background-color: #f8f9fa;
@@ -130,13 +136,17 @@
     }
     .product-attribute-info {
       width: 65%;
-      margin-top: 20px;
+      margin-top: 0;
       margin-right: 33px;
       display: flex;
       flex-direction: column;
       gap: 30px;
       flex: 1;
       min-width: 0;
+      min-height: 0;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
 
       .product-attribute-info-empty {
         display: flex;
@@ -243,7 +253,6 @@
           }
         }
         .ant-table-wrapper {
-          max-height: 400px;
           overflow: auto;
           min-width: 0;
         }
@@ -276,7 +285,8 @@
     justify-content: flex-end;
     gap: 12px;
     margin-right: 33px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
+    flex-shrink: 0;
     &-cancel {
       color: #a4a7a9;
     }
@@ -315,15 +325,23 @@
 }
 @media (max-width: 580px) {
   .product-attributes-wrap {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 16px 0 20px;
+
     .product-attributes-main {
       flex-direction: column;
       gap: 20px;
+      overflow: visible;
+      height: auto;
+      min-height: 0;
 
       .all-product-attributes {
         width: 100% !important;
         margin-left: 0;
         min-width: unset;
-        position: static;
+        height: auto;
         max-height: none;
 
         .prod-attr-container {
@@ -334,6 +352,8 @@
       .product-attribute-info {
         width: 100% !important;
         margin-right: 0;
+        height: auto;
+        overflow: visible;
 
         .product-attribute {
           width: 100% !important;
