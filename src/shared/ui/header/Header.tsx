@@ -27,29 +27,28 @@ export const Header = () => {
   }
 
   return (
-    <>
-      <div className="header">
-        <div className="header-container">
-          <div className="btn-container">
-            <NotificationBell items={notificationItems} count={unreadCount} />
-
-            <ConfigProvider wave={{ disabled: true }}>
-              <Button
-                onClick={handleLogout}
-                className="btn-logout"
-                type="text"
-                size="middle"
-                aria-label="Выйти"
-              >
-                <Icon name="logout" />
-              </Button>
-            </ConfigProvider>
-          </div>
-        </div>
-        <div className="breadcrumbs-container">
+    <header className="header">
+      <div className="header-container">
+        <div className="header-breadcrumbs">
           <Breadcrumbs />
         </div>
+
+        <div className="btn-container">
+          <NotificationBell items={notificationItems} count={unreadCount} />
+
+          <ConfigProvider wave={{ disabled: true }}>
+            <Button
+              onClick={handleLogout}
+              className="btn-logout"
+              type="text"
+              size="middle"
+              aria-label="Выйти"
+            >
+              <Icon name="logout" />
+            </Button>
+          </ConfigProvider>
+        </div>
       </div>
-    </>
+    </header>
   )
 }
