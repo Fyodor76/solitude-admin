@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import { useMobileSidebarSwipe } from '@/shared/hooks/useMobileSidebarSwipe'
@@ -80,7 +80,6 @@ const Sidebar = ({
     isOpen,
     onClose: toggleSidebar,
   })
-  const prevPathnameRef = useRef(pathname)
   const [openSubMenuItem, setOpenSubMenuItem] = useState<Set<string>>(new Set())
 
   const leafHrefs = useMemo(() => collectLeafHrefs(menuItems), [menuItems])
@@ -122,15 +121,11 @@ const Sidebar = ({
     }
   }, [isOpen, toggleSidebar])
 
-  useEffect(() => {
-    if (!isMobile || !isOpen || prevPathnameRef.current === pathname) {
-      prevPathnameRef.current = pathname
-      return
+  const closeSidebarAfterNavigate = () => {
+    if (isOpen) {
+      toggleSidebar()
     }
-
-    prevPathnameRef.current = pathname
-    toggleSidebar()
-  }, [isMobile, isOpen, pathname, toggleSidebar])
+  }
 
   useEffect(() => {
     if (!isMobile || !isOpen) {
@@ -224,11 +219,7 @@ const Sidebar = ({
       <>
         <div className="sidebar-header-container">
           {logo && (
-            <Link
-              to="/"
-              className="sidebar-header"
-              onClick={() => isMobile && isOpen && toggleSidebar()}
-            >
+            <Link to="/" className="sidebar-header" onClick={closeSidebarAfterNavigate}>
               <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
               {isOpen && logo.title && <span className="sidebar-brand">{logo.title}</span>}
             </Link>
@@ -365,9 +356,7 @@ const Sidebar = ({
                           data-collapsed={!isOpen}
                           onClick={() => {
                             item.onClick?.()
-                            if (isMobile && isOpen) {
-                              toggleSidebar()
-                            }
+                            closeSidebarAfterNavigate()
                           }}
                         >
                           <div className="icon-and-text">
@@ -421,9 +410,7 @@ const Sidebar = ({
                                   .join(' ')}
                                 onClick={() => {
                                   subItem.onClick?.()
-                                  if (isMobile && isOpen) {
-                                    toggleSidebar()
-                                  }
+                                  closeSidebarAfterNavigate()
                                 }}
                               >
                                 <div className="icon-and-text">

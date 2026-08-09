@@ -189,6 +189,15 @@
       border-color: #1677ff;
       box-shadow: 0 0 0 1px #1677ff;
     }
+
+    &:hover {
+      .product-create-images__badge,
+      .product-create-images__make-main,
+      .product-create-images__remove {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
   }
 
   &__badge {
@@ -202,6 +211,9 @@
     color: #fff;
     font-size: 11px;
     line-height: 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
   }
 
   &__make-main {
@@ -214,6 +226,9 @@
     font-size: 11px;
     line-height: 20px;
     background: rgba(255, 255, 255, 0.92) !important;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
   }
 
   &__remove {
@@ -222,6 +237,9 @@
     right: 2px;
     z-index: 1;
     background: rgba(255, 255, 255, 0.9) !important;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
   }
 }
 

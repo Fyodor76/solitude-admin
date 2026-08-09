@@ -1,10 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-import { useSearchProductsQuery } from '@/shared/lib/api/products/Products'
+import {
+  useDeleteProductMutation,
+  useSearchProductsQuery,
+} from '@/shared/lib/api/products/Products'
+import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Input, Space, Table, Tag } from 'antd'
+import { DeleteOutlined } from '@ant-design/icons'
+import { Button, Input, Modal, Space, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link } from 'react-router-dom'
 
@@ -44,6 +49,8 @@ export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const { openNotification, contextHolder } = useNotificationHandler()
+  const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
 
   const { data, isFetching, isError, refetch } = useSearchProductsQuery({
     search: search || undefined,
@@ -55,6 +62,33 @@ export default function ProductsPage() {
 
   const products = (data?.data ?? []) as ProductListItem[]
   const meta = data?.meta
+
+  const handleDelete = useCallback(
+    (product: ProductListItem) => {
+      Modal.confirm({
+        title: 'Удалить товар?',
+        content: (
+          <>
+            Будут удалены товар <strong>{product.name}</strong>, его вариации и остатки.
+            Восстановить будет невозможно.
+          </>
+        ),
+        okText: 'Удалить',
+        okType: 'danger',
+        cancelText: 'Отмена',
+        onOk: async () => {
+          try {
+            await deleteProduct(product.id).unwrap()
+            openNotification('success', ['Товар удалён'])
+          } catch {
+            openNotification('error', ['Не удалось удалить товар'])
+            throw new Error('delete failed')
+          }
+        },
+      })
+    },
+    [deleteProduct, openNotification]
+  )
 
   const columns: ColumnsType<ProductListItem> = useMemo(
     () => [
@@ -107,19 +141,30 @@ export default function ProductsPage() {
       {
         title: '',
         key: 'actions',
-        width: 110,
+        width: 140,
         render: (_, record) => (
-          <Link to={`/products/${record.id}`}>
-            <Button type="link">Открыть</Button>
-          </Link>
+          <Space size={4}>
+            <Link to={`/products/${record.id}`}>
+              <Button type="link">Открыть</Button>
+            </Link>
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              aria-label={`Удалить ${record.name}`}
+              loading={isDeleting}
+              onClick={() => handleDelete(record)}
+            />
+          </Space>
         ),
       },
     ],
-    []
+    [handleDelete, isDeleting]
   )
 
   return (
     <Container className="products-page admin-page">
+      {contextHolder}
       <PageHeader
         title="Товары"
         subtitle="Список товаров каталога: просмотр и редактирование"

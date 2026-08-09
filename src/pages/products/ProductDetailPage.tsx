@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react'
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import {
+  useDeleteProductMutation,
   useGetProductByIdQuery,
   useUpdateProductMutation,
 } from '@/shared/lib/api/products/Products'
@@ -11,7 +12,8 @@ import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandle
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Form, Input, InputNumber, Select, Space, Switch, Table, Tag } from 'antd'
+import { DeleteOutlined } from '@ant-design/icons'
+import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
@@ -55,6 +57,7 @@ export default function ProductDetailPage() {
   })
   const { data: categoriesResponse } = useGetCategoriesTreeQuery()
   const [updateProduct, { isLoading: isSaving }] = useUpdateProductMutation()
+  const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
 
   const product = data?.data
 
@@ -166,6 +169,33 @@ export default function ProductDetailPage() {
     }
   }
 
+  const handleDelete = () => {
+    if (!product) return
+
+    Modal.confirm({
+      title: 'Удалить товар?',
+      content: (
+        <>
+          Будут удалены товар <strong>{product.name}</strong>, его вариации и остатки. Восстановить
+          будет невозможно.
+        </>
+      ),
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk: async () => {
+        try {
+          await deleteProduct(product.id).unwrap()
+          openNotification('success', ['Товар удалён'])
+          navigate('/products')
+        } catch {
+          openNotification('error', ['Не удалось удалить товар'])
+          throw new Error('delete failed')
+        }
+      },
+    })
+  }
+
   if (isError) {
     return (
       <Container className="product-detail admin-page">
@@ -184,6 +214,15 @@ export default function ProductDetailPage() {
         actions={
           <Space>
             <Button onClick={() => navigate('/products')}>К списку</Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              loading={isDeleting}
+              disabled={!product}
+              onClick={handleDelete}
+            >
+              Удалить
+            </Button>
             <Button type="primary" loading={isSaving} onClick={() => void handleSave()}>
               Сохранить
             </Button>

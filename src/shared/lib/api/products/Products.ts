@@ -71,6 +71,17 @@ export const apiProducts = baseApi.injectEndpoints({
       ],
     }),
 
+    deleteProduct: builder.mutation<ApiResponse<{ id: string }, any>, string>({
+      query: id => ({
+        url: `/products/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, id) => [
+        { type: 'Product', id },
+        { type: 'Product', id: 'LIST' },
+      ],
+    }),
+
     createStockBulk: builder.mutation<ApiResponse<unknown, any>, CreateStockBulkPayload>({
       query: body => ({
         url: `/stock/bulk`,
@@ -112,6 +123,7 @@ export const {
   useGetProductByIdQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
+  useDeleteProductMutation,
   useCreateStockBulkMutation,
   useGetProductVariationByIdQuery,
   useUpdateProductVariationMutation,
