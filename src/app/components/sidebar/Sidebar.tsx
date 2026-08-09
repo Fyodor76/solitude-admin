@@ -426,11 +426,23 @@ const Sidebar = ({
                                   }
                                 }}
                               >
-                                <span
-                                  className={`menu-item-text ${subRouteActive ? 'is-highlighted' : ''}`}
-                                >
-                                  {subItem.text}
-                                </span>
+                                <div className="icon-and-text">
+                                  {subItem.icon ? (
+                                    <span className="menu-item-icon-wrap">
+                                      <span className="menu-item-icon">
+                                        <Icon
+                                          name={subItem.icon}
+                                          color={subRouteActive ? '#1072d5' : '#c2c7d0'}
+                                        />
+                                      </span>
+                                    </span>
+                                  ) : null}
+                                  <span
+                                    className={`menu-item-text ${subRouteActive ? 'is-highlighted' : ''}`}
+                                  >
+                                    {subItem.text}
+                                  </span>
+                                </div>
                               </Link>
                             </li>
                           )

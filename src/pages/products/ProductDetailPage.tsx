@@ -8,6 +8,7 @@ import {
 } from '@/shared/lib/api/products/Products'
 import { ProductUpdatePayload } from '@/shared/lib/api/products/types'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
+import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Button, Form, Input, InputNumber, Select, Space, Switch, Table, Tag } from 'antd'
@@ -84,7 +85,7 @@ export default function ProductDetailPage() {
       dataIndex: 'mainImage',
       width: 64,
       render: (mainImage: string, record) => {
-        const src = mainImage || record.images?.[0]
+        const src = resolveMediaUrl(mainImage || record.images?.[0])
         return src ? <img src={src} alt="" className="product-detail__thumb" /> : null
       },
     },

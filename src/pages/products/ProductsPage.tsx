@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import { useSearchProductsQuery } from '@/shared/lib/api/products/Products'
+import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Button, Input, Space, Table, Tag } from 'antd'
@@ -12,6 +13,14 @@ import { Product } from '@/app/types/product'
 import './ProductsPage.scss'
 
 const PAGE_SIZE = 20
+
+function getProductThumb(product: Product): string | null {
+  const raw =
+    product.images?.[0] ||
+    product.variations?.[0]?.mainImage ||
+    product.variations?.[0]?.images?.[0]
+  return resolveMediaUrl(raw)
+}
 
 export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
@@ -33,14 +42,16 @@ export default function ProductsPage() {
     () => [
       {
         title: '',
-        dataIndex: 'images',
+        key: 'thumb',
         width: 64,
-        render: (images: string[]) =>
-          images?.[0] ? (
-            <img src={images[0]} alt="" className="products-page__thumb" />
+        render: (_, record) => {
+          const thumb = getProductThumb(record)
+          return thumb ? (
+            <img src={thumb} alt="" className="products-page__thumb" />
           ) : (
             <div className="products-page__thumb-placeholder" />
-          ),
+          )
+        },
       },
       {
         title: 'Название',
@@ -72,14 +83,14 @@ export default function ProductsPage() {
       {
         title: 'Статус',
         dataIndex: 'isActive',
-        width: 120,
+        width: 220,
         render: (isActive: boolean, record) => (
-          <Space size={4} wrap>
+          <div className="products-page__status">
             <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Активен' : 'Скрыт'}</Tag>
             <Tag color={record.inStock ? 'blue' : 'orange'}>
               {record.inStock ? 'В наличии' : 'Нет'}
             </Tag>
-          </Space>
+          </div>
         ),
       },
       {

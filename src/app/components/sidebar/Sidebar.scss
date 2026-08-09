@@ -338,7 +338,17 @@
             &--child {
               justify-content: flex-start;
               min-height: 36px;
-              padding: 6px 12px 6px 59px;
+              padding: 6px 12px 6px 36px;
+
+              .icon-and-text {
+                gap: 12px;
+              }
+
+              .menu-item-icon-wrap,
+              .menu-item-icon {
+                width: 18px;
+                height: 18px;
+              }
 
               .menu-item-text {
                 font-family: 'Source Sans 3';

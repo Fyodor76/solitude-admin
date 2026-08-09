@@ -41,6 +41,14 @@
     color: #8c8c8c;
     font-size: 12px;
   }
+
+  &__status {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
 }
 
 .product-detail {

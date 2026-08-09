@@ -6,6 +6,7 @@ import {
   useUpdateProductVariationMutation,
 } from '@/shared/lib/api/products/Products'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
+import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Button, Form, Input, InputNumber, Space } from 'antd'
@@ -27,7 +28,10 @@ type VariationFormValues = {
 }
 
 function toImageItems(images: string[] | undefined): ProductImageItem[] {
-  return (images ?? []).map(value => ({ fileId: value, url: value }))
+  return (images ?? []).map(value => ({
+    fileId: value,
+    url: resolveMediaUrl(value) || value,
+  }))
 }
 
 export default function VariationEditPage() {
