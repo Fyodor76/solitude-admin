@@ -47,7 +47,7 @@ export default function StockPage() {
   const [rows, setRows] = useState<StockRow[]>([])
 
   const { data: productsResponse, isLoading: isProductsLoading } = useSearchProductsQuery({
-    limit: 200,
+    limit: 100,
     page: 1,
     sort: 'sort_order',
   })
