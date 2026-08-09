@@ -1,15 +1,16 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   useDeleteProductMutation,
+  useReorderProductsMutation,
   useSearchProductsQuery,
 } from '@/shared/lib/api/products/Products'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { DeleteOutlined } from '@ant-design/icons'
-import { Button, Input, Modal, Space, Table, Tag } from 'antd'
+import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
+import { Button, Input, Modal, Space, Switch, Table, Tag } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link } from 'react-router-dom'
 
@@ -18,17 +19,18 @@ import { Product } from '@/app/types/product'
 import './ProductsPage.scss'
 
 const PAGE_SIZE = 20
+const LANDING_ORDER_LIMIT = 50
 
 /** Ответ search может быть без variations — учитываем. */
 type ProductListItem = Pick<
   Product,
-  'id' | 'name' | 'slug' | 'brand' | 'price' | 'isActive' | 'inStock' | 'images'
+  'id' | 'name' | 'slug' | 'brand' | 'price' | 'isActive' | 'inStock' | 'images' | 'showOnLanding'
 > & {
   variations?: Product['variations']
+  sortOrder?: number
 }
 
 function getProductThumb(product: ProductListItem): string | null {
-  // Источник правды — фото вариации; product.images только запасной вариант
   const variation = product.variations?.[0]
   const raw = variation?.mainImage || variation?.images?.[0] || product.images?.[0] || null
   return resolveMediaUrl(raw)
@@ -49,19 +51,29 @@ export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [landingOrderMode, setLandingOrderMode] = useState(false)
+  const [orderedProducts, setOrderedProducts] = useState<ProductListItem[]>([])
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [overIndex, setOverIndex] = useState<number | null>(null)
   const { openNotification, contextHolder } = useNotificationHandler()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
+  const [reorderProducts, { isLoading: isReordering }] = useReorderProductsMutation()
 
   const { data, isFetching, isError, refetch } = useSearchProductsQuery({
-    search: search || undefined,
+    search: landingOrderMode ? undefined : search || undefined,
     isActiveFilter: 'all',
-    sort: 'newest',
-    page,
-    limit: PAGE_SIZE,
+    showOnLanding: landingOrderMode ? true : undefined,
+    sort: landingOrderMode ? 'sort_order' : 'newest',
+    page: landingOrderMode ? 1 : page,
+    limit: landingOrderMode ? LANDING_ORDER_LIMIT : PAGE_SIZE,
   })
 
   const products = (data?.data ?? []) as ProductListItem[]
   const meta = data?.meta
+
+  useEffect(() => {
+    setOrderedProducts(products)
+  }, [products])
 
   const handleDelete = useCallback(
     (product: ProductListItem) => {
@@ -90,8 +102,63 @@ export default function ProductsPage() {
     [deleteProduct, openNotification]
   )
 
+  const persistOrder = useCallback(
+    async (next: ProductListItem[]) => {
+      const previous = orderedProducts
+      setOrderedProducts(next)
+      try {
+        await reorderProducts({ orderedIds: next.map(item => item.id) }).unwrap()
+        openNotification('success', ['Порядок на главной сохранён'])
+      } catch {
+        setOrderedProducts(previous)
+        openNotification('error', ['Не удалось сохранить порядок'])
+      }
+    },
+    [openNotification, orderedProducts, reorderProducts]
+  )
+
+  const handleReorder = useCallback(
+    (from: number, to: number) => {
+      if (from === to || from < 0 || to < 0) return
+      const next = [...orderedProducts]
+      const [moved] = next.splice(from, 1)
+      if (!moved) return
+      next.splice(to, 0, moved)
+      void persistOrder(next)
+    },
+    [orderedProducts, persistOrder]
+  )
+
   const columns: ColumnsType<ProductListItem> = useMemo(
     () => [
+      ...(landingOrderMode
+        ? [
+            {
+              title: '',
+              key: 'drag',
+              width: 44,
+              render: (_: unknown, __: ProductListItem, index: number) => (
+                <button
+                  type="button"
+                  className="products-page__drag-handle"
+                  draggable
+                  aria-label="Перетащить товар"
+                  onDragStart={event => {
+                    setDragIndex(index)
+                    event.dataTransfer.effectAllowed = 'move'
+                    event.dataTransfer.setData('text/plain', String(index))
+                  }}
+                  onDragEnd={() => {
+                    setDragIndex(null)
+                    setOverIndex(null)
+                  }}
+                >
+                  <HolderOutlined />
+                </button>
+              ),
+            } as ColumnsType<ProductListItem>[number],
+          ]
+        : []),
       {
         title: '',
         key: 'thumb',
@@ -128,13 +195,14 @@ export default function ProductsPage() {
       {
         title: 'Статус',
         dataIndex: 'isActive',
-        width: 220,
+        width: 260,
         render: (isActive: boolean, record) => (
           <div className="products-page__status">
             <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Активен' : 'Скрыт'}</Tag>
             <Tag color={record.inStock ? 'blue' : 'orange'}>
               {record.inStock ? 'В наличии' : 'Нет'}
             </Tag>
+            {record.showOnLanding ? <Tag color="purple">Главная</Tag> : null}
           </div>
         ),
       },
@@ -159,15 +227,21 @@ export default function ProductsPage() {
         ),
       },
     ],
-    [handleDelete, isDeleting]
+    [handleDelete, isDeleting, landingOrderMode]
   )
+
+  const tableData = landingOrderMode ? orderedProducts : products
 
   return (
     <Container className="products-page admin-page">
       {contextHolder}
       <PageHeader
         title="Товары"
-        subtitle="Список товаров каталога: просмотр и редактирование"
+        subtitle={
+          landingOrderMode
+            ? 'Перетащите товары — так они пойдут в блоке «Коллекция» на главной (первые 3)'
+            : 'Список товаров каталога: просмотр и редактирование'
+        }
         actions={
           <Space>
             <Button loading={isFetching} onClick={() => void refetch()}>
@@ -185,6 +259,7 @@ export default function ProductsPage() {
           className="products-page__search"
           placeholder="Поиск по названию, slug, бренду"
           allowClear
+          disabled={landingOrderMode}
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
           onSearch={value => {
@@ -193,6 +268,18 @@ export default function ProductsPage() {
           }}
           enterButton="Найти"
         />
+        <label className="products-page__landing-order">
+          <Switch
+            checked={landingOrderMode}
+            onChange={checked => {
+              setLandingOrderMode(checked)
+              setPage(1)
+              setDragIndex(null)
+              setOverIndex(null)
+            }}
+          />
+          <span>Порядок на главной</span>
+        </label>
       </div>
 
       {isError ? (
@@ -201,16 +288,54 @@ export default function ProductsPage() {
         <Table<ProductListItem>
           rowKey="id"
           columns={columns}
-          dataSource={products}
-          loading={isFetching}
-          locale={{ emptyText: 'Товары не найдены' }}
-          pagination={{
-            current: page,
-            pageSize: PAGE_SIZE,
-            total: meta?.total ?? 0,
-            showSizeChanger: false,
-            onChange: nextPage => setPage(nextPage),
+          dataSource={tableData}
+          loading={isFetching || isReordering}
+          locale={{
+            emptyText: landingOrderMode
+              ? 'Нет товаров с флагом «На главной лендинга»'
+              : 'Товары не найдены',
           }}
+          rowClassName={(_, index) => {
+            if (!landingOrderMode) return ''
+            const classes = ['products-page__row']
+            if (dragIndex === index) classes.push('is-dragging')
+            if (overIndex === index && dragIndex !== null && dragIndex !== index) {
+              classes.push('is-over')
+            }
+            return classes.join(' ')
+          }}
+          onRow={(_, index) => {
+            if (!landingOrderMode || index == null) return {}
+            return {
+              onDragOver: event => {
+                event.preventDefault()
+                event.dataTransfer.dropEffect = 'move'
+                if (dragIndex !== null && dragIndex !== index) {
+                  setOverIndex(index)
+                }
+              },
+              onDrop: event => {
+                event.preventDefault()
+                const from = dragIndex ?? Number(event.dataTransfer.getData('text/plain'))
+                if (!Number.isNaN(from)) {
+                  handleReorder(from, index)
+                }
+                setDragIndex(null)
+                setOverIndex(null)
+              },
+            }
+          }}
+          pagination={
+            landingOrderMode
+              ? false
+              : {
+                  current: page,
+                  pageSize: PAGE_SIZE,
+                  total: meta?.total ?? 0,
+                  showSizeChanger: false,
+                  onChange: nextPage => setPage(nextPage),
+                }
+          }
         />
       )}
     </Container>

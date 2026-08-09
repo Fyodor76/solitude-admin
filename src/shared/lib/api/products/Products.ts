@@ -128,6 +128,15 @@ export const apiProducts = baseApi.injectEndpoints({
         { type: 'Product', id: 'LIST' },
       ],
     }),
+
+    reorderProducts: builder.mutation<ApiResponse<Product[], any>, { orderedIds: string[] }>({
+      query: body => ({
+        url: `/products/reorder`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }],
+    }),
   }),
 })
 
@@ -143,4 +152,5 @@ export const {
   useGetProductVariationByIdQuery,
   useUpdateProductVariationMutation,
   useReorderProductVariationsMutation,
+  useReorderProductsMutation,
 } = apiProducts

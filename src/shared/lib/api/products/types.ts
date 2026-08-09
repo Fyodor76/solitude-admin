@@ -69,7 +69,7 @@ export interface ProductSearchFilters {
   isActive?: boolean
   isActiveFilter?: 'all' | 'active' | 'includes' | 'inactive'
   search?: string
-  sort?: 'newest' | 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc'
+  sort?: 'newest' | 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc' | 'sort_order'
   page?: number
   limit?: number
 }
