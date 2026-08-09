@@ -5,7 +5,7 @@ import { useMobileSidebarSwipe } from '@/shared/hooks/useMobileSidebarSwipe'
 import { Button, Tooltip } from 'antd'
 import classNames from 'classnames'
 import { motion } from 'framer-motion'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import defaultUserLogo from '@/app/assets/images/user.jpg'
 import { ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY } from '@/app/constans/layout'
@@ -193,10 +193,14 @@ const Sidebar = ({
       <>
         <div className="sidebar-header-container">
           {logo && (
-            <a href="/" className="sidebar-header">
+            <Link
+              to="/"
+              className="sidebar-header"
+              onClick={() => isMobile && isOpen && toggleSidebar()}
+            >
               <img src={logo.imageUrl} alt={logo.altText || 'логотип'} className="sidebar-logo" />
               {isOpen && logo.title && <span className="sidebar-brand">{logo.title}</span>}
-            </a>
+            </Link>
           )}
           <div className="header-sidebar-container">
             <motion.div
@@ -261,70 +265,106 @@ const Sidebar = ({
                       placement={tooltipPlacement}
                       mouseEnterDelay={0}
                     >
-                      <a
-                        href={hasSubItems ? '#' : item.href || '#'}
-                        className={[
-                          'sidebar-menu-link',
-                          routeMatchesLeaf ? 'is-active' : '',
-                          subMenuExpanded ? 'is-expanded' : '',
-                          hasActiveChild ? 'has-active-child' : '',
-                        ]
-                          .filter(Boolean)
-                          .join(' ')}
-                        data-collapsed={!isOpen}
-                        onClick={e => {
-                          if (hasSubItems) {
-                            e.preventDefault()
+                      {hasSubItems ? (
+                        <button
+                          type="button"
+                          className={[
+                            'sidebar-menu-link',
+                            subMenuExpanded ? 'is-expanded' : '',
+                            hasActiveChild ? 'has-active-child' : '',
+                          ]
+                            .filter(Boolean)
+                            .join(' ')}
+                          data-collapsed={!isOpen}
+                          onClick={() => {
                             if (!isOpen) {
                               toggleSidebar()
                               toggleSubMenuItem(item.id)
                             } else {
                               toggleSubMenuItem(item.id)
                             }
-                            if (item.onClick) {
-                              item.onClick()
-                            }
-                            return
-                          }
-
-                          if (isMobile && isOpen) {
-                            toggleSidebar()
-                          }
-                        }}
-                      >
-                        <div className="icon-and-text">
-                          {item.icon && (
-                            <span className="menu-item-icon-wrap">
-                              <span className="menu-item-icon">
-                                <Icon
-                                  name={item.icon}
-                                  color={menuIconHighlighted ? '#1072d5' : '#c2c7d0'}
-                                />
-                              </span>
-                              {item.badgeCount != null && item.badgeCount > 0 ? (
-                                <span
-                                  className="sidebar-menu-badge-count"
-                                  aria-label={`Новых обращений: ${item.badgeCount}`}
-                                >
-                                  {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                            item.onClick?.()
+                          }}
+                        >
+                          <div className="icon-and-text">
+                            {item.icon && (
+                              <span className="menu-item-icon-wrap">
+                                <span className="menu-item-icon">
+                                  <Icon
+                                    name={item.icon}
+                                    color={menuIconHighlighted ? '#1072d5' : '#c2c7d0'}
+                                  />
                                 </span>
-                              ) : null}
-                            </span>
-                          )}
+                                {item.badgeCount != null && item.badgeCount > 0 ? (
+                                  <span
+                                    className="sidebar-menu-badge-count"
+                                    aria-label={`Новых обращений: ${item.badgeCount}`}
+                                  >
+                                    {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                                  </span>
+                                ) : null}
+                              </span>
+                            )}
+                            {isOpen && (
+                              <span
+                                className={`menu-item-text ${menuTextHighlighted ? 'is-highlighted' : ''}`}
+                              >
+                                {item.text}
+                              </span>
+                            )}
+                          </div>
                           {isOpen && (
-                            <span
-                              className={`menu-item-text ${menuTextHighlighted ? 'is-highlighted' : ''}`}
-                            >
-                              {item.text}
+                            <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
+                              <Icon
+                                name="arrow"
+                                color={`${isOpenSubItem ? '#1072d5' : '#ffffff'}`}
+                              />
                             </span>
                           )}
-                        </div>
-                        {hasSubItems && isOpen && (
-                          <span className={`submenu-arrow ${isOpenSubItem ? 'expanded' : ''}`}>
-                            <Icon name="arrow" color={`${isOpenSubItem ? '#1072d5' : '#ffffff'}`} />
-                          </span>
-                        )}
-                      </a>
+                        </button>
+                      ) : (
+                        <Link
+                          to={item.href || '/'}
+                          className={['sidebar-menu-link', routeMatchesLeaf ? 'is-active' : '']
+                            .filter(Boolean)
+                            .join(' ')}
+                          data-collapsed={!isOpen}
+                          onClick={() => {
+                            item.onClick?.()
+                            if (isMobile && isOpen) {
+                              toggleSidebar()
+                            }
+                          }}
+                        >
+                          <div className="icon-and-text">
+                            {item.icon && (
+                              <span className="menu-item-icon-wrap">
+                                <span className="menu-item-icon">
+                                  <Icon
+                                    name={item.icon}
+                                    color={menuIconHighlighted ? '#1072d5' : '#c2c7d0'}
+                                  />
+                                </span>
+                                {item.badgeCount != null && item.badgeCount > 0 ? (
+                                  <span
+                                    className="sidebar-menu-badge-count"
+                                    aria-label={`Новых обращений: ${item.badgeCount}`}
+                                  >
+                                    {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                                  </span>
+                                ) : null}
+                              </span>
+                            )}
+                            {isOpen && (
+                              <span
+                                className={`menu-item-text ${menuTextHighlighted ? 'is-highlighted' : ''}`}
+                              >
+                                {item.text}
+                              </span>
+                            )}
+                          </div>
+                        </Link>
+                      )}
                     </Tooltip>
                     {hasSubItems && isOpenSubItem && isOpen && item.subItems ? (
                       <ul className="sidebar-submenu">
@@ -332,8 +372,8 @@ const Sidebar = ({
                           const subRouteActive = isSidebarHrefActive(subItem.href, pathname)
                           return (
                             <li className="sidebar-submenu-item" key={subItem.id}>
-                              <a
-                                href={subItem.href || '#'}
+                              <Link
+                                to={subItem.href || '/'}
                                 className={[
                                   'sidebar-menu-link',
                                   'sidebar-menu-link--child',
@@ -353,7 +393,7 @@ const Sidebar = ({
                                 >
                                   {subItem.text}
                                 </span>
-                              </a>
+                              </Link>
                             </li>
                           )
                         })}

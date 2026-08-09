@@ -1,5 +1,6 @@
 import { Product } from '../../../../app/types/product'
 import { ApiResponse, baseApi } from '../baseApi'
+import { CreateStockBulkPayload, ProductCreatePayload } from './types'
 
 export const apiProducts = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -12,7 +13,29 @@ export const apiProducts = baseApi.injectEndpoints({
         { type: 'Product', id: `CATEGORY_${categoryId}` },
       ],
     }),
+
+    createProduct: builder.mutation<ApiResponse<Product, any>, ProductCreatePayload>({
+      query: body => ({
+        url: `/products`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [{ type: 'Product', id: 'LIST' }],
+    }),
+
+    createStockBulk: builder.mutation<ApiResponse<unknown, any>, CreateStockBulkPayload>({
+      query: body => ({
+        url: `/stock/bulk`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 })
 
-export const { useGetProductsByCategoryIdQuery, useLazyGetProductsByCategoryIdQuery } = apiProducts
+export const {
+  useGetProductsByCategoryIdQuery,
+  useLazyGetProductsByCategoryIdQuery,
+  useCreateProductMutation,
+  useCreateStockBulkMutation,
+} = apiProducts

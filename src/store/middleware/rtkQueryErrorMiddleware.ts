@@ -56,9 +56,12 @@ export const rtkQueryErrorMiddleware: Middleware =
         return next(action)
       }
 
-      const messagesWithErrors = Object.values(action.payload.error).map<string[]>(
-        err => err.titles
-      )
+      const errorPayload = action.payload?.error
+      if (!errorPayload || typeof errorPayload !== 'object') {
+        return next(action)
+      }
+
+      const messagesWithErrors = Object.values(errorPayload).map<string[]>(err => err.titles)
 
       dispatch(clearNotifications())
 

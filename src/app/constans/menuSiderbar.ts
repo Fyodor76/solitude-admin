@@ -11,6 +11,13 @@ export const menuSidebar: MenuItem[] = [
     hasArrow: false,
   },
   {
+    id: SIDEBAR_MENU_ITEM_ID.PRODUCT_CREATE,
+    text: 'Создание товара',
+    href: '/products/create',
+    icon: 'doc',
+    hasArrow: false,
+  },
+  {
     id: SIDEBAR_MENU_ITEM_ID.SIZE_CHARTS,
     text: 'Размерные сетки',
     href: '/size-charts',
