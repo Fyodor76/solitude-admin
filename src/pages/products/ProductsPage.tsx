@@ -1,4 +1,4 @@
-import { type DragEvent, useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import {
   useDeleteProductMutation,
@@ -10,8 +10,8 @@ import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
-import { Button, Input, Modal, Space, Table, Tag } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
+import { Button, Empty, Input, Modal, Pagination, Space, Spin, Tag } from 'antd'
+import { Reorder, useDragControls } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 import { Product } from '@/app/types/product'
@@ -20,7 +20,6 @@ import './ProductsPage.scss'
 
 const PAGE_SIZE = 20
 
-/** Ответ search может быть без variations — учитываем. */
 type ProductListItem = Pick<
   Product,
   'id' | 'name' | 'slug' | 'brand' | 'price' | 'isActive' | 'inStock' | 'images' | 'showOnLanding'
@@ -46,14 +45,99 @@ function ProductThumb({ product }: { product: ProductListItem }) {
   return <img src={thumb} alt="" className="products-page__thumb" onError={() => setFailed(true)} />
 }
 
+function ProductSortableRow({
+  product,
+  canReorder,
+  isDeleting,
+  onDelete,
+  onDragEnd,
+}: {
+  product: ProductListItem
+  canReorder: boolean
+  isDeleting: boolean
+  onDelete: (product: ProductListItem) => void
+  onDragEnd: () => void
+}) {
+  const controls = useDragControls()
+
+  return (
+    <Reorder.Item
+      value={product}
+      id={product.id}
+      as="li"
+      className="products-page__row"
+      dragListener={false}
+      dragControls={controls}
+      onDragEnd={onDragEnd}
+      whileDrag={{
+        scale: 1.01,
+        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.12)',
+        zIndex: 2,
+        cursor: 'grabbing',
+      }}
+      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+    >
+      {canReorder ? (
+        <button
+          type="button"
+          className="products-page__drag-handle"
+          aria-label="Перетащить товар"
+          onPointerDown={event => controls.start(event)}
+        >
+          <HolderOutlined />
+        </button>
+      ) : (
+        <span className="products-page__drag-spacer" />
+      )}
+
+      <ProductThumb product={product} />
+
+      <div className="products-page__name">
+        <Link to={`/products/${product.id}`}>{product.name}</Link>
+        <span className="products-page__slug">{product.slug}</span>
+      </div>
+
+      <span className="products-page__cell products-page__cell--brand">{product.brand}</span>
+      <span className="products-page__cell products-page__cell--price">
+        {Number(product.price || 0).toLocaleString('ru-RU')} ₽
+      </span>
+      <span className="products-page__cell products-page__cell--variations">
+        {product.variations?.length ?? '—'}
+      </span>
+
+      <div className="products-page__status">
+        <Tag color={product.isActive ? 'green' : 'default'}>
+          {product.isActive ? 'Активен' : 'Скрыт'}
+        </Tag>
+        <Tag color={product.inStock ? 'blue' : 'orange'}>
+          {product.inStock ? 'В наличии' : 'Нет'}
+        </Tag>
+        {product.showOnLanding ? <Tag color="purple">Главная</Tag> : null}
+      </div>
+
+      <Space size={4} className="products-page__actions">
+        <Link to={`/products/${product.id}`}>
+          <Button type="link">Открыть</Button>
+        </Link>
+        <Button
+          type="text"
+          danger
+          icon={<DeleteOutlined />}
+          aria-label={`Удалить ${product.name}`}
+          loading={isDeleting}
+          onClick={() => onDelete(product)}
+        />
+      </Space>
+    </Reorder.Item>
+  )
+}
+
 export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [orderedProducts, setOrderedProducts] = useState<ProductListItem[]>([])
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
-  /** Индекс «вставить перед» (0…length). null — нет цели. */
-  const [dropSlot, setDropSlot] = useState<number | null>(null)
+  const orderedRef = useRef(orderedProducts)
   const { openNotification, contextHolder } = useNotificationHandler()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
   const [reorderProducts, { isLoading: isReordering }] = useReorderProductsMutation()
@@ -74,6 +158,10 @@ export default function ProductsPage() {
   useEffect(() => {
     setOrderedProducts(products)
   }, [products])
+
+  useEffect(() => {
+    orderedRef.current = orderedProducts
+  }, [orderedProducts])
 
   const handleDelete = useCallback(
     (product: ProductListItem) => {
@@ -104,7 +192,11 @@ export default function ProductsPage() {
 
   const persistOrder = useCallback(
     async (next: ProductListItem[]) => {
-      const previous = orderedProducts
+      const previousIds = products.map(item => item.id).join(',')
+      const nextIds = next.map(item => item.id).join(',')
+      if (previousIds === nextIds) return
+
+      const previous = products
       setOrderedProducts(next)
       try {
         await reorderProducts({
@@ -117,140 +209,20 @@ export default function ProductsPage() {
         openNotification('error', ['Не удалось сохранить порядок'])
       }
     },
-    [openNotification, orderedProducts, page, reorderProducts]
+    [openNotification, page, products, reorderProducts]
   )
 
-  const handleInsert = useCallback(
-    (from: number, insertBefore: number) => {
-      if (!canReorder || from < 0 || insertBefore < 0) return
-      // Уже стоит в этом слоте — ничего не делаем
-      if (insertBefore === from || insertBefore === from + 1) return
-
-      const next = [...orderedProducts]
-      const [moved] = next.splice(from, 1)
-      if (!moved) return
-
-      const to = from < insertBefore ? insertBefore - 1 : insertBefore
-      next.splice(to, 0, moved)
-      void persistOrder(next)
-    },
-    [canReorder, orderedProducts, persistOrder]
-  )
-
-  const resolveDropSlot = useCallback((event: DragEvent, index: number) => {
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-    const before = event.clientY < rect.top + rect.height / 2
-    return before ? index : index + 1
-  }, [])
-
-  const columns: ColumnsType<ProductListItem> = useMemo(
-    () => [
-      ...(canReorder
-        ? [
-            {
-              title: '',
-              key: 'drag',
-              width: 44,
-              render: (_: unknown, __: ProductListItem, index: number) => (
-                <button
-                  type="button"
-                  className="products-page__drag-handle"
-                  draggable
-                  aria-label="Перетащить товар"
-                  onDragStart={event => {
-                    event.stopPropagation()
-                    setDragIndex(index)
-                    event.dataTransfer.effectAllowed = 'move'
-                    event.dataTransfer.setData('text/plain', String(index))
-                  }}
-                  onDragEnd={() => {
-                    setDragIndex(null)
-                    setDropSlot(null)
-                  }}
-                >
-                  <HolderOutlined />
-                </button>
-              ),
-            } as ColumnsType<ProductListItem>[number],
-          ]
-        : []),
-      {
-        title: '',
-        key: 'thumb',
-        width: 64,
-        render: (_, record) => <ProductThumb key={record.id} product={record} />,
-      },
-      {
-        title: 'Название',
-        dataIndex: 'name',
-        render: (name: string, record) => (
-          <div className="products-page__name">
-            <Link to={`/products/${record.id}`}>{name}</Link>
-            <span className="products-page__slug">{record.slug}</span>
-          </div>
-        ),
-      },
-      {
-        title: 'Бренд',
-        dataIndex: 'brand',
-        width: 140,
-      },
-      {
-        title: 'Цена',
-        dataIndex: 'price',
-        width: 120,
-        render: (price: number) => `${Number(price || 0).toLocaleString('ru-RU')} ₽`,
-      },
-      {
-        title: 'Вариации',
-        dataIndex: 'variations',
-        width: 100,
-        render: (variations: ProductListItem['variations']) => variations?.length ?? '—',
-      },
-      {
-        title: 'Статус',
-        dataIndex: 'isActive',
-        width: 260,
-        render: (isActive: boolean, record) => (
-          <div className="products-page__status">
-            <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Активен' : 'Скрыт'}</Tag>
-            <Tag color={record.inStock ? 'blue' : 'orange'}>
-              {record.inStock ? 'В наличии' : 'Нет'}
-            </Tag>
-            {record.showOnLanding ? <Tag color="purple">Главная</Tag> : null}
-          </div>
-        ),
-      },
-      {
-        title: '',
-        key: 'actions',
-        width: 140,
-        render: (_, record) => (
-          <Space size={4}>
-            <Link to={`/products/${record.id}`}>
-              <Button type="link">Открыть</Button>
-            </Link>
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              aria-label={`Удалить ${record.name}`}
-              loading={isDeleting}
-              onClick={() => handleDelete(record)}
-            />
-          </Space>
-        ),
-      },
-    ],
-    [canReorder, handleDelete, isDeleting]
-  )
+  const handleDragEnd = useCallback(() => {
+    if (!canReorder) return
+    void persistOrder(orderedRef.current)
+  }, [canReorder, persistOrder])
 
   return (
     <Container className="products-page admin-page">
       {contextHolder}
       <PageHeader
         title="Товары"
-        subtitle="Перетащите строки, чтобы задать порядок (на главной — товары с флагом «На главной»)"
+        subtitle="Перетащите строки — остальные плавно разъедутся. На главной — товары с флагом «На главной»"
         actions={
           <Space>
             <Button loading={isFetching} onClick={() => void refetch()}>
@@ -273,8 +245,6 @@ export default function ProductsPage() {
           onSearch={value => {
             setPage(1)
             setSearch(value.trim())
-            setDragIndex(null)
-            setDropSlot(null)
           }}
           enterButton="Найти"
         />
@@ -283,55 +253,53 @@ export default function ProductsPage() {
       {isError ? (
         <AlertError onRetry={() => void refetch()} />
       ) : (
-        <Table<ProductListItem>
-          rowKey="id"
-          columns={columns}
-          dataSource={orderedProducts}
-          loading={isFetching || isReordering}
-          locale={{ emptyText: 'Товары не найдены' }}
-          rowClassName={(_, index) => {
-            if (!canReorder) return ''
-            const classes = ['products-page__row']
-            if (dragIndex === index) classes.push('is-dragging')
-            if (dropSlot === index) classes.push('drop-before')
-            if (dropSlot === orderedProducts.length && index === orderedProducts.length - 1) {
-              classes.push('drop-after')
-            }
-            return classes.join(' ')
-          }}
-          onRow={(_, index) => {
-            if (!canReorder || index == null) return {}
-            return {
-              onDragOver: event => {
-                event.preventDefault()
-                event.dataTransfer.dropEffect = 'move'
-                if (dragIndex === null) return
-                setDropSlot(resolveDropSlot(event, index))
-              },
-              onDrop: event => {
-                event.preventDefault()
-                const from = dragIndex ?? Number(event.dataTransfer.getData('text/plain'))
-                const slot = resolveDropSlot(event, index)
-                if (!Number.isNaN(from)) {
-                  handleInsert(from, slot)
-                }
-                setDragIndex(null)
-                setDropSlot(null)
-              },
-            }
-          }}
-          pagination={{
-            current: page,
-            pageSize: PAGE_SIZE,
-            total: meta?.total ?? 0,
-            showSizeChanger: false,
-            onChange: nextPage => {
-              setPage(nextPage)
-              setDragIndex(null)
-              setDropSlot(null)
-            },
-          }}
-        />
+        <Spin spinning={isFetching || isReordering}>
+          <div className="products-page__list-wrap">
+            <div className="products-page__list-head">
+              <span />
+              <span />
+              <span>Название</span>
+              <span>Бренд</span>
+              <span>Цена</span>
+              <span>Вариации</span>
+              <span>Статус</span>
+              <span />
+            </div>
+
+            {orderedProducts.length === 0 ? (
+              <Empty className="products-page__empty" description="Товары не найдены" />
+            ) : (
+              <Reorder.Group
+                axis="y"
+                values={orderedProducts}
+                onReorder={canReorder ? setOrderedProducts : () => undefined}
+                as="ul"
+                className="products-page__list"
+              >
+                {orderedProducts.map(product => (
+                  <ProductSortableRow
+                    key={product.id}
+                    product={product}
+                    canReorder={canReorder}
+                    isDeleting={isDeleting}
+                    onDelete={handleDelete}
+                    onDragEnd={handleDragEnd}
+                  />
+                ))}
+              </Reorder.Group>
+            )}
+          </div>
+
+          <div className="products-page__pagination">
+            <Pagination
+              current={page}
+              pageSize={PAGE_SIZE}
+              total={meta?.total ?? 0}
+              showSizeChanger={false}
+              onChange={nextPage => setPage(nextPage)}
+            />
+          </div>
+        </Spin>
       )}
     </Container>
   )

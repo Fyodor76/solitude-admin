@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
@@ -15,6 +15,7 @@ import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
 import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Tag } from 'antd'
+import { Reorder, useDragControls } from 'framer-motion'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ProductVariation } from '@/app/types/product'
@@ -57,14 +58,78 @@ function sortVariations(list: ProductVariation[]): ProductVariation[] {
   })
 }
 
+function VariationSortableRow({
+  record,
+  productId,
+  onDragEnd,
+}: {
+  record: ProductVariation
+  productId: string
+  onDragEnd: () => void
+}) {
+  const controls = useDragControls()
+  const thumb = resolveMediaUrl(record.mainImage || record.images?.[0])
+
+  return (
+    <Reorder.Item
+      value={record}
+      as="div"
+      className="product-detail__variation-row"
+      dragListener={false}
+      dragControls={controls}
+      onDragEnd={onDragEnd}
+      whileDrag={{
+        scale: 1.01,
+        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.12)',
+        zIndex: 2,
+        cursor: 'grabbing',
+      }}
+      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+    >
+      <button
+        type="button"
+        className="product-detail__drag-handle"
+        aria-label="Перетащить вариацию"
+        onPointerDown={event => controls.start(event)}
+      >
+        <HolderOutlined />
+      </button>
+      <div className="product-detail__thumb-wrap">
+        {thumb ? (
+          <img src={thumb} alt="" className="product-detail__thumb" />
+        ) : (
+          <div className="product-detail__thumb-placeholder" />
+        )}
+      </div>
+      <Link
+        to={`/products/${productId}/variations/${record.id}`}
+        className="product-detail__cell-text"
+      >
+        {record.name}
+      </Link>
+      <span className="product-detail__sku" title={record.sku}>
+        {record.sku}
+      </span>
+      <span>{Number(record.price || 0).toLocaleString('ru-RU')} ₽</span>
+      <span className="product-detail__status">
+        <Tag color={record.isActive ? 'green' : 'default'}>
+          {record.isActive ? 'Активна' : 'Скрыта'}
+        </Tag>
+      </span>
+      <Link to={`/products/${productId}/variations/${record.id}`}>
+        <Button type="link">Редактировать</Button>
+      </Link>
+    </Reorder.Item>
+  )
+}
+
 export default function ProductDetailPage() {
   const { productId = '' } = useParams<{ productId: string }>()
   const navigate = useNavigate()
   const { openNotification, contextHolder } = useNotificationHandler()
   const [form] = Form.useForm<ProductFormValues>()
   const [orderedVariations, setOrderedVariations] = useState<ProductVariation[]>([])
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
-  const [overIndex, setOverIndex] = useState<number | null>(null)
+  const orderedRef = useRef(orderedVariations)
 
   const { data, isLoading, isError } = useGetProductByIdQuery(productId, {
     skip: !productId,
@@ -99,32 +164,38 @@ export default function ProductDetailPage() {
     setOrderedVariations(sortVariations(product.variations ?? []))
   }, [form, product])
 
-  const persistOrder = async (next: ProductVariation[]) => {
-    if (!productId || next.length < 2) return
-    try {
-      await reorderVariations({
-        productId,
-        orderedIds: next.map(item => item.id),
-      }).unwrap()
-      openNotification('success', ['Порядок вариаций сохранён'])
-    } catch {
-      openNotification('error', ['Не удалось сохранить порядок вариаций'])
-      if (product?.variations) {
-        setOrderedVariations(sortVariations(product.variations))
-      }
-    }
-  }
+  useEffect(() => {
+    orderedRef.current = orderedVariations
+  }, [orderedVariations])
 
-  const handleReorder = (fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return
-    setOrderedVariations(prev => {
-      const next = [...prev]
-      const [moved] = next.splice(fromIndex, 1)
-      next.splice(toIndex, 0, moved)
-      void persistOrder(next)
-      return next
-    })
-  }
+  const persistOrder = useCallback(
+    async (next: ProductVariation[]) => {
+      if (!productId || next.length < 2) return
+      const prevIds = sortVariations(product?.variations ?? [])
+        .map(item => item.id)
+        .join(',')
+      const nextIds = next.map(item => item.id).join(',')
+      if (prevIds === nextIds) return
+
+      try {
+        await reorderVariations({
+          productId,
+          orderedIds: next.map(item => item.id),
+        }).unwrap()
+        openNotification('success', ['Порядок вариаций сохранён'])
+      } catch {
+        openNotification('error', ['Не удалось сохранить порядок вариаций'])
+        if (product?.variations) {
+          setOrderedVariations(sortVariations(product.variations))
+        }
+      }
+    },
+    [openNotification, product?.variations, productId, reorderVariations]
+  )
+
+  const handleDragEnd = useCallback(() => {
+    void persistOrder(orderedRef.current)
+  }, [persistOrder])
 
   const handleSave = async () => {
     if (!product) return
@@ -323,82 +394,22 @@ export default function ProductDetailPage() {
               <span>Статус</span>
               <span />
             </div>
-            {orderedVariations.map((record, index) => {
-              const thumb = resolveMediaUrl(record.mainImage || record.images?.[0])
-              return (
-                <div
+            <Reorder.Group
+              axis="y"
+              values={orderedVariations}
+              onReorder={setOrderedVariations}
+              as="div"
+              className="product-detail__variations-list"
+            >
+              {orderedVariations.map(record => (
+                <VariationSortableRow
                   key={record.id}
-                  className={[
-                    'product-detail__variation-row',
-                    dragIndex === index ? 'is-dragging' : '',
-                    overIndex === index && dragIndex !== null && dragIndex !== index
-                      ? 'is-over'
-                      : '',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  onDragOver={event => {
-                    event.preventDefault()
-                    event.dataTransfer.dropEffect = 'move'
-                    if (dragIndex !== null && dragIndex !== index) {
-                      setOverIndex(index)
-                    }
-                  }}
-                  onDrop={event => {
-                    event.preventDefault()
-                    const from = dragIndex ?? Number(event.dataTransfer.getData('text/plain'))
-                    if (!Number.isNaN(from)) {
-                      handleReorder(from, index)
-                    }
-                    setDragIndex(null)
-                    setOverIndex(null)
-                  }}
-                >
-                  <button
-                    type="button"
-                    className="product-detail__drag-handle"
-                    draggable
-                    aria-label="Перетащить вариацию"
-                    onDragStart={event => {
-                      setDragIndex(index)
-                      event.dataTransfer.effectAllowed = 'move'
-                      event.dataTransfer.setData('text/plain', String(index))
-                    }}
-                    onDragEnd={() => {
-                      setDragIndex(null)
-                      setOverIndex(null)
-                    }}
-                  >
-                    <HolderOutlined />
-                  </button>
-                  <div className="product-detail__thumb-wrap">
-                    {thumb ? (
-                      <img src={thumb} alt="" className="product-detail__thumb" />
-                    ) : (
-                      <div className="product-detail__thumb-placeholder" />
-                    )}
-                  </div>
-                  <Link
-                    to={`/products/${productId}/variations/${record.id}`}
-                    className="product-detail__cell-text"
-                  >
-                    {record.name}
-                  </Link>
-                  <span className="product-detail__sku" title={record.sku}>
-                    {record.sku}
-                  </span>
-                  <span>{Number(record.price || 0).toLocaleString('ru-RU')} ₽</span>
-                  <span className="product-detail__status">
-                    <Tag color={record.isActive ? 'green' : 'default'}>
-                      {record.isActive ? 'Активна' : 'Скрыта'}
-                    </Tag>
-                  </span>
-                  <Link to={`/products/${productId}/variations/${record.id}`}>
-                    <Button type="link">Редактировать</Button>
-                  </Link>
-                </div>
-              )
-            })}
+                  record={record}
+                  productId={productId}
+                  onDragEnd={handleDragEnd}
+                />
+              ))}
+            </Reorder.Group>
           </div>
         )}
       </section>

@@ -16,18 +16,68 @@
     width: 100%;
   }
 
-  &__drag-handle {
+  &__list-wrap {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  &__list-head,
+  &__row {
+    display: grid;
+    grid-template-columns: 36px 56px minmax(140px, 1.6fr) 120px 100px 80px minmax(
+        180px,
+        1.2fr
+      ) 130px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  &__list-head {
+    padding: 10px 12px;
+    color: #8c8c8c;
+    font-size: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    position: relative;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f5f5f5;
+    background: #fff;
+    list-style: none;
+    touch-action: none;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__drag-handle,
+  &__drag-spacer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 28px;
     height: 28px;
+  }
+
+  &__drag-handle {
     padding: 0;
     border: none;
     border-radius: 4px;
     background: transparent;
     color: #bfbfbf;
     cursor: grab;
+    touch-action: none;
     transition: color 0.15s ease;
 
     &:hover,
@@ -42,18 +92,23 @@
     }
   }
 
-  &__row {
-    &.is-dragging {
-      opacity: 0.4;
-    }
+  &__cell {
+    min-width: 0;
+    font-size: 14px;
+  }
 
-    &.drop-before td {
-      box-shadow: inset 0 2px 0 0 #1677ff;
-    }
+  &__actions {
+    justify-self: end;
+  }
 
-    &.drop-after td {
-      box-shadow: inset 0 -2px 0 0 #1677ff;
-    }
+  &__empty {
+    padding: 40px 16px;
+  }
+
+  &__pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
   }
 
   &__thumb {
@@ -183,6 +238,12 @@
     }
   }
 
+  &__variations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
   &__variations-head,
   &__variation-row {
     display: grid;
@@ -202,19 +263,7 @@
     border: 1px solid #f0f0f0;
     border-radius: 8px;
     background: #fff;
-    transition:
-      border-color 0.15s ease,
-      box-shadow 0.15s ease,
-      opacity 0.15s ease;
-
-    &.is-dragging {
-      opacity: 0.45;
-    }
-
-    &.is-over {
-      border-color: #1677ff;
-      box-shadow: 0 0 0 1px rgba(22, 119, 255, 0.35);
-    }
+    touch-action: none;
   }
 
   &__drag-handle {
@@ -223,14 +272,21 @@
     justify-content: center;
     width: 28px;
     height: 28px;
+    padding: 0;
     border: none;
-    border-radius: 6px;
-    background: #f5f5f5;
-    color: #595959;
+    border-radius: 4px;
+    background: transparent;
+    color: #bfbfbf;
     cursor: grab;
+    touch-action: none;
+
+    &:hover {
+      color: #8c8c8c;
+    }
 
     &:active {
       cursor: grabbing;
+      color: #595959;
     }
   }
 

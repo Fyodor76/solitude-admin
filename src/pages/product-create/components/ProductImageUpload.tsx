@@ -6,6 +6,7 @@ import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import { DeleteOutlined, HolderOutlined, InboxOutlined } from '@ant-design/icons'
 import { Button, Image, Spin, Upload } from 'antd'
 import type { RcFile } from 'antd/es/upload'
+import { Reorder, useDragControls } from 'framer-motion'
 
 import { ProductImageItem } from '../types'
 
@@ -18,14 +19,114 @@ interface ProductImageUploadProps {
   onShowcaseChange?: (next: string[]) => void
 }
 
-function reorderImages(list: ProductImageItem[], fromIndex: number, toIndex: number) {
-  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) {
-    return list
-  }
-  const next = [...list]
-  const [moved] = next.splice(fromIndex, 1)
-  next.splice(toIndex, 0, moved)
-  return next
+function SortableImageItem({
+  item,
+  index,
+  multiple,
+  isMain,
+  isShowcase,
+  showcaseEnabled,
+  onSetMain,
+  onToggleShowcase,
+  onRemove,
+}: {
+  item: ProductImageItem
+  index: number
+  multiple: boolean
+  isMain: boolean
+  isShowcase: boolean
+  showcaseEnabled: boolean
+  onSetMain: (fileId: string) => void
+  onToggleShowcase: (fileId: string) => void
+  onRemove: (fileId: string) => void
+}) {
+  const controls = useDragControls()
+  const sortable = multiple
+
+  return (
+    <Reorder.Item
+      value={item}
+      as="div"
+      className={[
+        'product-create-images__item',
+        isMain ? 'product-create-images__item--main' : '',
+        isShowcase ? 'product-create-images__item--showcase' : '',
+        sortable ? 'product-create-images__item--sortable' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      dragListener={false}
+      dragControls={sortable ? controls : undefined}
+      whileDrag={{
+        scale: 1.06,
+        boxShadow: '0 10px 24px rgba(0, 0, 0, 0.18)',
+        zIndex: 3,
+        cursor: 'grabbing',
+      }}
+      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+    >
+      {sortable ? (
+        <button
+          type="button"
+          className="product-create-images__drag-handle"
+          aria-label={`Перетащить фото ${index + 1}`}
+          onPointerDown={event => controls.start(event)}
+        >
+          <HolderOutlined />
+        </button>
+      ) : null}
+      <Image
+        src={item.url}
+        alt=""
+        width={96}
+        height={96}
+        style={{ objectFit: 'cover' }}
+        preview={{ mask: 'Просмотр' }}
+      />
+      <div className="product-create-images__actions">
+        {isMain ? (
+          <span className="product-create-images__badge">Главная</span>
+        ) : multiple ? (
+          <Button
+            type="default"
+            size="small"
+            className="product-create-images__action-btn"
+            onClick={() => onSetMain(item.fileId)}
+          >
+            Главная
+          </Button>
+        ) : null}
+        {showcaseEnabled ? (
+          isShowcase ? (
+            <button
+              type="button"
+              className="product-create-images__badge product-create-images__badge--showcase"
+              onClick={() => onToggleShowcase(item.fileId)}
+            >
+              Витрина
+            </button>
+          ) : (
+            <Button
+              type="default"
+              size="small"
+              className="product-create-images__action-btn"
+              onClick={() => onToggleShowcase(item.fileId)}
+            >
+              На витрине
+            </Button>
+          )
+        ) : null}
+      </div>
+      <Button
+        type="text"
+        danger
+        size="small"
+        className="product-create-images__remove"
+        icon={<DeleteOutlined />}
+        onClick={() => onRemove(item.fileId)}
+      />
+    </Reorder.Item>
+  )
 }
 
 /** Загрузка в корень CDN: в товар пишем только fileId, без folder. */
@@ -39,11 +140,10 @@ export function ProductImageUpload({
   const { openNotification } = useNotificationHandler()
   const [uploadImage] = useUploadImageMutation()
   const [uploading, setUploading] = useState(false)
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
-  const [overIndex, setOverIndex] = useState<number | null>(null)
 
   const showcaseEnabled = Boolean(onShowcaseChange)
   const showcaseSet = new Set(showcaseFileIds ?? [])
+  const canReorder = multiple && value.length > 1
 
   const handleFiles = async (files: File[]) => {
     if (!files.length) return
@@ -105,11 +205,6 @@ export function ProductImageUpload({
     }
   }
 
-  const clearDragState = () => {
-    setDragIndex(null)
-    setOverIndex(null)
-  }
-
   return (
     <div className="product-create-images">
       <Upload.Dragger
@@ -143,67 +238,42 @@ export function ProductImageUpload({
       ) : null}
 
       {value.length > 0 ? (
-        <div className="product-create-images__list">
-          {value.map((item, index) => {
-            const isMain = multiple && index === 0
-            const isShowcase = showcaseSet.has(item.fileId)
-            const isDragging = dragIndex === index
-            const isOver = overIndex === index && dragIndex !== null && dragIndex !== index
-
-            return (
+        canReorder ? (
+          <Reorder.Group
+            axis="x"
+            values={value}
+            onReorder={onChange}
+            as="div"
+            className="product-create-images__list product-create-images__list--sortable"
+          >
+            {value.map((item, index) => (
+              <SortableImageItem
+                key={item.fileId}
+                item={item}
+                index={index}
+                multiple={multiple}
+                isMain={index === 0}
+                isShowcase={showcaseSet.has(item.fileId)}
+                showcaseEnabled={showcaseEnabled}
+                onSetMain={setAsMain}
+                onToggleShowcase={toggleShowcase}
+                onRemove={removeImage}
+              />
+            ))}
+          </Reorder.Group>
+        ) : (
+          <div className="product-create-images__list">
+            {value.map((item, index) => (
               <div
                 key={item.fileId}
                 className={[
                   'product-create-images__item',
-                  isMain ? 'product-create-images__item--main' : '',
-                  isShowcase ? 'product-create-images__item--showcase' : '',
-                  isDragging ? 'product-create-images__item--dragging' : '',
-                  isOver ? 'product-create-images__item--over' : '',
-                  multiple && value.length > 1 ? 'product-create-images__item--sortable' : '',
+                  multiple && index === 0 ? 'product-create-images__item--main' : '',
+                  showcaseSet.has(item.fileId) ? 'product-create-images__item--showcase' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                draggable={multiple && value.length > 1}
-                onDragStart={event => {
-                  if (!multiple || value.length < 2) return
-                  const target = event.target as HTMLElement
-                  if (target.closest('button, a')) {
-                    event.preventDefault()
-                    return
-                  }
-                  setDragIndex(index)
-                  event.dataTransfer.effectAllowed = 'move'
-                  event.dataTransfer.setData('text/plain', String(index))
-                }}
-                onDragEnter={event => {
-                  event.preventDefault()
-                  if (dragIndex === null || dragIndex === index) return
-                  setOverIndex(index)
-                }}
-                onDragOver={event => {
-                  event.preventDefault()
-                  event.dataTransfer.dropEffect = 'move'
-                  if (dragIndex !== null && dragIndex !== index) {
-                    setOverIndex(index)
-                  }
-                }}
-                onDrop={event => {
-                  event.preventDefault()
-                  const from = dragIndex ?? Number(event.dataTransfer.getData('text/plain'))
-                  if (Number.isNaN(from)) {
-                    clearDragState()
-                    return
-                  }
-                  onChange(reorderImages(value, from, index))
-                  clearDragState()
-                }}
-                onDragEnd={clearDragState}
               >
-                {multiple && value.length > 1 ? (
-                  <span className="product-create-images__drag-handle" aria-hidden>
-                    <HolderOutlined />
-                  </span>
-                ) : null}
                 <Image
                   src={item.url}
                   alt=""
@@ -213,20 +283,11 @@ export function ProductImageUpload({
                   preview={{ mask: 'Просмотр' }}
                 />
                 <div className="product-create-images__actions">
-                  {isMain ? (
+                  {multiple && index === 0 ? (
                     <span className="product-create-images__badge">Главная</span>
-                  ) : multiple ? (
-                    <Button
-                      type="default"
-                      size="small"
-                      className="product-create-images__action-btn"
-                      onClick={() => setAsMain(item.fileId)}
-                    >
-                      Главная
-                    </Button>
                   ) : null}
                   {showcaseEnabled ? (
-                    isShowcase ? (
+                    showcaseSet.has(item.fileId) ? (
                       <button
                         type="button"
                         className="product-create-images__badge product-create-images__badge--showcase"
@@ -255,9 +316,9 @@ export function ProductImageUpload({
                   onClick={() => removeImage(item.fileId)}
                 />
               </div>
-            )
-          })}
-        </div>
+            ))}
+          </div>
+        )
       ) : null}
     </div>
   )

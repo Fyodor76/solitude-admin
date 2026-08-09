@@ -194,14 +194,8 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     }))
   }, [])
 
-  const reorderVariations = useCallback((fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return
-    setState(prev => {
-      const next = [...prev.variations]
-      const [moved] = next.splice(fromIndex, 1)
-      next.splice(toIndex, 0, moved)
-      return { ...prev, variations: next }
-    })
+  const reorderVariations = useCallback((next: DraftVariation[]) => {
+    setState(prev => ({ ...prev, variations: next }))
   }, [])
 
   const addAttributeSelection = useCallback((attributeId: string) => {
