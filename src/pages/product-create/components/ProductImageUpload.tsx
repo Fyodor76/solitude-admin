@@ -13,6 +13,9 @@ interface ProductImageUploadProps {
   value: ProductImageItem[]
   multiple?: boolean
   onChange: (next: ProductImageItem[]) => void
+  /** fileId фото на витрине коллекции (product.images), без лимита */
+  showcaseFileIds?: string[]
+  onShowcaseChange?: (next: string[]) => void
 }
 
 function reorderImages(list: ProductImageItem[], fromIndex: number, toIndex: number) {
@@ -26,12 +29,21 @@ function reorderImages(list: ProductImageItem[], fromIndex: number, toIndex: num
 }
 
 /** Загрузка в корень CDN: в товар пишем только fileId, без folder. */
-export function ProductImageUpload({ value, multiple = true, onChange }: ProductImageUploadProps) {
+export function ProductImageUpload({
+  value,
+  multiple = true,
+  onChange,
+  showcaseFileIds,
+  onShowcaseChange,
+}: ProductImageUploadProps) {
   const { openNotification } = useNotificationHandler()
   const [uploadImage] = useUploadImageMutation()
   const [uploading, setUploading] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
+
+  const showcaseEnabled = Boolean(onShowcaseChange)
+  const showcaseSet = new Set(showcaseFileIds ?? [])
 
   const handleFiles = async (files: File[]) => {
     if (!files.length) return
@@ -76,6 +88,23 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
     onChange([selected, ...value.filter(item => item.fileId !== fileId)])
   }
 
+  const toggleShowcase = (fileId: string) => {
+    if (!onShowcaseChange) return
+    const current = showcaseFileIds ?? []
+    if (current.includes(fileId)) {
+      onShowcaseChange(current.filter(id => id !== fileId))
+      return
+    }
+    onShowcaseChange([...current, fileId])
+  }
+
+  const removeImage = (fileId: string) => {
+    onChange(value.filter(image => image.fileId !== fileId))
+    if (onShowcaseChange && (showcaseFileIds ?? []).includes(fileId)) {
+      onShowcaseChange((showcaseFileIds ?? []).filter(id => id !== fileId))
+    }
+  }
+
   const clearDragState = () => {
     setDragIndex(null)
     setOverIndex(null)
@@ -102,7 +131,8 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
         <p className="product-create-images__title">Перетащите фото или нажмите для выбора</p>
         <p className="product-create-images__hint">
           JPG, PNG, WEBP, GIF
-          {multiple ? ' · первое фото — главное · можно менять местами' : ''}
+          {multiple ? ' · первое — главное · можно менять местами' : ''}
+          {showcaseEnabled ? ' · «На витрине» — в карточке коллекции' : ''}
         </p>
       </Upload.Dragger>
 
@@ -116,6 +146,7 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
         <div className="product-create-images__list">
           {value.map((item, index) => {
             const isMain = multiple && index === 0
+            const isShowcase = showcaseSet.has(item.fileId)
             const isDragging = dragIndex === index
             const isOver = overIndex === index && dragIndex !== null && dragIndex !== index
 
@@ -125,6 +156,7 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
                 className={[
                   'product-create-images__item',
                   isMain ? 'product-create-images__item--main' : '',
+                  isShowcase ? 'product-create-images__item--showcase' : '',
                   isDragging ? 'product-create-images__item--dragging' : '',
                   isOver ? 'product-create-images__item--over' : '',
                   multiple && value.length > 1 ? 'product-create-images__item--sortable' : '',
@@ -181,6 +213,15 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
                   preview={{ mask: 'Просмотр' }}
                 />
                 {isMain ? <span className="product-create-images__badge">Главное</span> : null}
+                {showcaseEnabled && isShowcase ? (
+                  <button
+                    type="button"
+                    className="product-create-images__badge product-create-images__badge--showcase"
+                    onClick={() => toggleShowcase(item.fileId)}
+                  >
+                    Витрина
+                  </button>
+                ) : null}
                 {multiple && index > 0 ? (
                   <Button
                     type="default"
@@ -191,13 +232,23 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
                     Главное
                   </Button>
                 ) : null}
+                {showcaseEnabled && !isShowcase ? (
+                  <Button
+                    type="default"
+                    size="small"
+                    className="product-create-images__make-showcase"
+                    onClick={() => toggleShowcase(item.fileId)}
+                  >
+                    На витрине
+                  </Button>
+                ) : null}
                 <Button
                   type="text"
                   danger
                   size="small"
                   className="product-create-images__remove"
                   icon={<DeleteOutlined />}
-                  onClick={() => onChange(value.filter(image => image.fileId !== item.fileId))}
+                  onClick={() => removeImage(item.fileId)}
                 />
               </div>
             )

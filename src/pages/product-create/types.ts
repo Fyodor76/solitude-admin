@@ -29,6 +29,8 @@ export interface DraftVariation {
   description: string
   mainImage: ProductImageItem | null
   images: ProductImageItem[]
+  /** fileId для product.images / карточки коллекции */
+  showcaseFileIds: string[]
 }
 
 export interface AttributeSelection {

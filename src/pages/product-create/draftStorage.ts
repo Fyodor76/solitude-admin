@@ -31,7 +31,14 @@ export function loadProductCreateDraft(): ProductCreateWizardState | null {
       step: isWizardStep(parsed.step) ? parsed.step : 0,
       maxReachedStep: isWizardStep(parsed.maxReachedStep) ? parsed.maxReachedStep : 0,
       basics: { ...base.basics, ...(parsed.basics || {}) },
-      variations: Array.isArray(parsed.variations) ? parsed.variations : [],
+      variations: Array.isArray(parsed.variations)
+        ? parsed.variations.map(variation => ({
+            ...variation,
+            showcaseFileIds: Array.isArray(variation?.showcaseFileIds)
+              ? variation.showcaseFileIds
+              : [],
+          }))
+        : [],
       attributeSelections: Array.isArray(parsed.attributeSelections)
         ? parsed.attributeSelections
         : [],

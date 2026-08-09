@@ -21,6 +21,7 @@ export interface ProductVariationCreatePayload {
   comparePrice?: number
   images?: string[]
   mainImage?: string
+  sortOrder?: number
   attributes?: VariationAttributeCreatePayload[]
 }
 

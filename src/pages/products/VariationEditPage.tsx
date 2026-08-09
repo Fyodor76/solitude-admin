@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   useGetProductByIdQuery,
   useGetProductVariationByIdQuery,
+  useUpdateProductMutation,
   useUpdateProductVariationMutation,
 } from '@/shared/lib/api/products/Products'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
@@ -44,6 +45,8 @@ export default function VariationEditPage() {
   const [form] = Form.useForm<VariationFormValues>()
   const [imageItems, setImageItems] = useState<ProductImageItem[]>([])
   const [mainImageId, setMainImageId] = useState<string | undefined>()
+  const [showcaseFileIds, setShowcaseFileIds] = useState<string[]>([])
+  const [showcaseHydrated, setShowcaseHydrated] = useState(false)
 
   const { data: productResponse } = useGetProductByIdQuery(productId, { skip: !productId })
   const {
@@ -51,10 +54,12 @@ export default function VariationEditPage() {
     isLoading,
     isError,
   } = useGetProductVariationByIdQuery(variationId, { skip: !variationId })
-  const [updateVariation, { isLoading: isSaving }] = useUpdateProductVariationMutation()
+  const [updateVariation, { isLoading: isSavingVariation }] = useUpdateProductVariationMutation()
+  const [updateProduct, { isLoading: isSavingProduct }] = useUpdateProductMutation()
 
   const product = productResponse?.data
   const variation = variationResponse?.data
+  const isSaving = isSavingVariation || isSavingProduct
 
   useEffect(() => {
     if (!variation) return
@@ -79,15 +84,40 @@ export default function VariationEditPage() {
     setMainImageId(mainId)
   }, [form, variation])
 
+  useEffect(() => {
+    if (!product || showcaseHydrated) return
+    setShowcaseFileIds(product.images ?? [])
+    setShowcaseHydrated(true)
+  }, [product, showcaseHydrated])
+
   const previewUrl = useMemo(() => {
     const main = imageItems.find(item => item.fileId === mainImageId)
     return main?.url || imageItems[0]?.url
   }, [imageItems, mainImageId])
 
+  const handleImagesChange = (next: ProductImageItem[]) => {
+    const remainingIds = new Set(next.map(item => item.fileId))
+    const removedFromVariation = imageItems
+      .filter(item => !remainingIds.has(item.fileId))
+      .map(item => item.fileId)
+
+    setImageItems(next)
+    setMainImageId(next[0]?.fileId)
+    if (removedFromVariation.length) {
+      setShowcaseFileIds(prev => prev.filter(id => !removedFromVariation.includes(id)))
+    }
+  }
+
   const handleSave = async () => {
+    if (!product) {
+      openNotification('error', ['Товар ещё не загрузился'])
+      return
+    }
+
     try {
       const values = await form.validateFields()
       const imageIds = imageItems.map(item => item.fileId)
+
       await updateVariation({
         id: variationId,
         productId,
@@ -104,12 +134,29 @@ export default function VariationEditPage() {
         },
       }).unwrap()
 
-      openNotification('success', ['Вариация сохранена'])
+      await updateProduct({
+        id: product.id,
+        body: {
+          name: product.name,
+          slug: product.slug,
+          description: product.description,
+          modelParameters: product.modelParameters,
+          price: product.price,
+          categoryId: product.categoryId,
+          brand: product.brand,
+          material: product.material,
+          isActive: product.isActive,
+          isFeatured: product.isFeatured,
+          images: showcaseFileIds,
+        },
+      }).unwrap()
+
+      openNotification('success', ['Вариация и витрина сохранены'])
     } catch (error) {
       if (error && typeof error === 'object' && 'errorFields' in error) {
         return
       }
-      openNotification('error', ['Не удалось сохранить вариацию'])
+      openNotification('error', ['Не удалось сохранить'])
     }
   }
 
@@ -179,13 +226,15 @@ export default function VariationEditPage() {
               <Input.TextArea rows={2} />
             </Form.Item>
             <div className="variation-edit__full">
+              <p className="variation-edit__images-hint">
+                «На витрине» — фото попадёт в карточку товара в коллекции (можно с разных цветов,
+                без лимита). Не забудьте сохранить.
+              </p>
               <ProductImageUpload
                 value={imageItems}
-                onChange={next => {
-                  setImageItems(next)
-                  // Первое в списке — главное (кнопка «Главное» двигает фото в начало)
-                  setMainImageId(next[0]?.fileId)
-                }}
+                showcaseFileIds={showcaseFileIds}
+                onShowcaseChange={setShowcaseFileIds}
+                onChange={handleImagesChange}
               />
             </div>
             {previewUrl ? (

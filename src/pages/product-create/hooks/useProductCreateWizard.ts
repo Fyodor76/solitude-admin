@@ -156,6 +156,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
         description: '',
         mainImage: null,
         images: [],
+        showcaseFileIds: [],
       }
       return { ...prev, variations: [...prev.variations, next] }
     })
@@ -191,6 +192,16 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       variations: prev.variations.filter(item => item.key !== key),
       stockRows: prev.stockRows.filter(row => row.variationKey !== key),
     }))
+  }, [])
+
+  const reorderVariations = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return
+    setState(prev => {
+      const next = [...prev.variations]
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, moved)
+      return { ...prev, variations: next }
+    })
   }, [])
 
   const addAttributeSelection = useCallback((attributeId: string) => {
@@ -275,7 +286,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   }, [goToStep, state.step])
 
   const buildCreatePayload = useCallback(() => {
-    const variations = state.variations.map(item => ({
+    const variations = state.variations.map((item, index) => ({
       productId: '00000000-0000-0000-0000-000000000000',
       colorId: item.colorId,
       name: item.name.trim(),
@@ -286,16 +297,19 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       description: item.description.trim() || undefined,
       mainImage: item.mainImage?.fileId,
       images: item.images.map(image => image.fileId),
+      sortOrder: index,
       attributes: [],
     }))
 
-    // Фото только у вариаций; на товар кладём превью первой для каталога/SEO.
-    const firstVariationImages = variations[0]?.images ?? []
-    const firstMain = variations[0]?.mainImage
-    const productImages = firstVariationImages.length
-      ? firstVariationImages
-      : firstMain
-        ? [firstMain]
+    // Витрина = отмеченные «На витрине» со всех вариаций (без лимита).
+    const showcaseImages = state.variations.flatMap(item => item.showcaseFileIds ?? [])
+    const uniqueShowcase = [...new Set(showcaseImages)]
+    const fallbackMain =
+      state.variations[0]?.mainImage?.fileId || state.variations[0]?.images[0]?.fileId
+    const productImages = uniqueShowcase.length
+      ? uniqueShowcase
+      : fallbackMain
+        ? [fallbackMain]
         : []
 
     return {
@@ -344,6 +358,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     addVariation,
     updateVariation,
     removeVariation,
+    reorderVariations,
     addAttributeSelection,
     setAttributeSelection,
     removeAttributeSelection,

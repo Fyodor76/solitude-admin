@@ -1,10 +1,11 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
 import {
   useDeleteProductMutation,
   useGetProductByIdQuery,
+  useReorderProductVariationsMutation,
   useUpdateProductMutation,
 } from '@/shared/lib/api/products/Products'
 import { ProductUpdatePayload } from '@/shared/lib/api/products/types'
@@ -12,9 +13,8 @@ import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandle
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { DeleteOutlined } from '@ant-design/icons'
-import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Table, Tag } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
+import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
+import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Tag } from 'antd'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ProductVariation } from '@/app/types/product'
@@ -46,11 +46,23 @@ function flattenCategories(
   })
 }
 
+function sortVariations(list: ProductVariation[]): ProductVariation[] {
+  return [...list].sort((a, b) => {
+    const orderA = a.sortOrder ?? Number.MAX_SAFE_INTEGER
+    const orderB = b.sortOrder ?? Number.MAX_SAFE_INTEGER
+    if (orderA !== orderB) return orderA - orderB
+    return (a.createdAt || '').localeCompare(b.createdAt || '')
+  })
+}
+
 export default function ProductDetailPage() {
   const { productId = '' } = useParams<{ productId: string }>()
   const navigate = useNavigate()
   const { openNotification, contextHolder } = useNotificationHandler()
   const [form] = Form.useForm<ProductFormValues>()
+  const [orderedVariations, setOrderedVariations] = useState<ProductVariation[]>([])
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [overIndex, setOverIndex] = useState<number | null>(null)
 
   const { data, isLoading, isError } = useGetProductByIdQuery(productId, {
     skip: !productId,
@@ -58,6 +70,7 @@ export default function ProductDetailPage() {
   const { data: categoriesResponse } = useGetCategoriesTreeQuery()
   const [updateProduct, { isLoading: isSaving }] = useUpdateProductMutation()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
+  const [reorderVariations, { isLoading: isReordering }] = useReorderProductVariationsMutation()
 
   const product = data?.data
 
@@ -80,65 +93,35 @@ export default function ProductDetailPage() {
       isActive: product.isActive,
       isFeatured: product.isFeatured,
     })
+    setOrderedVariations(sortVariations(product.variations ?? []))
   }, [form, product])
 
-  const variationColumns: ColumnsType<ProductVariation> = [
-    {
-      title: '',
-      dataIndex: 'mainImage',
-      width: 64,
-      render: (mainImage: string, record) => {
-        const src = resolveMediaUrl(mainImage || record.images?.[0])
-        return src ? <img src={src} alt="" className="product-detail__thumb" /> : null
-      },
-    },
-    {
-      title: 'Название',
-      dataIndex: 'name',
-      render: (name: string, record) => (
-        <Link
-          to={`/products/${productId}/variations/${record.id}`}
-          className="product-detail__cell-text"
-        >
-          {name}
-        </Link>
-      ),
-    },
-    {
-      title: 'SKU',
-      dataIndex: 'sku',
-      width: 200,
-      render: (sku: string) => (
-        <span className="product-detail__sku" title={sku}>
-          {sku}
-        </span>
-      ),
-    },
-    {
-      title: 'Цена',
-      dataIndex: 'price',
-      width: 120,
-      render: (price: number) => `${price.toLocaleString('ru-RU')} ₽`,
-    },
-    {
-      title: 'Статус',
-      dataIndex: 'isActive',
-      width: 110,
-      render: (isActive: boolean) => (
-        <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Активна' : 'Скрыта'}</Tag>
-      ),
-    },
-    {
-      title: '',
-      key: 'actions',
-      width: 120,
-      render: (_, record) => (
-        <Link to={`/products/${productId}/variations/${record.id}`}>
-          <Button type="link">Редактировать</Button>
-        </Link>
-      ),
-    },
-  ]
+  const persistOrder = async (next: ProductVariation[]) => {
+    if (!productId || next.length < 2) return
+    try {
+      await reorderVariations({
+        productId,
+        orderedIds: next.map(item => item.id),
+      }).unwrap()
+      openNotification('success', ['Порядок вариаций сохранён'])
+    } catch {
+      openNotification('error', ['Не удалось сохранить порядок вариаций'])
+      if (product?.variations) {
+        setOrderedVariations(sortVariations(product.variations))
+      }
+    }
+  }
+
+  const handleReorder = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return
+    setOrderedVariations(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, moved)
+      void persistOrder(next)
+      return next
+    })
+  }
 
   const handleSave = async () => {
     if (!product) return
@@ -303,14 +286,100 @@ export default function ProductDetailPage() {
 
       <section className="product-detail__section">
         <h2 className="product-detail__section-title">Вариации</h2>
-        <Table<ProductVariation>
-          rowKey="id"
-          columns={variationColumns}
-          dataSource={product?.variations ?? []}
-          loading={isLoading}
-          pagination={false}
-          locale={{ emptyText: 'У товара пока нет вариаций' }}
-        />
+        <p className="product-detail__variations-hint">
+          Перетащите строки за иконку, чтобы изменить порядок (сразу сохраняется).
+        </p>
+        {isLoading ? (
+          <p className="product-detail__variations-empty">Загрузка...</p>
+        ) : !orderedVariations.length ? (
+          <p className="product-detail__variations-empty">У товара пока нет вариаций</p>
+        ) : (
+          <div className={`product-detail__variations ${isReordering ? 'is-reordering' : ''}`}>
+            <div className="product-detail__variations-head">
+              <span />
+              <span>Фото</span>
+              <span>Название</span>
+              <span>SKU</span>
+              <span>Цена</span>
+              <span>Статус</span>
+              <span />
+            </div>
+            {orderedVariations.map((record, index) => {
+              const thumb = resolveMediaUrl(record.mainImage || record.images?.[0])
+              return (
+                <div
+                  key={record.id}
+                  className={[
+                    'product-detail__variation-row',
+                    dragIndex === index ? 'is-dragging' : '',
+                    overIndex === index && dragIndex !== null && dragIndex !== index
+                      ? 'is-over'
+                      : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onDragOver={event => {
+                    event.preventDefault()
+                    event.dataTransfer.dropEffect = 'move'
+                    if (dragIndex !== null && dragIndex !== index) {
+                      setOverIndex(index)
+                    }
+                  }}
+                  onDrop={event => {
+                    event.preventDefault()
+                    const from = dragIndex ?? Number(event.dataTransfer.getData('text/plain'))
+                    if (!Number.isNaN(from)) {
+                      handleReorder(from, index)
+                    }
+                    setDragIndex(null)
+                    setOverIndex(null)
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="product-detail__drag-handle"
+                    draggable
+                    aria-label="Перетащить вариацию"
+                    onDragStart={event => {
+                      setDragIndex(index)
+                      event.dataTransfer.effectAllowed = 'move'
+                      event.dataTransfer.setData('text/plain', String(index))
+                    }}
+                    onDragEnd={() => {
+                      setDragIndex(null)
+                      setOverIndex(null)
+                    }}
+                  >
+                    <HolderOutlined />
+                  </button>
+                  <div className="product-detail__thumb-wrap">
+                    {thumb ? (
+                      <img src={thumb} alt="" className="product-detail__thumb" />
+                    ) : (
+                      <div className="product-detail__thumb-placeholder" />
+                    )}
+                  </div>
+                  <Link
+                    to={`/products/${productId}/variations/${record.id}`}
+                    className="product-detail__cell-text"
+                  >
+                    {record.name}
+                  </Link>
+                  <span className="product-detail__sku" title={record.sku}>
+                    {record.sku}
+                  </span>
+                  <span>{Number(record.price || 0).toLocaleString('ru-RU')} ₽</span>
+                  <Tag color={record.isActive ? 'green' : 'default'}>
+                    {record.isActive ? 'Активна' : 'Скрыта'}
+                  </Tag>
+                  <Link to={`/products/${productId}/variations/${record.id}`}>
+                    <Button type="link">Редактировать</Button>
+                  </Link>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       <div className="product-detail__footer">

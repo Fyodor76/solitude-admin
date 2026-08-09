@@ -174,6 +174,7 @@ export default function ProductCreatePage() {
               onAdd={wizard.addVariation}
               onChange={wizard.updateVariation}
               onRemove={wizard.removeVariation}
+              onReorder={wizard.reorderVariations}
             />
           )}
 

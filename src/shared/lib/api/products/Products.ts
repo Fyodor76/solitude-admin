@@ -113,6 +113,21 @@ export const apiProducts = baseApi.injectEndpoints({
         ...(productId ? [{ type: 'Product' as const, id: productId }] : []),
       ],
     }),
+
+    reorderProductVariations: builder.mutation<
+      ApiResponse<ProductVariation[], any>,
+      { productId: string; orderedIds: string[] }
+    >({
+      query: body => ({
+        url: `/product-variations/reorder`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (result, error, { productId }) => [
+        { type: 'Product', id: productId },
+        { type: 'Product', id: 'LIST' },
+      ],
+    }),
   }),
 })
 
@@ -127,4 +142,5 @@ export const {
   useCreateStockBulkMutation,
   useGetProductVariationByIdQuery,
   useUpdateProductVariationMutation,
+  useReorderProductVariationsMutation,
 } = apiProducts
