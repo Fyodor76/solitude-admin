@@ -131,7 +131,7 @@ export function ProductImageUpload({
         <p className="product-create-images__title">Перетащите фото или нажмите для выбора</p>
         <p className="product-create-images__hint">
           JPG, PNG, WEBP, GIF
-          {multiple ? ' · первое — главное · можно менять местами' : ''}
+          {multiple ? ' · первое — главная · можно менять местами' : ''}
           {showcaseEnabled ? ' · «На витрине» — в карточке коллекции' : ''}
         </p>
       </Upload.Dragger>
@@ -214,7 +214,7 @@ export function ProductImageUpload({
                 />
                 <div className="product-create-images__actions">
                   {isMain ? (
-                    <span className="product-create-images__badge">Главное</span>
+                    <span className="product-create-images__badge">Главная</span>
                   ) : multiple ? (
                     <Button
                       type="default"
@@ -222,7 +222,7 @@ export function ProductImageUpload({
                       className="product-create-images__action-btn"
                       onClick={() => setAsMain(item.fileId)}
                     >
-                      Главное
+                      Главная
                     </Button>
                   ) : null}
                   {showcaseEnabled ? (
