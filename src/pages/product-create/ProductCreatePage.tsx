@@ -36,10 +36,13 @@ export default function ProductCreatePage() {
 
   const wizard = useProductCreateWizard(colorAttributes)
 
-  const { data: sizeChartResponse, isFetching: isSizeChartLoading } =
-    useGetSizeChartByCategoryIdQuery(wizard.state.basics.categoryId, {
-      skip: !wizard.state.basics.categoryId,
-    })
+  const {
+    data: sizeChartResponse,
+    isFetching: isSizeChartLoading,
+    isError: isSizeChartMissing,
+  } = useGetSizeChartByCategoryIdQuery(wizard.state.basics.categoryId, {
+    skip: !wizard.state.basics.categoryId,
+  })
 
   const sizeChart = sizeChartResponse?.data
   const sizeParameters = sizeChart?.sizeParameters || []
@@ -53,7 +56,7 @@ export default function ProductCreatePage() {
     setSubmitError(null)
 
     if (!wizard.canEnterStep(3)) {
-      openNotification('error', ['Заполните предыдущие шаги и выберите размеры'])
+      openNotification('error', ['Заполните предыдущие шаги'])
       return
     }
 
@@ -89,7 +92,7 @@ export default function ProductCreatePage() {
 
       openNotification('success', [
         `Товар «${product.name}» создан`,
-        stockItems.length ? `Сток: ${stockItems.length} позиций` : 'Сток не создан',
+        stockItems.length ? `Сток: ${stockItems.length} позиций` : 'Сток не создан (нет размеров)',
       ])
     } catch (error: any) {
       const message =
@@ -109,10 +112,7 @@ export default function ProductCreatePage() {
     <Container>
       {contextHolder}
       <div className="product-create">
-        <PageHeader
-          title="Создание товара"
-          subtitle="Временная форма, чтобы не дергать Swagger. Потом причешем."
-        />
+        <PageHeader title="Создание товара" subtitle="Черновик формы создания товара и стока" />
 
         <Steps
           current={wizard.state.step}
@@ -145,9 +145,12 @@ export default function ProductCreatePage() {
               attributes={attributes}
               sizeParameters={sizeParameters}
               sizeChartName={sizeChart?.name}
+              sizeChartMissing={Boolean(wizard.state.basics.categoryId) && isSizeChartMissing}
               selections={wizard.state.attributeSelections}
               selectedSizeIds={wizard.state.selectedSizeIds}
+              onAddAttribute={wizard.addAttributeSelection}
               onAttributeChange={wizard.setAttributeSelection}
+              onRemoveAttribute={wizard.removeAttributeSelection}
               onSizesChange={wizard.setSelectedSizeIds}
             />
           )}

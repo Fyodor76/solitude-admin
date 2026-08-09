@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 
 import { INITIAL_BASICS } from '../constants'
-import { createDraftKey, parseImagesText, slugify } from '../helpers'
+import { createDraftKey, slugify } from '../helpers'
 import {
   AttributeSelection,
   DraftVariation,
@@ -69,15 +69,11 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       if (target === 1) return isBasicsValid(state.basics)
       if (target === 2) return isBasicsValid(state.basics) && isVariationsValid(state.variations)
       if (target === 3) {
-        return (
-          isBasicsValid(state.basics) &&
-          isVariationsValid(state.variations) &&
-          state.selectedSizeIds.length > 0
-        )
+        return isBasicsValid(state.basics) && isVariationsValid(state.variations)
       }
       return false
     },
-    [state.basics, state.selectedSizeIds.length, state.variations]
+    [state.basics, state.variations]
   )
 
   const goToStep = useCallback(
@@ -121,8 +117,8 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
         comparePrice: null,
         colorId: colorOptions[0]?.value || '',
         description: '',
-        mainImage: '',
-        imagesText: '',
+        mainImage: null,
+        images: [],
       }
       return { ...prev, variations: [...prev.variations, next] }
     })
@@ -150,14 +146,34 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     }))
   }, [])
 
-  const setAttributeSelection = useCallback((attributeId: string, valueIds: string[]) => {
+  const addAttributeSelection = useCallback((attributeId: string) => {
     setState(prev => {
-      const without = prev.attributeSelections.filter(item => item.attributeId !== attributeId)
-      const nextSelections: AttributeSelection[] = valueIds.length
-        ? [...without, { attributeId, valueIds }]
-        : without
-      return { ...prev, attributeSelections: nextSelections }
+      if (prev.attributeSelections.some(item => item.attributeId === attributeId)) {
+        return prev
+      }
+      return {
+        ...prev,
+        attributeSelections: [...prev.attributeSelections, { attributeId, valueIds: [] }],
+      }
     })
+  }, [])
+
+  const setAttributeSelection = useCallback((attributeId: string, valueIds: string[]) => {
+    setState(prev => ({
+      ...prev,
+      attributeSelections: prev.attributeSelections.map(item =>
+        item.attributeId === attributeId ? { ...item, valueIds } : item
+      ),
+    }))
+  }, [])
+
+  const removeAttributeSelection = useCallback((attributeId: string) => {
+    setState(prev => ({
+      ...prev,
+      attributeSelections: prev.attributeSelections.filter(
+        item => item.attributeId !== attributeId
+      ),
+    }))
   }, [])
 
   const setSelectedSizeIds = useCallback((sizeIds: string[]) => {
@@ -213,24 +229,24 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   }, [goToStep, state.step])
 
   const buildCreatePayload = useCallback(() => {
-    const images = parseImagesText(state.basics.imagesText)
-
     return {
       name: state.basics.name.trim(),
       slug: state.basics.slug.trim() || undefined,
       description: state.basics.description.trim() || undefined,
       price: Number(state.basics.price),
-      images,
+      images: state.basics.images.map(item => item.fileId),
       categoryId: state.basics.categoryId,
       brand: state.basics.brand.trim(),
       material: state.basics.material.trim(),
       isActive: state.basics.isActive,
       isFeatured: state.basics.isFeatured,
       modelParameters: state.basics.modelParameters.trim() || undefined,
-      attributes: state.attributeSelections.map(item => ({
-        attributeId: item.attributeId,
-        valueIds: item.valueIds,
-      })),
+      attributes: state.attributeSelections
+        .filter(item => item.valueIds.length > 0)
+        .map(item => ({
+          attributeId: item.attributeId,
+          valueIds: item.valueIds,
+        })),
       variations: state.variations.map(item => ({
         productId: '00000000-0000-0000-0000-000000000000',
         colorId: item.colorId,
@@ -240,8 +256,8 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
         price: Number(item.price),
         comparePrice: item.comparePrice ?? undefined,
         description: item.description.trim() || undefined,
-        mainImage: item.mainImage.trim() || undefined,
-        images: parseImagesText(item.imagesText),
+        mainImage: item.mainImage?.fileId,
+        images: item.images.map(image => image.fileId),
       })),
     }
   }, [state])
@@ -257,7 +273,9 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     addVariation,
     updateVariation,
     removeVariation,
+    addAttributeSelection,
     setAttributeSelection,
+    removeAttributeSelection,
     setSelectedSizeIds,
     updateStockRow,
     rebuildStockRows,

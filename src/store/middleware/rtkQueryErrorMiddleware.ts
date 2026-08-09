@@ -3,7 +3,7 @@ import type { Middleware, UnknownAction } from '@reduxjs/toolkit'
 
 import { addNotification, clearNotifications } from '../slices/notificationsSlice'
 
-const ignoredEndpoints = new Set(['refresh'])
+const ignoredEndpoints = new Set(['refresh', 'getSizeChartByCategoryId'])
 
 const includeEndpoints = new Set(['updateCategoryById', 'deleteCategory', 'createCategory'])
 

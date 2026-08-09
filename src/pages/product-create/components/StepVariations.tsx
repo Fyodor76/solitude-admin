@@ -1,6 +1,7 @@
-import { Button, Card, Empty, Input, InputNumber, Select, Space } from 'antd'
+import { Button, Card, Empty, Input, InputNumber, Select } from 'antd'
 
 import { DraftVariation } from '../types'
+import { ProductImageUpload } from './ProductImageUpload'
 
 interface ColorOption {
   label: string
@@ -23,13 +24,19 @@ export function StepVariations({
   onRemove,
 }: StepVariationsProps) {
   return (
-    <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-        <div>Добавьте вариации (цвет обязателен). Для каждой потом зададим сток по размерам.</div>
+    <div className="product-create__stack">
+      <div className="product-create__toolbar">
+        <p className="product-create__hint">
+          Добавьте вариации (например, по цвету). Цвет обязателен — из раздела «Опции товаров».
+        </p>
         <Button type="primary" onClick={onAdd}>
           Добавить вариацию
         </Button>
       </div>
+
+      {!colorOptions.length ? (
+        <Empty description="Нет цветов. Создайте опцию type=color и значения в «Опции товаров»." />
+      ) : null}
 
       {!variations.length ? (
         <Empty description="Пока нет вариаций" />
@@ -45,102 +52,100 @@ export function StepVariations({
               </Button>
             }
           >
-            <Space direction="vertical" style={{ width: '100%' }} size="small">
-              <Space wrap>
-                <label>
-                  Название *
-                  <Input
-                    value={item.name}
-                    onChange={e => onChange(item.key, { name: e.target.value })}
-                  />
-                </label>
-                <label>
-                  Цвет *
-                  <Select
-                    style={{ width: 220, display: 'block' }}
-                    value={item.colorId || undefined}
-                    options={colorOptions}
-                    onChange={colorId => onChange(item.key, { colorId })}
-                    placeholder="Выберите цвет"
-                    showSearch
-                    optionFilterProp="label"
-                  />
-                </label>
-              </Space>
+            <div className="product-create__grid">
+              <div className="product-create__field">
+                <span>Название *</span>
+                <Input
+                  value={item.name}
+                  onChange={e => onChange(item.key, { name: e.target.value })}
+                />
+              </div>
 
-              <Space wrap>
-                <label>
-                  Slug *
-                  <Input
-                    value={item.slug}
-                    onChange={e => onChange(item.key, { slug: e.target.value })}
-                  />
-                </label>
-                <label>
-                  SKU *
-                  <Input
-                    value={item.sku}
-                    onChange={e => onChange(item.key, { sku: e.target.value })}
-                  />
-                </label>
-              </Space>
+              <div className="product-create__field">
+                <span>Цвет *</span>
+                <Select
+                  className="product-create__control"
+                  value={item.colorId || undefined}
+                  options={colorOptions}
+                  onChange={colorId => onChange(item.key, { colorId })}
+                  placeholder="Выберите цвет"
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </div>
 
-              <Space wrap>
-                <label>
-                  Цена *
-                  <InputNumber
-                    min={0.01}
-                    style={{ width: 140, display: 'block' }}
-                    value={item.price}
-                    onChange={price =>
-                      onChange(item.key, { price: price == null ? null : Number(price) })
-                    }
-                  />
-                </label>
-                <label>
-                  Compare price
-                  <InputNumber
-                    min={0}
-                    style={{ width: 140, display: 'block' }}
-                    value={item.comparePrice}
-                    onChange={comparePrice =>
-                      onChange(item.key, {
-                        comparePrice: comparePrice == null ? null : Number(comparePrice),
-                      })
-                    }
-                  />
-                </label>
-              </Space>
+              <div className="product-create__field">
+                <span>Slug *</span>
+                <Input
+                  value={item.slug}
+                  onChange={e => onChange(item.key, { slug: e.target.value })}
+                />
+              </div>
 
-              <label>
-                Описание
+              <div className="product-create__field">
+                <span>SKU *</span>
+                <Input
+                  value={item.sku}
+                  onChange={e => onChange(item.key, { sku: e.target.value })}
+                />
+              </div>
+
+              <div className="product-create__field">
+                <span>Цена *</span>
+                <InputNumber
+                  min={0.01}
+                  className="product-create__control"
+                  value={item.price}
+                  onChange={price =>
+                    onChange(item.key, { price: price == null ? null : Number(price) })
+                  }
+                />
+              </div>
+
+              <div className="product-create__field">
+                <span>Compare price</span>
+                <InputNumber
+                  min={0}
+                  className="product-create__control"
+                  value={item.comparePrice}
+                  onChange={comparePrice =>
+                    onChange(item.key, {
+                      comparePrice: comparePrice == null ? null : Number(comparePrice),
+                    })
+                  }
+                />
+              </div>
+
+              <div className="product-create__field product-create__field--full">
+                <span>Описание</span>
                 <Input.TextArea
                   rows={2}
                   value={item.description}
                   onChange={e => onChange(item.key, { description: e.target.value })}
                 />
-              </label>
+              </div>
 
-              <label>
-                Main image (fileId)
-                <Input
-                  value={item.mainImage}
-                  onChange={e => onChange(item.key, { mainImage: e.target.value })}
+              <div className="product-create__field product-create__field--full">
+                <span>Главное фото</span>
+                <ProductImageUpload
+                  value={item.mainImage ? [item.mainImage] : []}
+                  multiple={false}
+                  onChange={images => onChange(item.key, { mainImage: images[0] || null })}
                 />
-              </label>
+              </div>
 
-              <label>
-                Images (fileId)
-                <Input.TextArea
-                  rows={2}
-                  value={item.imagesText}
-                  onChange={e => onChange(item.key, { imagesText: e.target.value })}
+              <div className="product-create__field product-create__field--full">
+                <span>Доп. фото вариации</span>
+                <ProductImageUpload
+                  value={item.images}
+                  multiple
+                  onChange={images => onChange(item.key, { images })}
                 />
-              </label>
-            </Space>
+              </div>
+            </div>
           </Card>
         ))
       )}
-    </Space>
+    </div>
   )
 }

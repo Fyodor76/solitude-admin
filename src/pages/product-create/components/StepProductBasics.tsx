@@ -1,8 +1,9 @@
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
-import { Card, Input, InputNumber, Select, Space, Switch } from 'antd'
+import { Card, Input, InputNumber, Select, Switch } from 'antd'
 
 import { flattenCategoryOptions } from '../helpers'
 import { ProductBasicsForm } from '../types'
+import { ProductImageUpload } from './ProductImageUpload'
 
 interface StepProductBasicsProps {
   value: ProductBasicsForm
@@ -15,103 +16,101 @@ export function StepProductBasics({ value, categories, onChange }: StepProductBa
 
   return (
     <Card title="Основные данные товара" size="small">
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <label>
-          Название *
+      <div className="product-create__grid">
+        <div className="product-create__field">
+          <span>Название *</span>
           <Input
             value={value.name}
             onChange={e => onChange({ name: e.target.value })}
             placeholder="Футболка Solitude"
           />
-        </label>
+        </div>
 
-        <label>
-          Slug
+        <div className="product-create__field">
+          <span>Slug</span>
           <Input
             value={value.slug}
             onChange={e => onChange({ slug: e.target.value })}
             placeholder="futbolka-solitude"
           />
-        </label>
+        </div>
 
-        <label>
-          Описание
+        <div className="product-create__field product-create__field--full">
+          <span>Описание</span>
           <Input.TextArea
             rows={3}
             value={value.description}
             onChange={e => onChange({ description: e.target.value })}
           />
-        </label>
+        </div>
 
-        <Space wrap>
-          <label>
-            Цена *
-            <InputNumber
-              min={0.01}
-              style={{ width: 160, display: 'block' }}
-              value={value.price}
-              onChange={price => onChange({ price: price == null ? null : Number(price) })}
-            />
-          </label>
+        <div className="product-create__field">
+          <span>Цена *</span>
+          <InputNumber
+            min={0.01}
+            className="product-create__control"
+            value={value.price}
+            onChange={price => onChange({ price: price == null ? null : Number(price) })}
+          />
+        </div>
 
-          <label>
-            Категория *
-            <Select
-              style={{ width: 280, display: 'block' }}
-              value={value.categoryId || undefined}
-              options={categoryOptions}
-              onChange={categoryId => onChange({ categoryId })}
-              showSearch
-              optionFilterProp="label"
-              placeholder="Выберите категорию"
-            />
-          </label>
-        </Space>
+        <div className="product-create__field">
+          <span>Категория *</span>
+          <Select
+            className="product-create__control"
+            value={value.categoryId || undefined}
+            options={categoryOptions}
+            onChange={categoryId => onChange({ categoryId })}
+            showSearch
+            optionFilterProp="label"
+            placeholder="Выберите категорию"
+            allowClear
+          />
+        </div>
 
-        <Space wrap>
-          <label>
-            Бренд *
-            <Input value={value.brand} onChange={e => onChange({ brand: e.target.value })} />
-          </label>
-          <label>
-            Материал *
-            <Input
-              value={value.material}
-              onChange={e => onChange({ material: e.target.value })}
-              placeholder="cotton-100"
-            />
-          </label>
-        </Space>
+        <div className="product-create__field">
+          <span>Бренд *</span>
+          <Input value={value.brand} onChange={e => onChange({ brand: e.target.value })} />
+        </div>
 
-        <label>
-          Параметры модели
+        <div className="product-create__field">
+          <span>Материал *</span>
+          <Input
+            value={value.material}
+            onChange={e => onChange({ material: e.target.value })}
+            placeholder="cotton-100"
+          />
+        </div>
+
+        <div className="product-create__field product-create__field--full">
+          <span>Параметры модели</span>
           <Input
             value={value.modelParameters}
             onChange={e => onChange({ modelParameters: e.target.value })}
             placeholder="Рост 170, размер M"
           />
-        </label>
+        </div>
 
-        <label>
-          Images (fileId через запятую или с новой строки)
-          <Input.TextArea
-            rows={3}
-            value={value.imagesText}
-            onChange={e => onChange({ imagesText: e.target.value })}
-            placeholder="1785587118500-fjqookkhq4n"
+        <div className="product-create__field product-create__field--full">
+          <span>Фото товара</span>
+          <ProductImageUpload
+            value={value.images}
+            onChange={images => onChange({ images })}
+            multiple
           />
-        </label>
+        </div>
 
-        <Space size="large">
-          <label>
-            <Switch checked={value.isActive} onChange={isActive => onChange({ isActive })} /> Active
+        <div className="product-create__switches">
+          <label className="product-create__switch">
+            <Switch checked={value.isActive} onChange={isActive => onChange({ isActive })} />
+            <span>Active (витрина)</span>
           </label>
-          <label>
-            <Switch checked={value.isFeatured} onChange={isFeatured => onChange({ isFeatured })} />{' '}
-            Featured
+          <label className="product-create__switch">
+            <Switch checked={value.isFeatured} onChange={isFeatured => onChange({ isFeatured })} />
+            <span>Featured</span>
           </label>
-        </Space>
-      </Space>
+        </div>
+      </div>
     </Card>
   )
 }

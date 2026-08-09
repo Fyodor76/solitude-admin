@@ -1,5 +1,10 @@
 export type WizardStep = 0 | 1 | 2 | 3
 
+export interface ProductImageItem {
+  fileId: string
+  url: string
+}
+
 export interface ProductBasicsForm {
   name: string
   slug: string
@@ -9,7 +14,7 @@ export interface ProductBasicsForm {
   brand: string
   material: string
   modelParameters: string
-  imagesText: string
+  images: ProductImageItem[]
   isActive: boolean
   isFeatured: boolean
 }
@@ -23,8 +28,8 @@ export interface DraftVariation {
   comparePrice: number | null
   colorId: string
   description: string
-  mainImage: string
-  imagesText: string
+  mainImage: ProductImageItem | null
+  images: ProductImageItem[]
 }
 
 export interface AttributeSelection {

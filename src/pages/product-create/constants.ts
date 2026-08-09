@@ -16,7 +16,7 @@ export const INITIAL_BASICS: ProductBasicsForm = {
   brand: 'solitude',
   material: '',
   modelParameters: '',
-  imagesText: '',
+  images: [],
   isActive: false,
   isFeatured: false,
 }
