@@ -23,10 +23,9 @@ type ProductListItem = Pick<
 }
 
 function getProductThumb(product: ProductListItem): string | null {
-  const raw =
-    product.images?.[0] ||
-    product.variations?.[0]?.mainImage ||
-    product.variations?.[0]?.images?.[0]
+  // Источник правды — фото вариации; product.images только запасной вариант
+  const variation = product.variations?.[0]
+  const raw = variation?.mainImage || variation?.images?.[0] || product.images?.[0] || null
   return resolveMediaUrl(raw)
 }
 

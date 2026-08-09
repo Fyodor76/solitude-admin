@@ -88,13 +88,23 @@ export function ProductImageUpload({ value, multiple = true, onChange }: Product
 
       {value.length > 0 ? (
         <div className="product-create-images__list">
-          {value.map(item => (
-            <div key={item.fileId} className="product-create-images__item">
-              <Image src={item.url} alt="" width={72} height={72} style={{ objectFit: 'cover' }} />
+          {value.map((item, index) => (
+            <div
+              key={item.fileId}
+              className={[
+                'product-create-images__item',
+                index === 0 ? 'product-create-images__item--main' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <Image src={item.url} alt="" width={96} height={96} style={{ objectFit: 'cover' }} />
+              {index === 0 ? <span className="product-create-images__badge">Главное</span> : null}
               <Button
                 type="text"
                 danger
                 size="small"
+                className="product-create-images__remove"
                 icon={<DeleteOutlined />}
                 onClick={() => onChange(value.filter(image => image.fileId !== item.fileId))}
               />

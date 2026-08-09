@@ -93,13 +93,23 @@ export default function ProductDetailPage() {
       title: 'Название',
       dataIndex: 'name',
       render: (name: string, record) => (
-        <Link to={`/products/${productId}/variations/${record.id}`}>{name}</Link>
+        <Link
+          to={`/products/${productId}/variations/${record.id}`}
+          className="product-detail__cell-text"
+        >
+          {name}
+        </Link>
       ),
     },
     {
       title: 'SKU',
       dataIndex: 'sku',
-      width: 140,
+      width: 200,
+      render: (sku: string) => (
+        <span className="product-detail__sku" title={sku}>
+          {sku}
+        </span>
+      ),
     },
     {
       title: 'Цена',
