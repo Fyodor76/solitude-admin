@@ -90,7 +90,7 @@ const OrderDetailPage = () => {
         color: 'green' as const,
         children: (
           <div>
-            <div>Создан · {ORDER_STATUS_LABEL.created}</div>
+            <div>Создан: {ORDER_STATUS_LABEL.created}</div>
             <div className="orders-page__muted">{formatOrderDate(order.createdAt)}</div>
           </div>
         ),
@@ -103,7 +103,7 @@ const OrderDetailPage = () => {
             <div>
               {ORDER_STATUS_LABEL[item.from]} → {ORDER_STATUS_LABEL[item.to]}
               {item.source
-                ? ` · ${ORDER_STATUS_HISTORY_SOURCE_LABEL[item.source] || item.source}`
+                ? ` (${ORDER_STATUS_HISTORY_SOURCE_LABEL[item.source] || item.source})`
                 : ''}
             </div>
             <div className="orders-page__muted">{formatOrderDate(item.at)}</div>
@@ -332,7 +332,7 @@ const OrderDetailPage = () => {
           <Alert
             type="info"
             showIcon
-            message="Трек можно указать в статусах «Оплачен · подготовка» или «В пути». При сохранении трека из «Подготовка» статус станет «В пути»."
+            message="Трек можно указать в статусах «Оплачен, подготовка» или «В пути». При сохранении трека из «Подготовка» статус станет «В пути»."
           />
         ) : null}
         <Form

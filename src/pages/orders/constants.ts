@@ -6,7 +6,7 @@ export type OrdersListFilter = OrderStatus | 'all' | 'needs_pricing'
 
 export const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
   created: 'Заявка получена',
-  paid: 'Оплачен · подготовка',
+  paid: 'Оплачен, подготовка',
   shipped: 'В пути',
   delivered: 'Доставлен',
   cancelled: 'Отменён',
