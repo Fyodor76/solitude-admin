@@ -32,6 +32,14 @@ import { buildSku, slugify } from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
 import { DraftVariation, ProductImageItem, StockDraftRow } from '../product-create/types'
 import './ProductsPage.scss'
+import {
+  clearVariationCreateDraft,
+  hasVariationCreateDraftContent,
+  loadVariationCreateDraft,
+  saveVariationCreateDraft,
+  VariationCreateDraft,
+  VariationCreateStep,
+} from './variationCreateDraftStorage'
 
 type VariationCreateFormValues = {
   name: string
@@ -43,8 +51,6 @@ type VariationCreateFormValues = {
   price: number
   comparePrice?: number | null
 }
-
-type CreateStep = 0 | 1 | 2
 
 const DRAFT_KEY = 'new-variation'
 const STEP_LABELS = ['Вариация', 'Размеры', 'Сток'] as const
@@ -60,14 +66,17 @@ export default function VariationCreatePage() {
   const navigate = useNavigate()
   const { openNotification, contextHolder } = useNotificationHandler()
   const [form] = Form.useForm<VariationCreateFormValues>()
-  const [step, setStep] = useState<CreateStep>(0)
-  const [maxReachedStep, setMaxReachedStep] = useState<CreateStep>(0)
+  const [step, setStep] = useState<VariationCreateStep>(0)
+  const [maxReachedStep, setMaxReachedStep] = useState<VariationCreateStep>(0)
   const [imageItems, setImageItems] = useState<ProductImageItem[]>([])
   const [showcaseFileIds, setShowcaseFileIds] = useState<string[]>([])
   const [defaultsReady, setDefaultsReady] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
+  const [userTouched, setUserTouched] = useState(false)
   const [selectedSizeIds, setSelectedSizeIds] = useState<string[]>([])
   const [stockRows, setStockRows] = useState<StockDraftRow[]>([])
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [formVersion, setFormVersion] = useState(0)
 
   const { data: productResponse, isLoading: isProductLoading } = useGetProductByIdQuery(productId, {
     skip: !productId,
@@ -115,8 +124,8 @@ export default function VariationCreatePage() {
       )
   }, [attributesResponse?.data])
 
-  useEffect(() => {
-    if (!product || isAttributesLoading || defaultsReady) return
+  const applyProductDefaults = () => {
+    if (!product) return
 
     const index = (product.variations?.length ?? 0) + 1
     const baseName = product.name?.trim() || 'variation'
@@ -132,9 +141,112 @@ export default function VariationCreatePage() {
       modelParameters: product.modelParameters || '',
       colorId: colorOptions[0]?.value,
     })
+    setImageItems([])
     setShowcaseFileIds(product.images ?? [])
+    setSelectedSizeIds([])
+    setStockRows([])
+    setStep(0)
+    setMaxReachedStep(0)
+    setFormVersion(v => v + 1)
+  }
+
+  useEffect(() => {
+    if (!productId || !product || isAttributesLoading || defaultsReady) return
+
+    const draft = loadVariationCreateDraft(productId)
+    if (draft && hasVariationCreateDraftContent(draft)) {
+      form.setFieldsValue({
+        name: draft.form.name || '',
+        colorId: draft.form.colorId,
+        slug: draft.form.slug || '',
+        sku: draft.form.sku || '',
+        description: draft.form.description || '',
+        modelParameters: draft.form.modelParameters || '',
+        price: draft.form.price ?? product.price,
+        comparePrice: draft.form.comparePrice ?? null,
+      })
+      setImageItems(draft.imageItems)
+      setShowcaseFileIds(draft.showcaseFileIds)
+      setSelectedSizeIds(draft.selectedSizeIds)
+      setStockRows(draft.stockRows)
+      setStep(draft.step)
+      setMaxReachedStep(draft.maxReachedStep)
+      setHasDraft(true)
+      setUserTouched(true)
+      setDefaultsReady(true)
+      setFormVersion(v => v + 1)
+      return
+    }
+
+    applyProductDefaults()
+    setHasDraft(false)
+    setUserTouched(false)
     setDefaultsReady(true)
-  }, [colorOptions, defaultsReady, form, isAttributesLoading, product])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [colorOptions, defaultsReady, form, isAttributesLoading, product, productId])
+
+  const buildDraftSnapshot = (): VariationCreateDraft => ({
+    productId,
+    step,
+    maxReachedStep,
+    form: form.getFieldsValue(true),
+    imageItems,
+    showcaseFileIds,
+    selectedSizeIds,
+    stockRows,
+  })
+
+  useEffect(() => {
+    if (!defaultsReady || !productId) return
+
+    const draft = buildDraftSnapshot()
+    const shouldPersist = userTouched && hasVariationCreateDraftContent(draft)
+
+    if (!shouldPersist) {
+      clearVariationCreateDraft(productId)
+      setHasDraft(false)
+      return
+    }
+
+    saveVariationCreateDraft(draft)
+    setHasDraft(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    defaultsReady,
+    productId,
+    userTouched,
+    step,
+    maxReachedStep,
+    imageItems,
+    showcaseFileIds,
+    selectedSizeIds,
+    stockRows,
+    formVersion,
+  ])
+
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!defaultsReady || !productId || !userTouched) return
+      const draft = buildDraftSnapshot()
+      if (!hasVariationCreateDraftContent(draft)) return
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    defaultsReady,
+    productId,
+    userTouched,
+    step,
+    maxReachedStep,
+    imageItems,
+    showcaseFileIds,
+    selectedSizeIds,
+    stockRows,
+    formVersion,
+  ])
 
   const watchedName = Form.useWatch('name', form)
   const watchedSku = Form.useWatch('sku', form)
@@ -183,13 +295,23 @@ export default function VariationCreatePage() {
       .filter(item => !remainingIds.has(item.fileId))
       .map(item => item.fileId)
 
+    setUserTouched(true)
     setImageItems(next)
     if (removed.length) {
       setShowcaseFileIds(prev => prev.filter(id => !removed.includes(id)))
     }
   }
 
-  const goToStep = async (target: CreateStep) => {
+  const handleClearDraft = () => {
+    clearVariationCreateDraft(productId)
+    applyProductDefaults()
+    setHasDraft(false)
+    setUserTouched(false)
+    setSubmitError(null)
+    openNotification('info', ['Черновик очищен'])
+  }
+
+  const goToStep = async (target: VariationCreateStep) => {
     if (target > step) {
       if (step === 0) {
         try {
@@ -204,8 +326,9 @@ export default function VariationCreatePage() {
       }
     }
 
+    setUserTouched(true)
     setStep(target)
-    setMaxReachedStep(prev => (target > prev ? target : prev) as CreateStep)
+    setMaxReachedStep(prev => (target > prev ? target : prev) as VariationCreateStep)
   }
 
   const handleCreate = async () => {
@@ -217,8 +340,6 @@ export default function VariationCreatePage() {
     setSubmitError(null)
 
     try {
-      // Форма должна оставаться смонтированной на всех шагах — иначе Ant Design
-      // сбрасывает значения и name/sku становятся undefined.
       const values = await form.validateFields()
       const name = safeTrim(values.name)
       const colorId = values.colorId
@@ -288,6 +409,9 @@ export default function VariationCreatePage() {
         await createStockBulk({ items: stockItems }).unwrap()
       }
 
+      clearVariationCreateDraft(productId)
+      setHasDraft(false)
+
       openNotification('success', [
         'Вариация создана',
         stockItems.length ? `Сток: ${stockItems.length} позиций` : 'Сток не создан (нет размеров)',
@@ -320,8 +444,23 @@ export default function VariationCreatePage() {
       {contextHolder}
       <PageHeader
         title="Новая вариация"
-        subtitle={product ? `Товар: ${product.name}` : 'Загрузка...'}
-        actions={<Button onClick={() => navigate(`/products/${productId}`)}>К товару</Button>}
+        subtitle={
+          product
+            ? hasDraft
+              ? `Товар: ${product.name} · черновик восстановится после перезагрузки`
+              : `Товар: ${product.name}`
+            : 'Загрузка...'
+        }
+        actions={
+          <Space>
+            {hasDraft ? (
+              <Button danger onClick={handleClearDraft}>
+                Сбросить черновик
+              </Button>
+            ) : null}
+            <Button onClick={() => navigate(`/products/${productId}`)}>К товару</Button>
+          </Space>
+        }
       />
 
       <Steps
@@ -331,7 +470,7 @@ export default function VariationCreatePage() {
           title,
           disabled: !(index <= maxReachedStep || index <= step),
         }))}
-        onChange={value => void goToStep(value as CreateStep)}
+        onChange={value => void goToStep(value as VariationCreateStep)}
       />
 
       {!isAttributesLoading && !colorOptions.length && step === 0 ? (
@@ -355,6 +494,10 @@ export default function VariationCreatePage() {
               layout="vertical"
               disabled={!product || !colorOptions.length}
               preserve
+              onValuesChange={() => {
+                setUserTouched(true)
+                setFormVersion(v => v + 1)
+              }}
             >
               <div className="variation-edit__grid">
                 <Form.Item
@@ -426,9 +569,10 @@ export default function VariationCreatePage() {
               sizeParameters.length ? (
                 <Button
                   type="link"
-                  onClick={() =>
+                  onClick={() => {
+                    setUserTouched(true)
                     setSelectedSizeIds(sizeParameters.map(item => item.id!).filter(Boolean))
-                  }
+                  }}
                 >
                   Выбрать все
                 </Button>
@@ -457,7 +601,10 @@ export default function VariationCreatePage() {
                 <Checkbox.Group
                   className="product-create__size-grid"
                   value={selectedSizeIds}
-                  onChange={values => setSelectedSizeIds(values as string[])}
+                  onChange={values => {
+                    setUserTouched(true)
+                    setSelectedSizeIds(values as string[])
+                  }}
                   options={sizeParameters.map(size => ({
                     label: size.russianSize
                       ? `${size.internationalSize} / ${size.russianSize}`
@@ -475,9 +622,10 @@ export default function VariationCreatePage() {
             rows={stockRows}
             variations={[draftVariation]}
             sizeParameters={sizeParameters}
-            onChange={(key, patch) =>
+            onChange={(key, patch) => {
+              setUserTouched(true)
               setStockRows(prev => prev.map(row => (row.key === key ? { ...row, ...patch } : row)))
-            }
+            }}
           />
         )}
       </section>
@@ -493,7 +641,7 @@ export default function VariationCreatePage() {
           <Button onClick={() => navigate(`/products/${productId}`)}>Отмена</Button>
           <Button
             disabled={step === 0 || isSaving}
-            onClick={() => void goToStep((step - 1) as CreateStep)}
+            onClick={() => void goToStep((step - 1) as VariationCreateStep)}
           >
             Назад
           </Button>
@@ -501,7 +649,7 @@ export default function VariationCreatePage() {
             <Button
               type="primary"
               disabled={isSaving}
-              onClick={() => void goToStep((step + 1) as CreateStep)}
+              onClick={() => void goToStep((step + 1) as VariationCreateStep)}
             >
               Далее
             </Button>
