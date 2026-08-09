@@ -1,4 +1,5 @@
 import {
+  AttributeType,
   AttributeValueRequest,
   ProductAttributeRequest,
 } from '@/shared/lib/api/product-attributes/types'
@@ -6,7 +7,7 @@ import {
 export const initialState: ProductAttributeRequest = {
   name: '',
   slug: '',
-  type: 'color' || 'size' || 'volume' || 'weight' || 'dimension' || 'other',
+  type: AttributeType.Color,
   description: '',
   sortOrder: 0,
 }

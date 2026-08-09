@@ -227,6 +227,8 @@ export const baseApi = createApi({
     'FormSubmissions',
     'FormSubmissionsStats',
     'FormSubmission',
+    'Orders',
+    'Order',
   ],
   endpoints: () => ({}),
 })

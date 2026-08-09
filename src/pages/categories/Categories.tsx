@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import {
   useGetCategoriesTreeQuery,
@@ -27,7 +27,7 @@ const Categories = () => {
 
   const { createNewCategory, handleDelete } = useServerActions()
 
-  const { data: categoriesTreeData, isLoading, error, refetch } = useGetCategoriesTreeQuery()
+  const { data: categoriesTreeData, isLoading, refetch } = useGetCategoriesTreeQuery()
   const [updateCategory] = useUpdateCategoryByIdMutation()
 
   const [formDataModal, setFormDataModal] = useState<FormData>(InitialFormData)

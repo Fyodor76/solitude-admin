@@ -33,7 +33,7 @@ export const SizeParameters = baseApi.injectEndpoints({
         url: `/size-parameters/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Size-parameter', id }],
+      providesTags: (_result, _error, id) => [{ type: 'Size-parameter', id }],
     }),
 
     deleteSizeParameterById: builder.mutation<ApiResponse<deleteResponse, any>, string>({
@@ -41,7 +41,7 @@ export const SizeParameters = baseApi.injectEndpoints({
         url: `/size-parameters/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: 'Size-parameter', id },
         { type: 'Size-parameter', id: 'ALL_SIZE-PARAMETER' },
       ],
@@ -60,7 +60,7 @@ export const SizeParameters = baseApi.injectEndpoints({
         url: `/size-parameters/size-chart/${sizeChartId}`,
         method: 'GET',
       }),
-      providesTags: (result, error, sizeChartId) => [{ type: 'Size-parameter', sizeChartId }],
+      providesTags: (_result, _error, sizeChartId) => [{ type: 'Size-parameter', sizeChartId }],
     }),
   }),
 })

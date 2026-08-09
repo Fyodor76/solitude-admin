@@ -13,7 +13,7 @@ export const AttributeValues = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
-      invalidatesTags: (result, error, { attributeId }) => [
+      invalidatesTags: (_result, _error, { attributeId }) => [
         { type: 'Product-attributes', id: attributeId },
         { type: 'Product-attributes', id: 'ALL_PRODUCT-ATTRIBUTES' },
       ],
@@ -23,7 +23,7 @@ export const AttributeValues = baseApi.injectEndpoints({
         url: `/product-attributes/${attributeId}/values`,
         method: 'GET',
       }),
-      providesTags: (result, error, attributeId) => [
+      providesTags: (_result, _error, attributeId) => [
         { type: 'Product-attributes', id: attributeId },
       ],
     }),
@@ -36,7 +36,7 @@ export const AttributeValues = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { attributeId }) => [
+      invalidatesTags: (_result, _error, { attributeId }) => [
         { type: 'Product-attributes', id: attributeId },
         { type: 'Product-attributes', id: 'ALL_PRODUCT-ATTRIBUTES' },
       ],
@@ -49,7 +49,7 @@ export const AttributeValues = baseApi.injectEndpoints({
         url: `/product-attributes/${attrId}/values/${valueId}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, { attrId }) => [
+      invalidatesTags: (_result, _error, { attrId }) => [
         { type: 'Product-attributes', id: attrId },
         {
           type: 'Product-attributes',

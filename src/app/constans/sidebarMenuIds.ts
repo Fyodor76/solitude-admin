@@ -11,6 +11,7 @@ export const SIDEBAR_MENU_ITEM_ID = {
   PLATFORM_IMAGES: 'platform-images',
   FORMS: 'forms',
   CALLBACK_FORM: 'callback-form',
+  ORDERS: 'orders',
   ANALYTICS: 'analytics',
   HEATMAP: 'heatmap',
   SUPPORT: 'support',

@@ -3,6 +3,7 @@ import { Categories } from '@/pages/categories'
 import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
 import { NotificationsPage } from '@/pages/notifications'
+import { OrderDetailPage, OrdersPage } from '@/pages/orders'
 import { PlatformImages } from '@/pages/platform-images'
 import { ProductAttribute } from '@/pages/product-attributes'
 import { ProductCreatePage } from '@/pages/product-create'
@@ -102,6 +103,14 @@ export const Router: RouteObject[] = [
           {
             path: 'stock',
             element: <StockPage />,
+          },
+          {
+            path: 'orders',
+            element: <OrdersPage />,
+          },
+          {
+            path: 'orders/:orderId',
+            element: <OrderDetailPage />,
           },
           {
             path: 'products/:productId',

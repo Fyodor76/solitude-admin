@@ -4,7 +4,7 @@ import type { imgUpload } from '@/shared/lib/api/upload-files/uploadFiles'
 /** RTK unwrap отдаёт ApiResponse; на всякий случай поддерживаем вложенный data. */
 export function extractMediaUrl(
   response:
-    | ApiResponse<imgUpload | { url: string }>
+    | ApiResponse<imgUpload | { url: string }, unknown>
     | imgUpload
     | { url?: string }
     | null

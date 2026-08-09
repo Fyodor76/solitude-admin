@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import { useMobileSidebarSwipe } from '@/shared/hooks/useMobileSidebarSwipe'

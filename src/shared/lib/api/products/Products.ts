@@ -20,7 +20,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/products/category/${categoryId}`,
         method: 'GET',
       }),
-      providesTags: (result, error, categoryId) => [
+      providesTags: (_result, _error, categoryId) => [
         { type: 'Product', id: `CATEGORY_${categoryId}` },
       ],
     }),
@@ -48,7 +48,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/products/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Product', id }],
+      providesTags: (_result, _error, id) => [{ type: 'Product', id }],
     }),
 
     createProduct: builder.mutation<ApiResponse<Product, any>, ProductCreatePayload>({
@@ -69,7 +69,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: 'Product', id },
         { type: 'Product', id: 'LIST' },
       ],
@@ -80,7 +80,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/products/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: 'Product', id },
         { type: 'Product', id: 'LIST' },
       ],
@@ -92,7 +92,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: (result, error, body) => {
+      invalidatesTags: (_result, _error, body) => {
         const variationIds = [...new Set(body.items.map(item => item.variationId))]
         return [
           ...variationIds.map(id => ({ type: 'Stock' as const, id })),
@@ -107,7 +107,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: (result, error, body) => [
+      invalidatesTags: (_result, _error, body) => [
         { type: 'Stock', id: body.variationId },
         { type: 'Stock', id: 'LIST' },
       ],
@@ -118,7 +118,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/stock/variation/${variationId}`,
         method: 'GET',
       }),
-      providesTags: (result, error, variationId) => [
+      providesTags: (result, _error, variationId) => [
         { type: 'Stock', id: variationId },
         ...(result?.data?.map(item => ({ type: 'Stock' as const, id: item.id })) ?? []),
       ],
@@ -129,7 +129,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/stock/product/${productId}`,
         method: 'GET',
       }),
-      providesTags: (result, error, productId) => [
+      providesTags: (result, _error, productId) => [
         { type: 'Stock', id: `PRODUCT_${productId}` },
         ...(result?.data?.map(item => ({ type: 'Stock' as const, id: item.id })) ?? []),
       ],
@@ -156,7 +156,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: (result, error, { id, variationId }) => [
+      invalidatesTags: (_result, _error, { id, variationId }) => [
         { type: 'Stock', id },
         ...(variationId ? [{ type: 'Stock' as const, id: variationId }] : []),
         { type: 'Stock', id: 'LIST' },
@@ -171,7 +171,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/stock/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, { id, variationId }) => [
+      invalidatesTags: (_result, _error, { id, variationId }) => [
         { type: 'Stock', id },
         ...(variationId ? [{ type: 'Stock' as const, id: variationId }] : []),
         { type: 'Stock', id: 'LIST' },
@@ -183,7 +183,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/product-variations/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Product', id: `VARIATION_${id}` }],
+      providesTags: (_result, _error, id) => [{ type: 'Product', id: `VARIATION_${id}` }],
     }),
 
     createProductVariation: builder.mutation<
@@ -195,7 +195,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'POST',
         body,
       }),
-      invalidatesTags: (result, error, body) => [
+      invalidatesTags: (_result, _error, body) => [
         { type: 'Product', id: body.productId },
         { type: 'Product', id: 'LIST' },
       ],
@@ -210,7 +210,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: (result, error, { id, productId }) => [
+      invalidatesTags: (_result, _error, { id, productId }) => [
         { type: 'Product', id: `VARIATION_${id}` },
         { type: 'Product', id: 'LIST' },
         ...(productId ? [{ type: 'Product' as const, id: productId }] : []),
@@ -225,7 +225,7 @@ export const apiProducts = baseApi.injectEndpoints({
         url: `/product-variations/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, { id, productId }) => [
+      invalidatesTags: (_result, _error, { id, productId }) => [
         { type: 'Product', id: `VARIATION_${id}` },
         { type: 'Product', id: productId },
         { type: 'Product', id: 'LIST' },
@@ -243,7 +243,7 @@ export const apiProducts = baseApi.injectEndpoints({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: (result, error, { productId }) => [
+      invalidatesTags: (_result, _error, { productId }) => [
         { type: 'Product', id: productId },
         { type: 'Product', id: 'LIST' },
       ],

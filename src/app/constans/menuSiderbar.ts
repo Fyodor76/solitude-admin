@@ -64,6 +64,13 @@ export const menuSidebar: MenuItem[] = [
     ],
   },
   {
+    id: SIDEBAR_MENU_ITEM_ID.ORDERS,
+    text: 'Заказы',
+    href: '/orders',
+    icon: 'mailbox',
+    hasArrow: false,
+  },
+  {
     id: SIDEBAR_MENU_ITEM_ID.FORMS,
     text: 'Формы',
     href: '#',

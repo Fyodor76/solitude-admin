@@ -11,6 +11,7 @@ export const ROUTES = {
   SIZE_CHARTS: { label: 'Таблицы размеров', path: '/size-charts' },
   PRODUCT_ATTRIBUTES: { label: 'Опции товаров', path: '/product-attributes' },
   PLATFORM_IMAGES: { label: 'Изображения платформы', path: '/platform-images' },
+  ORDERS: { label: 'Заказы', path: '/orders' },
   HEATMAP: { label: 'Тепловая карта сайта', path: '/heatmap' },
   SUPPORT: { label: 'Обращения', path: '/support' },
   NOTIFICATIONS: { label: 'Уведомления', path: '/notifications' },

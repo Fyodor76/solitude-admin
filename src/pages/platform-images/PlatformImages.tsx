@@ -62,10 +62,9 @@ export const PlatformImages = () => {
         Boolean(response.meta?.nextContinuationToken) || Boolean(response.meta?.isTruncated)
       )
     } catch (error: any) {
-      openNotification(
-        'error',
-        error?.data?.error || error?.data?.message || 'Не удалось загрузить изображения.'
-      )
+      openNotification('error', [
+        error?.data?.error || error?.data?.message || 'Не удалось загрузить изображения.',
+      ])
     }
   }
 
@@ -113,10 +112,9 @@ export const PlatformImages = () => {
         Boolean(response.meta?.nextContinuationToken) || Boolean(response.meta?.isTruncated)
       )
     } catch (error: any) {
-      openNotification(
-        'error',
-        error?.data?.error || error?.data?.message || 'Не удалось загрузить следующую страницу.'
-      )
+      openNotification('error', [
+        error?.data?.error || error?.data?.message || 'Не удалось загрузить следующую страницу.',
+      ])
     } finally {
       setLoadingMore(false)
     }
@@ -137,13 +135,12 @@ export const PlatformImages = () => {
     try {
       await deleteFileById({ fileId, folder: PLATFORM_IMAGES_FOLDER }).unwrap()
       setSelectedIds(previous => previous.filter(id => id !== fileId))
-      openNotification('success', 'Изображение удалено.')
+      openNotification('success', ['Изображение удалено.'])
       await loadFirstPage()
     } catch (error: any) {
-      openNotification(
-        'error',
-        error?.data?.error || error?.data?.message || 'Не удалось удалить изображение.'
-      )
+      openNotification('error', [
+        error?.data?.error || error?.data?.message || 'Не удалось удалить изображение.',
+      ])
     }
   }
 
@@ -164,22 +161,21 @@ export const PlatformImages = () => {
         folder: PLATFORM_IMAGES_FOLDER,
       }).unwrap()
 
-      openNotification('success', 'Выбранные изображения удалены.')
+      openNotification('success', ['Выбранные изображения удалены.'])
       await loadFirstPage()
     } catch (error: any) {
-      openNotification(
-        'error',
-        error?.data?.error || error?.data?.message || 'Не удалось удалить выбранные изображения.'
-      )
+      openNotification('error', [
+        error?.data?.error || error?.data?.message || 'Не удалось удалить выбранные изображения.',
+      ])
     }
   }
 
   const handleCopy = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url)
-      openNotification('success', 'Ссылка скопирована.')
+      openNotification('success', ['Ссылка скопирована.'])
     } catch {
-      openNotification('error', 'Не удалось скопировать ссылку.')
+      openNotification('error', ['Не удалось скопировать ссылку.'])
     }
   }
 
