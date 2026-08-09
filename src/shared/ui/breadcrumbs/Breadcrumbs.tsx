@@ -4,7 +4,7 @@ import { useBreadcrumbs } from './useBreadcrumbs'
 const Breadcrumbs = () => {
   const breadcrumbs = useBreadcrumbs()
   return (
-    <div>
+    <div className="breadcrumbs-container">
       <BreadcrumbsItems items={breadcrumbs} />
     </div>
   )
