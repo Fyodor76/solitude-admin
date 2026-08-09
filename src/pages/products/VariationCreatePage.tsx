@@ -49,6 +49,12 @@ type CreateStep = 0 | 1 | 2
 const DRAFT_KEY = 'new-variation'
 const STEP_LABELS = ['Вариация', 'Размеры', 'Сток'] as const
 
+function safeTrim(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const trimmed = value.trim()
+  return trimmed || undefined
+}
+
 export default function VariationCreatePage() {
   const { productId = '' } = useParams<{ productId: string }>()
   const navigate = useNavigate()
@@ -113,7 +119,7 @@ export default function VariationCreatePage() {
     if (!product || isAttributesLoading || defaultsReady) return
 
     const index = (product.variations?.length ?? 0) + 1
-    const baseName = product.name.trim() || 'variation'
+    const baseName = product.name?.trim() || 'variation'
     const baseSlug = product.slug?.trim() || slugify(baseName) || 'item'
 
     form.setFieldsValue({
@@ -211,17 +217,27 @@ export default function VariationCreatePage() {
     setSubmitError(null)
 
     try {
+      // Форма должна оставаться смонтированной на всех шагах — иначе Ant Design
+      // сбрасывает значения и name/sku становятся undefined.
       const values = await form.validateFields()
+      const name = safeTrim(values.name)
+      const colorId = values.colorId
+      if (!name || !colorId) {
+        setStep(0)
+        openNotification('error', ['Заполните название и цвет вариации'])
+        return
+      }
+
       const imageIds = imageItems.map(item => item.fileId)
 
       const created = await createVariation({
         productId: product.id,
-        colorId: values.colorId,
-        name: values.name.trim(),
-        slug: values.slug?.trim() || undefined,
-        sku: values.sku?.trim() || undefined,
-        description: values.description?.trim() || undefined,
-        modelParameters: values.modelParameters?.trim() || undefined,
+        colorId,
+        name,
+        slug: safeTrim(values.slug),
+        sku: safeTrim(values.sku),
+        description: safeTrim(values.description),
+        modelParameters: safeTrim(values.modelParameters),
         price: values.price,
         comparePrice: values.comparePrice ?? undefined,
         mainImage: imageIds[0],
@@ -328,11 +344,18 @@ export default function VariationCreatePage() {
       ) : null}
 
       <section className="variation-edit__section">
-        {step === 0 &&
-          (isAttributesLoading || isProductLoading ? (
+        {isAttributesLoading || isProductLoading ? (
+          step === 0 ? (
             <Empty description="Загрузка..." />
-          ) : (
-            <Form form={form} layout="vertical" disabled={!product || !colorOptions.length}>
+          ) : null
+        ) : (
+          <div style={{ display: step === 0 ? 'block' : 'none' }} aria-hidden={step !== 0}>
+            <Form
+              form={form}
+              layout="vertical"
+              disabled={!product || !colorOptions.length}
+              preserve
+            >
               <div className="variation-edit__grid">
                 <Form.Item
                   label="Название"
@@ -392,7 +415,8 @@ export default function VariationCreatePage() {
                 </div>
               </div>
             </Form>
-          ))}
+          </div>
+        )}
 
         {step === 1 && (
           <Card
