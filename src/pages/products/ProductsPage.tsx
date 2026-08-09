@@ -14,7 +14,15 @@ import './ProductsPage.scss'
 
 const PAGE_SIZE = 20
 
-function getProductThumb(product: Product): string | null {
+/** Ответ search может быть без variations — учитываем. */
+type ProductListItem = Pick<
+  Product,
+  'id' | 'name' | 'slug' | 'brand' | 'price' | 'isActive' | 'inStock' | 'images'
+> & {
+  variations?: Product['variations']
+}
+
+function getProductThumb(product: ProductListItem): string | null {
   const raw =
     product.images?.[0] ||
     product.variations?.[0]?.mainImage ||
@@ -22,12 +30,23 @@ function getProductThumb(product: Product): string | null {
   return resolveMediaUrl(raw)
 }
 
+function ProductThumb({ product }: { product: ProductListItem }) {
+  const [failed, setFailed] = useState(false)
+  const thumb = getProductThumb(product)
+
+  if (!thumb || failed) {
+    return <div className="products-page__thumb-placeholder" />
+  }
+
+  return <img src={thumb} alt="" className="products-page__thumb" onError={() => setFailed(true)} />
+}
+
 export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
 
-  const { data, isFetching, refetch } = useSearchProductsQuery({
+  const { data, isFetching, isError, refetch } = useSearchProductsQuery({
     search: search || undefined,
     isActiveFilter: 'all',
     sort: 'newest',
@@ -35,23 +54,16 @@ export default function ProductsPage() {
     limit: PAGE_SIZE,
   })
 
-  const products = data?.data ?? []
+  const products = (data?.data ?? []) as ProductListItem[]
   const meta = data?.meta
 
-  const columns: ColumnsType<Product> = useMemo(
+  const columns: ColumnsType<ProductListItem> = useMemo(
     () => [
       {
         title: '',
         key: 'thumb',
         width: 64,
-        render: (_, record) => {
-          const thumb = getProductThumb(record)
-          return thumb ? (
-            <img src={thumb} alt="" className="products-page__thumb" />
-          ) : (
-            <div className="products-page__thumb-placeholder" />
-          )
-        },
+        render: (_, record) => <ProductThumb product={record} />,
       },
       {
         title: 'Название',
@@ -72,13 +84,13 @@ export default function ProductsPage() {
         title: 'Цена',
         dataIndex: 'price',
         width: 120,
-        render: (price: number) => `${price.toLocaleString('ru-RU')} ₽`,
+        render: (price: number) => `${Number(price || 0).toLocaleString('ru-RU')} ₽`,
       },
       {
         title: 'Вариации',
         dataIndex: 'variations',
         width: 100,
-        render: (variations: Product['variations']) => variations?.length ?? 0,
+        render: (variations: ProductListItem['variations']) => variations?.length ?? '—',
       },
       {
         title: 'Статус',
@@ -139,19 +151,33 @@ export default function ProductsPage() {
         />
       </div>
 
-      <Table<Product>
-        rowKey="id"
-        columns={columns}
-        dataSource={products}
-        loading={isFetching}
-        pagination={{
-          current: page,
-          pageSize: PAGE_SIZE,
-          total: meta?.total ?? 0,
-          showSizeChanger: false,
-          onChange: nextPage => setPage(nextPage),
-        }}
-      />
+      {isError ? (
+        <AlertError onRetry={() => void refetch()} />
+      ) : (
+        <Table<ProductListItem>
+          rowKey="id"
+          columns={columns}
+          dataSource={products}
+          loading={isFetching}
+          locale={{ emptyText: 'Товары не найдены' }}
+          pagination={{
+            current: page,
+            pageSize: PAGE_SIZE,
+            total: meta?.total ?? 0,
+            showSizeChanger: false,
+            onChange: nextPage => setPage(nextPage),
+          }}
+        />
+      )}
     </Container>
+  )
+}
+
+function AlertError({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="products-page__error">
+      <p>Не удалось загрузить товары</p>
+      <Button onClick={onRetry}>Повторить</Button>
+    </div>
   )
 }

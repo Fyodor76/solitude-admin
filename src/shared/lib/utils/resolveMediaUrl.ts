@@ -1,6 +1,9 @@
 import { CDN_URL } from '@/app/constans/url'
 
-/** Превращает fileId / относитивный путь / полный URL в адрес для <img>. */
+/**
+ * fileId / относительный путь / полный URL → src для <img>.
+ * На CDN файлы отдаются с корня: `{CDN}/{fileId}` (без folder).
+ */
 export function resolveMediaUrl(value?: string | null): string | null {
   if (!value) return null
   const trimmed = value.trim()
@@ -12,10 +15,11 @@ export function resolveMediaUrl(value?: string | null): string | null {
   ) {
     return trimmed
   }
+  // Уже абсолютный путь сайта
   if (trimmed.startsWith('/')) {
-    return trimmed
+    return `${CDN_URL}${trimmed}`
   }
-  const base = (CDN_URL || '').replace(/\/$/, '')
-  if (!base) return trimmed
-  return `${base}/${trimmed}`
+  // Иногда приходит `products/fileId` — берём только fileId (как на витрине)
+  const fileId = trimmed.includes('/') ? trimmed.split('/').filter(Boolean).pop()! : trimmed
+  return `${CDN_URL}/${fileId}`
 }

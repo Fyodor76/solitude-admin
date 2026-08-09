@@ -11,6 +11,7 @@ import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandle
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { Alert, Button, Space, Steps } from 'antd'
+import { useNavigate } from 'react-router-dom'
 
 import { StepAttributes } from './components/StepAttributes'
 import { StepProductBasics } from './components/StepProductBasics'
@@ -22,6 +23,7 @@ import './ProductCreate.scss'
 import { WizardStep } from './types'
 
 export default function ProductCreatePage() {
+  const navigate = useNavigate()
   const { openNotification, contextHolder } = useNotificationHandler()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -103,10 +105,12 @@ export default function ProductCreatePage() {
         await createStockBulk({ items: stockItems }).unwrap()
       }
 
+      wizard.clearDraft()
       openNotification('success', [
         `Товар «${product.name}» создан`,
         stockItems.length ? `Сток: ${stockItems.length} позиций` : 'Сток не создан (нет размеров)',
       ])
+      navigate('/products')
     } catch (error: any) {
       const message =
         error?.data?.error || error?.error || error?.message || 'Не удалось создать товар'
@@ -125,7 +129,27 @@ export default function ProductCreatePage() {
     <Container>
       {contextHolder}
       <div className="product-create">
-        <PageHeader title="Создание товара" subtitle="Черновик формы создания товара и стока" />
+        <PageHeader
+          title="Создание товара"
+          subtitle={
+            wizard.hasDraft
+              ? 'Черновик сохраняется автоматически и восстановится после перезагрузки'
+              : 'Заполните шаги — прогресс сохранится как черновик'
+          }
+          actions={
+            wizard.hasDraft ? (
+              <Button
+                danger
+                onClick={() => {
+                  wizard.clearDraft()
+                  openNotification('info', ['Черновик очищен'])
+                }}
+              >
+                Сбросить черновик
+              </Button>
+            ) : undefined
+          }
+        />
 
         <Steps
           current={wizard.state.step}

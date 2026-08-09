@@ -21,6 +21,7 @@ interface useProductAttributeActionsProps {
   setErrors: React.Dispatch<React.SetStateAction<ErrorsProps>>
   setErrorsValue: React.Dispatch<React.SetStateAction<ErrorsValueProps>>
   setRowErrors: React.Dispatch<React.SetStateAction<RowErrorsProps>>
+  validateAttributeBeforeSave: (data: ProductAttributeRequest) => boolean
 }
 const useProductAttributeActions = ({
   selectAttr,
@@ -32,18 +33,22 @@ const useProductAttributeActions = ({
   setErrors,
   setErrorsValue,
   setRowErrors,
+  validateAttributeBeforeSave,
 }: useProductAttributeActionsProps) => {
   const saveAllChanges = async () => {
     try {
       if (selectedAttributeId && editFormLocal) {
         const { id, values, isActive, createdAt, updatedAt, ...optionData } = editFormLocal
 
+        if (!validateAttributeBeforeSave(optionData)) {
+          message.error('Исправьте ошибки в форме опции')
+          return
+        }
+
         await onSaveEditedOption(optionData, selectedAttributeId)
-      }
-      if (selectedAttributeId && editFormLocal) {
         await onSaveEditedValue(selectedAttributeId, editFormLocal)
+        message.success('Изменения сохранены')
       }
-      console.log('Все изменения сохранены!')
     } catch (error) {
       console.error('Ошибка сохранения:', error)
     }

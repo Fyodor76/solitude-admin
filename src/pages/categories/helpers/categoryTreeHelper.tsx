@@ -33,9 +33,13 @@ export function getCategoryDisplayState(
 export const sortCategoryTree = (tree: BaseCategoryTree[]): BaseCategoryTree[] => {
   return [...tree]
     .sort((a, b) => {
+      // Активные выше скрытых, затем sortOrder
+      if (a.isActive !== b.isActive) {
+        return a.isActive ? -1 : 1
+      }
       const orderDiff = (a.sortOrder || 0) - (b.sortOrder || 0)
       if (orderDiff !== 0) return orderDiff
-      return a.id.localeCompare(b.id)
+      return a.name.localeCompare(b.name, 'ru')
     })
     .map(category => ({
       ...category,

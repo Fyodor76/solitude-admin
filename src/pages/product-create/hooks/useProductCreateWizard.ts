@@ -3,9 +3,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 
 import { INITIAL_BASICS } from '../constants'
+import {
+  clearProductCreateDraft,
+  hasProductCreateDraftContent,
+  loadProductCreateDraft,
+  saveProductCreateDraft,
+} from '../draftStorage'
 import { buildSku, createDraftKey, slugify } from '../helpers'
 import {
-  AttributeSelection,
   DraftVariation,
   ProductBasicsForm,
   ProductCreateWizardState,
@@ -40,15 +45,37 @@ function isVariationsValid(variations: DraftVariation[]): boolean {
 
 export function useProductCreateWizard(colorAttributes: ProductAttributeResponse[]) {
   const sizeCodeByIdRef = useRef<Record<string, string>>({})
-  const [state, setState] = useState<ProductCreateWizardState>({
-    step: 0,
-    maxReachedStep: 0,
-    basics: INITIAL_BASICS,
-    variations: [],
-    attributeSelections: [],
-    selectedSizeIds: [],
-    stockRows: [],
+  const [state, setState] = useState<ProductCreateWizardState>(() => {
+    return (
+      loadProductCreateDraft() || {
+        step: 0,
+        maxReachedStep: 0,
+        basics: { ...INITIAL_BASICS },
+        variations: [],
+        attributeSelections: [],
+        selectedSizeIds: [],
+        stockRows: [],
+      }
+    )
   })
+
+  useEffect(() => {
+    if (!hasProductCreateDraftContent(state)) {
+      clearProductCreateDraft()
+      return
+    }
+    saveProductCreateDraft(state)
+  }, [state])
+
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!hasProductCreateDraftContent(state)) return
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [state])
 
   const setSizeCodeById = useCallback((sizeCodeById: Record<string, string>) => {
     sizeCodeByIdRef.current = sizeCodeById
@@ -293,6 +320,19 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     }
   }, [state])
 
+  const clearDraft = useCallback(() => {
+    clearProductCreateDraft()
+    setState({
+      step: 0,
+      maxReachedStep: 0,
+      basics: { ...INITIAL_BASICS },
+      variations: [],
+      attributeSelections: [],
+      selectedSizeIds: [],
+      stockRows: [],
+    })
+  }, [])
+
   return {
     state,
     colorOptions,
@@ -312,6 +352,8 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     updateStockRow,
     rebuildStockRows,
     buildCreatePayload,
+    clearDraft,
+    hasDraft: hasProductCreateDraftContent(state),
     isBasicsValid: isBasicsValid(state.basics),
     isVariationsValid: isVariationsValid(state.variations),
   }
