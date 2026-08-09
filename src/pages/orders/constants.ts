@@ -41,3 +41,9 @@ export function formatOrderDate(value?: string): string {
     minute: '2-digit',
   })
 }
+
+/** Короткий код заказа для UI (не путать с трек-номером перевозчика). */
+export function formatOrderShortCode(trackingId?: string, orderId?: string): string {
+  const source = (trackingId || orderId || '').replace(/-/g, '')
+  return source.slice(0, 8)
+}

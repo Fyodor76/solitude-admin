@@ -5,15 +5,16 @@ import { useGetOrdersQuery } from '@/shared/lib/api/orders/Orders'
 import type { AdminOrderListItem, OrderStatus } from '@/shared/lib/api/orders/types'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Empty, Input, Segmented, Spin, Table, Tag } from 'antd'
+import { Button, Empty, Input, Segmented, Spin, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import { ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY } from '@/app/constans/layout'
 
 import {
   formatOrderDate,
   formatOrderMoney,
+  formatOrderShortCode,
   ORDER_STATUS_COLOR,
   ORDER_STATUS_LABEL,
   ORDER_STATUSES_FILTER,
@@ -21,6 +22,7 @@ import {
 import './OrdersPage.scss'
 
 const OrdersPage = () => {
+  const navigate = useNavigate()
   const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
   const { data, isLoading, isFetching, refetch } = useGetOrdersQuery()
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all')
@@ -44,9 +46,11 @@ const OrdersPage = () => {
     return orders.filter(order => {
       if (statusFilter !== 'all' && order.status !== statusFilter) return false
       if (!q) return true
+      const shortCode = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
       const haystack = [
         order.id,
         order.trackingId,
+        shortCode,
         order.customerName,
         order.customerPhone,
         order.customerEmail,
@@ -67,12 +71,25 @@ const OrdersPage = () => {
       render: value => formatOrderDate(value),
     },
     {
-      title: 'Tracking',
-      dataIndex: 'trackingId',
-      width: 200,
-      render: (value: string | undefined, row) => (
-        <Link to={`/orders/${row.id}`}>{value || row.id.slice(0, 8)}</Link>
+      title: (
+        <Tooltip title="Короткий код заказа для поиска и поддержки. Не путать с трек-номером службы доставки.">
+          Код
+        </Tooltip>
       ),
+      key: 'shortCode',
+      width: 110,
+      render: (_value, row) => {
+        const code = row.shortCode || formatOrderShortCode(row.trackingId, row.id)
+        return (
+          <Link
+            to={`/orders/${row.id}`}
+            className="orders-page__code"
+            onClick={e => e.stopPropagation()}
+          >
+            {code}
+          </Link>
+        )
+      },
     },
     {
       title: 'Клиент',
@@ -82,6 +99,9 @@ const OrdersPage = () => {
           <span>{row.customerName || '—'}</span>
           {row.customerPhone ? (
             <span className="orders-page__muted">{row.customerPhone}</span>
+          ) : null}
+          {row.customerEmail ? (
+            <span className="orders-page__muted">{row.customerEmail}</span>
           ) : null}
         </div>
       ),
@@ -101,12 +121,12 @@ const OrdersPage = () => {
       render: value => formatOrderMoney(value),
     },
     {
-      title: 'Позиции',
+      title: 'Поз.',
       dataIndex: 'itemsCount',
-      width: 100,
+      width: 90,
       render: (count: number, row) => (
         <span>
-          {count}
+          {count ?? 0}
           {row.needsCustomPricing ? (
             <Tag color="orange" style={{ marginLeft: 8 }}>
               цена
@@ -120,11 +140,11 @@ const OrdersPage = () => {
     {
       title: 'Оплата',
       key: 'payment',
-      width: 120,
+      width: 110,
       render: (_value, row) => {
-        if (row.wasPaid) return <Tag color="green">оплачен</Tag>
+        if (row.wasPaid) return <Tag color="green">да</Tag>
         if (row.paymentInProgress) return <Tag color="gold">ожидает</Tag>
-        return <Tag>нет</Tag>
+        return <span className="orders-page__muted">нет</span>
       },
     },
   ]
@@ -141,7 +161,7 @@ const OrdersPage = () => {
     <Container className="orders-page admin-page">
       <PageHeader
         title="Заказы"
-        subtitle="Список заказов: статусы, клиенты, custom-цены и доставка."
+        subtitle="Статусы, клиенты, доставка и согласование цен custom-позиций."
         actions={
           <Button loading={isFetching} onClick={() => void refetch()}>
             Обновить
@@ -158,7 +178,7 @@ const OrdersPage = () => {
         />
         <Input.Search
           allowClear
-          placeholder="Поиск: клиент, телефон, email, tracking..."
+          placeholder="Клиент, телефон, email, код заказа..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="orders-page__search"
@@ -173,22 +193,26 @@ const OrdersPage = () => {
         <Empty className="orders-page__empty" description="Заказы не найдены" />
       ) : isMobile ? (
         <div className="orders-page__cards">
-          {filtered.map(order => (
-            <Link key={order.id} to={`/orders/${order.id}`} className="orders-page__card">
-              <div className="orders-page__card-head">
-                <Tag color={ORDER_STATUS_COLOR[order.status]}>
-                  {ORDER_STATUS_LABEL[order.status]}
-                </Tag>
-                <span className="orders-page__muted">{formatOrderDate(order.createdAt)}</span>
-              </div>
-              <strong>{order.customerName || order.trackingId || order.id.slice(0, 8)}</strong>
-              <div className="orders-page__card-meta">
-                <span>{formatOrderMoney(order.totalAmount)}</span>
-                <span>{order.itemsCount} поз.</span>
-                {order.needsCustomPricing ? <Tag color="orange">нужна цена</Tag> : null}
-              </div>
-            </Link>
-          ))}
+          {filtered.map(order => {
+            const code = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
+            return (
+              <Link key={order.id} to={`/orders/${order.id}`} className="orders-page__card">
+                <div className="orders-page__card-head">
+                  <Tag color={ORDER_STATUS_COLOR[order.status]}>
+                    {ORDER_STATUS_LABEL[order.status]}
+                  </Tag>
+                  <span className="orders-page__muted">{formatOrderDate(order.createdAt)}</span>
+                </div>
+                <strong>{order.customerName || code}</strong>
+                <div className="orders-page__card-meta">
+                  <code className="orders-page__code">{code}</code>
+                  <span>{formatOrderMoney(order.totalAmount)}</span>
+                  <span>{order.itemsCount ?? 0} поз.</span>
+                  {order.needsCustomPricing ? <Tag color="orange">нужна цена</Tag> : null}
+                </div>
+              </Link>
+            )
+          })}
         </div>
       ) : (
         <Table
@@ -199,6 +223,10 @@ const OrdersPage = () => {
           loading={isFetching}
           pagination={{ pageSize: 20, showSizeChanger: false }}
           scroll={{ x: 1100 }}
+          onRow={row => ({
+            onClick: () => navigate(`/orders/${row.id}`),
+            className: 'orders-page__row',
+          })}
         />
       )}
     </Container>

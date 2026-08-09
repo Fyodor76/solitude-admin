@@ -32,10 +32,20 @@
     font-size: 12px;
   }
 
+  &__code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+
   &__client {
     display: flex;
     flex-direction: column;
     gap: 2px;
+  }
+
+  &__row {
+    cursor: pointer;
   }
 
   &__cards {

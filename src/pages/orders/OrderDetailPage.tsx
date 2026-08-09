@@ -29,6 +29,7 @@ import { Link, useParams } from 'react-router-dom'
 import {
   formatOrderDate,
   formatOrderMoney,
+  formatOrderShortCode,
   ORDER_STATUS_COLOR,
   ORDER_STATUS_LABEL,
   ORDER_STATUS_TRANSITIONS,
@@ -60,7 +61,7 @@ const OrderDetailPage = () => {
   useEffect(() => {
     if (!order) return
     shipmentForm.setFieldsValue({
-      carrierCode: order.carrierCode,
+      carrierCode: order.carrierCode || order.contact?.preferredCarrierCode,
       carrierTrackingNumber: order.carrierTrackingNumber,
       carrierTrackingUrl: order.carrierTrackingUrl,
     })
@@ -138,12 +139,13 @@ const OrderDetailPage = () => {
   }
 
   const canEditShipment = order.status === 'paid' || order.status === 'shipped'
+  const shortCode = formatOrderShortCode(order.trackingId, order.id)
 
   return (
     <Container className="orders-page admin-page orders-detail">
       {contextHolder}
       <PageHeader
-        title={order.trackingId || `Заказ ${order.id.slice(0, 8)}`}
+        title={`Заказ ${shortCode}`}
         subtitle={
           <Space wrap size={[8, 8]}>
             <Tag color={ORDER_STATUS_COLOR[order.status]}>{ORDER_STATUS_LABEL[order.status]}</Tag>
@@ -151,6 +153,9 @@ const OrderDetailPage = () => {
             <span className="orders-page__muted">{formatOrderDate(order.createdAt)}</span>
             {order.wasPaid ? <Tag color="green">оплата есть</Tag> : null}
             {order.paymentInProgress ? <Tag color="gold">оплата в процессе</Tag> : null}
+            {order.trackingId ? (
+              <span className="orders-page__muted">tracking: {order.trackingId}</span>
+            ) : null}
           </Space>
         }
         actions={
@@ -281,20 +286,29 @@ const OrderDetailPage = () => {
             {
               title: 'Название',
               dataIndex: 'name',
-              render: (name: string, row) => (
-                <Space direction="vertical" size={0}>
-                  <span>{name}</span>
-                  <Space size={4}>
-                    <Tag>{row.type === 'custom' ? 'custom' : 'товар'}</Tag>
-                    {row.type === 'custom' && !row.customPricingApprovedAt ? (
-                      <Tag color="orange">цена не согласована</Tag>
-                    ) : null}
-                    {row.type === 'custom' && row.customPricingApprovedAt ? (
-                      <Tag color="green">цена ок</Tag>
-                    ) : null}
+              render: (name: string, row) => {
+                const productHref =
+                  row.type === 'product' && row.productId && row.variationId
+                    ? `/products/${row.productId}/variations/${row.variationId}`
+                    : row.type === 'product' && row.productId
+                      ? `/products/${row.productId}`
+                      : null
+
+                return (
+                  <Space direction="vertical" size={0}>
+                    {productHref ? <Link to={productHref}>{name}</Link> : <span>{name}</span>}
+                    <Space size={4}>
+                      <Tag>{row.type === 'custom' ? 'custom' : 'товар'}</Tag>
+                      {row.type === 'custom' && !row.customPricingApprovedAt ? (
+                        <Tag color="orange">цена не согласована</Tag>
+                      ) : null}
+                      {row.type === 'custom' && row.customPricingApprovedAt ? (
+                        <Tag color="green">цена ок</Tag>
+                      ) : null}
+                    </Space>
                   </Space>
-                </Space>
-              ),
+                )
+              },
             },
             {
               title: 'Размер',

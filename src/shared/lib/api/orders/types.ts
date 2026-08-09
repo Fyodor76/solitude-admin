@@ -12,6 +12,8 @@ export interface OrderCarrierOption {
 export interface AdminOrderListItem {
   id: string
   trackingId?: string
+  /** Короткий код для списка (8 символов) */
+  shortCode: string
   status: OrderStatus
   totalAmount: number
   createdAt: string
@@ -46,6 +48,8 @@ export interface OrderTrackContact {
 export interface OrderTrackItem {
   id: string
   itemId: string
+  productId?: string
+  variationId?: string
   type: OrderItemType
   name: string
   quantity: number
