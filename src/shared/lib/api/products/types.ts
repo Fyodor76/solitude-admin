@@ -58,6 +58,29 @@ export interface CreateStockBulkPayload {
   items: CreateStockItemPayload[]
 }
 
+export interface StockItem {
+  id: string
+  productId: string
+  variationId: string
+  sizeId?: string
+  sku: string
+  quantity: number
+  reserved: number
+  available: number
+  location?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface UpdateStockItemPayload {
+  variationId?: string
+  sizeId?: string
+  sku?: string
+  quantity?: number
+  reserved?: number
+  location?: string
+}
+
 export interface ProductSearchFilters {
   categoryIds?: string[]
   brand?: string

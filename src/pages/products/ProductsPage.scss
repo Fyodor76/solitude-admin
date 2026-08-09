@@ -258,7 +258,10 @@
   &__variations-head,
   &__variation-row {
     display: grid;
-    grid-template-columns: 36px 56px minmax(120px, 1.4fr) minmax(100px, 1fr) 100px 100px 120px;
+    grid-template-columns: 36px 56px minmax(120px, 1.4fr) minmax(100px, 1fr) 100px 100px minmax(
+        160px,
+        auto
+      );
     gap: 10px;
     align-items: center;
   }

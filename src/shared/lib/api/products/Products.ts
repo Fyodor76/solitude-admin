@@ -2,12 +2,15 @@ import { Product, ProductVariation } from '../../../../app/types/product'
 import { ApiResponse, baseApi } from '../baseApi'
 import {
   CreateStockBulkPayload,
+  CreateStockItemPayload,
   ProductCreatePayload,
   ProductSearchFilters,
   ProductsPaginationMeta,
   ProductUpdatePayload,
   ProductVariationCreatePayload,
   ProductVariationUpdatePayload,
+  StockItem,
+  UpdateStockItemPayload,
 } from './types'
 
 export const apiProducts = baseApi.injectEndpoints({
@@ -83,12 +86,73 @@ export const apiProducts = baseApi.injectEndpoints({
       ],
     }),
 
-    createStockBulk: builder.mutation<ApiResponse<unknown, any>, CreateStockBulkPayload>({
+    createStockBulk: builder.mutation<ApiResponse<StockItem[], any>, CreateStockBulkPayload>({
       query: body => ({
         url: `/stock/bulk`,
         method: 'POST',
         body,
       }),
+      invalidatesTags: (result, error, body) => {
+        const variationIds = [...new Set(body.items.map(item => item.variationId))]
+        return [
+          ...variationIds.map(id => ({ type: 'Stock' as const, id })),
+          { type: 'Stock', id: 'LIST' },
+        ]
+      },
+    }),
+
+    createStockItem: builder.mutation<ApiResponse<StockItem, any>, CreateStockItemPayload>({
+      query: body => ({
+        url: `/stock`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, body) => [
+        { type: 'Stock', id: body.variationId },
+        { type: 'Stock', id: 'LIST' },
+      ],
+    }),
+
+    getStockByVariation: builder.query<ApiResponse<StockItem[], any>, string>({
+      query: variationId => ({
+        url: `/stock/variation/${variationId}`,
+        method: 'GET',
+      }),
+      providesTags: (result, error, variationId) => [
+        { type: 'Stock', id: variationId },
+        ...(result?.data?.map(item => ({ type: 'Stock' as const, id: item.id })) ?? []),
+      ],
+    }),
+
+    updateStockItem: builder.mutation<
+      ApiResponse<StockItem, any>,
+      { id: string; body: UpdateStockItemPayload; variationId?: string }
+    >({
+      query: ({ id, body }) => ({
+        url: `/stock/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (result, error, { id, variationId }) => [
+        { type: 'Stock', id },
+        ...(variationId ? [{ type: 'Stock' as const, id: variationId }] : []),
+        { type: 'Stock', id: 'LIST' },
+      ],
+    }),
+
+    deleteStockItem: builder.mutation<
+      ApiResponse<{ id: string }, any>,
+      { id: string; variationId?: string }
+    >({
+      query: ({ id }) => ({
+        url: `/stock/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, { id, variationId }) => [
+        { type: 'Stock', id },
+        ...(variationId ? [{ type: 'Stock' as const, id: variationId }] : []),
+        { type: 'Stock', id: 'LIST' },
+      ],
     }),
 
     getProductVariationById: builder.query<ApiResponse<ProductVariation, any>, string>({
@@ -168,6 +232,10 @@ export const {
   useUpdateProductMutation,
   useDeleteProductMutation,
   useCreateStockBulkMutation,
+  useCreateStockItemMutation,
+  useGetStockByVariationQuery,
+  useUpdateStockItemMutation,
+  useDeleteStockItemMutation,
   useGetProductVariationByIdQuery,
   useCreateProductVariationMutation,
   useUpdateProductVariationMutation,

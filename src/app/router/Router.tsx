@@ -11,6 +11,7 @@ import {
   ProductsPage,
   VariationCreatePage,
   VariationEditPage,
+  VariationStockPage,
 } from '@/pages/products'
 import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
@@ -104,6 +105,10 @@ export const Router: RouteObject[] = [
           {
             path: 'products/:productId/variations/new',
             element: <VariationCreatePage />,
+          },
+          {
+            path: 'products/:productId/variations/:variationId/stock',
+            element: <VariationStockPage />,
           },
           {
             path: 'products/:productId/variations/:variationId',

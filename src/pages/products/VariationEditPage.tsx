@@ -183,6 +183,11 @@ export default function VariationEditPage() {
         actions={
           <Space>
             <Button onClick={() => navigate(`/products/${productId}`)}>К товару</Button>
+            <Button
+              onClick={() => navigate(`/products/${productId}/variations/${variationId}/stock`)}
+            >
+              Сток
+            </Button>
             <Button type="primary" loading={isSaving} onClick={() => void handleSave()}>
               Сохранить
             </Button>

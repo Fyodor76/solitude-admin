@@ -116,9 +116,14 @@ function VariationSortableRow({
           {record.isActive ? 'Активна' : 'Скрыта'}
         </Tag>
       </span>
-      <Link to={`/products/${productId}/variations/${record.id}`}>
-        <Button type="link">Редактировать</Button>
-      </Link>
+      <Space size={0}>
+        <Link to={`/products/${productId}/variations/${record.id}`}>
+          <Button type="link">Редактировать</Button>
+        </Link>
+        <Link to={`/products/${productId}/variations/${record.id}/stock`}>
+          <Button type="link">Сток</Button>
+        </Link>
+      </Space>
     </Reorder.Item>
   )
 }

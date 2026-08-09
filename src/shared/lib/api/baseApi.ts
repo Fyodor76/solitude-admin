@@ -214,6 +214,7 @@ export const baseApi = createApi({
     'Category',
     'Collection',
     'Product',
+    'Stock',
     'Size-chart',
     'Size-parameter',
     'Product-attributes',
