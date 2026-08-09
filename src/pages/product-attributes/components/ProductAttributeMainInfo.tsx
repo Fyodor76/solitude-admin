@@ -59,7 +59,7 @@ const ProductAttributeMainInfo = ({
     }))
   }
   return (
-    <div className="product-attribute-info-split">
+    <>
       <div className="product-attribute">
         <div className="title-and-btns">
           <h4 className="middle-title">Информация об опции</h4>
@@ -132,7 +132,7 @@ const ProductAttributeMainInfo = ({
               <span className="select-attr-inputs-title-description">Описание</span>
               <TextArea
                 value={editFormLocal?.description}
-                rows={5}
+                rows={11}
                 onChange={e => handlerInputsSelect('description', e.target.value)}
               />
             </div>
@@ -154,7 +154,7 @@ const ProductAttributeMainInfo = ({
         localDeleteValue={localDeleteValue}
         localEditValue={localEditValue}
       />
-    </div>
+    </>
   )
 }
 

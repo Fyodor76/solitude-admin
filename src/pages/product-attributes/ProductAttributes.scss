@@ -59,6 +59,11 @@
       margin-left: 33px;
       width: 35%;
       gap: 20px;
+      position: sticky;
+      top: 16px;
+      align-self: flex-start;
+      max-height: calc(100vh - 32px);
+      overflow: hidden;
 
       .input-search {
         padding: 0px 20px;
@@ -68,7 +73,9 @@
         flex-direction: column;
         gap: 20px;
         overflow: auto;
-        max-height: 650px;
+        flex: 1;
+        min-height: 0;
+        max-height: none;
         .no-results {
           font-family: var(--font-primary);
           font-size: 14px;
@@ -127,6 +134,7 @@
       margin-right: 33px;
       display: flex;
       flex-direction: column;
+      gap: 30px;
       flex: 1;
       min-width: 0;
 
@@ -150,35 +158,21 @@
         }
       }
 
-      .product-attribute-info-split {
-        display: flex;
-        align-items: flex-start;
-        gap: 20px;
-        width: 100%;
-        min-width: 0;
-      }
-
       .product-attribute {
         display: flex;
-        gap: 16px;
+        gap: 20px;
         flex-direction: column;
         background-color: rgb(255, 253, 253);
         border: 1px solid var(--admin-color-border);
         border-radius: var(--admin-radius-surface);
         padding: 20px;
-        width: min(340px, 38%);
-        flex-shrink: 0;
+        width: 100%;
         height: auto;
-        position: sticky;
-        top: 16px;
-        align-self: flex-start;
-        max-height: calc(100vh - 120px);
-        overflow: auto;
+        min-width: 0;
 
         .title-and-btns {
           display: flex;
           justify-content: space-between;
-          gap: 12px;
 
           .middle-title {
             font-size: 18px;
@@ -190,7 +184,7 @@
             &-delete {
               color: red !important;
               border-color: red !important;
-              padding: 5px 16px;
+              padding: 5px 30px;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -203,18 +197,18 @@
         }
         .select-attr-main-info {
           display: flex;
-          flex-direction: column;
-          gap: 16px;
+          gap: 30px;
           .select-attr-inputs,
           .select-attr-description {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            width: 100%;
+            width: 50%;
             &-title-and-input {
               display: flex;
               flex-direction: column;
               gap: 10px;
+              flex: 1;
 
               .select-attr-inputs-title {
                 color: var(--admin-color-text-muted);
@@ -236,9 +230,9 @@
         border-radius: var(--admin-radius-surface);
         padding: 20px;
         gap: 20px;
-        flex: 1;
-        min-width: 0;
+        width: 100%;
         height: auto;
+        min-width: 0;
 
         .title-and-btn {
           display: flex;
@@ -249,7 +243,7 @@
           }
         }
         .ant-table-wrapper {
-          max-height: calc(100vh - 220px);
+          max-height: 400px;
           overflow: auto;
           min-width: 0;
         }
@@ -303,16 +297,6 @@
         margin-right: 0;
         min-width: 0;
 
-        .product-attribute-info-split {
-          flex-direction: column;
-        }
-
-        .product-attribute {
-          width: 100%;
-          position: static;
-          max-height: none;
-        }
-
         .attribute-value {
           width: 100%;
           min-width: 0;
@@ -339,6 +323,8 @@
         width: 100% !important;
         margin-left: 0;
         min-width: unset;
+        position: static;
+        max-height: none;
 
         .prod-attr-container {
           max-height: 300px !important;
@@ -349,15 +335,9 @@
         width: 100% !important;
         margin-right: 0;
 
-        .product-attribute-info-split {
-          flex-direction: column;
-        }
-
         .product-attribute {
           width: 100% !important;
           height: auto !important;
-          position: static;
-          max-height: none;
 
           .title-and-btns {
             max-width: 100%;
