@@ -6,7 +6,12 @@ import { NotificationsPage } from '@/pages/notifications'
 import { PlatformImages } from '@/pages/platform-images'
 import { ProductAttribute } from '@/pages/product-attributes'
 import { ProductCreatePage } from '@/pages/product-create'
-import { ProductDetailPage, ProductsPage, VariationEditPage } from '@/pages/products'
+import {
+  ProductDetailPage,
+  ProductsPage,
+  VariationCreatePage,
+  VariationEditPage,
+} from '@/pages/products'
 import { SizeChart } from '@/pages/size-charts'
 import { StorePreview } from '@/pages/store-preview'
 import { SupportInbox } from '@/pages/support-inbox'
@@ -95,6 +100,10 @@ export const Router: RouteObject[] = [
           {
             path: 'products/:productId',
             element: <ProductDetailPage />,
+          },
+          {
+            path: 'products/:productId/variations/new',
+            element: <VariationCreatePage />,
           },
           {
             path: 'products/:productId/variations/:variationId',

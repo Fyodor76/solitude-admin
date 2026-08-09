@@ -6,6 +6,7 @@ import {
   ProductSearchFilters,
   ProductsPaginationMeta,
   ProductUpdatePayload,
+  ProductVariationCreatePayload,
   ProductVariationUpdatePayload,
 } from './types'
 
@@ -98,6 +99,21 @@ export const apiProducts = baseApi.injectEndpoints({
       providesTags: (result, error, id) => [{ type: 'Product', id: `VARIATION_${id}` }],
     }),
 
+    createProductVariation: builder.mutation<
+      ApiResponse<ProductVariation, any>,
+      ProductVariationCreatePayload
+    >({
+      query: body => ({
+        url: `/product-variations`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, body) => [
+        { type: 'Product', id: body.productId },
+        { type: 'Product', id: 'LIST' },
+      ],
+    }),
+
     updateProductVariation: builder.mutation<
       ApiResponse<ProductVariation, any>,
       { id: string; body: ProductVariationUpdatePayload; productId?: string }
@@ -153,6 +169,7 @@ export const {
   useDeleteProductMutation,
   useCreateStockBulkMutation,
   useGetProductVariationByIdQuery,
+  useCreateProductVariationMutation,
   useUpdateProductVariationMutation,
   useReorderProductVariationsMutation,
   useReorderProductsMutation,

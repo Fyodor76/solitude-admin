@@ -378,7 +378,12 @@ export default function ProductDetailPage() {
       </section>
 
       <section className="product-detail__section">
-        <h2 className="product-detail__section-title">Вариации</h2>
+        <div className="product-detail__section-head">
+          <h2 className="product-detail__section-title">Вариации</h2>
+          <Button type="primary" onClick={() => navigate(`/products/${productId}/variations/new`)}>
+            Добавить вариацию
+          </Button>
+        </div>
         {isLoading ? (
           <p className="product-detail__variations-empty">Загрузка...</p>
         ) : !orderedVariations.length ? (
