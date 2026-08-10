@@ -21,6 +21,16 @@
     min-width: 0;
   }
 
+  &__filter {
+    width: min(180px, 100%);
+  }
+
+  &__hint {
+    margin: 0;
+    color: #8c8c8c;
+    font-size: 13px;
+  }
+
   &__list-wrap {
     border: 1px solid #f0f0f0;
     border-radius: 8px;
@@ -35,7 +45,7 @@
   &__row {
     display: grid;
     grid-template-columns:
-      36px 56px minmax(140px, 1.6fr) 120px 100px 80px minmax(180px, 1.2fr)
+      36px 56px minmax(140px, 1.6fr) 120px 100px 80px minmax(220px, 1.4fr)
       130px;
     gap: 10px;
     align-items: center;
@@ -173,8 +183,10 @@
   }
 
   @media (max-width: 900px) {
-    &__search {
+    &__search,
+    &__filter {
       max-width: 100%;
+      width: 100%;
     }
 
     &__list-wrap {

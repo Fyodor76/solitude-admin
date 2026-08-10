@@ -5,12 +5,13 @@ import {
   useReorderProductsMutation,
   useSearchProductsQuery,
 } from '@/shared/lib/api/products/Products'
+import type { ProductSearchFilters } from '@/shared/lib/api/products/types'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
-import { Button, Empty, Input, Modal, Pagination, Space, Spin, Tag } from 'antd'
+import { Button, Empty, Input, Modal, Pagination, Select, Space, Spin, Tag } from 'antd'
 import { Reorder, useDragControls } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
@@ -28,6 +29,10 @@ type ProductListItem = Pick<
   sortOrder?: number
 }
 
+type ActiveFilter = 'all' | 'active' | 'inactive'
+type StockFilter = 'all' | 'in_stock' | 'out_of_stock'
+type LandingFilter = 'all' | 'yes' | 'no'
+
 function getProductThumb(product: ProductListItem): string | null {
   const variation = product.variations?.[0]
   const raw = variation?.mainImage || variation?.images?.[0] || product.images?.[0] || null
@@ -43,6 +48,20 @@ function ProductThumb({ product }: { product: ProductListItem }) {
   }
 
   return <img src={thumb} alt="" className="products-page__thumb" onError={() => setFailed(true)} />
+}
+
+function ProductStatusTags({ product }: { product: ProductListItem }) {
+  return (
+    <div className="products-page__status">
+      <Tag color={product.isActive ? 'green' : 'default'}>
+        {product.isActive ? 'На витрине' : 'Скрыт'}
+      </Tag>
+      <Tag color={product.inStock ? 'blue' : 'orange'}>
+        {product.inStock ? 'В наличии' : 'Нет остатка'}
+      </Tag>
+      {product.showOnLanding ? <Tag color="purple">Главная</Tag> : null}
+    </div>
+  )
 }
 
 function ProductSortableRow({
@@ -105,15 +124,7 @@ function ProductSortableRow({
         {product.variations?.length ?? '—'}
       </span>
 
-      <div className="products-page__status">
-        <Tag color={product.isActive ? 'green' : 'default'}>
-          {product.isActive ? 'Активен' : 'Скрыт'}
-        </Tag>
-        <Tag color={product.inStock ? 'blue' : 'orange'}>
-          {product.inStock ? 'В наличии' : 'Нет'}
-        </Tag>
-        {product.showOnLanding ? <Tag color="purple">Главная</Tag> : null}
-      </div>
+      <ProductStatusTags product={product} />
 
       <Space size={4} className="products-page__actions">
         <Link to={`/products/${product.id}`}>
@@ -132,25 +143,44 @@ function ProductSortableRow({
   )
 }
 
+function buildSearchFilters(input: {
+  search: string
+  page: number
+  activeFilter: ActiveFilter
+  stockFilter: StockFilter
+  landingFilter: LandingFilter
+}): ProductSearchFilters {
+  return {
+    search: input.search || undefined,
+    isActiveFilter: input.activeFilter,
+    inStock: input.stockFilter === 'all' ? undefined : input.stockFilter === 'in_stock',
+    showOnLanding: input.landingFilter === 'all' ? undefined : input.landingFilter === 'yes',
+    sort: 'sort_order',
+    page: input.page,
+    limit: PAGE_SIZE,
+  }
+}
+
 export default function ProductsPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
+  const [activeFilter, setActiveFilter] = useState<ActiveFilter>('all')
+  const [stockFilter, setStockFilter] = useState<StockFilter>('all')
+  const [landingFilter, setLandingFilter] = useState<LandingFilter>('all')
   const [orderedProducts, setOrderedProducts] = useState<ProductListItem[]>([])
   const orderedRef = useRef(orderedProducts)
   const { openNotification, contextHolder } = useNotificationHandler()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
   const [reorderProducts, { isLoading: isReordering }] = useReorderProductsMutation()
 
-  const canReorder = !search
+  const filtersActive =
+    Boolean(search) || activeFilter !== 'all' || stockFilter !== 'all' || landingFilter !== 'all'
+  const canReorder = !filtersActive
 
-  const { data, isFetching, isError, refetch } = useSearchProductsQuery({
-    search: search || undefined,
-    isActiveFilter: 'all',
-    sort: 'sort_order',
-    page,
-    limit: PAGE_SIZE,
-  })
+  const { data, isFetching, isError, refetch } = useSearchProductsQuery(
+    buildSearchFilters({ search, page, activeFilter, stockFilter, landingFilter })
+  )
 
   const products = (data?.data ?? []) as ProductListItem[]
   const meta = data?.meta
@@ -222,8 +252,9 @@ export default function ProductsPage() {
       {contextHolder}
       <PageHeader
         title="Товары"
+        subtitle="«На витрине» = виден в каталоге. «Главная» = блок коллекции на лендинге."
         actions={
-          <Space>
+          <Space wrap>
             <Button loading={isFetching} onClick={() => void refetch()}>
               Обновить
             </Button>
@@ -247,7 +278,52 @@ export default function ProductsPage() {
           }}
           enterButton="Найти"
         />
+        <Select
+          className="products-page__filter"
+          value={activeFilter}
+          onChange={value => {
+            setPage(1)
+            setActiveFilter(value)
+          }}
+          options={[
+            { value: 'all', label: 'Витрина: все' },
+            { value: 'active', label: 'На витрине' },
+            { value: 'inactive', label: 'Скрыты' },
+          ]}
+        />
+        <Select
+          className="products-page__filter"
+          value={stockFilter}
+          onChange={value => {
+            setPage(1)
+            setStockFilter(value)
+          }}
+          options={[
+            { value: 'all', label: 'Сток: все' },
+            { value: 'in_stock', label: 'В наличии' },
+            { value: 'out_of_stock', label: 'Нет остатка' },
+          ]}
+        />
+        <Select
+          className="products-page__filter"
+          value={landingFilter}
+          onChange={value => {
+            setPage(1)
+            setLandingFilter(value)
+          }}
+          options={[
+            { value: 'all', label: 'Главная: все' },
+            { value: 'yes', label: 'На главной' },
+            { value: 'no', label: 'Не на главной' },
+          ]}
+        />
       </div>
+
+      {!canReorder ? (
+        <p className="products-page__hint">
+          Сортировка перетаскиванием доступна без поиска и фильтров.
+        </p>
+      ) : null}
 
       {isError ? (
         <AlertError onRetry={() => void refetch()} />

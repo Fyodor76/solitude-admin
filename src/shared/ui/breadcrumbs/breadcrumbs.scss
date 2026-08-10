@@ -31,7 +31,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      flex-shrink: 0;
+      min-width: 0;
+      max-width: 280px;
+      flex-shrink: 1;
       white-space: nowrap;
     }
 
@@ -43,6 +45,11 @@
       font-family: 'Source Sans 3';
       font-size: 14px;
       font-weight: 300;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
 
       &:hover {
         color: var(--color-blue);

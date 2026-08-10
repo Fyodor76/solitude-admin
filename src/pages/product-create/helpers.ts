@@ -56,6 +56,39 @@ export function buildSku(...parts: Array<string | null | undefined>): string {
     .join('-')
 }
 
+/** Предложить slug из названия. */
+export function suggestSlugFromName(name: string): string {
+  return slugify(name)
+}
+
+/** Предложить SKU из названия. */
+export function suggestSkuFromName(name: string): string {
+  return buildSku(name)
+}
+
+/**
+ * Если поле ещё пустое или совпадает с авто-версией от старого названия —
+ * подставить новое предложение. Иначе оставить ручной ввод.
+ */
+export function syncDerivedFromName(
+  current: string | undefined | null,
+  previousName: string,
+  nextName: string,
+  derive: (name: string) => string
+): string {
+  const nextDerived = derive(nextName)
+  if (!nextDerived) return (current || '').trim()
+
+  const currentTrimmed = (current || '').trim()
+  const previousDerived = derive(previousName)
+
+  if (!currentTrimmed || currentTrimmed === previousDerived) {
+    return nextDerived
+  }
+
+  return currentTrimmed
+}
+
 export function parseImagesText(value: string): string[] {
   return value
     .split(/[\n,]/)

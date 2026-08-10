@@ -21,6 +21,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ProductVariation } from '@/app/types/product'
 
+import { suggestSlugFromName, syncDerivedFromName } from '../product-create/helpers'
 import './ProductsPage.scss'
 import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from './productSwitchLabels'
 
@@ -158,6 +159,8 @@ export default function ProductDetailPage() {
   const [reorderVariations, { isLoading: isReordering }] = useReorderProductVariationsMutation()
 
   const product = data?.data
+  const nameWatched = Form.useWatch('name', form)
+  const previousNameRef = useRef('')
 
   const categoryOptions = useMemo(
     () => flattenCategories(categoriesResponse?.data ?? []),
@@ -166,6 +169,7 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!product) return
+    previousNameRef.current = product.name
     form.setFieldsValue({
       name: product.name,
       slug: product.slug,
@@ -181,6 +185,24 @@ export default function ProductDetailPage() {
     })
     setOrderedVariations(sortVariations(product.variations ?? []))
   }, [form, product])
+
+  useEffect(() => {
+    if (!product || nameWatched == null) return
+    const nextName = String(nameWatched)
+    if (nextName === previousNameRef.current) return
+
+    const currentSlug = form.getFieldValue('slug') as string | undefined
+    const nextSlug = syncDerivedFromName(
+      currentSlug,
+      previousNameRef.current,
+      nextName,
+      suggestSlugFromName
+    )
+    if (nextSlug !== currentSlug) {
+      form.setFieldValue('slug', nextSlug)
+    }
+    previousNameRef.current = nextName
+  }, [form, nameWatched, product])
 
   useEffect(() => {
     orderedRef.current = orderedVariations
@@ -348,6 +370,7 @@ export default function ProductDetailPage() {
               label="Slug"
               name="slug"
               rules={[{ required: true, message: 'Укажите slug' }]}
+              extra="Меняется вместе с названием, пока вы сами не отредактируете slug"
             >
               <Input />
             </Form.Item>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   useDeleteProductVariationMutation,
@@ -15,6 +15,11 @@ import { Button, Form, Input, InputNumber, Modal, Space } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ProductImageUpload } from '../product-create/components/ProductImageUpload'
+import {
+  suggestSkuFromName,
+  suggestSlugFromName,
+  syncDerivedFromName,
+} from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
 import { ProductImageItem } from '../product-create/types'
 import './ProductsPage.scss'
@@ -62,9 +67,12 @@ export default function VariationEditPage() {
   const product = productResponse?.data
   const variation = variationResponse?.data
   const isSaving = isSavingVariation || isSavingProduct || isDeleting
+  const nameWatched = Form.useWatch('name', form)
+  const previousNameRef = useRef('')
 
   useEffect(() => {
     if (!variation) return
+    previousNameRef.current = variation.name
     form.setFieldsValue({
       name: variation.name,
       slug: variation.slug,
@@ -85,6 +93,32 @@ export default function VariationEditPage() {
     setImageItems(ordered)
     setMainImageId(mainId)
   }, [form, variation])
+
+  useEffect(() => {
+    if (!variation || nameWatched == null) return
+    const nextName = String(nameWatched)
+    if (nextName === previousNameRef.current) return
+
+    const currentSlug = form.getFieldValue('slug') as string | undefined
+    const currentSku = form.getFieldValue('sku') as string | undefined
+
+    const nextSlug = syncDerivedFromName(
+      currentSlug,
+      previousNameRef.current,
+      nextName,
+      suggestSlugFromName
+    )
+    const nextSku = syncDerivedFromName(
+      currentSku,
+      previousNameRef.current,
+      nextName,
+      suggestSkuFromName
+    )
+
+    if (nextSlug !== currentSlug) form.setFieldValue('slug', nextSlug)
+    if (nextSku !== currentSku) form.setFieldValue('sku', nextSku)
+    previousNameRef.current = nextName
+  }, [form, nameWatched, variation])
 
   useEffect(() => {
     if (!product || showcaseHydrated) return
@@ -237,10 +271,18 @@ export default function VariationEditPage() {
             >
               <Input />
             </Form.Item>
-            <Form.Item label="SKU" name="sku">
+            <Form.Item
+              label="SKU"
+              name="sku"
+              extra="Синхронизируется с названием, пока не правите вручную"
+            >
               <Input />
             </Form.Item>
-            <Form.Item label="Slug" name="slug">
+            <Form.Item
+              label="Slug"
+              name="slug"
+              extra="Синхронизируется с названием, пока не правите вручную"
+            >
               <Input />
             </Form.Item>
             <Form.Item
