@@ -113,23 +113,29 @@ function VariationSortableRow({
       <span className="product-detail__sku" title={record.sku}>
         {record.sku}
       </span>
-      <span>{Number(record.price || 0).toLocaleString('ru-RU')} ₽</span>
-      <span className="product-detail__status">
-        <Tag color={record.isActive ? 'green' : 'default'}>
-          {record.isActive ? 'Активна' : 'Скрыта'}
-        </Tag>
-      </span>
-      <Space size={0}>
-        <Link to={`/products/${productId}/variations/${record.id}`}>
-          <Button type="link">Редактировать</Button>
-        </Link>
-        <Link to={`/products/${productId}/variations/${record.id}/stock`}>
-          <Button type="link">Сток</Button>
-        </Link>
-        <Button type="link" danger onClick={() => onDelete(record)}>
-          Удалить
-        </Button>
-      </Space>
+      <div className="product-detail__meta">
+        <span className="product-detail__price">
+          {Number(record.price || 0).toLocaleString('ru-RU')} ₽
+        </span>
+        <span className="product-detail__status">
+          <Tag color={record.isActive ? 'green' : 'default'}>
+            {record.isActive ? 'Активна' : 'Скрыта'}
+          </Tag>
+        </span>
+      </div>
+      <div className="product-detail__row-actions">
+        <Space size={0} wrap>
+          <Link to={`/products/${productId}/variations/${record.id}`}>
+            <Button type="link">Редактировать</Button>
+          </Link>
+          <Link to={`/products/${productId}/variations/${record.id}/stock`}>
+            <Button type="link">Сток</Button>
+          </Link>
+          <Button type="link" danger onClick={() => onDelete(record)}>
+            Удалить
+          </Button>
+        </Space>
+      </div>
     </Reorder.Item>
   )
 }
@@ -429,32 +435,34 @@ export default function ProductDetailPage() {
           <p className="product-detail__variations-empty">У товара пока нет вариаций</p>
         ) : (
           <div className={`product-detail__variations ${isReordering ? 'is-reordering' : ''}`}>
-            <div className="product-detail__variations-head">
-              <span />
-              <span>Фото</span>
-              <span>Название</span>
-              <span>SKU</span>
-              <span>Цена</span>
-              <span>Статус</span>
-              <span />
+            <div className="product-detail__variations-scroll">
+              <div className="product-detail__variations-head">
+                <span />
+                <span>Фото</span>
+                <span>Название</span>
+                <span>SKU</span>
+                <span>Цена</span>
+                <span>Статус</span>
+                <span />
+              </div>
+              <Reorder.Group
+                axis="y"
+                values={orderedVariations}
+                onReorder={setOrderedVariations}
+                as="div"
+                className="product-detail__variations-list"
+              >
+                {orderedVariations.map(record => (
+                  <VariationSortableRow
+                    key={record.id}
+                    record={record}
+                    productId={productId}
+                    onDragEnd={handleDragEnd}
+                    onDelete={handleDeleteVariation}
+                  />
+                ))}
+              </Reorder.Group>
             </div>
-            <Reorder.Group
-              axis="y"
-              values={orderedVariations}
-              onReorder={setOrderedVariations}
-              as="div"
-              className="product-detail__variations-list"
-            >
-              {orderedVariations.map(record => (
-                <VariationSortableRow
-                  key={record.id}
-                  record={record}
-                  productId={productId}
-                  onDragEnd={handleDragEnd}
-                  onDelete={handleDeleteVariation}
-                />
-              ))}
-            </Reorder.Group>
           </div>
         )}
       </section>

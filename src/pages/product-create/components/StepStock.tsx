@@ -26,45 +26,48 @@ export function StepStock({ rows, variations, sizeParameters, onChange }: StepSt
   }
 
   return (
-    <Card title="Сток по вариациям и размерам" size="small">
-      <Table
-        rowKey="key"
-        pagination={false}
-        dataSource={rows}
-        columns={[
-          {
-            title: 'Вариация',
-            dataIndex: 'variationKey',
-            render: (value: string) => variationName(value),
-          },
-          {
-            title: 'Размер',
-            dataIndex: 'sizeId',
-            render: (value: string) => sizeName(value),
-          },
-          {
-            title: 'SKU',
-            dataIndex: 'sku',
-            render: (value: string, row) => (
-              <Input value={value} onChange={e => onChange(row.key, { sku: e.target.value })} />
-            ),
-          },
-          {
-            title: 'Количество',
-            dataIndex: 'quantity',
-            width: 140,
-            render: (value: number, row) => (
-              <InputNumber
-                min={0}
-                value={value}
-                onChange={quantity =>
-                  onChange(row.key, { quantity: quantity == null ? 0 : Number(quantity) })
-                }
-              />
-            ),
-          },
-        ]}
-      />
+    <Card title="Сток по вариациям и размерам" size="small" className="product-create__stock-card">
+      <div className="product-create__table-wrap">
+        <Table
+          rowKey="key"
+          pagination={false}
+          dataSource={rows}
+          scroll={{ x: 640 }}
+          columns={[
+            {
+              title: 'Вариация',
+              dataIndex: 'variationKey',
+              render: (value: string) => variationName(value),
+            },
+            {
+              title: 'Размер',
+              dataIndex: 'sizeId',
+              render: (value: string) => sizeName(value),
+            },
+            {
+              title: 'SKU',
+              dataIndex: 'sku',
+              render: (value: string, row) => (
+                <Input value={value} onChange={e => onChange(row.key, { sku: e.target.value })} />
+              ),
+            },
+            {
+              title: 'Количество',
+              dataIndex: 'quantity',
+              width: 140,
+              render: (value: number, row) => (
+                <InputNumber
+                  min={0}
+                  value={value}
+                  onChange={quantity =>
+                    onChange(row.key, { quantity: quantity == null ? 0 : Number(quantity) })
+                  }
+                />
+              ),
+            },
+          ]}
+        />
+      </div>
       <Space style={{ marginTop: 12 }}>
         <span>Можно оставить 0 — позиция всё равно создастся с нулевым остатком.</span>
       </Space>

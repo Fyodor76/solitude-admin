@@ -5,11 +5,14 @@ import { useGetOrdersQuery } from '@/shared/lib/api/orders/Orders'
 import type { AdminOrderListItem, OrderStatus } from '@/shared/lib/api/orders/types'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Empty, Input, Segmented, Spin, Table, Tag, Tooltip } from 'antd'
+import { Button, Empty, Input, Segmented, Select, Spin, Table, Tag, Tooltip } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY } from '@/app/constans/layout'
+import {
+  ADMIN_COMPACT_LAYOUT_MEDIA_QUERY,
+  ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY,
+} from '@/app/constans/layout'
 
 import {
   formatOrderDate,
@@ -25,6 +28,7 @@ import './OrdersPage.scss'
 const OrdersPage = () => {
   const navigate = useNavigate()
   const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
+  const isCompact = useMatchMedia(ADMIN_COMPACT_LAYOUT_MEDIA_QUERY)
   const { data, isLoading, isFetching, refetch } = useGetOrdersQuery()
   const [statusFilter, setStatusFilter] = useState<OrdersListFilter>('all')
   const [search, setSearch] = useState('')
@@ -175,24 +179,39 @@ const OrdersPage = () => {
     <Container className="orders-page admin-page">
       <PageHeader
         title="Заказы"
-        subtitle="Статусы, клиенты, доставка и согласование цен custom-позиций."
+        subtitle={
+          isMobile
+            ? 'Статусы, клиенты, доставка и custom-цены.'
+            : 'Статусы, клиенты, доставка и согласование цен custom-позиций.'
+        }
         actions={
-          <Button loading={isFetching} onClick={() => void refetch()}>
+          <Button loading={isFetching} onClick={() => void refetch()} block={isMobile}>
             Обновить
           </Button>
         }
       />
 
       <div className="orders-page__toolbar">
-        <Segmented
-          className="orders-page__segmented"
-          options={statusOptions}
-          value={statusFilter}
-          onChange={value => setStatusFilter(value as OrdersListFilter)}
-        />
+        {isCompact ? (
+          <Select
+            className="orders-page__filter-select"
+            value={statusFilter}
+            options={statusOptions}
+            onChange={value => setStatusFilter(value as OrdersListFilter)}
+          />
+        ) : (
+          <div className="orders-page__segmented-wrap">
+            <Segmented
+              className="orders-page__segmented"
+              options={statusOptions}
+              value={statusFilter}
+              onChange={value => setStatusFilter(value as OrdersListFilter)}
+            />
+          </div>
+        )}
         <Input.Search
           allowClear
-          placeholder="Клиент, телефон, email, код заказа..."
+          placeholder="Клиент, телефон, email, код..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="orders-page__search"
@@ -205,7 +224,7 @@ const OrdersPage = () => {
         </div>
       ) : filtered.length === 0 ? (
         <Empty className="orders-page__empty" description="Заказы не найдены" />
-      ) : isMobile ? (
+      ) : isCompact ? (
         <div className="orders-page__cards">
           {filtered.map(order => {
             const code = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
@@ -218,10 +237,14 @@ const OrdersPage = () => {
                   <span className="orders-page__muted">{formatOrderDate(order.createdAt)}</span>
                 </div>
                 <strong>{order.customerName || code}</strong>
+                {order.customerPhone ? (
+                  <span className="orders-page__muted">{order.customerPhone}</span>
+                ) : null}
                 <div className="orders-page__card-meta">
                   <code className="orders-page__code">{code}</code>
                   <span>{formatOrderMoney(order.totalAmount)}</span>
                   <span>{order.itemsCount ?? 0} поз.</span>
+                  {order.wasPaid ? <Tag color="green">оплата</Tag> : null}
                   {order.needsCustomPricing ? <Tag color="orange">нужна цена</Tag> : null}
                 </div>
               </Link>
@@ -229,19 +252,21 @@ const OrdersPage = () => {
           })}
         </div>
       ) : (
-        <Table
-          className="orders-page__table"
-          rowKey="id"
-          columns={columns}
-          dataSource={filtered}
-          loading={isFetching}
-          pagination={{ pageSize: 20, showSizeChanger: false }}
-          scroll={{ x: 1100 }}
-          onRow={row => ({
-            onClick: () => navigate(`/orders/${row.id}`),
-            className: 'orders-page__row',
-          })}
-        />
+        <div className="orders-page__table-wrap">
+          <Table
+            className="orders-page__table"
+            rowKey="id"
+            columns={columns}
+            dataSource={filtered}
+            loading={isFetching}
+            pagination={{ pageSize: 20, showSizeChanger: false }}
+            scroll={{ x: 960 }}
+            onRow={row => ({
+              onClick: () => navigate(`/orders/${row.id}`),
+              className: 'orders-page__row',
+            })}
+          />
+        </div>
       )}
     </Container>
   )

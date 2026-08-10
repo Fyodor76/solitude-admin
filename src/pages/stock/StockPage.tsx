@@ -271,113 +271,115 @@ export default function StockPage() {
         ) : !filteredRows.length ? (
           <Empty description="Позиции склада не найдены" />
         ) : (
-          <Table
-            rowKey="id"
-            pagination={{ pageSize: 50, showSizeChanger: true }}
-            loading={isFetching || isUpdating || isDeleting}
-            dataSource={filteredRows}
-            scroll={{ x: 1100 }}
-            columns={[
-              {
-                title: 'Товар',
-                dataIndex: 'productName',
-                render: (value: string, row) => (
-                  <Link to={`/products/${row.productId}`}>{value}</Link>
-                ),
-              },
-              {
-                title: 'Вариация',
-                dataIndex: 'variationName',
-                render: (value: string, row) => (
-                  <Link to={`/products/${row.productId}/variations/${row.variationId}`}>
-                    {value}
-                  </Link>
-                ),
-              },
-              {
-                title: 'Размер',
-                dataIndex: 'sizeLabel',
-                width: 120,
-                render: (value: string) =>
-                  value === 'Без размера' ? <Tag>Без размера</Tag> : value,
-              },
-              {
-                title: 'SKU',
-                dataIndex: 'draftSku',
-                width: 220,
-                render: (_value, row) => (
-                  <Input
-                    value={row.draftSku}
-                    onChange={e => patchRow(row.id, { draftSku: e.target.value })}
-                  />
-                ),
-              },
-              {
-                title: 'Кол-во',
-                dataIndex: 'draftQuantity',
-                width: 110,
-                render: (_value, row) => (
-                  <InputNumber
-                    min={0}
-                    value={row.draftQuantity}
-                    onChange={quantity =>
-                      patchRow(row.id, {
-                        draftQuantity: quantity == null ? 0 : Number(quantity),
-                      })
-                    }
-                  />
-                ),
-              },
-              {
-                title: 'Резерв',
-                dataIndex: 'reserved',
-                width: 80,
-                render: (value: number) => value ?? 0,
-              },
-              {
-                title: 'Доступно',
-                dataIndex: 'available',
-                width: 90,
-                render: (value: number) => (
-                  <Tag color={(value ?? 0) > 0 ? 'green' : 'default'}>{value ?? 0}</Tag>
-                ),
-              },
-              {
-                title: 'Локация',
-                dataIndex: 'draftLocation',
-                width: 160,
-                render: (_value, row) => (
-                  <Input
-                    value={row.draftLocation}
-                    placeholder="Склад"
-                    onChange={e => patchRow(row.id, { draftLocation: e.target.value })}
-                  />
-                ),
-              },
-              {
-                title: '',
-                key: 'actions',
-                width: 200,
-                fixed: 'right',
-                render: (_value, row) => (
-                  <Space size={0}>
-                    <Button type="link" onClick={() => void handleSaveRow(row)}>
-                      Сохранить
-                    </Button>
-                    <Link to={`/products/${row.productId}/variations/${row.variationId}/stock`}>
-                      <Button type="link">Открыть</Button>
+          <div className="stock-page__table-wrap">
+            <Table
+              rowKey="id"
+              pagination={{ pageSize: 50, showSizeChanger: true }}
+              loading={isFetching || isUpdating || isDeleting}
+              dataSource={filteredRows}
+              scroll={{ x: 1100 }}
+              columns={[
+                {
+                  title: 'Товар',
+                  dataIndex: 'productName',
+                  render: (value: string, row) => (
+                    <Link to={`/products/${row.productId}`}>{value}</Link>
+                  ),
+                },
+                {
+                  title: 'Вариация',
+                  dataIndex: 'variationName',
+                  render: (value: string, row) => (
+                    <Link to={`/products/${row.productId}/variations/${row.variationId}`}>
+                      {value}
                     </Link>
-                    <Button
-                      type="link"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleDeleteRow(row)}
+                  ),
+                },
+                {
+                  title: 'Размер',
+                  dataIndex: 'sizeLabel',
+                  width: 120,
+                  render: (value: string) =>
+                    value === 'Без размера' ? <Tag>Без размера</Tag> : value,
+                },
+                {
+                  title: 'SKU',
+                  dataIndex: 'draftSku',
+                  width: 220,
+                  render: (_value, row) => (
+                    <Input
+                      value={row.draftSku}
+                      onChange={e => patchRow(row.id, { draftSku: e.target.value })}
                     />
-                  </Space>
-                ),
-              },
-            ]}
-          />
+                  ),
+                },
+                {
+                  title: 'Кол-во',
+                  dataIndex: 'draftQuantity',
+                  width: 110,
+                  render: (_value, row) => (
+                    <InputNumber
+                      min={0}
+                      value={row.draftQuantity}
+                      onChange={quantity =>
+                        patchRow(row.id, {
+                          draftQuantity: quantity == null ? 0 : Number(quantity),
+                        })
+                      }
+                    />
+                  ),
+                },
+                {
+                  title: 'Резерв',
+                  dataIndex: 'reserved',
+                  width: 80,
+                  render: (value: number) => value ?? 0,
+                },
+                {
+                  title: 'Доступно',
+                  dataIndex: 'available',
+                  width: 90,
+                  render: (value: number) => (
+                    <Tag color={(value ?? 0) > 0 ? 'green' : 'default'}>{value ?? 0}</Tag>
+                  ),
+                },
+                {
+                  title: 'Локация',
+                  dataIndex: 'draftLocation',
+                  width: 160,
+                  render: (_value, row) => (
+                    <Input
+                      value={row.draftLocation}
+                      placeholder="Склад"
+                      onChange={e => patchRow(row.id, { draftLocation: e.target.value })}
+                    />
+                  ),
+                },
+                {
+                  title: '',
+                  key: 'actions',
+                  width: 200,
+                  fixed: 'right',
+                  render: (_value, row) => (
+                    <Space size={0}>
+                      <Button type="link" onClick={() => void handleSaveRow(row)}>
+                        Сохранить
+                      </Button>
+                      <Link to={`/products/${row.productId}/variations/${row.variationId}/stock`}>
+                        <Button type="link">Открыть</Button>
+                      </Link>
+                      <Button
+                        type="link"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteRow(row)}
+                      />
+                    </Space>
+                  ),
+                },
+              ]}
+            />
+          </div>
         )}
       </section>
     </Container>

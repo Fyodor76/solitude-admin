@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
 import {
   useGetOrderByIdQuery,
   useGetOrderCarriersQuery,
@@ -27,7 +28,13 @@ import {
   Tag,
   Timeline,
 } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
 import { Link, useParams } from 'react-router-dom'
+
+import {
+  ADMIN_COMPACT_LAYOUT_MEDIA_QUERY,
+  ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY,
+} from '@/app/constans/layout'
 
 import {
   formatOrderDate,
@@ -46,8 +53,16 @@ type ShipmentFormValues = {
   carrierTrackingUrl?: string
 }
 
+function productHrefForItem(row: OrderTrackItem): string | null {
+  if (row.type !== 'product' || !row.productId) return null
+  if (row.variationId) return `/products/${row.productId}/variations/${row.variationId}`
+  return `/products/${row.productId}`
+}
+
 const OrderDetailPage = () => {
   const { orderId = '' } = useParams<{ orderId: string }>()
+  const isCompact = useMatchMedia(ADMIN_COMPACT_LAYOUT_MEDIA_QUERY)
+  const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
   const { contextHolder, openNotification } = useNotificationHandler()
   const { data, isLoading, isFetching, refetch } = useGetOrderByIdQuery(orderId, {
     skip: !orderId,
@@ -191,6 +206,123 @@ const OrderDetailPage = () => {
     }
   }
 
+  const renderItemMeta = (row: OrderTrackItem) => {
+    const previewSrc = resolveMediaUrl(row.previewImage)
+    return (
+      <Space size={4} wrap>
+        <Tag>{row.type === 'custom' ? 'custom' : 'товар'}</Tag>
+        {row.type === 'custom' && !row.customPricingApprovedAt ? (
+          <Tag color="orange">цена не согласована</Tag>
+        ) : null}
+        {row.type === 'custom' && row.customPricingApprovedAt ? (
+          <Tag color="green">цена ок</Tag>
+        ) : null}
+        {row.type === 'custom' && row.customProductSlug ? (
+          <Tag>slug: {row.customProductSlug}</Tag>
+        ) : null}
+        {row.type === 'custom' && previewSrc ? (
+          <a href={previewSrc} target="_blank" rel="noreferrer">
+            превью
+          </a>
+        ) : null}
+        {row.type === 'custom' ? (
+          <Button
+            type="link"
+            size="small"
+            className="orders-detail__copy-id"
+            onClick={() => void copyText(row.itemId, 'ID custom-товара скопирован')}
+          >
+            ID
+          </Button>
+        ) : null}
+      </Space>
+    )
+  }
+
+  const renderItemPrice = (row: OrderTrackItem) => {
+    if (row.type !== 'custom') {
+      return <span>{formatOrderMoney(row.price)}</span>
+    }
+    return (
+      <div className="orders-detail__item-card-price">
+        <InputNumber
+          min={0.01}
+          step={100}
+          value={pricingDrafts[row.id] ?? row.price}
+          onChange={value =>
+            setPricingDrafts(prev => ({
+              ...prev,
+              [row.id]: typeof value === 'number' ? value : null,
+            }))
+          }
+          addonAfter="₽"
+        />
+        <Button
+          size="small"
+          type="primary"
+          loading={isUpdatingPricing}
+          block={isMobile}
+          onClick={() => void handleApprovePrice(row)}
+        >
+          Согласовать
+        </Button>
+      </div>
+    )
+  }
+
+  const itemColumns: ColumnsType<OrderTrackItem> = [
+    {
+      title: '',
+      key: 'preview',
+      width: 72,
+      render: (_value, row) => {
+        const src = resolveMediaUrl(row.previewImage)
+        if (!src) return null
+        return (
+          <a href={src} target="_blank" rel="noreferrer" className="orders-detail__thumb">
+            <img src={src} alt="" />
+          </a>
+        )
+      },
+    },
+    {
+      title: 'Название',
+      dataIndex: 'name',
+      render: (name: string, row) => {
+        const productHref = productHrefForItem(row)
+        return (
+          <Space direction="vertical" size={0}>
+            {productHref ? <Link to={productHref}>{name}</Link> : <span>{name}</span>}
+            {renderItemMeta(row)}
+          </Space>
+        )
+      },
+    },
+    {
+      title: 'Размер',
+      dataIndex: 'size',
+      width: 120,
+      render: value => value || '—',
+    },
+    {
+      title: 'Кол-во',
+      dataIndex: 'quantity',
+      width: 80,
+    },
+    {
+      title: 'Цена',
+      key: 'price',
+      width: 220,
+      render: (_value, row) => renderItemPrice(row),
+    },
+    {
+      title: 'Сумма',
+      key: 'lineTotal',
+      width: 120,
+      render: (_value, row) => formatOrderMoney(row.price * row.quantity),
+    },
+  ]
+
   if (isLoading) {
     return (
       <Container className="orders-page admin-page">
@@ -232,12 +364,12 @@ const OrderDetailPage = () => {
           </Space>
         }
         actions={
-          <Space wrap>
-            <Button loading={isFetching} onClick={() => void refetch()}>
+          <Space wrap className="orders-detail__header-actions">
+            <Button loading={isFetching} onClick={() => void refetch()} block={isMobile}>
               Обновить
             </Button>
-            <Link to="/orders">
-              <Button>К списку</Button>
+            <Link to="/orders" className="orders-detail__header-link">
+              <Button block={isMobile}>К списку</Button>
             </Link>
           </Space>
         }
@@ -257,7 +389,7 @@ const OrderDetailPage = () => {
       {nextStatuses.length > 0 ? (
         <section className="orders-detail__section">
           <h2 className="orders-detail__title">Смена статуса</h2>
-          <Space wrap>
+          <div className="orders-detail__status-actions">
             {nextStatuses.map(status => (
               <Button
                 key={status}
@@ -269,7 +401,7 @@ const OrderDetailPage = () => {
                 {ORDER_STATUS_LABEL[status]}
               </Button>
             ))}
-          </Space>
+          </div>
         </section>
       ) : null}
 
@@ -355,7 +487,7 @@ const OrderDetailPage = () => {
           <Form.Item name="carrierTrackingUrl" label="Ссылка на отслеживание">
             <Input placeholder="https://..." />
           </Form.Item>
-          <Space wrap>
+          <div className="orders-detail__status-actions">
             <Button type="primary" htmlType="submit" loading={isUpdatingShipment}>
               Сохранить отправление
             </Button>
@@ -373,7 +505,7 @@ const OrderDetailPage = () => {
                 Копировать ссылку
               </Button>
             ) : null}
-          </Space>
+          </div>
         </Form>
         {order.carrierTrackingUrl ? (
           <p className="orders-detail__track-link">
@@ -387,125 +519,56 @@ const OrderDetailPage = () => {
 
       <section className="orders-detail__section">
         <h2 className="orders-detail__title">Позиции ({order.itemsCount})</h2>
-        <Table
-          rowKey="id"
-          dataSource={order.items}
-          pagination={false}
-          scroll={{ x: 980 }}
-          columns={[
-            {
-              title: '',
-              key: 'preview',
-              width: 72,
-              render: (_value, row: OrderTrackItem) => {
-                const src = resolveMediaUrl(row.previewImage)
-                if (!src) return null
-                return (
-                  <a href={src} target="_blank" rel="noreferrer" className="orders-detail__thumb">
-                    <img src={src} alt="" />
-                  </a>
-                )
-              },
-            },
-            {
-              title: 'Название',
-              dataIndex: 'name',
-              render: (name: string, row) => {
-                const productHref =
-                  row.type === 'product' && row.productId && row.variationId
-                    ? `/products/${row.productId}/variations/${row.variationId}`
-                    : row.type === 'product' && row.productId
-                      ? `/products/${row.productId}`
-                      : null
-                const previewSrc = resolveMediaUrl(row.previewImage)
-
-                return (
-                  <Space direction="vertical" size={0}>
-                    {productHref ? <Link to={productHref}>{name}</Link> : <span>{name}</span>}
-                    <Space size={4} wrap>
-                      <Tag>{row.type === 'custom' ? 'custom' : 'товар'}</Tag>
-                      {row.type === 'custom' && !row.customPricingApprovedAt ? (
-                        <Tag color="orange">цена не согласована</Tag>
-                      ) : null}
-                      {row.type === 'custom' && row.customPricingApprovedAt ? (
-                        <Tag color="green">цена ок</Tag>
-                      ) : null}
-                      {row.type === 'custom' && row.customProductSlug ? (
-                        <Tag>slug: {row.customProductSlug}</Tag>
-                      ) : null}
-                      {row.type === 'custom' && previewSrc ? (
-                        <a href={previewSrc} target="_blank" rel="noreferrer">
-                          превью
-                        </a>
-                      ) : null}
-                      {row.type === 'custom' ? (
-                        <Button
-                          type="link"
-                          size="small"
-                          className="orders-detail__copy-id"
-                          onClick={() => void copyText(row.itemId, 'ID custom-товара скопирован')}
-                        >
-                          ID
-                        </Button>
-                      ) : null}
-                    </Space>
-                  </Space>
-                )
-              },
-            },
-            {
-              title: 'Размер',
-              dataIndex: 'size',
-              width: 120,
-              render: value => value || '—',
-            },
-            {
-              title: 'Кол-во',
-              dataIndex: 'quantity',
-              width: 80,
-            },
-            {
-              title: 'Цена',
-              key: 'price',
-              width: 220,
-              render: (_value, row: OrderTrackItem) => {
-                if (row.type !== 'custom') {
-                  return formatOrderMoney(row.price)
-                }
-                return (
-                  <Space>
-                    <InputNumber
-                      min={0.01}
-                      step={100}
-                      value={pricingDrafts[row.id] ?? row.price}
-                      onChange={value =>
-                        setPricingDrafts(prev => ({
-                          ...prev,
-                          [row.id]: typeof value === 'number' ? value : null,
-                        }))
-                      }
-                      addonAfter="₽"
-                    />
-                    <Button
-                      size="small"
-                      type="primary"
-                      loading={isUpdatingPricing}
-                      onClick={() => void handleApprovePrice(row)}
-                    >
-                      Согласовать
-                    </Button>
-                  </Space>
-                )
-              },
-            },
-            {
-              title: 'Сумма',
-              key: 'lineTotal',
-              width: 120,
-              render: (_value, row) => formatOrderMoney(row.price * row.quantity),
-            },
-          ]}
-        />
+        {isCompact ? (
+          <div className="orders-detail__items-cards">
+            {order.items.map(row => {
+              const previewSrc = resolveMediaUrl(row.previewImage)
+              const productHref = productHrefForItem(row)
+              return (
+                <article key={row.id} className="orders-detail__item-card">
+                  <div className="orders-detail__item-card-top">
+                    {previewSrc ? (
+                      <a
+                        href={previewSrc}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="orders-detail__thumb"
+                      >
+                        <img src={previewSrc} alt="" />
+                      </a>
+                    ) : null}
+                    <div className="orders-detail__item-card-body">
+                      {productHref ? (
+                        <Link to={productHref} className="orders-detail__item-card-name">
+                          {row.name}
+                        </Link>
+                      ) : (
+                        <span className="orders-detail__item-card-name">{row.name}</span>
+                      )}
+                      {renderItemMeta(row)}
+                    </div>
+                  </div>
+                  <div className="orders-detail__item-card-row">
+                    <span>Размер: {row.size || '—'}</span>
+                    <span>Кол-во: {row.quantity}</span>
+                    <span>Сумма: {formatOrderMoney(row.price * row.quantity)}</span>
+                  </div>
+                  {renderItemPrice(row)}
+                </article>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="orders-page__table-wrap">
+            <Table
+              rowKey="id"
+              dataSource={order.items}
+              pagination={false}
+              scroll={{ x: 980 }}
+              columns={itemColumns}
+            />
+          </div>
+        )}
       </section>
 
       <section className="orders-detail__section">

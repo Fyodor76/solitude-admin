@@ -3,24 +3,32 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px 0 32px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
   &__toolbar {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
+    min-width: 0;
   }
 
   &__search {
     max-width: 360px;
     width: 100%;
+    min-width: 0;
   }
 
   &__list-wrap {
     border: 1px solid #f0f0f0;
     border-radius: 8px;
     background: #fff;
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__list-head,
@@ -31,6 +39,7 @@
       130px;
     gap: 10px;
     align-items: center;
+    min-width: 900px;
   }
 
   &__list-head {
@@ -108,6 +117,8 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
+    max-width: 100%;
+    overflow-x: auto;
   }
 
   &__thumb {
@@ -147,10 +158,9 @@
 
   &__status {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     gap: 4px;
-    white-space: nowrap;
   }
 
   &__error {
@@ -161,6 +171,89 @@
     padding: 24px 0;
     color: #8c8c8c;
   }
+
+  @media (max-width: 900px) {
+    &__search {
+      max-width: 100%;
+    }
+
+    &__list-wrap {
+      overflow: visible;
+      border: none;
+      background: transparent;
+    }
+
+    &__list-head {
+      display: none;
+    }
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    &__list-head,
+    &__row {
+      min-width: 0;
+    }
+
+    &__row {
+      display: grid;
+      grid-template-columns: 28px 48px minmax(0, 1fr) auto;
+      grid-template-areas:
+        'drag thumb name actions'
+        'drag thumb meta actions'
+        'status status status status';
+      gap: 8px 10px;
+      padding: 14px 16px;
+      border: 1px solid #f0f0f0;
+      border-radius: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    &__drag-handle,
+    &__drag-spacer {
+      grid-area: drag;
+      align-self: start;
+    }
+
+    &__thumb,
+    &__thumb-placeholder {
+      grid-area: thumb;
+      align-self: start;
+    }
+
+    &__name {
+      grid-area: name;
+      max-width: none;
+    }
+
+    &__cell--brand,
+    &__cell--variations {
+      display: none;
+    }
+
+    &__cell--price {
+      grid-area: meta;
+      font-weight: 600;
+    }
+
+    &__status {
+      grid-area: status;
+    }
+
+    &__actions {
+      grid-area: actions;
+      justify-self: end;
+      align-self: start;
+      flex-direction: column;
+    }
+
+    &__pagination {
+      justify-content: center;
+    }
+  }
 }
 
 .product-detail {
@@ -168,11 +261,16 @@
   flex-direction: column;
   gap: 20px;
   padding: 16px 0 32px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
   &__section {
     background: #fff;
     border-radius: 8px;
     padding: 16px 20px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__section-head {
@@ -181,6 +279,8 @@
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 16px;
+    flex-wrap: wrap;
+    min-width: 0;
 
     .product-detail__section-title {
       margin: 0;
@@ -242,6 +342,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
 
     &.is-reordering {
       opacity: 0.75;
@@ -253,6 +354,15 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-width: 0;
+  }
+
+  &__variations-scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   &__variations-head,
@@ -264,6 +374,7 @@
       );
     gap: 10px;
     align-items: center;
+    min-width: 860px;
   }
 
   &__variations-head {
@@ -324,9 +435,22 @@
     font-size: 12px;
   }
 
+  &__price {
+    min-width: 0;
+  }
+
+  &__meta {
+    display: contents;
+  }
+
+  &__row-actions {
+    display: contents;
+  }
+
   &__footer {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 8px;
     position: sticky;
     bottom: 0;
@@ -336,9 +460,102 @@
     border-top: 1px solid #f0f0f0;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     &__grid {
       grid-template-columns: 1fr;
+    }
+
+    &__section {
+      padding: 14px 16px;
+    }
+
+    &__variations-scroll {
+      overflow: visible;
+    }
+
+    &__variations-head {
+      display: none;
+    }
+
+    &__variations-head,
+    &__variation-row {
+      min-width: 0;
+    }
+
+    &__variation-row {
+      display: grid;
+      grid-template-columns: 28px 48px minmax(0, 1fr);
+      grid-template-areas:
+        'drag thumb name'
+        'drag thumb sku'
+        'meta meta meta'
+        'actions actions actions';
+      gap: 8px 10px;
+      padding: 12px;
+    }
+
+    &__drag-handle {
+      grid-area: drag;
+      align-self: start;
+    }
+
+    &__thumb-wrap {
+      grid-area: thumb;
+      align-self: start;
+    }
+
+    &__cell-text {
+      grid-area: name;
+    }
+
+    &__sku {
+      grid-area: sku;
+      max-width: none;
+    }
+
+    &__price,
+    &__status {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+      align-items: center;
+      grid-area: meta;
+    }
+
+    &__row-actions {
+      display: block;
+      grid-area: actions;
+      width: 100%;
+
+      .ant-space {
+        flex-wrap: wrap;
+        width: 100%;
+      }
+    }
+
+    &__footer {
+      justify-content: stretch;
+
+      .ant-btn {
+        flex: 1 1 auto;
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    &__row-actions .ant-space {
+      flex-direction: column;
+      align-items: stretch;
+
+      .ant-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
   }
 }
@@ -348,11 +565,16 @@
   flex-direction: column;
   gap: 20px;
   padding: 16px 0 32px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 
   &__section {
     background: #fff;
     border-radius: 8px;
     padding: 16px 20px;
+    min-width: 0;
+    max-width: 100%;
   }
 
   &__grid {
@@ -383,6 +605,7 @@
   &__footer {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 8px;
     position: sticky;
     bottom: 0;
@@ -392,9 +615,29 @@
     border-top: 1px solid #f0f0f0;
   }
 
-  @media (max-width: 768px) {
+  &__table-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @media (max-width: 900px) {
     &__grid {
       grid-template-columns: 1fr;
+    }
+
+    &__section {
+      padding: 14px 16px;
+    }
+
+    &__footer {
+      justify-content: stretch;
+
+      .ant-btn {
+        flex: 1 1 auto;
+      }
     }
   }
 }

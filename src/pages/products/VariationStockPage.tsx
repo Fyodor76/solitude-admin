@@ -77,38 +77,25 @@ export default function VariationStockPage() {
   }, [sizeParameters])
 
   useEffect(() => {
-    const items = stockResponse?.data ?? []
-    const hasSizedRows = items.some(item => Boolean(item.sizeId))
-    const emptyPlaceholders = items.filter(
+    const items = (stockResponse?.data ?? []).filter(
       item =>
-        !item.sizeId &&
-        (item.quantity ?? 0) === 0 &&
-        (item.reserved ?? 0) === 0 &&
-        String(item.sku || '').startsWith('EMPTY-')
+        !(
+          !item.sizeId &&
+          (item.quantity ?? 0) === 0 &&
+          (item.reserved ?? 0) === 0 &&
+          String(item.sku || '').startsWith('EMPTY-')
+        )
     )
 
-    // Бэкенд всегда создаёт пустую позицию без размера — убираем, если уже есть размеры.
-    if (hasSizedRows && emptyPlaceholders.length) {
-      void Promise.all(
-        emptyPlaceholders.map(item => deleteStockItem({ id: item.id, variationId }).unwrap())
-      ).catch(() => {
-        // если не удалось — просто покажем строки как есть
-      })
-    }
-
-    const visible = hasSizedRows
-      ? items.filter(item => !emptyPlaceholders.some(empty => empty.id === item.id))
-      : items
-
     setRows(
-      visible.map(item => ({
+      items.map(item => ({
         ...item,
         draftSku: item.sku || '',
         draftQuantity: item.quantity ?? 0,
         draftLocation: item.location || '',
       }))
     )
-  }, [deleteStockItem, stockResponse?.data, variationId])
+  }, [stockResponse?.data])
 
   const existingSizeIds = useMemo(
     () => new Set(rows.map(row => row.sizeId).filter(Boolean) as string[]),
@@ -245,85 +232,88 @@ export default function VariationStockPage() {
         ) : !rows.length ? (
           <Empty description="Позиций склада пока нет. Добавьте размеры." />
         ) : (
-          <Table
-            rowKey="id"
-            pagination={false}
-            loading={isStockFetching || isUpdating || isDeleting || isCreating}
-            dataSource={rows}
-            columns={[
-              {
-                title: 'Размер',
-                dataIndex: 'sizeId',
-                render: (sizeId?: string) =>
-                  sizeId ? sizeLabelById.get(sizeId) || sizeId : <Tag>Без размера</Tag>,
-              },
-              {
-                title: 'SKU',
-                dataIndex: 'draftSku',
-                render: (_value, row) => (
-                  <Input
-                    value={row.draftSku}
-                    onChange={e => patchRow(row.id, { draftSku: e.target.value })}
-                  />
-                ),
-              },
-              {
-                title: 'Количество',
-                dataIndex: 'draftQuantity',
-                width: 140,
-                render: (_value, row) => (
-                  <InputNumber
-                    min={0}
-                    value={row.draftQuantity}
-                    onChange={quantity =>
-                      patchRow(row.id, { draftQuantity: quantity == null ? 0 : Number(quantity) })
-                    }
-                  />
-                ),
-              },
-              {
-                title: 'Резерв',
-                dataIndex: 'reserved',
-                width: 90,
-                render: (value: number) => value ?? 0,
-              },
-              {
-                title: 'Доступно',
-                dataIndex: 'available',
-                width: 100,
-                render: (value: number) => value ?? 0,
-              },
-              {
-                title: 'Локация',
-                dataIndex: 'draftLocation',
-                render: (_value, row) => (
-                  <Input
-                    value={row.draftLocation}
-                    onChange={e => patchRow(row.id, { draftLocation: e.target.value })}
-                    placeholder="Склад"
-                  />
-                ),
-              },
-              {
-                title: '',
-                key: 'actions',
-                width: 180,
-                render: (_value, row) => (
-                  <Space>
-                    <Button type="link" onClick={() => void handleSaveRow(row)}>
-                      Сохранить
-                    </Button>
-                    <Button
-                      type="link"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() => handleDeleteRow(row)}
+          <div className="variation-edit__table-wrap">
+            <Table
+              rowKey="id"
+              pagination={false}
+              loading={isStockFetching || isUpdating || isDeleting || isCreating}
+              dataSource={rows}
+              scroll={{ x: 720 }}
+              columns={[
+                {
+                  title: 'Размер',
+                  dataIndex: 'sizeId',
+                  render: (sizeId?: string) =>
+                    sizeId ? sizeLabelById.get(sizeId) || sizeId : <Tag>Без размера</Tag>,
+                },
+                {
+                  title: 'SKU',
+                  dataIndex: 'draftSku',
+                  render: (_value, row) => (
+                    <Input
+                      value={row.draftSku}
+                      onChange={e => patchRow(row.id, { draftSku: e.target.value })}
                     />
-                  </Space>
-                ),
-              },
-            ]}
-          />
+                  ),
+                },
+                {
+                  title: 'Количество',
+                  dataIndex: 'draftQuantity',
+                  width: 140,
+                  render: (_value, row) => (
+                    <InputNumber
+                      min={0}
+                      value={row.draftQuantity}
+                      onChange={quantity =>
+                        patchRow(row.id, { draftQuantity: quantity == null ? 0 : Number(quantity) })
+                      }
+                    />
+                  ),
+                },
+                {
+                  title: 'Резерв',
+                  dataIndex: 'reserved',
+                  width: 90,
+                  render: (value: number) => value ?? 0,
+                },
+                {
+                  title: 'Доступно',
+                  dataIndex: 'available',
+                  width: 100,
+                  render: (value: number) => value ?? 0,
+                },
+                {
+                  title: 'Локация',
+                  dataIndex: 'draftLocation',
+                  render: (_value, row) => (
+                    <Input
+                      value={row.draftLocation}
+                      onChange={e => patchRow(row.id, { draftLocation: e.target.value })}
+                      placeholder="Склад"
+                    />
+                  ),
+                },
+                {
+                  title: '',
+                  key: 'actions',
+                  width: 180,
+                  render: (_value, row) => (
+                    <Space>
+                      <Button type="link" onClick={() => void handleSaveRow(row)}>
+                        Сохранить
+                      </Button>
+                      <Button
+                        type="link"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteRow(row)}
+                      />
+                    </Space>
+                  ),
+                },
+              ]}
+            />
+          </div>
         )}
       </section>
 
