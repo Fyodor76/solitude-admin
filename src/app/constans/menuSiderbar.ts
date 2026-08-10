@@ -46,6 +46,13 @@ export const menuSidebar: MenuItem[] = [
         href: '/stock',
         icon: 'warehouse',
       },
+      {
+        id: SIDEBAR_MENU_ITEM_ID.EDITOR,
+        text: 'Редактор',
+        href: '/editor',
+        icon: 'constructor',
+        hasArrow: false,
+      },
     ],
   },
   {
@@ -84,13 +91,6 @@ export const menuSidebar: MenuItem[] = [
         icon: 'forms',
       },
     ],
-  },
-  {
-    id: SIDEBAR_MENU_ITEM_ID.EDITOR,
-    text: 'Конструктор товара',
-    href: '/editor',
-    icon: 'constructor',
-    hasArrow: false,
   },
 
   {

@@ -1,0 +1,68 @@
+body {
+  background-color: #f8f9fa;
+  max-width: 100%;
+  .wrapper-editor {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    font-family: var(--font-primary);
+    gap: 16px;
+    margin: 15px;
+    padding: 16px 12px;
+    border: 1px solid var(--admin-color-border);
+    border-radius: var(--admin-radius-surface);
+
+    .header-editor {
+      display: flex;
+      justify-content: space-between;
+      &-btns {
+        display: flex;
+        gap: 20px;
+      }
+    }
+    .tabs-editor {
+      display: flex;
+      gap: 20px;
+      .button-tab {
+        border: none;
+        box-shadow: none;
+        background-color: transparent;
+        cursor: pointer;
+        position: relative;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 0;
+          right: 0;
+          height: 2px;
+          background-color: var(--color-blue);
+          transform: scaleX(0);
+          border-radius: 2px;
+        }
+        &:hover {
+          border: none;
+          color: #111827;
+        }
+        &:hover::after {
+          transform: scaleX(1);
+        }
+      }
+    }
+    .categories-editor-container {
+      display: flex;
+      .categories-editor {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 30%;
+        &-cat {
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
+  }
+}
