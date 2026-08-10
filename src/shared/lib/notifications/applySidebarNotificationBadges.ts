@@ -3,6 +3,7 @@ import { SIDEBAR_MENU_ITEM_ID } from '@/app/constans/sidebarMenuIds'
 
 export type SidebarNotificationCounts = {
   supportUnreadCount: number
+  ordersAttentionCount?: number
 }
 
 /**
@@ -28,6 +29,13 @@ function getBadgeCountForMenuItem(
 ): number | undefined {
   if (menuItemId === SIDEBAR_MENU_ITEM_ID.SUPPORT && counts.supportUnreadCount > 0) {
     return counts.supportUnreadCount
+  }
+  if (
+    menuItemId === SIDEBAR_MENU_ITEM_ID.ORDERS &&
+    counts.ordersAttentionCount != null &&
+    counts.ordersAttentionCount > 0
+  ) {
+    return counts.ordersAttentionCount
   }
   return undefined
 }

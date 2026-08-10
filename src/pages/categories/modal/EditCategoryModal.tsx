@@ -94,20 +94,42 @@ const EditCategoryModal = ({
 
   const parentOptions = filterSelect(allCategories, currentId)
 
+  const ROOT_PARENT_VALUE = '__root__'
+
   const handleStringAndSelectChange = (field: keyof FormData) => {
     return (
-      valueOrEvent: string | null | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+      valueOrEvent:
+        | string
+        | null
+        | undefined
+        | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-      if (valueOrEvent === null) {
-        setFormDataModal(prev => ({ ...prev, [field]: null }))
+      if (valueOrEvent == null || valueOrEvent === '') {
+        setFormDataModal(prev => ({
+          ...prev,
+          [field]: field === 'parentId' ? null : '',
+        }))
         return
       }
 
-      const nextValue = typeof valueOrEvent === 'string' ? valueOrEvent : valueOrEvent.target.value
+      if (typeof valueOrEvent !== 'string') {
+        const nextValue = valueOrEvent.target.value
+        setFormDataModal(prev => ({
+          ...prev,
+          [field]:
+            field === 'parentId' && (nextValue === '' || nextValue === ROOT_PARENT_VALUE)
+              ? null
+              : nextValue,
+        }))
+        return
+      }
 
       setFormDataModal(prev => ({
         ...prev,
-        [field]: field === 'parentId' && nextValue === '' ? null : nextValue,
+        [field]:
+          field === 'parentId' && (valueOrEvent === '' || valueOrEvent === ROOT_PARENT_VALUE)
+            ? null
+            : valueOrEvent,
       }))
     }
   }
@@ -197,10 +219,10 @@ const EditCategoryModal = ({
           </Form.Item>
         </div>
 
-        <Form.Item label="Родитель">
+        <Form.Item label="Родитель" extra="«Без родителя» — категория станет корневой">
           <Select
-            value={value.parentId}
-            placeholder="Корневая"
+            value={value.parentId ?? ROOT_PARENT_VALUE}
+            placeholder="Без родителя"
             allowClear
             showSearch={{
               filterOption: (input, option) =>
@@ -209,10 +231,13 @@ const EditCategoryModal = ({
                   .includes(input.toLowerCase()),
             }}
             onChange={handleStringAndSelectChange('parentId')}
-            options={parentOptions.map(cat => ({
-              value: cat.id,
-              label: cat.name,
-            }))}
+            options={[
+              { value: ROOT_PARENT_VALUE, label: 'Без родителя (корневая)' },
+              ...parentOptions.map(cat => ({
+                value: cat.id,
+                label: cat.name,
+              })),
+            ]}
           />
         </Form.Item>
 

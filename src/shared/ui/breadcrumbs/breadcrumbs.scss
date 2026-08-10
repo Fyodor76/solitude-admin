@@ -1,57 +1,83 @@
 .breadcrumbs-container {
   width: 100%;
+  min-width: 0;
   display: flex;
-  background-color: var(--color-grey-background-breadcrumbs);
-  padding-left: 12px;
+  align-items: center;
+  background: transparent;
+  padding: 0;
   animation: gentleAppear 0.4s ease forwards;
+}
 
-  .breadcrumbs {
-    width: 100%;
+.breadcrumbs {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: 0;
+
+  .list {
     display: flex;
-    padding: 8px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+    font-style: italic;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    min-width: 0;
 
-    .list {
-      display: flex;
-      flex-wrap: wrap;
+    > li {
+      display: inline-flex;
       align-items: center;
-      gap: 5px;
-      font-style: italic;
-      margin: 0;
-      padding: 0;
-      list-style: none;
+      gap: 6px;
+      min-width: 0;
+      max-width: 280px;
+      flex-shrink: 1;
+      white-space: nowrap;
+    }
 
-      .inactive {
-        .link {
-          transition: all 0.2s ease;
-          cursor: pointer;
-          text-decoration: underline;
-          color: var(--color-grey-5);
-          font-family: 'Source Sans 3';
-          font-size: 14px;
-          font-weight: 300;
+    .inactive .link {
+      transition: color 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--color-grey-5);
+      font-family: 'Source Sans 3';
+      font-size: 14px;
+      font-weight: 300;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
 
-          &:hover {
-            color: var(--color-blue);
-            transform: translateY(-1px);
-          }
-        }
+      &:hover {
+        color: var(--color-blue);
       }
+    }
 
-      .active {
-        .text {
-          cursor: default;
-          color: var(--color-grey-header);
+    .active {
+      min-width: 0;
+      flex-shrink: 1;
+      overflow: hidden;
 
-          font-family: 'Source Sans 3';
-          font-size: 14px;
-          font-weight: 300;
-        }
+      .text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: default;
+        color: var(--color-grey-header);
+        font-family: 'Source Sans 3';
+        font-size: 14px;
+        font-weight: 400;
       }
+    }
 
-      .separator {
-        margin-left: 2px;
-        color: var(--color-grey-5);
-      }
+    .separator {
+      color: var(--color-grey-5);
+      flex-shrink: 0;
+      line-height: 1;
     }
   }
 }

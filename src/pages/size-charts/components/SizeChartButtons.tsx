@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { SizeChartRequest } from '@/shared/lib/api/size-charts/types'
 import { Button, Space } from 'antd'
 

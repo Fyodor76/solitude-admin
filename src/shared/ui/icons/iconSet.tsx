@@ -746,4 +746,16 @@ export const iconSet = {
       <rect x="14" y="14" width="7" height="7" rx="1.5" />
     </svg>
   ),
+  warehouse: (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M3 21V8.5L12 3l9 5.5V21h-6v-7H9v7H3zm2-2h2v-5h10v5h2V9.4L12 5.2 5 9.4V19z" />
+      <path d="M10 19h4v-3h-4v3z" />
+    </svg>
+  ),
 }

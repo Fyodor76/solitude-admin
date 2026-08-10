@@ -38,7 +38,7 @@ export const apiCategories = baseApi.injectEndpoints({
         method: 'GET',
         params: { isActiveFilter: ADMIN_IS_ACTIVE_FILTER },
       }),
-      providesTags: result => [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }],
+      providesTags: _result => [{ type: 'Category' as const, id: 'ALL_CATEGORIES' }],
     }),
 
     getCollections: builder.query<ApiResponse<CollectionItem[], any>, void>({
@@ -55,7 +55,7 @@ export const apiCategories = baseApi.injectEndpoints({
         url: `/categories/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Category', id }],
+      providesTags: (_result, _error, id) => [{ type: 'Category', id }],
     }),
     updateCategoryById: builder.mutation<
       ApiResponse<CategoryMenuItem, any>,
@@ -66,7 +66,7 @@ export const apiCategories = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: 'Category', id },
         { type: 'Category', id: 'ALL_CATEGORIES' },
       ],
@@ -76,7 +76,7 @@ export const apiCategories = baseApi.injectEndpoints({
         url: `/categories/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: 'Category', id },
         { type: 'Category', id: 'ALL_CATEGORIES' },
       ],
@@ -86,7 +86,7 @@ export const apiCategories = baseApi.injectEndpoints({
         url: `/categories/slug/${slug}`,
         method: 'GET',
       }),
-      providesTags: (result, error, slug) =>
+      providesTags: (result, _error, _slug) =>
         result?.data?.id ? [{ type: 'Category', id: result.data.id }] : [],
     }),
 
@@ -96,14 +96,14 @@ export const apiCategories = baseApi.injectEndpoints({
         method: 'GET',
         params: { isActiveFilter: ADMIN_IS_ACTIVE_FILTER },
       }),
-      providesTags: (result, error, id) => [{ type: 'Category', id: `CHILDREN_OF_${id}` }],
+      providesTags: (_result, _error, id) => [{ type: 'Category', id: `CHILDREN_OF_${id}` }],
     }),
     deactivateCategory: builder.mutation<ApiResponse<CategoryMenuItem, any>, string>({
       query: (id: string) => ({
         url: `/categories/${id}/deactivate`,
         method: 'PATCH',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: 'Category', id },
         { type: 'Category', id: 'ALL_CATEGORIES' },
       ],

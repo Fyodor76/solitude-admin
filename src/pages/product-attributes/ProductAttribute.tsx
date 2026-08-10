@@ -43,6 +43,17 @@ const ProductAttribute = () => {
   const mode = modal.mode
   const isCreateOption = mode === MODES.CREATE
 
+  const { validateForm, validateAttributeBeforeSave, validateValueForm, validateRowField } =
+    useValidateForms({
+      errors,
+      errorsValue,
+      allProdAttr,
+      excludeAttributeId: isCreateOption ? null : selectedAttributeId,
+      setErrors,
+      setErrorsValue,
+      setRowErrors,
+    })
+
   const { onSaveCreatedOption, onSaveEditedOption, deleteOption, handlerCreateOption } =
     useHandlerPoductAttribute({
       allProdAttr,
@@ -55,6 +66,7 @@ const ProductAttribute = () => {
       setSelectedAttributeId,
       setEditFormLocal,
       setFormOption,
+      validateAttributeBeforeSave,
     })
 
   const { onSaveEditedValue, localDeleteValue, addValue, localEditValue, onSaveCreatedValue } =
@@ -79,14 +91,7 @@ const ProductAttribute = () => {
     setErrors,
     setErrorsValue,
     setRowErrors,
-  })
-
-  const { validateForm, validateValueForm, validateRowField } = useValidateForms({
-    errors,
-    errorsValue,
-    setErrors,
-    setErrorsValue,
-    setRowErrors,
+    validateAttributeBeforeSave,
   })
   useEffect(() => {
     if (productAttributes?.data) {

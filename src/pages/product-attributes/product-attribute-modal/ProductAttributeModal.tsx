@@ -6,7 +6,6 @@ import {
 } from '@/shared/lib/api/product-attributes/types'
 import { ColorPicker, Input, Modal, Select, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { number } from 'framer-motion'
 
 import { typeOptions } from '../const/const'
 import './ProductAttributeModal.scss'
@@ -163,7 +162,7 @@ const ProductAttributeModal = ({
           <span className="input-name">HEX код цвета</span>
           <ColorPicker
             value={formValue.hexCode || '#000000'}
-            onChange={(color, hex) => {
+            onChange={(_color, hex) => {
               validateValueForm('hexCode', hex)
             }}
             showText={color => <span>{color.toHexString().toUpperCase()}</span>}

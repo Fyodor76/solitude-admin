@@ -28,7 +28,7 @@ export const SizeCharts = baseApi.injectEndpoints({
         url: `/size-charts/${sizeChartId}`,
         method: 'GET',
       }),
-      providesTags: (result, error, sizeChartId) => [{ type: 'Size-chart', sizeChartId }],
+      providesTags: (_result, _error, sizeChartId) => [{ type: 'Size-chart', sizeChartId }],
     }),
     updateSizeChartById: builder.mutation<
       ApiResponse<SizeChartResponse, any>,
@@ -39,7 +39,7 @@ export const SizeCharts = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: 'Size-chart', id },
         { type: 'Size-chart', id: 'ALL_SIZE-CHARTS' },
       ],
@@ -49,7 +49,7 @@ export const SizeCharts = baseApi.injectEndpoints({
         url: `/size-charts/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: 'Size-chart', id },
         { type: 'Size-chart', id: 'ALL_SIZE-CHARTS' },
       ],
@@ -59,7 +59,7 @@ export const SizeCharts = baseApi.injectEndpoints({
         url: `/size-charts/category/${categoryId}`,
         method: 'GET',
       }),
-      providesTags: (result, error, categoryId) => [
+      providesTags: (_result, _error, categoryId) => [
         { type: 'Size-chart', id: `CATEGORY_${categoryId}` },
       ],
     }),
@@ -68,7 +68,7 @@ export const SizeCharts = baseApi.injectEndpoints({
         url: `/size-charts/product-type/${productType}`,
         method: 'GET',
       }),
-      providesTags: (result, error, productType) => [{ type: 'Size-chart', productType }],
+      providesTags: (_result, _error, productType) => [{ type: 'Size-chart', productType }],
     }),
     getSizeChartsByCategories: builder.mutation<
       ApiResponse<SizeChartResponse[], any>,

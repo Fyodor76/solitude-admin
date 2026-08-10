@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 import Icon from '@/shared/ui/icons/Icon'
-import { Button, Input, Spin } from 'antd'
+import { Button, Input } from 'antd'
 
 import { getIconForAttribute } from '@/app/constans/getIconForAttribute'
 
@@ -19,7 +19,7 @@ const ProductAttributeOptions = ({
   filteredOptions,
   allProdAttr,
   selectedAttributeId,
-  isLoading,
+  isLoading: _isLoading,
   setSelectedAttributeId,
   setFilteredOptions,
   handlerCreateOption,

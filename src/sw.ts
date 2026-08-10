@@ -61,7 +61,7 @@ self.addEventListener('push', event => {
       icon: `${self.registration.scope}icons/web-app-manifest-192x192.png`,
       badge: `${self.registration.scope}icons/favicon-96x96.png`,
       renotify: true,
-    })
+    } as NotificationOptions)
   )
 })
 

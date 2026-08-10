@@ -215,6 +215,7 @@ export const baseApi = createApi({
     'Category',
     'Collection',
     'Product',
+    'Stock',
     'Size-chart',
     'Size-parameter',
     'Product-attributes',
@@ -227,6 +228,9 @@ export const baseApi = createApi({
     'FormSubmissions',
     'FormSubmissionsStats',
     'FormSubmission',
+    'Orders',
+    'Order',
+    'OrdersAttention',
   ],
   endpoints: () => ({}),
 })

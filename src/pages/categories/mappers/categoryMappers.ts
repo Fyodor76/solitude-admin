@@ -21,7 +21,8 @@ export const mapFormToRequest = (formData: FormData, cdnData?: imgUpload | null)
     name: formData.name,
     description: formData.description,
     sortOrder: Number(formData.sortOrder),
-    parentId: formData.parentId,
+    // Явно null — иначе ключ может пропасть из body и родитель не снимется
+    parentId: formData.parentId ?? null,
     imageId: cdnData?.fileId || formData.imageId,
     isActive: formData.isActive,
     ...(formData.type ? { type: formData.type } : {}),

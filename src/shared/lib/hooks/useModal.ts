@@ -17,10 +17,6 @@ export function useModal<T = any>(initialState = false): UseModalReturn<T> {
   const [content, setContent] = useState<T | null>(null)
   const [mode, setMode] = useState('edit')
 
-  const handleSetMode = useCallback((newMode: string) => {
-    setMode(newMode)
-  }, [])
-
   const onOpen = useCallback((newContent?: T) => {
     requestAnimationFrame(() => {
       setContent(newContent ?? null)

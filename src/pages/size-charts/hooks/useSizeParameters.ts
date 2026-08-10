@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 
 import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 
-export const useSizeParameters = (sizeChartId?: string) => {
+export const useSizeParameters = (_sizeChartId?: string) => {
   const [parameters, setParameters] = useState<EditableSizeParameter[]>([])
   const [deleteIds, setDeleteIds] = useState<string[]>([])
 

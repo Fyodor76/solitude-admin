@@ -28,14 +28,14 @@ export const ProductAttributes = baseApi.injectEndpoints({
         url: `/product-attributes/${id}`,
         method: 'GET',
       }),
-      providesTags: (result, error, id) => [{ type: 'Product-attributes', id }],
+      providesTags: (_result, _error, id) => [{ type: 'Product-attributes', id }],
     }),
     deleteProductAttributeById: builder.mutation<ApiResponse<deleteResponse, any>, string>({
       query: id => ({
         url: `/product-attributes/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: 'Product-attributes', id },
         {
           type: 'Product-attributes',
@@ -48,14 +48,14 @@ export const ProductAttributes = baseApi.injectEndpoints({
         url: `/product-attributes/slug/${slug}`,
         method: 'GET',
       }),
-      providesTags: (result, error, slug) => [{ type: 'Product-attributes', id: slug }],
+      providesTags: (_result, _error, slug) => [{ type: 'Product-attributes', id: slug }],
     }),
     getProductAttributeByType: builder.query<ApiResponse<ProductAttributeResponse[], any>, string>({
       query: productAttributeType => ({
         url: `/product-attributes/type/${productAttributeType}`,
         method: 'GET',
       }),
-      providesTags: (result, error, productAttributeType) => [
+      providesTags: (_result, _error, productAttributeType) => [
         { type: 'Product-attributes', id: productAttributeType },
       ],
     }),
@@ -68,7 +68,7 @@ export const ProductAttributes = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (result, error, { id }) => [
+      invalidatesTags: (_result, _error, { id }) => [
         { type: 'Product-attributes', id },
         { type: 'Product-attributes', id: 'ALL_PRODUCT-ATTRIBUTES' },
       ],

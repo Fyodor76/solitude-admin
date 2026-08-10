@@ -1,0 +1,38 @@
+.sortable-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    list-style: none;
+  }
+
+  &__drag-handle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(0, 0, 0, 0.45);
+    cursor: grab;
+
+    &:hover {
+      color: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__drag-spacer {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+  }
+}

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button, Modal, Select } from 'antd'
+import { Modal, Select } from 'antd'
 
 import { ALL_RU_SIZES } from '../constans/const'
 import './SizeParameterAddModal.scss'

@@ -1,9 +1,10 @@
-import React from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 import {
   AttributeValueRequest,
   AttributeValueResponse,
   ProductAttributeRequest,
+  ProductAttributeResponse,
 } from '@/shared/lib/api/product-attributes/types'
 
 import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from '../types/productAttributesTypes'
@@ -11,23 +12,48 @@ import { ErrorsProps, ErrorsValueProps, RowErrorsProps } from '../types/productA
 interface useValidateFormsProps {
   errors: ErrorsProps
   errorsValue: ErrorsValueProps
-  setErrors: React.Dispatch<React.SetStateAction<ErrorsProps>>
-  setErrorsValue: React.Dispatch<React.SetStateAction<ErrorsValueProps>>
-  setRowErrors: React.Dispatch<React.SetStateAction<RowErrorsProps>>
+  allProdAttr: ProductAttributeResponse[]
+  excludeAttributeId?: string | null
+  setErrors: Dispatch<SetStateAction<ErrorsProps>>
+  setErrorsValue: Dispatch<SetStateAction<ErrorsValueProps>>
+  setRowErrors: Dispatch<SetStateAction<RowErrorsProps>>
 }
+
+const normalizeName = (value: string) => value.trim().toLowerCase()
+const normalizeSlug = (value: string) => value.trim().toLowerCase()
 
 export const useValidateForms = ({
   errors,
   errorsValue,
+  allProdAttr,
+  excludeAttributeId,
   setErrors,
   setErrorsValue,
   setRowErrors,
 }: useValidateFormsProps) => {
+  const isDuplicateName = (value: string) => {
+    const normalized = normalizeName(value)
+    if (!normalized) return false
+    return allProdAttr.some(
+      attr => attr.id !== excludeAttributeId && normalizeName(attr.name) === normalized
+    )
+  }
+
+  const isDuplicateSlug = (value: string) => {
+    const normalized = normalizeSlug(value)
+    if (!normalized) return false
+    return allProdAttr.some(
+      attr => attr.id !== excludeAttributeId && normalizeSlug(attr.slug) === normalized
+    )
+  }
+
   const validateForm = (field: keyof ProductAttributeRequest, value: any) => {
     const newErrors = { ...errors }
     if (field === 'name') {
       if (!value || value.trim() === '') {
         newErrors.name = 'Введите название опции'
+      } else if (isDuplicateName(value)) {
+        newErrors.name = 'Опция с таким названием уже есть'
       } else {
         delete newErrors.name
       }
@@ -37,6 +63,8 @@ export const useValidateForms = ({
         newErrors.slug = 'Введите slug опции'
       } else if (!/^[a-zA-Z0-9-]+$/.test(value)) {
         newErrors.slug = 'Только латинские буквы, цифры и дефисы'
+      } else if (isDuplicateSlug(value)) {
+        newErrors.slug = 'Опция с таким slug уже есть'
       } else {
         delete newErrors.slug
       }
@@ -57,6 +85,27 @@ export const useValidateForms = ({
       }
     }
     setErrors(newErrors)
+  }
+
+  const validateAttributeBeforeSave = (data: ProductAttributeRequest): boolean => {
+    const next: ErrorsProps = {}
+
+    if (!data.name?.trim()) {
+      next.name = 'Введите название опции'
+    } else if (isDuplicateName(data.name)) {
+      next.name = 'Опция с таким названием уже есть'
+    }
+
+    if (!data.slug?.trim()) {
+      next.slug = 'Введите slug опции'
+    } else if (!/^[a-zA-Z0-9-]+$/.test(data.slug)) {
+      next.slug = 'Только латинские буквы, цифры и дефисы'
+    } else if (isDuplicateSlug(data.slug)) {
+      next.slug = 'Опция с таким slug уже есть'
+    }
+
+    setErrors(next)
+    return Object.keys(next).length === 0
   }
 
   const validateValueForm = (field: keyof AttributeValueRequest, value: any) => {
@@ -130,6 +179,7 @@ export const useValidateForms = ({
   }
   return {
     validateForm,
+    validateAttributeBeforeSave,
     validateValueForm,
     validateRowField,
   }

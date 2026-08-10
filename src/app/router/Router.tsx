@@ -4,9 +4,19 @@ import Editor from '@/pages/editor/Editor'
 import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
 import { MainPage } from '@/pages/main'
 import { NotificationsPage } from '@/pages/notifications'
+import { OrderDetailPage, OrdersPage } from '@/pages/orders'
 import { PlatformImages } from '@/pages/platform-images'
 import { ProductAttribute } from '@/pages/product-attributes'
+import { ProductCreatePage } from '@/pages/product-create'
+import {
+  ProductDetailPage,
+  ProductsPage,
+  VariationCreatePage,
+  VariationEditPage,
+  VariationStockPage,
+} from '@/pages/products'
 import { SizeChart } from '@/pages/size-charts'
+import { StockPage } from '@/pages/stock'
 import { StorePreview } from '@/pages/store-preview'
 import { SupportInbox } from '@/pages/support-inbox'
 import { Navigate, RouteObject } from 'react-router-dom'
@@ -45,13 +55,87 @@ export const Router: RouteObject[] = [
 
     children: [
       {
-        index: true,
-        element: (
-          <ProtectedRouter>
-            <MainPage />
-          </ProtectedRouter>
-        ),
+        element: <ProtectedRouter />,
+        children: [
+          {
+            index: true,
+            element: <MainPage />,
+          },
+          {
+            path: 'categories',
+            element: <CategoriesPage />,
+          },
+          {
+            path: 'platform-images',
+            element: <PlatformImages />,
+          },
+          {
+            path: 'size-charts',
+            element: <SizeChart />,
+          },
+          {
+            path: 'heatmap',
+            element: <StorePreview />,
+          },
+          {
+            path: 'support',
+            element: <SupportInbox />,
+          },
+          {
+            path: 'editor',
+            element: <Editor />,
+          },
+          {
+            path: 'notifications',
+            element: <NotificationsPage />,
+          },
+          {
+            path: 'forms/callback',
+            element: <CallbackFormPage />,
+          },
+          {
+            path: 'product-attributes',
+            element: <ProductAttribute />,
+          },
+          {
+            path: 'products',
+            element: <ProductsPage />,
+          },
+          {
+            path: 'products/create',
+            element: <ProductCreatePage />,
+          },
+          {
+            path: 'stock',
+            element: <StockPage />,
+          },
+          {
+            path: 'orders',
+            element: <OrdersPage />,
+          },
+          {
+            path: 'orders/:orderId',
+            element: <OrderDetailPage />,
+          },
+          {
+            path: 'products/:productId',
+            element: <ProductDetailPage />,
+          },
+          {
+            path: 'products/:productId/variations/new',
+            element: <VariationCreatePage />,
+          },
+          {
+            path: 'products/:productId/variations/:variationId/stock',
+            element: <VariationStockPage />,
+          },
+          {
+            path: 'products/:productId/variations/:variationId',
+            element: <VariationEditPage />,
+          },
+        ],
       },
+
       {
         path: '/login',
         element: (
@@ -76,81 +160,10 @@ export const Router: RouteObject[] = [
           </PublicRouter>
         ),
       },
-      {
-        path: '/categories',
-        element: (
-          <ProtectedRouter>
-            <CategoriesPage />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/platform-images',
-        element: (
-          <ProtectedRouter>
-            <PlatformImages />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/size-charts',
-        element: (
-          <ProtectedRouter>
-            <SizeChart />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/editor',
-        element: (
-          <ProtectedRouter>
-            <Editor />
-          </ProtectedRouter>
-        ),
-      },
+
       {
         path: '/store-preview',
         element: <Navigate to="/heatmap" replace />,
-      },
-      {
-        path: '/heatmap',
-        element: (
-          <ProtectedRouter>
-            <StorePreview />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/support',
-        element: (
-          <ProtectedRouter>
-            <SupportInbox />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/notifications',
-        element: (
-          <ProtectedRouter>
-            <NotificationsPage />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/forms/callback',
-        element: (
-          <ProtectedRouter>
-            <CallbackFormPage />
-          </ProtectedRouter>
-        ),
-      },
-      {
-        path: '/product-attributes',
-        element: (
-          <ProtectedRouter>
-            <ProductAttribute />
-          </ProtectedRouter>
-        ),
       },
     ],
   },

@@ -1,0 +1,56 @@
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__dot {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    background: #c8c8c8;
+    box-shadow:
+      inset 0 0 0 1px rgba(38, 38, 38, 0.1),
+      0 0 0 1px rgba(38, 38, 38, 0.08);
+
+    &--md {
+      width: 20px;
+      height: 20px;
+    }
+
+    &--lg {
+      width: 28px;
+      height: 28px;
+    }
+
+    &--light {
+      box-shadow:
+        inset 0 0 0 1px rgba(38, 38, 38, 0.16),
+        0 0 0 1px rgba(38, 38, 38, 0.22);
+    }
+
+    &--empty {
+      background: repeating-linear-gradient(-45deg, #ececec, #ececec 2px, #f7f7f7 2px, #f7f7f7 4px);
+    }
+  }
+
+  &__more {
+    margin: 0 0 0 2px;
+    padding: 0;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+}

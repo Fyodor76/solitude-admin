@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { MODES } from '@/pages/categories/const/constans'
 import {
   useCreateProductAttributesMutation,
@@ -16,6 +14,15 @@ import { message, Modal } from 'antd'
 import { initialState } from '../const/const'
 import { ErrorsProps } from '../types/productAttributesTypes'
 
+function getApiErrorMessage(error: unknown, fallback: string) {
+  const data = (error as { data?: { message?: string | string[]; error?: string } })?.data
+  if (!data) return fallback
+  if (Array.isArray(data.message)) return data.message[0] || fallback
+  if (typeof data.message === 'string' && data.message.trim()) return data.message
+  if (typeof data.error === 'string' && data.error.trim()) return data.error
+  return fallback
+}
+
 interface useHandlerPoductAttributeProps {
   allProdAttr: ProductAttributeResponse[]
   formOption: ProductAttributeRequest
@@ -27,6 +34,7 @@ interface useHandlerPoductAttributeProps {
   setAllProdAttr: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
   setSelectedAttributeId: React.Dispatch<React.SetStateAction<string | null>>
   setFilteredOptions: React.Dispatch<React.SetStateAction<ProductAttributeResponse[]>>
+  validateAttributeBeforeSave: (data: ProductAttributeRequest) => boolean
 }
 export const useHandlerPoductAttribute = ({
   allProdAttr,
@@ -39,6 +47,7 @@ export const useHandlerPoductAttribute = ({
   setAllProdAttr,
   setFilteredOptions,
   setSelectedAttributeId,
+  validateAttributeBeforeSave,
 }: useHandlerPoductAttributeProps) => {
   const [deleteProductAttributeById] = useDeleteProductAttributeByIdMutation()
   const [updateProductAttributes] = useUpdateProductAttributesMutation()
@@ -71,9 +80,8 @@ export const useHandlerPoductAttribute = ({
           await deleteProductAttributeById(id).unwrap()
           localDeleteOption(id)
           message.success(`Опция успешно удалена`)
-          console.log(`Успешное удаление аттрибута продукта с id:${id}`)
         } catch (error) {
-          console.log('Ошибка удаления аттрибута продукта!', error)
+          message.error(getApiErrorMessage(error, 'Не удалось удалить опцию'))
         }
       },
     })
@@ -86,21 +94,27 @@ export const useHandlerPoductAttribute = ({
         prev.map(filterProdAttr => (filterProdAttr.id === id ? response.data : filterProdAttr))
       )
       setEditFormLocal(response.data)
-      console.log(`Отредактировала опцию: ${response.data.name}`)
     } catch (error) {
-      console.log('Ошибка редактирования опции...', error)
+      message.error(getApiErrorMessage(error, 'Не удалось сохранить опцию'))
+      throw error
     }
   }
 
   const onSaveCreatedOption = async () => {
+    const newOption: ProductAttributeRequest = {
+      name: formOption.name,
+      slug: formOption.slug,
+      type: formOption.type,
+      description: formOption.description,
+      sortOrder: formOption.sortOrder,
+    }
+
+    if (!validateAttributeBeforeSave(newOption)) {
+      message.error('Исправьте ошибки в форме опции')
+      return
+    }
+
     try {
-      const newOption: ProductAttributeRequest = {
-        name: formOption.name,
-        slug: formOption.slug,
-        type: formOption.type,
-        description: formOption.description,
-        sortOrder: formOption.sortOrder,
-      }
       const response = await createProductAttributes({ data: newOption }).unwrap()
       setAllProdAttr(prev => {
         return [...prev, response.data]
@@ -108,9 +122,9 @@ export const useHandlerPoductAttribute = ({
       setFilteredOptions(prev => [...prev, response.data])
       setFormOption(initialState)
       modal.onClose()
-      console.log('Создала новую опцию!')
+      message.success('Опция создана')
     } catch (error) {
-      console.log('Ошибка создания новой опции...', error)
+      message.error(getApiErrorMessage(error, 'Не удалось создать опцию'))
     }
   }
 

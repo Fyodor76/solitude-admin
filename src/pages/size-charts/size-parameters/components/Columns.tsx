@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 import Icon from '@/shared/ui/icons/Icon'
 import { Button, InputNumber, Space, Tooltip } from 'antd'
@@ -14,19 +12,19 @@ export const getColumns = (
     title: 'Размер',
     dataIndex: 'internationalSize',
     key: 'internationalSize',
-    render: (text: string, record: EditableSizeParameter) => <span>{text}</span>,
+    render: (text: string) => <span>{text}</span>,
   },
   {
     title: 'Российский размер',
     dataIndex: 'russianSize',
     key: 'russianSize',
-    render: (text: string, record: EditableSizeParameter) => <span>{text}</span>,
+    render: (text: string) => <span>{text}</span>,
   },
   {
     title: 'Длина(см)',
     dataIndex: 'lengthCm',
     key: 'lengthCm',
-    render: (text: number, record: EditableSizeParameter, index: number) => (
+    render: (text: number, record: EditableSizeParameter, _index: number) => (
       <Tooltip title={`Допустимые значения: ${MIN_LENGTH} - ${MAX_LENGTH} см`}>
         <InputNumber
           min={MIN_LENGTH}
@@ -48,7 +46,7 @@ export const getColumns = (
     title: 'Обхват груди(см)',
     dataIndex: 'chestCircumferenceCm',
     key: 'chestCircumferenceCm',
-    render: (text: number, record: EditableSizeParameter, index: number) => (
+    render: (text: number, record: EditableSizeParameter, _index: number) => (
       <Tooltip title={`Допустимые значения: ${MIN_CHEST} - ${MAX_CHEST} см`}>
         <InputNumber
           min={MIN_CHEST}
@@ -79,7 +77,7 @@ export const getColumns = (
     title: 'Действия',
     dataIndex: 'actions',
     key: 'actions',
-    render: (_: any, record: EditableSizeParameter, index: number) => (
+    render: (_: any, record: EditableSizeParameter, _index: number) => (
       <Space>
         <Button onClick={() => deleteSize(record.id)}>
           <Icon name="delete" width="18px"></Icon>
