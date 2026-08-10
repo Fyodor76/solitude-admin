@@ -222,7 +222,6 @@ export default function ProductsPage() {
       {contextHolder}
       <PageHeader
         title="Товары"
-        subtitle="Перетащите строки — остальные плавно разъедутся. На главной — товары с флагом «На главной»"
         actions={
           <Space>
             <Button loading={isFetching} onClick={() => void refetch()}>
