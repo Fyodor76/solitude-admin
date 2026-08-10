@@ -15,8 +15,8 @@ import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandle
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { DeleteOutlined, HolderOutlined } from '@ant-design/icons'
-import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Tag } from 'antd'
+import { DeleteOutlined, HolderOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Tag, Tooltip } from 'antd'
 import { Reorder, useDragControls } from 'framer-motion'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 
@@ -512,11 +512,12 @@ export default function ProductDetailPage() {
       </section>
 
       <section className="product-detail__section product-detail__section--showcase">
-        <h2 className="product-detail__section-title">Все фото вариаций</h2>
-        <p className="product-detail__hint">
-          «На витрине» — показать на сайте (зелёная рамка). Порядок на витрине = порядок карточек с
-          этой меткой (перетаскивайте за ⋮⋮). Корзина удаляет фото из вариации.
-        </p>
+        <h2 className="product-detail__section-title">
+          Все фото вариаций{' '}
+          <Tooltip title="Все фото всех вариаций этого товара подряд. «На витрине» — показать на сайте (зелёная рамка). Порядок на сайте = порядок карточек с этой меткой (перетаскивайте за ⋮⋮). Корзина удаляет фото из вариации.">
+            <QuestionCircleOutlined className="product-detail__title-help" />
+          </Tooltip>
+        </h2>
         <ProductVariationPhotosGallery
           items={variationImagePool}
           showcaseFileIds={showcaseFileIds}

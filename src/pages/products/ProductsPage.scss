@@ -310,6 +310,13 @@
     font-weight: 600;
   }
 
+  &__title-help {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 14px;
+    cursor: help;
+    vertical-align: middle;
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
