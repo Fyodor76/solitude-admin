@@ -19,6 +19,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { buildSku } from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
+import { isStockRowDirty, mergeStockDrafts } from '../stock/stockDrafts'
 import './ProductsPage.scss'
 
 type EditableStockRow = StockItem & {
@@ -87,15 +88,20 @@ export default function VariationStockPage() {
         )
     )
 
-    setRows(
-      items.map(item => ({
-        ...item,
-        draftSku: item.sku || '',
-        draftQuantity: item.quantity ?? 0,
-        draftLocation: item.location || '',
-      }))
+    setRows(prev =>
+      mergeStockDrafts(
+        prev,
+        items.map(item => ({
+          ...item,
+          draftSku: item.sku || '',
+          draftQuantity: item.quantity ?? 0,
+          draftLocation: item.location || '',
+        }))
+      )
     )
   }, [stockResponse?.data])
+
+  const dirtyRows = useMemo(() => rows.filter(isStockRowDirty), [rows])
 
   const existingSizeIds = useMemo(
     () => new Set(rows.map(row => row.sizeId).filter(Boolean) as string[]),
@@ -133,6 +139,29 @@ export default function VariationStockPage() {
       openNotification('success', ['Позиция сохранена'])
     } catch {
       openNotification('error', ['Не удалось сохранить позицию'])
+    }
+  }
+
+  const handleSaveAll = async () => {
+    if (!dirtyRows.length) return
+    try {
+      await Promise.all(
+        dirtyRows.map(row =>
+          updateStockItem({
+            id: row.id,
+            variationId,
+            body: {
+              sku: row.draftSku.trim() || undefined,
+              quantity: Number(row.draftQuantity) || 0,
+              location: row.draftLocation.trim() || undefined,
+            },
+          }).unwrap()
+        )
+      )
+      openNotification('success', [`Сохранено позиций: ${dirtyRows.length}`])
+      navigate(`/products/${productId}`)
+    } catch {
+      openNotification('error', ['Не удалось сохранить часть позиций'])
     }
   }
 
@@ -201,17 +230,21 @@ export default function VariationStockPage() {
             : 'Загрузка...'
         }
         actions={
-          <Space>
+          <Space wrap>
             <Button onClick={() => navigate(`/products/${productId}/variations/${variationId}`)}>
               К вариации
             </Button>
             <Button onClick={() => navigate(`/products/${productId}`)}>К товару</Button>
+            <Button disabled={!availableSizesToAdd.length} onClick={() => setAddOpen(true)}>
+              Добавить размеры
+            </Button>
             <Button
               type="primary"
-              disabled={!availableSizesToAdd.length}
-              onClick={() => setAddOpen(true)}
+              disabled={!dirtyRows.length}
+              loading={isUpdating}
+              onClick={() => void handleSaveAll()}
             >
-              Добавить размеры
+              {dirtyRows.length ? `Сохранить все (${dirtyRows.length})` : 'Сохранить все'}
             </Button>
           </Space>
         }

@@ -198,6 +198,25 @@ export function ProductImageUpload({
     onShowcaseChange([...current, fileId])
   }
 
+  const handleReorder = (next: ProductImageItem[]) => {
+    onChange(next)
+    if (!onShowcaseChange || !(showcaseFileIds ?? []).length) return
+
+    const showcaseSet = new Set(showcaseFileIds)
+    const variationIds = new Set(next.map(item => item.fileId))
+    const orderedFromThis = next.map(item => item.fileId).filter(id => showcaseSet.has(id))
+    if (!orderedFromThis.length) return
+
+    let queueIndex = 0
+    const merged = (showcaseFileIds ?? []).map(id => {
+      if (variationIds.has(id) && showcaseSet.has(id)) {
+        return orderedFromThis[queueIndex++] ?? id
+      }
+      return id
+    })
+    onShowcaseChange(merged)
+  }
+
   const removeImage = (fileId: string) => {
     onChange(value.filter(image => image.fileId !== fileId))
     if (onShowcaseChange && (showcaseFileIds ?? []).includes(fileId)) {
@@ -227,7 +246,9 @@ export function ProductImageUpload({
         <p className="product-create-images__hint">
           JPG, PNG, WEBP, GIF
           {multiple ? ' · первое — главная · можно менять местами' : ''}
-          {showcaseEnabled ? ' · «На витрине» — в карточке коллекции' : ''}
+          {showcaseEnabled
+            ? ' · «На витрине» — в карточке коллекции; порядок витрины — на странице товара'
+            : ''}
         </p>
       </Upload.Dragger>
 
@@ -242,7 +263,7 @@ export function ProductImageUpload({
           <Reorder.Group
             axis="x"
             values={value}
-            onReorder={onChange}
+            onReorder={handleReorder}
             as="div"
             className="product-create-images__list product-create-images__list--sortable"
           >

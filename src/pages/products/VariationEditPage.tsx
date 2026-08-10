@@ -184,6 +184,7 @@ export default function VariationEditPage() {
       }).unwrap()
 
       openNotification('success', ['Вариация и витрина сохранены'])
+      navigate(`/products/${productId}`)
     } catch (error) {
       if (error && typeof error === 'object' && 'errorFields' in error) {
         return

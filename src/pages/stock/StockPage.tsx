@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom'
 
 import { Product, ProductVariation } from '@/app/types/product'
 
+import { isStockRowDirty, mergeStockDrafts } from './stockDrafts'
 import './StockPage.scss'
 
 type StockAvailabilityFilter = 'all' | 'attention' | 'in_stock' | 'out_of_stock'
@@ -172,22 +173,25 @@ export default function StockPage() {
   useEffect(() => {
     const items = rawStockItems.filter(item => !isEmptyPlaceholder(item))
 
-    setRows(
-      items.map(item => {
-        const meta = variationMeta.get(item.variationId)
-        return {
-          ...item,
-          productName: meta?.productName || '—',
-          variationName: meta?.variationName || '—',
-          variationSku: meta?.variationSku || '',
-          sizeLabel: item.sizeId ? sizeLabelById.get(item.sizeId) || item.sizeId : 'Без размера',
-          draftSku: item.sku || '',
-          draftQuantity: item.quantity ?? 0,
-          draftLocation: item.location || '',
-          color: meta?.color,
-          thumbUrl: meta?.thumbUrl ?? null,
-        }
-      })
+    setRows(prev =>
+      mergeStockDrafts(
+        prev,
+        items.map(item => {
+          const meta = variationMeta.get(item.variationId)
+          return {
+            ...item,
+            productName: meta?.productName || '—',
+            variationName: meta?.variationName || '—',
+            variationSku: meta?.variationSku || '',
+            sizeLabel: item.sizeId ? sizeLabelById.get(item.sizeId) || item.sizeId : 'Без размера',
+            draftSku: item.sku || '',
+            draftQuantity: item.quantity ?? 0,
+            draftLocation: item.location || '',
+            color: meta?.color,
+            thumbUrl: meta?.thumbUrl ?? null,
+          }
+        })
+      )
     )
   }, [rawStockItems, sizeLabelById, variationMeta])
 
@@ -271,6 +275,8 @@ export default function StockPage() {
     [rows]
   )
 
+  const dirtyRows = useMemo(() => rows.filter(isStockRowDirty), [rows])
+
   const patchRow = (id: string, patch: Partial<StockRow>) => {
     setRows(prev => prev.map(row => (row.id === id ? { ...row, ...patch } : row)))
   }
@@ -289,6 +295,28 @@ export default function StockPage() {
       openNotification('success', ['Позиция сохранена'])
     } catch {
       openNotification('error', ['Не удалось сохранить позицию'])
+    }
+  }
+
+  const handleSaveAll = async () => {
+    if (!dirtyRows.length) return
+    try {
+      await Promise.all(
+        dirtyRows.map(row =>
+          updateStockItem({
+            id: row.id,
+            variationId: row.variationId,
+            body: {
+              sku: row.draftSku.trim() || undefined,
+              quantity: Number(row.draftQuantity) || 0,
+              location: row.draftLocation.trim() || undefined,
+            },
+          }).unwrap()
+        )
+      )
+      openNotification('success', [`Сохранено позиций: ${dirtyRows.length}`])
+    } catch {
+      openNotification('error', ['Не удалось сохранить часть позиций'])
     }
   }
 
@@ -329,6 +357,16 @@ export default function StockPage() {
       <PageHeader
         title="Склад"
         subtitle="Остатки сгруппированы по товару и вариации. Красный — нет, жёлтый — мало (≤2)."
+        actions={
+          <Button
+            type="primary"
+            disabled={!dirtyRows.length}
+            loading={isUpdating}
+            onClick={() => void handleSaveAll()}
+          >
+            {dirtyRows.length ? `Сохранить все (${dirtyRows.length})` : 'Сохранить все'}
+          </Button>
+        }
       />
 
       <div className="stock-page__filters">
