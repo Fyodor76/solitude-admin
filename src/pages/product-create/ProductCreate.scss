@@ -248,6 +248,14 @@
       overflow-y: hidden;
       max-height: none;
     }
+
+    &--wrap {
+      display: flex;
+      flex-wrap: wrap;
+      grid-template-columns: none;
+      overflow: visible;
+      max-height: none;
+    }
   }
 
   &__item {

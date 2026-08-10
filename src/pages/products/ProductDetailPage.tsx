@@ -8,6 +8,7 @@ import {
   useGetProductByIdQuery,
   useReorderProductVariationsMutation,
   useUpdateProductMutation,
+  useUpdateProductVariationMutation,
 } from '@/shared/lib/api/products/Products'
 import { ProductUpdatePayload } from '@/shared/lib/api/products/types'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
@@ -24,6 +25,7 @@ import { ProductVariation } from '@/app/types/product'
 import { suggestSlugFromName } from '../product-create/helpers'
 import './ProductsPage.scss'
 import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from './productSwitchLabels'
+import { ProductVariationPhotosGallery } from './ProductVariationPhotosGallery'
 
 type ProductFormValues = {
   name: string
@@ -141,60 +143,6 @@ function VariationSortableRow({
   )
 }
 
-function ShowcaseSortableItem({
-  item,
-  index,
-  onRemove,
-}: {
-  item: { fileId: string; url: string; variationName?: string }
-  index: number
-  onRemove: (fileId: string) => void
-}) {
-  const controls = useDragControls()
-
-  return (
-    <Reorder.Item
-      value={item}
-      as="div"
-      className="product-detail__showcase-item"
-      dragListener={false}
-      dragControls={controls}
-      whileDrag={{
-        scale: 1.05,
-        boxShadow: '0 10px 24px rgba(0, 0, 0, 0.16)',
-        zIndex: 3,
-        cursor: 'grabbing',
-      }}
-      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-    >
-      <button
-        type="button"
-        className="product-detail__showcase-drag"
-        aria-label={`Перетащить фото витрины ${index + 1}`}
-        onPointerDown={event => controls.start(event)}
-      >
-        <HolderOutlined />
-      </button>
-      <img src={item.url} alt="" className="product-detail__showcase-thumb" />
-      <span className="product-detail__showcase-index">{index + 1}</span>
-      {item.variationName ? (
-        <span className="product-detail__showcase-var" title={item.variationName}>
-          {item.variationName}
-        </span>
-      ) : null}
-      <Button
-        type="text"
-        size="small"
-        danger
-        className="product-detail__showcase-remove"
-        icon={<DeleteOutlined />}
-        onClick={() => onRemove(item.fileId)}
-        aria-label="Убрать с витрины"
-      />
-    </Reorder.Item>
-  )
-}
-
 export default function ProductDetailPage() {
   const { productId = '' } = useParams<{ productId: string }>()
   const navigate = useNavigate()
@@ -209,6 +157,7 @@ export default function ProductDetailPage() {
   })
   const { data: categoriesResponse } = useGetCategoriesTreeQuery()
   const [updateProduct, { isLoading: isSaving }] = useUpdateProductMutation()
+  const [updateVariation] = useUpdateProductVariationMutation()
   const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
   const [deleteVariation] = useDeleteProductVariationMutation()
   const [reorderVariations, { isLoading: isReordering }] = useReorderProductVariationsMutation()
@@ -275,30 +224,32 @@ export default function ProductDetailPage() {
     return [...byId.values()]
   }, [orderedVariations])
 
-  const showcaseItems = useMemo(
-    () =>
-      showcaseFileIds.map(fileId => {
-        const meta = variationImagePool.find(item => item.fileId === fileId)
-        return {
-          fileId,
-          url: meta?.url || resolveMediaUrl(fileId) || fileId,
-          variationName: meta?.variationName,
-        }
-      }),
-    [showcaseFileIds, variationImagePool]
-  )
+  const handleRemoveVariationPhoto = useCallback(
+    async (item: { fileId: string; variationId: string }) => {
+      const variation = orderedVariations.find(row => row.id === item.variationId)
+      if (!variation || !productId) return
 
-  const availableShowcasePool = useMemo(
-    () => variationImagePool.filter(item => !showcaseFileIds.includes(item.fileId)),
-    [showcaseFileIds, variationImagePool]
-  )
+      const nextImages = (variation.images ?? []).filter(id => id !== item.fileId)
+      const nextMain =
+        variation.mainImage === item.fileId ? nextImages[0] || undefined : variation.mainImage
 
-  const addToShowcase = (fileId: string, position: 'start' | 'end' = 'end') => {
-    setShowcaseFileIds(prev => {
-      if (prev.includes(fileId)) return prev
-      return position === 'start' ? [fileId, ...prev] : [...prev, fileId]
-    })
-  }
+      try {
+        await updateVariation({
+          id: variation.id,
+          productId,
+          body: {
+            images: nextImages,
+            mainImage: nextMain,
+          },
+        }).unwrap()
+        setShowcaseFileIds(prev => prev.filter(id => id !== item.fileId))
+        openNotification('success', ['Фото удалено'])
+      } catch {
+        openNotification('error', ['Не удалось удалить фото'])
+      }
+    },
+    [openNotification, orderedVariations, productId, updateVariation]
+  )
 
   useEffect(() => {
     if (!product || nameWatched == null) return
@@ -561,69 +512,17 @@ export default function ProductDetailPage() {
       </section>
 
       <section className="product-detail__section product-detail__section--showcase">
-        <h2 className="product-detail__section-title">Витрина коллекции</h2>
+        <h2 className="product-detail__section-title">Все фото вариаций</h2>
         <p className="product-detail__hint">
-          Здесь задаётся порядок фото на сайте. Не внутри вариаций: перетаскивайте карточки ниже (1
-          = первое фото). Добавить фото можно кнопками «В начало» / «В конец» из пула вариаций.
+          «На витрине» — показать на сайте (зелёная рамка). Порядок на витрине = порядок карточек с
+          этой меткой (перетаскивайте за ⋮⋮). Корзина удаляет фото из вариации.
         </p>
-
-        <h3 className="product-detail__showcase-subtitle">
-          Порядок на витрине {showcaseItems.length ? `(${showcaseItems.length})` : ''}
-        </h3>
-        {!showcaseItems.length ? (
-          <p className="product-detail__variations-empty">
-            Пока пусто — добавьте фото из блока ниже (например «В начало» у фото второй вариации).
-          </p>
-        ) : (
-          <Reorder.Group
-            axis="x"
-            values={showcaseItems}
-            onReorder={next => setShowcaseFileIds(next.map(item => item.fileId))}
-            as="div"
-            className="product-detail__showcase-list"
-          >
-            {showcaseItems.map((item, index) => (
-              <ShowcaseSortableItem
-                key={item.fileId}
-                item={item}
-                index={index}
-                onRemove={fileId => setShowcaseFileIds(prev => prev.filter(id => id !== fileId))}
-              />
-            ))}
-          </Reorder.Group>
-        )}
-
-        <h3 className="product-detail__showcase-subtitle">Фото вариаций (ещё не на витрине)</h3>
-        {!availableShowcasePool.length ? (
-          <p className="product-detail__variations-empty">
-            {variationImagePool.length
-              ? 'Все фото вариаций уже на витрине — меняйте порядок перетаскиванием выше.'
-              : 'У вариаций пока нет фото. Загрузите их в редактировании вариации.'}
-          </p>
-        ) : (
-          <div className="product-detail__showcase-pool">
-            {availableShowcasePool.map(item => (
-              <div key={item.fileId} className="product-detail__showcase-pool-item">
-                <img src={item.url} alt="" className="product-detail__showcase-pool-thumb" />
-                <span className="product-detail__showcase-pool-name" title={item.variationName}>
-                  {item.variationName}
-                </span>
-                <div className="product-detail__showcase-pool-actions">
-                  <Button
-                    size="small"
-                    type="primary"
-                    onClick={() => addToShowcase(item.fileId, 'start')}
-                  >
-                    В начало
-                  </Button>
-                  <Button size="small" onClick={() => addToShowcase(item.fileId, 'end')}>
-                    В конец
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <ProductVariationPhotosGallery
+          items={variationImagePool}
+          showcaseFileIds={showcaseFileIds}
+          onShowcaseChange={setShowcaseFileIds}
+          onRemove={item => void handleRemoveVariationPhoto(item)}
+        />
       </section>
 
       <section className="product-detail__section">

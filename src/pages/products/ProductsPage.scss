@@ -345,140 +345,16 @@
     color: #8c8c8c;
   }
 
-  &__hint {
-    margin: -8px 0 16px;
-    color: #8c8c8c;
-    font-size: 13px;
-    line-height: 1.45;
-  }
-
   &__section--showcase {
     border: 1px solid #d6e4ff;
     background: #f8fbff;
   }
 
-  &__showcase-subtitle {
-    margin: 16px 0 10px;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  &__showcase-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    min-width: 0;
-  }
-
-  &__showcase-item {
-    position: relative;
-    width: 128px;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid #d9d9d9;
-    touch-action: none;
-  }
-
-  &__showcase-thumb {
-    display: block;
-    width: 128px;
-    height: 128px;
-    object-fit: cover;
-  }
-
-  &__showcase-drag {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border: none;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.92);
+  &__hint {
+    margin: -8px 0 16px;
     color: #8c8c8c;
-    cursor: grab;
-  }
-
-  &__showcase-index {
-    position: absolute;
-    bottom: 28px;
-    left: 4px;
-    min-width: 22px;
-    padding: 0 6px;
-    border-radius: 999px;
-    background: rgba(0, 0, 0, 0.55);
-    color: #fff;
-    font-size: 12px;
-    line-height: 22px;
-    text-align: center;
-  }
-
-  &__showcase-var {
-    display: block;
-    padding: 4px 6px;
-    font-size: 11px;
-    line-height: 1.3;
-    color: #595959;
-    background: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__showcase-remove {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    background: rgba(255, 255, 255, 0.92) !important;
-  }
-
-  &__showcase-pool {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  &__showcase-pool-item {
-    width: 140px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 8px;
-    border-radius: 8px;
-    background: #fff;
-    border: 1px solid #f0f0f0;
-  }
-
-  &__showcase-pool-thumb {
-    width: 100%;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 6px;
-    background: #f5f5f5;
-  }
-
-  &__showcase-pool-name {
-    font-size: 12px;
-    color: #595959;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__showcase-pool-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-
-    .ant-btn {
-      width: 100%;
-    }
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   &__status {
