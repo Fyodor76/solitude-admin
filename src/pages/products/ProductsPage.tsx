@@ -252,7 +252,6 @@ export default function ProductsPage() {
       {contextHolder}
       <PageHeader
         title="Товары"
-        subtitle="«На витрине» = виден в каталоге. «Главная» = блок коллекции на лендинге."
         actions={
           <Space wrap>
             <Button loading={isFetching} onClick={() => void refetch()}>
@@ -318,12 +317,6 @@ export default function ProductsPage() {
           ]}
         />
       </div>
-
-      {!canReorder ? (
-        <p className="products-page__hint">
-          Сортировка перетаскиванием доступна без поиска и фильтров.
-        </p>
-      ) : null}
 
       {isError ? (
         <AlertError onRetry={() => void refetch()} />

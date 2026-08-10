@@ -85,7 +85,7 @@ export default function StockPage() {
   const { openNotification, contextHolder } = useNotificationHandler()
   const [search, setSearch] = useState('')
   const [productId, setProductId] = useState<string | undefined>()
-  const [availability, setAvailability] = useState<StockAvailabilityFilter>('attention')
+  const [availability, setAvailability] = useState<StockAvailabilityFilter>('in_stock')
   const [rows, setRows] = useState<StockRow[]>([])
 
   const { data: productsResponse, isLoading: isProductsLoading } = useSearchProductsQuery({
