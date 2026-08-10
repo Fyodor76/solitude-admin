@@ -15,11 +15,7 @@ import { Button, Form, Input, InputNumber, Modal, Space } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ProductImageUpload } from '../product-create/components/ProductImageUpload'
-import {
-  suggestSkuFromName,
-  suggestSlugFromName,
-  syncDerivedFromName,
-} from '../product-create/helpers'
+import { suggestSkuFromName, suggestSlugFromName } from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
 import { ProductImageItem } from '../product-create/types'
 import './ProductsPage.scss'
@@ -69,10 +65,19 @@ export default function VariationEditPage() {
   const isSaving = isSavingVariation || isSavingProduct || isDeleting
   const nameWatched = Form.useWatch('name', form)
   const previousNameRef = useRef('')
+  const loadedVariationIdRef = useRef<string | null>(null)
+  const slugLockedRef = useRef(false)
+  const skuLockedRef = useRef(false)
 
   useEffect(() => {
     if (!variation) return
-    previousNameRef.current = variation.name
+    const isNewVariation = loadedVariationIdRef.current !== variation.id
+    if (isNewVariation) {
+      loadedVariationIdRef.current = variation.id
+      slugLockedRef.current = false
+      skuLockedRef.current = false
+      previousNameRef.current = variation.name
+    }
     form.setFieldsValue({
       name: variation.name,
       slug: variation.slug,
@@ -99,24 +104,14 @@ export default function VariationEditPage() {
     const nextName = String(nameWatched)
     if (nextName === previousNameRef.current) return
 
-    const currentSlug = form.getFieldValue('slug') as string | undefined
-    const currentSku = form.getFieldValue('sku') as string | undefined
-
-    const nextSlug = syncDerivedFromName(
-      currentSlug,
-      previousNameRef.current,
-      nextName,
-      suggestSlugFromName
-    )
-    const nextSku = syncDerivedFromName(
-      currentSku,
-      previousNameRef.current,
-      nextName,
-      suggestSkuFromName
-    )
-
-    if (nextSlug !== currentSlug) form.setFieldValue('slug', nextSlug)
-    if (nextSku !== currentSku) form.setFieldValue('sku', nextSku)
+    if (!slugLockedRef.current) {
+      const nextSlug = suggestSlugFromName(nextName)
+      if (nextSlug) form.setFieldValue('slug', nextSlug)
+    }
+    if (!skuLockedRef.current) {
+      const nextSku = suggestSkuFromName(nextName)
+      if (nextSku) form.setFieldValue('sku', nextSku)
+    }
     previousNameRef.current = nextName
   }, [form, nameWatched, variation])
 
@@ -276,14 +271,22 @@ export default function VariationEditPage() {
               name="sku"
               extra="Синхронизируется с названием, пока не правите вручную"
             >
-              <Input />
+              <Input
+                onChange={() => {
+                  skuLockedRef.current = true
+                }}
+              />
             </Form.Item>
             <Form.Item
               label="Slug"
               name="slug"
               extra="Синхронизируется с названием, пока не правите вручную"
             >
-              <Input />
+              <Input
+                onChange={() => {
+                  slugLockedRef.current = true
+                }}
+              />
             </Form.Item>
             <Form.Item
               label="Цена"

@@ -33,6 +33,9 @@ export function StepProductBasics({ value, categories, onChange }: StepProductBa
             onChange={e => onChange({ slug: e.target.value })}
             placeholder="futbolka-solitude"
           />
+          <span className="product-create__field-hint">
+            Меняется вместе с названием, пока вы сами не отредактируете slug
+          </span>
         </div>
 
         <div className="product-create__field product-create__field--full">

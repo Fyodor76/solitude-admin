@@ -9,7 +9,7 @@ import {
   loadProductCreateDraft,
   saveProductCreateDraft,
 } from '../draftStorage'
-import { buildSku, createDraftKey, slugify } from '../helpers'
+import { buildSku, createDraftKey, suggestSkuFromName, suggestSlugFromName } from '../helpers'
 import {
   DraftVariation,
   ProductBasicsForm,
@@ -129,13 +129,15 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   const updateBasics = useCallback((patch: Partial<ProductBasicsForm>) => {
     setState(prev => {
       const nextBasics = { ...prev.basics, ...patch }
-      if (patch.name !== undefined) {
-        const previousAutoSlug = slugify(prev.basics.name)
-        const slugIsAuto = !prev.basics.slug.trim() || prev.basics.slug === previousAutoSlug
-        if (slugIsAuto) {
-          nextBasics.slug = slugify(patch.name)
-        }
+
+      if (patch.slug !== undefined && patch.name === undefined) {
+        nextBasics.slugLocked = true
       }
+
+      if (patch.name !== undefined && !nextBasics.slugLocked) {
+        nextBasics.slug = suggestSlugFromName(patch.name)
+      }
+
       return { ...prev, basics: nextBasics }
     })
   }, [])
@@ -144,7 +146,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     setState(prev => {
       const index = prev.variations.length + 1
       const baseName = prev.basics.name.trim() || 'variation'
-      const baseSlug = prev.basics.slug.trim() || slugify(baseName) || 'item'
+      const baseSlug = prev.basics.slug.trim() || suggestSlugFromName(baseName) || 'item'
       const next: DraftVariation = {
         key: createDraftKey('var'),
         name: `${baseName} ${index}`,
@@ -168,19 +170,23 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       variations: prev.variations.map(item => {
         if (item.key !== key) return item
         const next = { ...item, ...patch }
-        if (patch.name !== undefined) {
-          const previousAutoSlug = slugify(item.name)
-          const slugIsAuto = !item.slug.trim() || item.slug === previousAutoSlug
-          if (slugIsAuto) {
-            next.slug = slugify(patch.name)
-          }
 
-          const previousAutoSku = buildSku(slugify(item.name))
-          const skuIsAuto = !item.sku.trim() || item.sku === previousAutoSku
-          if (skuIsAuto) {
-            next.sku = buildSku(slugify(patch.name))
+        if (patch.slug !== undefined && patch.name === undefined) {
+          next.slugLocked = true
+        }
+        if (patch.sku !== undefined && patch.name === undefined) {
+          next.skuLocked = true
+        }
+
+        if (patch.name !== undefined) {
+          if (!next.slugLocked) {
+            next.slug = suggestSlugFromName(patch.name)
+          }
+          if (!next.skuLocked) {
+            next.sku = suggestSkuFromName(patch.name)
           }
         }
+
         return next
       }),
     }))

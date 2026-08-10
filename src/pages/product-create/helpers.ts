@@ -69,6 +69,7 @@ export function suggestSkuFromName(name: string): string {
 /**
  * Если поле ещё пустое или совпадает с авто-версией от старого названия —
  * подставить новое предложение. Иначе оставить ручной ввод.
+ * Для форм редактирования товара/вариации предпочтительнее явный lock по onChange поля.
  */
 export function syncDerivedFromName(
   current: string | undefined | null,

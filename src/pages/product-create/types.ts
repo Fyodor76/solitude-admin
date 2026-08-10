@@ -8,6 +8,8 @@ export interface ProductImageItem {
 export interface ProductBasicsForm {
   name: string
   slug: string
+  /** true после ручного ввода slug — больше не синкать с названием */
+  slugLocked?: boolean
   description: string
   price: number | null
   categoryId: string
@@ -24,6 +26,8 @@ export interface DraftVariation {
   name: string
   slug: string
   sku: string
+  slugLocked?: boolean
+  skuLocked?: boolean
   price: number | null
   comparePrice: number | null
   colorId: string

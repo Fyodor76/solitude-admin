@@ -21,7 +21,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import { ProductVariation } from '@/app/types/product'
 
-import { suggestSlugFromName, syncDerivedFromName } from '../product-create/helpers'
+import { suggestSlugFromName } from '../product-create/helpers'
 import './ProductsPage.scss'
 import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from './productSwitchLabels'
 
@@ -161,6 +161,9 @@ export default function ProductDetailPage() {
   const product = data?.data
   const nameWatched = Form.useWatch('name', form)
   const previousNameRef = useRef('')
+  const loadedProductIdRef = useRef<string | null>(null)
+  /** Пока false — slug подтягивается из названия; true после ручного ввода в поле slug. */
+  const slugLockedRef = useRef(false)
 
   const categoryOptions = useMemo(
     () => flattenCategories(categoriesResponse?.data ?? []),
@@ -169,7 +172,12 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!product) return
-    previousNameRef.current = product.name
+    const isNewProduct = loadedProductIdRef.current !== product.id
+    if (isNewProduct) {
+      loadedProductIdRef.current = product.id
+      slugLockedRef.current = false
+      previousNameRef.current = product.name
+    }
     form.setFieldsValue({
       name: product.name,
       slug: product.slug,
@@ -191,15 +199,11 @@ export default function ProductDetailPage() {
     const nextName = String(nameWatched)
     if (nextName === previousNameRef.current) return
 
-    const currentSlug = form.getFieldValue('slug') as string | undefined
-    const nextSlug = syncDerivedFromName(
-      currentSlug,
-      previousNameRef.current,
-      nextName,
-      suggestSlugFromName
-    )
-    if (nextSlug !== currentSlug) {
-      form.setFieldValue('slug', nextSlug)
+    if (!slugLockedRef.current) {
+      const nextSlug = suggestSlugFromName(nextName)
+      if (nextSlug) {
+        form.setFieldValue('slug', nextSlug)
+      }
     }
     previousNameRef.current = nextName
   }, [form, nameWatched, product])
@@ -372,7 +376,11 @@ export default function ProductDetailPage() {
               rules={[{ required: true, message: 'Укажите slug' }]}
               extra="Меняется вместе с названием, пока вы сами не отредактируете slug"
             >
-              <Input />
+              <Input
+                onChange={() => {
+                  slugLockedRef.current = true
+                }}
+              />
             </Form.Item>
             <Form.Item
               label="Цена"

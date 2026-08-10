@@ -93,11 +93,17 @@ function VariationCard({
           <div className="product-create__field">
             <span>Slug *</span>
             <Input value={item.slug} onChange={e => onChange(item.key, { slug: e.target.value })} />
+            <span className="product-create__field-hint">
+              Синхронизируется с названием, пока не правите вручную
+            </span>
           </div>
 
           <div className="product-create__field">
             <span>SKU *</span>
             <Input value={item.sku} onChange={e => onChange(item.key, { sku: e.target.value })} />
+            <span className="product-create__field-hint">
+              Синхронизируется с названием, пока не правите вручную
+            </span>
           </div>
 
           <div className="product-create__field">
