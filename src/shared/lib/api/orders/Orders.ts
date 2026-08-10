@@ -5,15 +5,34 @@ import type {
   AdminOrdersAttention,
   OrderCarrierOption,
   OrderResponseThin,
+  OrdersListQuery,
+  OrdersPaginationMeta,
   UpdateOrderItemCustomPricingPayload,
   UpdateOrderShipmentPayload,
   UpdateOrderStatusPayload,
 } from './types'
 
+function buildOrdersQuery(params: OrdersListQuery = {}): Record<string, string | number | boolean> {
+  const query: Record<string, string | number | boolean> = {
+    page: params.page ?? 1,
+    limit: params.limit ?? 50,
+  }
+  if (params.status) query.status = params.status
+  if (params.needsCustomPricing) query.needsCustomPricing = true
+  if (params.q?.trim()) query.q = params.q.trim()
+  return query
+}
+
 export const ordersApi = baseApi.injectEndpoints({
   endpoints: builder => ({
-    getOrders: builder.query<ApiResponse<AdminOrderListItem[], unknown>, void>({
-      query: () => '/orders',
+    getOrders: builder.query<
+      ApiResponse<AdminOrderListItem[], OrdersPaginationMeta>,
+      OrdersListQuery | void
+    >({
+      query: params => ({
+        url: '/orders',
+        params: buildOrdersQuery(params ?? {}),
+      }),
       providesTags: result =>
         result?.data
           ? ['Orders', ...result.data.map(item => ({ type: 'Order' as const, id: item.id }))]

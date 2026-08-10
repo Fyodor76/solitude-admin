@@ -74,6 +74,25 @@ export interface AdminOrdersAttention {
   createdCount: number
   needsCustomPricingCount: number
   badgeCount: number
+  totalCount: number
+  statusCounts: Record<OrderStatus, number>
+}
+
+export interface OrdersListQuery {
+  page?: number
+  limit?: number
+  status?: OrderStatus
+  needsCustomPricing?: boolean
+  q?: string
+}
+
+export interface OrdersPaginationMeta {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext?: boolean
+  hasPrev?: boolean
 }
 
 export interface OrderTrackNotifications {

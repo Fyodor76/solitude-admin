@@ -37,6 +37,14 @@
     min-width: 0;
   }
 
+  &__pagination {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
   &__loading {
     display: flex;
     justify-content: center;

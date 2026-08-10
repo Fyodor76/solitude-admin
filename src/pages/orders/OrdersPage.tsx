@@ -1,11 +1,22 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useMatchMedia } from '@/shared/hooks/useMatchMedia'
-import { useGetOrdersQuery } from '@/shared/lib/api/orders/Orders'
+import { useGetOrdersAttentionQuery, useGetOrdersQuery } from '@/shared/lib/api/orders/Orders'
 import type { AdminOrderListItem, OrderStatus } from '@/shared/lib/api/orders/types'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Empty, Input, Segmented, Select, Spin, Table, Tag, Tooltip } from 'antd'
+import {
+  Button,
+  Empty,
+  Input,
+  Pagination,
+  Segmented,
+  Select,
+  Spin,
+  Table,
+  Tag,
+  Tooltip,
+} from 'antd'
 import type { ColumnsType } from 'antd/es/table'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -25,57 +36,50 @@ import {
 } from './constants'
 import './OrdersPage.scss'
 
+const PAGE_SIZE = 50
+const SEARCH_DEBOUNCE_MS = 300
+
 const OrdersPage = () => {
   const navigate = useNavigate()
   const isMobile = useMatchMedia(ADMIN_MOBILE_SIDEBAR_MEDIA_QUERY)
   const isCompact = useMatchMedia(ADMIN_COMPACT_LAYOUT_MEDIA_QUERY)
-  const { data, isLoading, isFetching, refetch } = useGetOrdersQuery()
+
   const [statusFilter, setStatusFilter] = useState<OrdersListFilter>('all')
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(search.trim())
+    }, SEARCH_DEBOUNCE_MS)
+    return () => window.clearTimeout(timer)
+  }, [search])
+
+  useEffect(() => {
+    setPage(1)
+  }, [statusFilter, debouncedSearch])
+
+  const listQuery = useMemo(() => {
+    const base = { page, limit: PAGE_SIZE, q: debouncedSearch || undefined }
+    if (statusFilter === 'needs_pricing') {
+      return { ...base, needsCustomPricing: true as const }
+    }
+    if (statusFilter !== 'all') {
+      return { ...base, status: statusFilter }
+    }
+    return base
+  }, [page, statusFilter, debouncedSearch])
+
+  const { data, isLoading, isFetching, refetch } = useGetOrdersQuery(listQuery)
+  const { data: attentionData } = useGetOrdersAttentionQuery()
 
   const orders = data?.data ?? []
-
-  const statusCounts = useMemo(() => {
-    const counts = Object.fromEntries(ORDER_STATUSES_FILTER.map(s => [s, 0])) as Record<
-      OrderStatus,
-      number
-    >
-    for (const order of orders) {
-      counts[order.status] = (counts[order.status] ?? 0) + 1
-    }
-    return counts
-  }, [orders])
-
-  const needsPricingCount = useMemo(
-    () => orders.filter(order => order.needsCustomPricing).length,
-    [orders]
-  )
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    return orders.filter(order => {
-      if (statusFilter === 'needs_pricing') {
-        if (!order.needsCustomPricing) return false
-      } else if (statusFilter !== 'all' && order.status !== statusFilter) {
-        return false
-      }
-      if (!q) return true
-      const shortCode = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
-      const haystack = [
-        order.id,
-        order.trackingId,
-        shortCode,
-        order.customerName,
-        order.customerPhone,
-        order.customerEmail,
-        order.carrierTrackingNumber,
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-      return haystack.includes(q)
-    })
-  }, [orders, search, statusFilter])
+  const total = data?.meta?.total ?? 0
+  const attention = attentionData?.data
+  const statusCounts = attention?.statusCounts
+  const needsPricingCount = attention?.needsCustomPricingCount ?? 0
+  const totalCount = attention?.totalCount ?? total
 
   const columns: ColumnsType<AdminOrderListItem> = [
     {
@@ -164,16 +168,29 @@ const OrdersPage = () => {
   ]
 
   const statusOptions = [
-    { label: `Все (${orders.length})`, value: 'all' as const },
+    { label: `Все (${totalCount})`, value: 'all' as const },
     {
       label: `Нужна цена (${needsPricingCount})`,
       value: 'needs_pricing' as const,
     },
     ...ORDER_STATUSES_FILTER.map(status => ({
-      label: `${ORDER_STATUS_LABEL[status]} (${statusCounts[status]})`,
+      label: `${ORDER_STATUS_LABEL[status]} (${statusCounts?.[status] ?? 0})`,
       value: status,
     })),
   ]
+
+  const paginationNode =
+    total > 0 ? (
+      <div className="orders-page__pagination">
+        <Pagination
+          current={page}
+          pageSize={PAGE_SIZE}
+          total={total}
+          showSizeChanger={false}
+          onChange={nextPage => setPage(nextPage)}
+        />
+      </div>
+    ) : null
 
   return (
     <Container className="orders-page admin-page">
@@ -222,50 +239,56 @@ const OrdersPage = () => {
         <div className="orders-page__loading">
           <Spin />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : orders.length === 0 ? (
         <Empty className="orders-page__empty" description="Заказы не найдены" />
       ) : isCompact ? (
-        <div className="orders-page__cards">
-          {filtered.map(order => {
-            const code = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
-            return (
-              <Link key={order.id} to={`/orders/${order.id}`} className="orders-page__card">
-                <div className="orders-page__card-head">
-                  <Tag color={ORDER_STATUS_COLOR[order.status]}>
-                    {ORDER_STATUS_LABEL[order.status]}
-                  </Tag>
-                  <span className="orders-page__muted">{formatOrderDate(order.createdAt)}</span>
-                </div>
-                <strong>{order.customerName || code}</strong>
-                {order.customerPhone ? (
-                  <span className="orders-page__muted">{order.customerPhone}</span>
-                ) : null}
-                <div className="orders-page__card-meta">
-                  <code className="orders-page__code">{code}</code>
-                  <span>{formatOrderMoney(order.totalAmount)}</span>
-                  <span>{order.itemsCount ?? 0} поз.</span>
-                  {order.wasPaid ? <Tag color="green">оплата</Tag> : null}
-                  {order.needsCustomPricing ? <Tag color="orange">нужна цена</Tag> : null}
-                </div>
-              </Link>
-            )
-          })}
-        </div>
+        <>
+          <Spin spinning={isFetching}>
+            <div className="orders-page__cards">
+              {orders.map(order => {
+                const code = order.shortCode || formatOrderShortCode(order.trackingId, order.id)
+                return (
+                  <Link key={order.id} to={`/orders/${order.id}`} className="orders-page__card">
+                    <div className="orders-page__card-head">
+                      <Tag color={ORDER_STATUS_COLOR[order.status]}>
+                        {ORDER_STATUS_LABEL[order.status]}
+                      </Tag>
+                      <span className="orders-page__muted">{formatOrderDate(order.createdAt)}</span>
+                    </div>
+                    <strong>{order.customerName || code}</strong>
+                    {order.customerPhone ? (
+                      <span className="orders-page__muted">{order.customerPhone}</span>
+                    ) : null}
+                    <div className="orders-page__card-meta">
+                      <code className="orders-page__code">{code}</code>
+                      <span>{formatOrderMoney(order.totalAmount)}</span>
+                      <span>{order.itemsCount ?? 0} поз.</span>
+                      {order.wasPaid ? <Tag color="green">оплата</Tag> : null}
+                      {order.needsCustomPricing ? <Tag color="orange">нужна цена</Tag> : null}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </Spin>
+          {paginationNode}
+        </>
       ) : (
         <div className="orders-page__table-wrap">
           <Table
             className="orders-page__table"
             rowKey="id"
             columns={columns}
-            dataSource={filtered}
+            dataSource={orders}
             loading={isFetching}
-            pagination={{ pageSize: 20, showSizeChanger: false }}
+            pagination={false}
             scroll={{ x: 960 }}
             onRow={row => ({
               onClick: () => navigate(`/orders/${row.id}`),
               className: 'orders-page__row',
             })}
           />
+          {paginationNode}
         </div>
       )}
     </Container>
