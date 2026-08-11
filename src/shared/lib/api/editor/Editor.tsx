@@ -26,7 +26,10 @@ export const Editor = baseApi.injectEndpoints({
       }),
       providesTags: (result, error, id) => [{ type: 'Editor', id }],
     }),
-    updateEditor: builder.mutation<ApiResponse<EditorTypeResponse, any>, EditorPatchRequest>({
+    updateEditor: builder.mutation<
+      ApiResponse<EditorTypeResponse, any>,
+      { id: string } & EditorPatchRequest
+    >({
       query: ({ id, ...patchData }) => ({
         url: `/editors/${id}`,
         method: 'PATCH',

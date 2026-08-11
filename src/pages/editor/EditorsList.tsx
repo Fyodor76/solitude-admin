@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
-import { EditorTypeResponse } from '@/shared/lib/api/editor/types'
-import { Input, Select } from 'antd'
+import { EditorPatchRequest, EditorTypeResponse, Variants } from '@/shared/lib/api/editor/types'
+import { Button, Input, message, Select, Switch } from 'antd'
 
+import { toPatchPayload } from './helpers/editorTransformers'
 import { FormEditorType } from './types'
 
 interface EditorsListProps {
@@ -11,6 +12,9 @@ interface EditorsListProps {
   categories: BaseCategoryTree[] | undefined
   formEditor: FormEditorType | undefined
   configurations: EditorTypeResponse[]
+  originalVariants: Variants[]
+  handleSelectConfiguration: (config: EditorTypeResponse) => void
+  handleSave: (id: string, formEditor: EditorPatchRequest) => Promise<void>
   handleInput: (v: any, field: keyof FormEditorType) => void
   setActiveConfigurationId: React.Dispatch<React.SetStateAction<string | null>>
 }
@@ -19,9 +23,20 @@ const EditorsList = ({
   categories,
   formEditor,
   configurations,
+  originalVariants,
+  handleSave,
+  handleSelectConfiguration,
   handleInput,
   setActiveConfigurationId,
 }: EditorsListProps) => {
+  const onSave = () => {
+    if (!formEditor?.id) {
+      message.warning('Нет данных для сохранения')
+      return
+    }
+    const payload = toPatchPayload(formEditor, originalVariants)
+    handleSave(formEditor.id, payload)
+  }
   return (
     <div className="categories-editor-container">
       {configurations && (
@@ -29,8 +44,10 @@ const EditorsList = ({
           <h3>Конфигурации</h3>
           {configurations.map(configuration => (
             <div
-              onClick={() => setActiveConfigurationId(configuration.id)}
-              className="categories-editor-cat"
+              onClick={() => handleSelectConfiguration(configuration)}
+              className={`categories-editor-cat ${
+                activeConfigurationId === configuration.id ? 'active' : ''
+              }`}
               key={configuration.id}
             >
               {configuration.title}
@@ -40,13 +57,14 @@ const EditorsList = ({
       )}
 
       {configurations.length > 0 ? (
-        <div>
+        <div className="editor-base-info">
           <span>Название</span>
           <Input
             type="text"
             value={formEditor?.title}
             onChange={e => handleInput(e.target.value, 'title')}
           />
+          <span>Категория</span>
           <Select
             placeholder="Выберите категорию"
             value={formEditor?.categoryId}
@@ -59,6 +77,15 @@ const EditorsList = ({
                 </Select.Option>
               ))}
           </Select>
+          <span>Активно</span>
+          <Switch
+            checked={formEditor?.isActive === true}
+            onChange={checked => handleInput(checked, 'isActive')}
+            className="switch-editor"
+          />
+          <Button className="btn-save-editor" type="primary" onClick={onSave}>
+            Сохранить
+          </Button>
         </div>
       ) : (
         <div>Пока нет редактора</div>

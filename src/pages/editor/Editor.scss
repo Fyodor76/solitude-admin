@@ -63,6 +63,19 @@ body {
           flex-direction: column;
         }
       }
+      .editor-base-info {
+        display: flex;
+        flex-direction: column;
+        width: 70%;
+        .switch-editor {
+          width: 100px;
+        }
+        .btn-save-editor {
+          width: 100px;
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
     }
   }
 }
