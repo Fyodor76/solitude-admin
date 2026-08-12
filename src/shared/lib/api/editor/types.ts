@@ -40,5 +40,3 @@ export interface EditorTypeRequest {
   variants: Variants[]
   specifications: Omit<Specifications, 'id'>[]
 }
-
-export type EditorPatchRequest = Partial<EditorTypeRequest>

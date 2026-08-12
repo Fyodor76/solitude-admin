@@ -1,6 +1,6 @@
 import { ApiResponse, baseApi } from '../baseApi'
 import { deleteResponse } from '../size-charts/types'
-import { EditorPatchRequest, EditorTypeRequest, EditorTypeResponse } from './types'
+import { EditorTypeRequest, EditorTypeResponse } from './types'
 
 export const Editor = baseApi.injectEndpoints({
   endpoints: builder => ({
@@ -28,7 +28,7 @@ export const Editor = baseApi.injectEndpoints({
     }),
     updateEditor: builder.mutation<
       ApiResponse<EditorTypeResponse, any>,
-      { id: string } & EditorPatchRequest
+      { id: string; data: Partial<EditorTypeRequest> }
     >({
       query: ({ id, ...patchData }) => ({
         url: `/editors/${id}`,

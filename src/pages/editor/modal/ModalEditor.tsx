@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
-import { Colors } from '@/shared/lib/api/editor/types'
+import { Colors, EditorTypeRequest } from '@/shared/lib/api/editor/types'
 import { Input, Modal, Select, Switch } from 'antd'
 
 import { FormEditorType } from '../types'
@@ -11,19 +11,26 @@ interface ModalEditorProps {
   isOpen: boolean
   categories: BaseCategoryTree[] | undefined
   colors: Colors[]
+  onSaveCreated: (data: FormEditorType) => Promise<void>
   closeModal: () => void
   handleInput: (v: any, field: keyof FormEditorType) => void
 }
-const modalEditor = ({
+const ModalEditor = ({
   closeModal,
   isOpen,
   formEditor,
   handleInput,
+  onSaveCreated,
   categories,
   colors,
 }: ModalEditorProps) => {
   return (
-    <Modal title="Создание нового редактора" open={isOpen} onCancel={closeModal}>
+    <Modal
+      onOk={() => onSaveCreated(formEditor)}
+      title="Создание нового редактора"
+      open={isOpen}
+      onCancel={closeModal}
+    >
       <div className="modal-editor-form">
         <div className="field">
           <label>Название</label>
@@ -99,4 +106,4 @@ const modalEditor = ({
   )
 }
 
-export default modalEditor
+export default ModalEditor

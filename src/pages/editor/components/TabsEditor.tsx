@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Button } from 'antd'
 
-import { EDITOR_TABS } from './const'
-import { EditorTabType } from './types'
+import { EDITOR_TABS } from '../const'
+import { EditorTabType } from '../types'
 
 interface TabsEditorProps {
   setActiveTab: React.Dispatch<React.SetStateAction<EditorTabType>>

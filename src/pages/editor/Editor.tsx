@@ -6,17 +6,18 @@ import {
   useGetAllEditorsQuery,
   useUpdateEditorMutation,
 } from '@/shared/lib/api/editor/Editor'
-import { EditorPatchRequest, Variants } from '@/shared/lib/api/editor/types'
+import { EditorTypeRequest, Variants } from '@/shared/lib/api/editor/types'
 import { useGetProductAttributeByTypeQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
 import { useModal } from '@/shared/lib/hooks/useModal'
-import { Button } from 'antd'
+import { Button, message } from 'antd'
 
+import ButtonSave from './components/ButtonSave'
+import EditorsList from './components/EditorsList'
+import TabsEditor from './components/TabsEditor'
 import { EDITOR_TABS, initialStateEditor } from './const'
 import './Editor.scss'
-import EditorsList from './EditorsList'
-import { toEditorColors } from './helpers/editorTransformers'
-import ModalEditor from './modal/modalEditor'
-import TabsEditor from './TabsEditor'
+import { toCreatePayload, toEditorColors, toPatchPayload } from './helpers/editorTransformers'
+import ModalEditor from './modal/ModalEditor'
 import { EditorTabType, FormEditorType } from './types'
 
 const Editor = () => {
@@ -41,6 +42,7 @@ const Editor = () => {
       handleSelectConfiguration(firstConfig)
     }
   }, [configurations])
+
   const handleSelectConfiguration = (config: FormEditorType) => {
     setOriginalVariants(config.variants || [])
     setActiveConfigurationId(config.id)
@@ -64,10 +66,10 @@ const Editor = () => {
     }))
   }
 
-  const handleSave = async (id: string, data: EditorPatchRequest) => {
+  const handleSave = async (id: string, data: EditorTypeRequest) => {
     try {
       console.log('Сохранить:', data)
-      await updateEditor({ id, ...data }).unwrap()
+      await updateEditor({ id, data }).unwrap()
       refetch()
     } catch (error) {
       console.log('Ошибка обновления редактора', error)
@@ -75,7 +77,34 @@ const Editor = () => {
   }
   const openModal = () => {
     setFormEditor(initialStateEditor)
-    modal.onOpen(formEditor)
+    modal.onOpen()
+  }
+  const onSave = () => {
+    if (!formEditor?.id) {
+      message.warning('Нет данных для сохранения')
+      return
+    }
+    const payload = toPatchPayload(formEditor, originalVariants)
+    handleSave(formEditor.id, payload)
+  }
+
+  const onSaveCreated = async (data: FormEditorType) => {
+    if (!data.categoryId) {
+      message.warning('Выберите категорию')
+      return
+    }
+
+    const payload = toCreatePayload(data)
+    try {
+      await createEditor(payload).unwrap()
+      message.success('Редактор успешно создан')
+      modal.onClose()
+      refetch()
+      setFormEditor(initialStateEditor)
+    } catch (error) {
+      console.error('Ошибка создания:', error)
+      message.error('Не удалось создать редактор')
+    }
   }
   return (
     <div className="wrapper-editor">
@@ -107,10 +136,12 @@ const Editor = () => {
           setActiveConfigurationId={setActiveConfigurationId}
         />
       )}
+      <ButtonSave onSave={onSave} />
       <ModalEditor
         categories={categories}
         isOpen={modal.isOpen}
         formEditor={formEditor}
+        onSaveCreated={onSaveCreated}
         closeModal={modal.onClose}
         handleInput={handleInput}
         colors={colors}

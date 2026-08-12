@@ -23,6 +23,8 @@ body {
     .tabs-editor {
       display: flex;
       gap: 20px;
+      width: 100%;
+
       .button-tab {
         border: none;
         box-shadow: none;
@@ -50,6 +52,11 @@ body {
         }
       }
     }
+    .line {
+      width: 100%;
+      height: 0px;
+      border-bottom: 2px solid #e6ebf2;
+    }
     .categories-editor-container {
       display: flex;
       .categories-editor {
@@ -76,6 +83,10 @@ body {
           justify-content: flex-end;
         }
       }
+    }
+    .container-btn-save-editor {
+      display: flex;
+      flex-direction: row-reverse;
     }
   }
 }
