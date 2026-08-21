@@ -168,6 +168,8 @@ export default function ProductDetailPage() {
   const loadedProductIdRef = useRef<string | null>(null)
   /** Пока false — slug подтягивается из названия; true после ручного ввода в поле slug. */
   const slugLockedRef = useRef(false)
+  /** Не перетирать локальный порядок «На витрине» при refetch после удаления фото. */
+  const showcaseHydratedRef = useRef(false)
 
   const categoryOptions = useMemo(
     () => flattenCategories(categoriesResponse?.data ?? []),
@@ -181,6 +183,7 @@ export default function ProductDetailPage() {
       loadedProductIdRef.current = product.id
       slugLockedRef.current = false
       previousNameRef.current = product.name
+      showcaseHydratedRef.current = false
     }
     form.setFieldsValue({
       name: product.name,
@@ -196,7 +199,18 @@ export default function ProductDetailPage() {
       showOnLanding: product.showOnLanding ?? false,
     })
     setOrderedVariations(sortVariations(product.variations ?? []))
-    setShowcaseFileIds(product.images ?? [])
+
+    if (!showcaseHydratedRef.current) {
+      const variationImageIds = new Set<string>()
+      for (const variation of product.variations ?? []) {
+        for (const imageId of variation.images ?? []) {
+          if (imageId) variationImageIds.add(imageId)
+        }
+        if (variation.mainImage) variationImageIds.add(variation.mainImage)
+      }
+      setShowcaseFileIds((product.images ?? []).filter(id => variationImageIds.has(id)))
+      showcaseHydratedRef.current = true
+    }
   }, [form, product])
 
   const variationImagePool = useMemo(() => {
@@ -227,11 +241,12 @@ export default function ProductDetailPage() {
   const handleRemoveVariationPhoto = useCallback(
     async (item: { fileId: string; variationId: string }) => {
       const variation = orderedVariations.find(row => row.id === item.variationId)
-      if (!variation || !productId) return
+      if (!variation || !productId || !product) return
 
       const nextImages = (variation.images ?? []).filter(id => id !== item.fileId)
       const nextMain =
         variation.mainImage === item.fileId ? nextImages[0] || undefined : variation.mainImage
+      const nextShowcase = showcaseFileIds.filter(id => id !== item.fileId)
 
       try {
         await updateVariation({
@@ -242,13 +257,43 @@ export default function ProductDetailPage() {
             mainImage: nextMain,
           },
         }).unwrap()
-        setShowcaseFileIds(prev => prev.filter(id => id !== item.fileId))
+
+        // Сразу убираем fileId с витрины товара — иначе главная продолжает отдавать старое фото.
+        if (nextShowcase.length !== showcaseFileIds.length) {
+          await updateProduct({
+            id: product.id,
+            body: {
+              name: product.name,
+              slug: product.slug,
+              description: product.description,
+              modelParameters: product.modelParameters,
+              price: product.price,
+              categoryId: product.categoryId,
+              brand: product.brand,
+              material: product.material,
+              isActive: product.isActive,
+              isFeatured: product.isFeatured,
+              showOnLanding: product.showOnLanding,
+              images: nextShowcase,
+            },
+          }).unwrap()
+        }
+
+        setShowcaseFileIds(nextShowcase)
         openNotification('success', ['Фото удалено'])
       } catch {
         openNotification('error', ['Не удалось удалить фото'])
       }
     },
-    [openNotification, orderedVariations, productId, updateVariation]
+    [
+      openNotification,
+      orderedVariations,
+      product,
+      productId,
+      showcaseFileIds,
+      updateProduct,
+      updateVariation,
+    ]
   )
 
   useEffect(() => {
