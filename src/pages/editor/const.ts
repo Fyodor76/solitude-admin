@@ -1,5 +1,3 @@
-import { EditorTypeResponse } from '@/shared/lib/api/editor/types'
-
 import { FormEditorType } from './types'
 
 export const EDITOR_TABS = {

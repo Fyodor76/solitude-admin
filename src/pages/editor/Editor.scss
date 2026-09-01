@@ -6,49 +6,51 @@ body {
     flex-direction: column;
     background-color: white;
     font-family: var(--font-primary);
-    gap: 16px;
+
     margin: 15px;
-    padding: 16px 12px;
+    padding: 16px 0px 0px 0px;
     border: 1px solid var(--admin-color-border);
     border-radius: var(--admin-radius-surface);
 
     .header-editor {
       display: flex;
       justify-content: space-between;
+      padding: 10px 20px;
+      margin-bottom: 15px;
+      &-title {
+        color: var(--admin-color-text-muted);
+      }
       &-btns {
         display: flex;
         gap: 20px;
+        .btn-update {
+          color: var(--color-blue);
+          border: 1px solid var(--color-blue);
+        }
       }
     }
     .tabs-editor {
       display: flex;
       gap: 20px;
       width: 100%;
+      border-radius: 12px;
+      padding-left: 15px;
 
       .button-tab {
+        display: flex;
+        align-items: center;
         border: none;
         box-shadow: none;
-        background-color: transparent;
         cursor: pointer;
-        position: relative;
+        padding: 10px;
 
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: -2px;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background-color: var(--color-blue);
-          transform: scaleX(0);
-          border-radius: 2px;
-        }
         &:hover {
-          border: none;
-          color: #111827;
+          background-color: #f2f7fd;
         }
-        &:hover::after {
-          transform: scaleX(1);
+        &.active {
+          background-color: #f2f7fd;
+          border-bottom: 2px solid var(--color-blue);
+          color: var(--color-blue);
         }
       }
     }
@@ -59,24 +61,55 @@ body {
     }
     .categories-editor-container {
       display: flex;
+
       .categories-editor {
         display: flex;
         flex-direction: column;
         gap: 20px;
         width: 30%;
+        align-items: stretch;
+        padding: 20px 0px;
+        .configuration-title {
+          padding: 0px 20px;
+        }
         &-cat {
           cursor: pointer;
           display: flex;
           flex-direction: column;
+          padding: 10px 20px;
+
+          &:hover {
+            background-color: #f2f7fd;
+          }
+          &.active {
+            background-color: #f2f7fd;
+            border-left: 2px solid var(--color-blue);
+          }
         }
+      }
+      .line-editor {
+        width: 2px;
+        flex-shrink: 0;
+        background-color: #e6ebf2;
       }
       .editor-base-info {
         display: flex;
         flex-direction: column;
         width: 70%;
-        .switch-editor {
-          width: 100px;
+        padding: 40px 20px 20px 20px;
+        gap: 20px;
+        .input-title-editor {
+          color: var(--admin-color-text-muted);
         }
+        .title-and-switch {
+          display: flex;
+          gap: 20px;
+
+          .switch-editor {
+            width: 60px;
+          }
+        }
+
         .btn-save-editor {
           width: 100px;
           display: flex;
@@ -85,6 +118,19 @@ body {
       }
     }
     .container-btn-save-editor {
+      display: flex;
+      flex-direction: row-reverse;
+      padding: 0px 20px;
+      margin-top: 30px;
+    }
+  }
+  .editor-color-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    &-btn-add,
+    &-btn-save {
       display: flex;
       flex-direction: row-reverse;
     }

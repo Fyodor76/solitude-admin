@@ -7,22 +7,35 @@ import { EditorTabType } from '../types'
 
 interface TabsEditorProps {
   setActiveTab: React.Dispatch<React.SetStateAction<EditorTabType>>
+  activeTab: EditorTabType
 }
-const TabsEditor = ({ setActiveTab }: TabsEditorProps) => {
+const TabsEditor = ({ activeTab, setActiveTab }: TabsEditorProps) => {
   return (
     <div className="tabs-editor">
-      <Button onClick={() => setActiveTab(EDITOR_TABS.BASE)} type="default" className="button-tab">
+      <div
+        onClick={() => setActiveTab(EDITOR_TABS.BASE)}
+        className={`button-tab ${activeTab === EDITOR_TABS.BASE ? 'active' : ''}`}
+      >
         Основное
-      </Button>
-      <Button onClick={() => setActiveTab(EDITOR_TABS.COLORS)} className="button-tab">
+      </div>
+      <div
+        onClick={() => setActiveTab(EDITOR_TABS.COLORS)}
+        className={`button-tab ${activeTab === EDITOR_TABS.COLORS ? 'active' : ''}`}
+      >
         Цвета
-      </Button>
-      <Button onClick={() => setActiveTab(EDITOR_TABS.SIDES)} className="button-tab">
+      </div>
+      <div
+        onClick={() => setActiveTab(EDITOR_TABS.SIDES)}
+        className={`button-tab ${activeTab === EDITOR_TABS.SIDES ? 'active' : ''}`}
+      >
         Стороны макета
-      </Button>
-      <Button onClick={() => setActiveTab(EDITOR_TABS.SPECIFICATIONS)} className="button-tab">
+      </div>
+      <div
+        onClick={() => setActiveTab(EDITOR_TABS.SPECIFICATIONS)}
+        className={`button-tab ${activeTab === EDITOR_TABS.SPECIFICATIONS ? 'active' : ''}`}
+      >
         Характеристики
-      </Button>
+      </div>
     </div>
   )
 }

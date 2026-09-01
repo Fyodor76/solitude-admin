@@ -11,12 +11,13 @@ import { useGetProductAttributeByTypeQuery } from '@/shared/lib/api/product-attr
 import { useModal } from '@/shared/lib/hooks/useModal'
 import { Button, message } from 'antd'
 
-import ButtonSave from './components/ButtonSave'
+import EditorColors from './components/EditorColors'
 import EditorsList from './components/EditorsList'
 import TabsEditor from './components/TabsEditor'
 import { EDITOR_TABS, initialStateEditor } from './const'
 import './Editor.scss'
 import { toCreatePayload, toEditorColors, toPatchPayload } from './helpers/editorTransformers'
+import useColorLocalChange from './hooks/useColorLocalChange'
 import ModalEditor from './modal/ModalEditor'
 import { EditorTabType, FormEditorType } from './types'
 
@@ -32,9 +33,19 @@ const Editor = () => {
   const [formEditor, setFormEditor] = useState<FormEditorType>(initialStateEditor)
   const [originalVariants, setOriginalVariants] = useState<Variants[]>([])
   const modal = useModal()
+  const handleInput = (v: any, field: keyof FormEditorType) => {
+    setFormEditor(prev => ({
+      ...prev,
+      [field]: v,
+    }))
+  }
+  const { localDeletedColor, localUpdatedColor, handleToggleStatus, localAddNewColor } =
+    useColorLocalChange({ formEditor, handleInput })
   const configurations = editors?.data || []
   const categories = categoriesData?.data
   const colors = toEditorColors(data?.data?.[0]?.values || [])
+
+  console.log(colors)
   console.log(editors)
   useEffect(() => {
     if (configurations.length > 0 && !activeConfigurationId) {
@@ -59,13 +70,6 @@ const Editor = () => {
     })
   }
 
-  const handleInput = (v: any, field: keyof FormEditorType) => {
-    setFormEditor(prev => ({
-      ...prev,
-      [field]: v,
-    }))
-  }
-
   const handleSave = async (id: string, data: EditorTypeRequest) => {
     try {
       console.log('Сохранить:', data)
@@ -77,6 +81,7 @@ const Editor = () => {
   }
   const openModal = () => {
     setFormEditor(initialStateEditor)
+    console.log(colors)
     modal.onOpen()
   }
   const onSave = () => {
@@ -106,12 +111,18 @@ const Editor = () => {
       message.error('Не удалось создать редактор')
     }
   }
+
   return (
     <div className="wrapper-editor">
       <div className="header-editor">
         <div>
-          <h1 style={{ fontSize: 32, color: '#000', marginBottom: 24 }}>Редактор</h1>
-          <span>Настройки конструктора для категорий</span>
+          <h1>Редактор</h1>
+          {activeTab === EDITOR_TABS.BASE && (
+            <span className="header-editor-title">Настройки конструктора для категорий</span>
+          )}
+          {activeTab === EDITOR_TABS.COLORS && (
+            <span className="header-editor-title">Конфигурация: {formEditor.title}</span>
+          )}
         </div>
         <div className="header-editor-btns">
           <Button className="btn-update" type="default">
@@ -122,7 +133,7 @@ const Editor = () => {
           </Button>
         </div>
       </div>
-      <TabsEditor setActiveTab={setActiveTab} />
+      <TabsEditor setActiveTab={setActiveTab} activeTab={activeTab} />
       {activeTab === EDITOR_TABS.BASE && (
         <EditorsList
           categories={categories}
@@ -130,13 +141,22 @@ const Editor = () => {
           activeConfigurationId={activeConfigurationId}
           formEditor={formEditor}
           originalVariants={originalVariants}
+          onSave={onSave}
           handleSelectConfiguration={handleSelectConfiguration}
           handleSave={handleSave}
           handleInput={handleInput}
           setActiveConfigurationId={setActiveConfigurationId}
         />
       )}
-      <ButtonSave onSave={onSave} />
+      {activeTab === EDITOR_TABS.COLORS && (
+        <EditorColors
+          localDeleteColor={localDeletedColor}
+          localUpdatedColor={localUpdatedColor}
+          handleToggleStatus={handleToggleStatus}
+          colors={formEditor.colors || []}
+        />
+      )}
+
       <ModalEditor
         categories={categories}
         isOpen={modal.isOpen}

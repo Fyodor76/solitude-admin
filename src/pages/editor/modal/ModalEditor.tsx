@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
-import { Colors, EditorTypeRequest } from '@/shared/lib/api/editor/types'
+import { Colors } from '@/shared/lib/api/editor/types'
 import { Input, Modal, Select, Switch } from 'antd'
 
 import { FormEditorType } from '../types'
@@ -24,6 +24,9 @@ const ModalEditor = ({
   categories,
   colors,
 }: ModalEditorProps) => {
+  console.log('formEditor.colors:', formEditor.colors)
+  console.log('Тип:', typeof formEditor.colors)
+  console.log('Массив ли это:', Array.isArray(formEditor.colors))
   return (
     <Modal
       onOk={() => onSaveCreated(formEditor)}
@@ -62,32 +65,38 @@ const ModalEditor = ({
           <label>Цвета</label>
           <Select
             mode="multiple"
-            value={formEditor.colors?.map(c => c.id)}
+            value={formEditor?.colors?.map(c => c.id)}
             onChange={selectedIds => {
-              // Находим полные объекты цветов по id
+              if (!colors) {
+                handleInput([], 'colors')
+                return
+              }
               const selectedColors = colors.filter(c => selectedIds.includes(c.id))
-              // ✅ Сохраняем в formEditor.colors
+
               handleInput(selectedColors, 'colors')
             }}
             placeholder="Выберите цвета"
             style={{ width: '100%' }}
           >
-            {colors.map(color => (
-              <Select.Option key={color.id} value={color.id}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div
-                    style={{
-                      width: 16,
-                      height: 16,
-                      backgroundColor: color.hexCode,
-                      borderRadius: 4,
-                      border: '1px solid #ddd',
-                    }}
-                  />
-                  {color.value}
-                </div>
-              </Select.Option>
-            ))}
+            {colors?.map(color => {
+              if (!color) return null
+              return (
+                <Select.Option key={color.id} value={color.id}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        backgroundColor: color.hexCode,
+                        borderRadius: 4,
+                        border: '1px solid #ddd',
+                      }}
+                    />
+                    {color.value}
+                  </div>
+                </Select.Option>
+              )
+            })}
           </Select>
           <span className="hint">Выберите цвета, которые будут доступны в конструкторе</span>
         </div>
