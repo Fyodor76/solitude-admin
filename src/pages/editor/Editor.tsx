@@ -33,19 +33,20 @@ const Editor = () => {
   const [formEditor, setFormEditor] = useState<FormEditorType>(initialStateEditor)
   const [originalVariants, setOriginalVariants] = useState<Variants[]>([])
   const modal = useModal()
+  const modalForAddColor = useModal()
+
   const handleInput = (v: any, field: keyof FormEditorType) => {
     setFormEditor(prev => ({
       ...prev,
       [field]: v,
     }))
   }
-  const { localDeletedColor, localUpdatedColor, handleToggleStatus, localAddNewColor } =
-    useColorLocalChange({ formEditor, handleInput })
+  const { localDeletedColor, localAddNewColor } = useColorLocalChange({ formEditor, handleInput })
   const configurations = editors?.data || []
   const categories = categoriesData?.data
   const colors = toEditorColors(data?.data?.[0]?.values || [])
-
-  console.log(colors)
+  console.log('📦 Данные из API:', data?.data?.[0]?.values)
+  console.log('COLORS', colors)
   console.log(editors)
   useEffect(() => {
     if (configurations.length > 0 && !activeConfigurationId) {
@@ -57,12 +58,20 @@ const Editor = () => {
   const handleSelectConfiguration = (config: FormEditorType) => {
     setOriginalVariants(config.variants || [])
     setActiveConfigurationId(config.id)
+    const colorsWithStatus =
+      config.colors?.map(color => {
+        const fullColor = colors.find(c => c.id === color.id) // ← берем из colors (с isActive)
+        return {
+          ...color,
+          isActive: fullColor?.isActive ?? true,
+        }
+      }) || []
     setFormEditor({
       id: config.id,
       categoryId: config.categoryId,
       title: config.title,
-      isActive: true,
-      colors: config.colors || [],
+      isActive: config.isActive ?? false,
+      colors: colorsWithStatus,
       variants: config.variants || [],
       specifications: config.specifications || [],
       createdAt: config.createdAt || '',
@@ -89,8 +98,14 @@ const Editor = () => {
       message.warning('Нет данных для сохранения')
       return
     }
-    const payload = toPatchPayload(formEditor, originalVariants)
-    handleSave(formEditor.id, payload)
+
+    try {
+      const payload = toPatchPayload(formEditor, originalVariants)
+
+      handleSave(formEditor.id, payload)
+    } catch (error) {
+      console.log('Ошибка в toPatchPayload:', error)
+    }
   }
 
   const onSaveCreated = async (data: FormEditorType) => {
@@ -150,10 +165,16 @@ const Editor = () => {
       )}
       {activeTab === EDITOR_TABS.COLORS && (
         <EditorColors
+          colors={formEditor.colors}
+          colorsAttributies={colors}
+          isOpen={modalForAddColor.isOpen}
+          formEditor={formEditor}
+          onSave={onSave}
           localDeleteColor={localDeletedColor}
-          localUpdatedColor={localUpdatedColor}
-          handleToggleStatus={handleToggleStatus}
-          colors={formEditor.colors || []}
+          localAddColor={localAddNewColor}
+          closeModal={modalForAddColor.onClose}
+          handleInput={handleInput}
+          modalOpen={modalForAddColor.onOpen}
         />
       )}
 

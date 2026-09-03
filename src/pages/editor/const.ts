@@ -11,7 +11,7 @@ export const initialStateEditor: FormEditorType = {
   id: '',
   categoryId: '',
   title: '',
-  isActive: true,
+  isActive: false,
   colors: [],
   variants: [],
   specifications: [],

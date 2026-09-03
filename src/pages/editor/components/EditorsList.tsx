@@ -76,7 +76,7 @@ const EditorsList = ({
             <div className="title-and-switch">
               <span>Активен</span>
               <Switch
-                checked={formEditor?.isActive === true}
+                checked={formEditor?.isActive}
                 onChange={checked => handleInput(checked, 'isActive')}
                 className="switch-editor"
               />

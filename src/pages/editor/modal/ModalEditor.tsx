@@ -24,9 +24,6 @@ const ModalEditor = ({
   categories,
   colors,
 }: ModalEditorProps) => {
-  console.log('formEditor.colors:', formEditor.colors)
-  console.log('Тип:', typeof formEditor.colors)
-  console.log('Массив ли это:', Array.isArray(formEditor.colors))
   return (
     <Modal
       onOk={() => onSaveCreated(formEditor)}
