@@ -4,6 +4,26 @@ import { EditableSizeParameter } from '@/shared/lib/api/size-parameters/type'
 
 import { MAX_CHEST, MAX_LENGTH, MIN_CHEST, MIN_LENGTH } from '../size-parameters/constans/const'
 
+export const prepareCreateData = (data: SizeChartRequest) => ({
+  categoryId: data.categoryId,
+  name: data.name,
+  description: data.description || undefined,
+  imageId: data.imageId || undefined,
+  productType: data.productType,
+  metricsText: data.metricsText || undefined,
+  ...(data.sizeParameters?.length
+    ? {
+        sizeParameters: data.sizeParameters.map(p => ({
+          internationalSize: p.internationalSize,
+          russianSize: p.russianSize,
+          lengthCm: Number(p.lengthCm),
+          chestCircumferenceCm: Number(p.chestCircumferenceCm),
+          order: Number(p.order),
+        })),
+      }
+    : {}),
+})
+
 export const prepareUpdateData = (
   data: Partial<SizeChartRequest>,
   editParameter: EditableSizeParameter[]
@@ -12,6 +32,7 @@ export const prepareUpdateData = (
   description: data.description,
   imageId: data.imageId,
   productType: data.productType,
+  metricsText: data.metricsText,
   sizeParameters: editParameter.map(p => ({
     id: p.id,
     internationalSize: p.internationalSize,

@@ -14,7 +14,12 @@ export const SizeCharts = baseApi.injectEndpoints({
         method: 'POST',
         body: newSizeChart,
       }),
-      invalidatesTags: [{ type: 'Size-chart' as const, id: 'ALL_SIZE-CHARTS' }],
+      invalidatesTags: (_result, _error, newSizeChart) => [
+        { type: 'Size-chart' as const, id: 'ALL_SIZE-CHARTS' },
+        ...(newSizeChart.categoryId
+          ? [{ type: 'Size-chart' as const, id: `CATEGORY_${newSizeChart.categoryId}` }]
+          : []),
+      ],
     }),
     getAllSizeCharts: builder.query<ApiResponse<SizeChartResponse[], any>, void>({
       query: () => ({
@@ -39,9 +44,12 @@ export const SizeCharts = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
-      invalidatesTags: (_result, _error, { id }) => [
+      invalidatesTags: (result, _error, { id }) => [
         { type: 'Size-chart', id },
         { type: 'Size-chart', id: 'ALL_SIZE-CHARTS' },
+        ...(result?.data?.categoryId
+          ? [{ type: 'Size-chart' as const, id: `CATEGORY_${result.data.categoryId}` }]
+          : []),
       ],
     }),
     deleteSizeChartById: builder.mutation<ApiResponse<deleteResponse, any>, string>({

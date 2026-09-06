@@ -117,9 +117,7 @@ const SizeChartModal = ({
         />
         {currentUrl ? (
           <img className="imgSizeChart" src={currentUrl} alt="Category preview"></img>
-        ) : (
-          <img className="imgSizeChart" src="/visily-image.png" alt="Category preview"></img>
-        )}
+        ) : null}
       </Modal>
     </div>
   )

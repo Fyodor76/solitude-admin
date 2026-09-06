@@ -10,11 +10,9 @@ export const useSizeChartActions = () => {
   const [updateSizeChart] = useUpdateSizeChartByIdMutation()
   const [createSizeChart] = useCreateSizeChartMutation()
 
-  const createNewSizeChart = async (data: SizeChartRequest) => {
+  const createNewSizeChart = async (data: Partial<SizeChartRequest>) => {
     try {
-      const result = await createSizeChart(data).unwrap()
-      console.log('✅ Таблица размеров создана, обновляем данные...')
-
+      const result = await createSizeChart(data as SizeChartRequest).unwrap()
       return result
     } catch (error) {
       console.log('Ошибка создания таблицы категории!', error)

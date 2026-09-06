@@ -13,6 +13,7 @@ import { INITIAL_DATA } from '../constans/const'
 import {
   hasAnyData,
   isValidateParemeters,
+  prepareCreateData,
   prepareResetData,
   prepareUpdateData,
 } from '../helpers/SizeChartHelper'
@@ -38,7 +39,9 @@ interface useHandleSizeChartsProps {
   setSelectedSizeToAdd: Dispatch<SetStateAction<string | null>>
   refetch: () => void
   deleteParameter: (id: string) => Promise<void>
-  createNewSizeChart: (data: SizeChartRequest) => Promise<ApiResponse<SizeChartRequest, any>>
+  createNewSizeChart: (
+    data: Partial<SizeChartRequest>
+  ) => Promise<ApiResponse<SizeChartRequest, any>>
   updateSizeChartData: (
     id: string,
     data: Partial<SizeChartRequest>
@@ -145,8 +148,7 @@ export const useHandleSizeCharts = ({
       }
 
       await updateSizeChartData(sizeChartId, prepareUpdateData(data, parameters))
-      message.success('✅ Изменения сохранены!')
-      refetch()
+      message.success('Изменения сохранены')
       clearChanges()
       setDeleteIds([])
     } catch (error) {
@@ -185,11 +187,13 @@ export const useHandleSizeCharts = ({
 
   const handleCreateSizeChartSubmit = async (data: SizeChartRequest) => {
     try {
-      const result = await createNewSizeChart(data)
-      await refetch()
+      const result = await createNewSizeChart(prepareCreateData(data))
       setFormSizeChart(result.data)
+      if (result.data.sizeParameters) {
+        setParameters(result.data.sizeParameters)
+      }
       editModal.onClose()
-      message.success('✅ Таблица размеров создана!')
+      message.success('Таблица размеров создана')
     } catch (error) {
       message.error('Ошибка создания таблицы размеров')
     }

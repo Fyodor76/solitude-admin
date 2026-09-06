@@ -166,11 +166,20 @@
         }
         .size-chart-img-with-btn {
           display: flex;
-          gap: 30px;
+          flex: 1;
+          min-width: 0;
           .size-chart-img {
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: stretch;
+            width: 100%;
+
+            .size-chart-image-row {
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              width: 100%;
+            }
 
             .size-chart-container-img {
               position: relative;
@@ -180,13 +189,28 @@
               background-color: #f2f2fdff;
               border-color: #f2f2fd;
               border-radius: 8px;
-              max-width: 200px;
+              width: 200px;
+              min-height: 160px;
+              flex-shrink: 0;
               img {
                 width: 100%;
                 height: auto;
                 object-fit: cover;
                 display: block;
                 border-radius: inherit;
+              }
+              &--empty {
+                border: 1px dashed var(--admin-color-border);
+                background: #f8fafb;
+              }
+              .size-chart-empty-upload {
+                width: 100%;
+                min-height: 160px;
+                border: none;
+                background: transparent;
+                cursor: pointer;
+                color: var(--admin-color-text-muted);
+                font-size: var(--admin-font-caption);
               }
               .image-edit-overlay {
                 position: absolute;
@@ -205,15 +229,14 @@
             }
 
             .size-chart-text-container {
-              display: flex;
-              flex-wrap: wrap;
-              width: 80%;
+              display: block;
+              width: 100%;
+              margin-top: 8px;
             }
           }
           .size-chart-btn {
             display: flex;
-            justify-content: center;
-
+            justify-content: flex-start;
             flex-shrink: 0;
             width: auto;
 
@@ -316,11 +339,13 @@
             width: 50%;
           }
           .size-chart-img-with-btn {
-            align-items: center;
+            align-items: flex-start;
+            width: 100%;
 
             .size-chart-img {
+              width: 100%;
               .size-chart-container-img {
-                max-width: 50%;
+                max-width: 200px;
 
                 img {
                   width: 100%;
@@ -328,18 +353,17 @@
                 }
               }
               .size-chart-text-container {
-                display: flex;
-
-                justify-content: center;
+                display: block;
+                width: 100%;
 
                 .size-chart-title-text {
-                  text-align: center;
+                  text-align: left;
                 }
               }
             }
 
             .size-chart-btn {
-              justify-content: center;
+              justify-content: flex-start;
             }
           }
         }

@@ -28,6 +28,13 @@ const SizeChartMainInfo = ({
   setUploadImg,
 }: SizeChartMainInfoProps) => {
   const { TextArea } = Input
+  const hasImage = Boolean(formSizeChart.imageId && imageUrl)
+
+  const triggerUpload = () => {
+    const button = document.querySelector('.btn-upload-img-size')
+    ;(button as HTMLElement | null)?.click()
+  }
+
   return (
     <div className="size-chart-select-empty-container">
       <h2 className="empty-table">Информация о таблице размеров</h2>
@@ -67,24 +74,30 @@ const SizeChartMainInfo = ({
         <div className="size-chart-img-with-btn">
           <div className="size-chart-img">
             <span className="size-chart-title-text">Изображение с инструкцией (необязательно)</span>
-            <div className="size-chart-container-img">
-              <img
-                src={imageUrl || '/visily-image.png'}
-                alt="Size-chart preview"
-                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                  e.currentTarget.src = '/visily-image.png'
-                }}
-              />
-              <div className="image-edit-overlay">
-                <Icon
-                  name="editing"
-                  width="20px"
-                  color="#505253"
-                  onClick={() => {
-                    const button = document.querySelector('.btn-upload-img-size')
-                    ;(button as HTMLElement)?.click()
-                  }}
-                />
+            <div className="size-chart-image-row">
+              <div
+                className={`size-chart-container-img${hasImage ? '' : ' size-chart-container-img--empty'}`}
+              >
+                {hasImage ? (
+                  <img src={imageUrl || ''} alt="Size-chart preview" />
+                ) : (
+                  <button type="button" className="size-chart-empty-upload" onClick={triggerUpload}>
+                    Загрузить изображение
+                  </button>
+                )}
+                {hasImage && (
+                  <div className="image-edit-overlay">
+                    <Icon name="editing" width="20px" color="#505253" onClick={triggerUpload} />
+                  </div>
+                )}
+              </div>
+              <div className="size-chart-btn">
+                <Button
+                  onClick={() => deleteSizeChart(formSizeChart.id)}
+                  className="btn-delete-size"
+                >
+                  <Icon name="delete" width="24px" color="#505253"></Icon>
+                </Button>
               </div>
             </div>
             <div style={{ display: 'none' }}>
@@ -110,7 +123,7 @@ const SizeChartMainInfo = ({
                     }))
                   }
 
-                  message.success('Файл загружен successfully')
+                  message.success('Файл загружен')
                 }}
                 onFileError={() => {
                   message.error('Ошибка загрузки файла.')
@@ -120,15 +133,9 @@ const SizeChartMainInfo = ({
 
             <div className="size-chart-text-container">
               <span className="size-chart-title-text">
-                Рекомендуемый размер: 1200 x 800 px. Форматы: JPG,PNG, WEBP, до 5 МБ
+                Рекомендуемый размер: 1200 x 800 px. Форматы: JPG, PNG, WEBP, до 5 МБ
               </span>
             </div>
-          </div>
-
-          <div className="size-chart-btn">
-            <Button onClick={() => deleteSizeChart(formSizeChart.id)} className="btn-delete-size">
-              <Icon name="delete" width="24px" color="#505253"></Icon>
-            </Button>
           </div>
         </div>
       </div>
