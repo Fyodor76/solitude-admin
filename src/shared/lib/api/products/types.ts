@@ -118,4 +118,5 @@ export interface ProductVariationUpdatePayload {
   mainImage?: string
   attributes?: VariationAttributeCreatePayload[]
   isActive?: boolean
+  sortOrder?: number
 }

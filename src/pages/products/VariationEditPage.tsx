@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
 import {
   useDeleteProductVariationMutation,
   useGetProductByIdQuery,
@@ -11,7 +12,7 @@ import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandle
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { Button, Form, Input, InputNumber, Modal, Space } from 'antd'
+import { Button, Form, Input, InputNumber, Modal, Select, Space } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ProductImageUpload } from '../product-create/components/ProductImageUpload'
@@ -22,6 +23,7 @@ import './ProductsPage.scss'
 
 type VariationFormValues = {
   name: string
+  colorId: string
   slug?: string
   sku?: string
   description?: string
@@ -51,6 +53,7 @@ export default function VariationEditPage() {
   const [showcaseHydrated, setShowcaseHydrated] = useState(false)
 
   const { data: productResponse } = useGetProductByIdQuery(productId, { skip: !productId })
+  const { data: attributesResponse } = useGetAllProductAttributesQuery()
   const {
     data: variationResponse,
     isLoading,
@@ -62,6 +65,19 @@ export default function VariationEditPage() {
 
   const product = productResponse?.data
   const variation = variationResponse?.data
+  const colorOptions = useMemo(() => {
+    const attributes = attributesResponse?.data ?? []
+    return attributes
+      .filter(attr => attr.type === 'color')
+      .flatMap(attr =>
+        (attr.values || [])
+          .filter(value => value.isActive !== false)
+          .map(value => ({
+            label: value.displayName || value.value,
+            value: value.id,
+          }))
+      )
+  }, [attributesResponse?.data])
   const isSaving = isSavingVariation || isSavingProduct || isDeleting
   const nameWatched = Form.useWatch('name', form)
   const previousNameRef = useRef('')
@@ -80,6 +96,7 @@ export default function VariationEditPage() {
     }
     form.setFieldsValue({
       name: variation.name,
+      colorId: variation.colorId || variation.color?.id,
       slug: variation.slug,
       sku: variation.sku,
       description: variation.description,
@@ -154,6 +171,7 @@ export default function VariationEditPage() {
         productId,
         body: {
           name: values.name.trim(),
+          colorId: values.colorId,
           slug: values.slug?.trim() || undefined,
           sku: values.sku?.trim() || undefined,
           description: values.description?.trim() || undefined,
@@ -266,6 +284,18 @@ export default function VariationEditPage() {
               rules={[{ required: true, message: 'Укажите название' }]}
             >
               <Input />
+            </Form.Item>
+            <Form.Item
+              label="Цвет"
+              name="colorId"
+              rules={[{ required: true, message: 'Выберите цвет' }]}
+            >
+              <Select
+                options={colorOptions}
+                placeholder="Выберите цвет"
+                showSearch
+                optionFilterProp="label"
+              />
             </Form.Item>
             <Form.Item
               label="SKU"

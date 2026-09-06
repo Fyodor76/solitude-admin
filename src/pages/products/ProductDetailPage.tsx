@@ -1,407 +1,367 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useGetCategoriesTreeQuery } from '@/shared/lib/api/categories/Categories'
-import { BaseCategoryTree } from '@/shared/lib/api/categories/types'
+import { useGetAllProductAttributesQuery } from '@/shared/lib/api/product-attributes/ProductAttributes'
 import {
+  useCreateProductVariationMutation,
+  useCreateStockBulkMutation,
   useDeleteProductMutation,
   useDeleteProductVariationMutation,
+  useDeleteStockItemMutation,
   useGetProductByIdQuery,
+  useGetStockByProductQuery,
   useReorderProductVariationsMutation,
   useUpdateProductMutation,
   useUpdateProductVariationMutation,
+  useUpdateStockItemMutation,
 } from '@/shared/lib/api/products/Products'
-import { ProductUpdatePayload } from '@/shared/lib/api/products/types'
+import { useGetSizeChartByCategoryIdQuery } from '@/shared/lib/api/size-charts/SizeCharts'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
-import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
-import { DeleteOutlined, HolderOutlined, QuestionCircleOutlined } from '@ant-design/icons'
-import { Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Tag, Tooltip } from 'antd'
-import { Reorder, useDragControls } from 'framer-motion'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { DeleteOutlined } from '@ant-design/icons'
+import { Alert, Button, Empty, Modal, Space, Steps } from 'antd'
+import { useNavigate, useParams } from 'react-router-dom'
 
-import { ProductVariation } from '@/app/types/product'
-
-import { suggestSlugFromName } from '../product-create/helpers'
+import { StepAttributes } from '../product-create/components/StepAttributes'
+import { StepProductBasics } from '../product-create/components/StepProductBasics'
+import { StepStock } from '../product-create/components/StepStock'
+import { StepVariations } from '../product-create/components/StepVariations'
+import { STEP_LABELS } from '../product-create/constants'
+import { useProductCreateWizard } from '../product-create/hooks/useProductCreateWizard'
+import {
+  collectShowcaseImages,
+  mapProductToEditState,
+  ProductEditSnapshot,
+} from '../product-create/mapProductToEditState'
+import '../product-create/ProductCreate.scss'
+import { WizardStep } from '../product-create/types'
 import './ProductsPage.scss'
-import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from './productSwitchLabels'
-import { ProductVariationPhotosGallery } from './ProductVariationPhotosGallery'
 
-type ProductFormValues = {
-  name: string
-  slug: string
-  description?: string
-  modelParameters?: string
-  price: number
-  categoryId: string
-  brand: string
-  material: string
-  isActive: boolean
-  isFeatured: boolean
-  showOnLanding: boolean
-}
-
-function flattenCategories(
-  nodes: BaseCategoryTree[],
-  prefix = ''
-): { value: string; label: string }[] {
-  return nodes.flatMap(node => {
-    const label = prefix ? `${prefix} / ${node.name}` : node.name
-    const self = [{ value: node.id, label }]
-    const children = node.children?.length ? flattenCategories(node.children, label) : []
-    return [...self, ...children]
-  })
-}
-
-function sortVariations(list: ProductVariation[]): ProductVariation[] {
-  return [...list].sort((a, b) => {
-    const orderA = a.sortOrder ?? Number.MAX_SAFE_INTEGER
-    const orderB = b.sortOrder ?? Number.MAX_SAFE_INTEGER
-    if (orderA !== orderB) return orderA - orderB
-    return (a.createdAt || '').localeCompare(b.createdAt || '')
-  })
-}
-
-function VariationSortableRow({
-  record,
-  productId,
-  onDragEnd,
-  onDelete,
-}: {
-  record: ProductVariation
-  productId: string
-  onDragEnd: () => void
-  onDelete: (variation: ProductVariation) => void
-}) {
-  const controls = useDragControls()
-  const thumb = resolveMediaUrl(record.mainImage || record.images?.[0])
-
-  return (
-    <Reorder.Item
-      value={record}
-      as="div"
-      className="product-detail__variation-row"
-      dragListener={false}
-      dragControls={controls}
-      onDragEnd={onDragEnd}
-      whileDrag={{
-        scale: 1.01,
-        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.12)',
-        zIndex: 2,
-        cursor: 'grabbing',
-      }}
-      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-    >
-      <button
-        type="button"
-        className="product-detail__drag-handle"
-        aria-label="Перетащить вариацию"
-        onPointerDown={event => controls.start(event)}
-      >
-        <HolderOutlined />
-      </button>
-      <div className="product-detail__thumb-wrap">
-        {thumb ? (
-          <img src={thumb} alt="" className="product-detail__thumb" />
-        ) : (
-          <div className="product-detail__thumb-placeholder" />
-        )}
-      </div>
-      <Link
-        to={`/products/${productId}/variations/${record.id}`}
-        className="product-detail__cell-text"
-      >
-        {record.name}
-      </Link>
-      <span className="product-detail__sku" title={record.sku}>
-        {record.sku}
-      </span>
-      <div className="product-detail__meta">
-        <span className="product-detail__price">
-          {Number(record.price || 0).toLocaleString('ru-RU')} ₽
-        </span>
-        <span className="product-detail__status">
-          <Tag color={record.isActive ? 'green' : 'default'}>
-            {record.isActive ? 'Активна' : 'Скрыта'}
-          </Tag>
-        </span>
-      </div>
-      <div className="product-detail__row-actions">
-        <Space size={0} wrap>
-          <Link to={`/products/${productId}/variations/${record.id}`}>
-            <Button type="link">Редактировать</Button>
-          </Link>
-          <Link to={`/products/${productId}/variations/${record.id}/stock`}>
-            <Button type="link">Сток</Button>
-          </Link>
-          <Button type="link" danger onClick={() => onDelete(record)}>
-            Удалить
-          </Button>
-        </Space>
-      </div>
-    </Reorder.Item>
-  )
+function extractErrorMessage(error: unknown, fallback: string): string {
+  const payload = error as { data?: { error?: unknown }; error?: unknown; message?: unknown }
+  const message = payload?.data?.error || payload?.error || payload?.message || fallback
+  return Array.isArray(message) ? message.join(', ') : String(message)
 }
 
 export default function ProductDetailPage() {
   const { productId = '' } = useParams<{ productId: string }>()
   const navigate = useNavigate()
   const { openNotification, contextHolder } = useNotificationHandler()
-  const [form] = Form.useForm<ProductFormValues>()
-  const [orderedVariations, setOrderedVariations] = useState<ProductVariation[]>([])
-  const [showcaseFileIds, setShowcaseFileIds] = useState<string[]>([])
-  const orderedRef = useRef(orderedVariations)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [ready, setReady] = useState(false)
+  const hydratedTokenRef = useRef<string | null>(null)
+  const snapshotRef = useRef<ProductEditSnapshot | null>(null)
 
-  const { data, isLoading, isError } = useGetProductByIdQuery(productId, {
+  const {
+    data: productResponse,
+    isLoading: isProductLoading,
+    isError: isProductError,
+  } = useGetProductByIdQuery(productId, { skip: !productId })
+  const {
+    data: stockResponse,
+    isLoading: isStockLoading,
+    isError: isStockError,
+    isSuccess: isStockSuccess,
+  } = useGetStockByProductQuery(productId, {
     skip: !productId,
   })
   const { data: categoriesResponse } = useGetCategoriesTreeQuery()
-  const [updateProduct, { isLoading: isSaving }] = useUpdateProductMutation()
-  const [updateVariation] = useUpdateProductVariationMutation()
-  const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation()
-  const [deleteVariation] = useDeleteProductVariationMutation()
+  const { data: attributesResponse } = useGetAllProductAttributesQuery()
+
+  const product = productResponse?.data
+  const stockItems = stockResponse?.data ?? []
+  const attributes = attributesResponse?.data || []
+  const colorAttributes = useMemo(
+    () => attributes.filter(item => item.type === 'color'),
+    [attributes]
+  )
+
+  const wizard = useProductCreateWizard(colorAttributes, { persistDraft: false })
+
+  const {
+    data: sizeChartResponse,
+    isFetching: isSizeChartLoading,
+    isError: isSizeChartMissing,
+  } = useGetSizeChartByCategoryIdQuery(wizard.state.basics.categoryId, {
+    skip: !wizard.state.basics.categoryId,
+  })
+
+  const sizeChart = sizeChartResponse?.data
+  const sizeParameters = sizeChart?.sizeParameters || []
+
+  const sizeCodeById = useMemo(() => {
+    const map: Record<string, string> = {}
+    for (const size of sizeParameters) {
+      if (!size.id) continue
+      map[size.id] = size.internationalSize || size.russianSize || 'SIZE'
+    }
+    return map
+  }, [sizeParameters])
+
+  useEffect(() => {
+    wizard.setSizeCodeById(sizeCodeById)
+  }, [sizeCodeById, wizard.setSizeCodeById])
+
+  useEffect(() => {
+    hydratedTokenRef.current = null
+    snapshotRef.current = null
+    setReady(false)
+  }, [productId])
+
+  const hydrateToken = product ? `${product.id}:${product.updatedAt}` : ''
+
+  useEffect(() => {
+    if (!product || !isStockSuccess || !hydrateToken) return
+    if (hydratedTokenRef.current === hydrateToken) return
+
+    const mapped = mapProductToEditState(product, stockItems)
+    wizard.hydrate(mapped.state)
+    snapshotRef.current = mapped.snapshot
+    hydratedTokenRef.current = hydrateToken
+    setReady(true)
+  }, [hydrateToken, isStockSuccess, product, stockItems, wizard.hydrate])
+
+  const [updateProduct, { isLoading: isUpdatingProduct }] = useUpdateProductMutation()
+  const [createVariation, { isLoading: isCreatingVariation }] = useCreateProductVariationMutation()
+  const [updateVariation, { isLoading: isUpdatingVariation }] = useUpdateProductVariationMutation()
+  const [deleteVariation, { isLoading: isDeletingVariation }] = useDeleteProductVariationMutation()
   const [reorderVariations, { isLoading: isReordering }] = useReorderProductVariationsMutation()
+  const [createStockBulk, { isLoading: isCreatingStock }] = useCreateStockBulkMutation()
+  const [updateStockItem, { isLoading: isUpdatingStock }] = useUpdateStockItemMutation()
+  const [deleteStockItem, { isLoading: isDeletingStock }] = useDeleteStockItemMutation()
+  const [deleteProduct, { isLoading: isDeletingProduct }] = useDeleteProductMutation()
 
-  const product = data?.data
-  const nameWatched = Form.useWatch('name', form)
-  const previousNameRef = useRef('')
-  const loadedProductIdRef = useRef<string | null>(null)
-  /** Пока false — slug подтягивается из названия; true после ручного ввода в поле slug. */
-  const slugLockedRef = useRef(false)
-  /** Не перетирать локальный порядок «На витрине» при refetch после удаления фото. */
-  const showcaseHydratedRef = useRef(false)
+  const isSaving =
+    isUpdatingProduct ||
+    isCreatingVariation ||
+    isUpdatingVariation ||
+    isDeletingVariation ||
+    isReordering ||
+    isCreatingStock ||
+    isUpdatingStock ||
+    isDeletingStock
 
-  const categoryOptions = useMemo(
-    () => flattenCategories(categoriesResponse?.data ?? []),
-    [categoriesResponse?.data]
-  )
+  const handleRemoveVariation = (key: string) => {
+    const variation = wizard.state.variations.find(item => item.key === key)
+    if (!variation) return
 
-  useEffect(() => {
-    if (!product) return
-    const isNewProduct = loadedProductIdRef.current !== product.id
-    if (isNewProduct) {
-      loadedProductIdRef.current = product.id
-      slugLockedRef.current = false
-      previousNameRef.current = product.name
-      showcaseHydratedRef.current = false
-    }
-    form.setFieldsValue({
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      modelParameters: product.modelParameters,
-      price: product.price,
-      categoryId: product.categoryId,
-      brand: product.brand,
-      material: product.material,
-      isActive: product.isActive,
-      isFeatured: product.isFeatured,
-      showOnLanding: product.showOnLanding ?? false,
-    })
-    setOrderedVariations(sortVariations(product.variations ?? []))
-
-    if (!showcaseHydratedRef.current) {
-      const variationImageIds = new Set<string>()
-      for (const variation of product.variations ?? []) {
-        for (const imageId of variation.images ?? []) {
-          if (imageId) variationImageIds.add(imageId)
-        }
-        if (variation.mainImage) variationImageIds.add(variation.mainImage)
-      }
-      setShowcaseFileIds((product.images ?? []).filter(id => variationImageIds.has(id)))
-      showcaseHydratedRef.current = true
-    }
-  }, [form, product])
-
-  const variationImagePool = useMemo(() => {
-    const byId = new Map<
-      string,
-      { fileId: string; url: string; variationName: string; variationId: string }
-    >()
-
-    for (const variation of orderedVariations) {
-      const ids = [...(variation.images ?? [])]
-      if (variation.mainImage && !ids.includes(variation.mainImage)) {
-        ids.unshift(variation.mainImage)
-      }
-      for (const fileId of ids) {
-        if (!fileId || byId.has(fileId)) continue
-        byId.set(fileId, {
-          fileId,
-          url: resolveMediaUrl(fileId) || fileId,
-          variationName: variation.name,
-          variationId: variation.id,
-        })
-      }
-    }
-
-    return [...byId.values()]
-  }, [orderedVariations])
-
-  const handleRemoveVariationPhoto = useCallback(
-    async (item: { fileId: string; variationId: string }) => {
-      const variation = orderedVariations.find(row => row.id === item.variationId)
-      if (!variation || !productId || !product) return
-
-      const nextImages = (variation.images ?? []).filter(id => id !== item.fileId)
-      const nextMain =
-        variation.mainImage === item.fileId ? nextImages[0] || undefined : variation.mainImage
-      const nextShowcase = showcaseFileIds.filter(id => id !== item.fileId)
-
-      try {
-        await updateVariation({
-          id: variation.id,
-          productId,
-          body: {
-            images: nextImages,
-            mainImage: nextMain,
-          },
-        }).unwrap()
-
-        // Сразу убираем fileId с витрины товара — иначе главная продолжает отдавать старое фото.
-        if (nextShowcase.length !== showcaseFileIds.length) {
-          await updateProduct({
-            id: product.id,
-            body: {
-              name: product.name,
-              slug: product.slug,
-              description: product.description,
-              modelParameters: product.modelParameters,
-              price: product.price,
-              categoryId: product.categoryId,
-              brand: product.brand,
-              material: product.material,
-              isActive: product.isActive,
-              isFeatured: product.isFeatured,
-              showOnLanding: product.showOnLanding,
-              images: nextShowcase,
-            },
-          }).unwrap()
-        }
-
-        setShowcaseFileIds(nextShowcase)
-        openNotification('success', ['Фото удалено'])
-      } catch {
-        openNotification('error', ['Не удалось удалить фото'])
-      }
-    },
-    [
-      openNotification,
-      orderedVariations,
-      product,
-      productId,
-      showcaseFileIds,
-      updateProduct,
-      updateVariation,
-    ]
-  )
-
-  useEffect(() => {
-    if (!product || nameWatched == null) return
-    const nextName = String(nameWatched)
-    if (nextName === previousNameRef.current) return
-
-    if (!slugLockedRef.current) {
-      const nextSlug = suggestSlugFromName(nextName)
-      if (nextSlug) {
-        form.setFieldValue('slug', nextSlug)
-      }
-    }
-    previousNameRef.current = nextName
-  }, [form, nameWatched, product])
-
-  useEffect(() => {
-    orderedRef.current = orderedVariations
-  }, [orderedVariations])
-
-  const persistOrder = useCallback(
-    async (next: ProductVariation[]) => {
-      if (!productId || next.length < 2) return
-      const prevIds = sortVariations(product?.variations ?? [])
-        .map(item => item.id)
-        .join(',')
-      const nextIds = next.map(item => item.id).join(',')
-      if (prevIds === nextIds) return
-
-      try {
-        await reorderVariations({
-          productId,
-          orderedIds: next.map(item => item.id),
-        }).unwrap()
-        openNotification('success', ['Порядок вариаций сохранён'])
-      } catch {
-        openNotification('error', ['Не удалось сохранить порядок вариаций'])
-        if (product?.variations) {
-          setOrderedVariations(sortVariations(product.variations))
-        }
-      }
-    },
-    [openNotification, product?.variations, productId, reorderVariations]
-  )
-
-  const handleDragEnd = useCallback(() => {
-    void persistOrder(orderedRef.current)
-  }, [persistOrder])
-
-  const handleDeleteVariation = useCallback(
-    (variation: ProductVariation) => {
-      Modal.confirm({
-        title: 'Удалить вариацию?',
-        content: (
-          <>
-            Будут удалены вариация <strong>{variation.name}</strong> и все её складские позиции.
-            Восстановить будет невозможно.
-          </>
-        ),
-        okText: 'Удалить',
-        okType: 'danger',
-        cancelText: 'Отмена',
-        onOk: async () => {
-          try {
-            await deleteVariation({ id: variation.id, productId }).unwrap()
-            openNotification('success', ['Вариация удалена'])
-          } catch {
-            openNotification('error', ['Не удалось удалить вариацию'])
-            throw new Error('delete failed')
-          }
-        },
+    const reservedRows = wizard.state.stockRows.filter(
+      row => row.variationKey === key && (row.reserved ?? 0) > 0
+    )
+    if (reservedRows.length) {
+      Modal.error({
+        title: 'Нельзя удалить вариацию',
+        content: 'По ней есть резерв в заказах. Сначала дождитесь отгрузки или отмените резерв.',
       })
-    },
-    [deleteVariation, openNotification, productId]
-  )
+      return
+    }
+
+    if (!variation.id) {
+      wizard.removeVariation(key)
+      return
+    }
+
+    Modal.confirm({
+      title: 'Удалить вариацию?',
+      content: (
+        <>
+          При сохранении будут удалены вариация <strong>{variation.name}</strong> и её складские
+          позиции.
+        </>
+      ),
+      okText: 'Удалить',
+      okType: 'danger',
+      cancelText: 'Отмена',
+      onOk: () => wizard.removeVariation(key),
+    })
+  }
+
+  const handleSizesChange = (sizeIds: string[]) => {
+    const removed = wizard.state.selectedSizeIds.filter(id => !sizeIds.includes(id))
+    const blocked = wizard.state.stockRows.filter(
+      row => removed.includes(row.sizeId) && (row.reserved ?? 0) > 0
+    )
+    if (blocked.length) {
+      openNotification('error', ['Нельзя убрать размер: по нему есть резерв в заказах'])
+    }
+    wizard.setSelectedSizeIds(sizeIds)
+  }
 
   const handleSave = async () => {
     if (!product) return
+    setSubmitError(null)
+
+    if (!wizard.canEnterStep(3)) {
+      openNotification('error', ['Заполните товар и вариации, включая цвет'])
+      return
+    }
+
+    const snapshot = snapshotRef.current
+    if (!snapshot) {
+      openNotification('error', ['Данные товара ещё не загрузились'])
+      return
+    }
+
+    const { basics, variations, attributeSelections, stockRows } = wizard.state
 
     try {
-      const values = await form.validateFields()
-      const body: ProductUpdatePayload = {
-        name: values.name.trim(),
-        slug: values.slug.trim(),
-        description: values.description?.trim() || undefined,
-        modelParameters: values.modelParameters?.trim() || undefined,
-        price: values.price,
-        categoryId: values.categoryId,
-        brand: values.brand.trim(),
-        material: values.material.trim(),
-        isActive: values.isActive,
-        isFeatured: values.isFeatured,
-        showOnLanding: values.showOnLanding,
-        images: showcaseFileIds,
+      const keyToId = new Map<string, string>()
+
+      for (const [index, variation] of variations.entries()) {
+        if (variation.id) {
+          keyToId.set(variation.key, variation.id)
+          continue
+        }
+
+        const created = await createVariation({
+          productId: product.id,
+          colorId: variation.colorId,
+          name: variation.name.trim(),
+          slug: variation.slug.trim(),
+          sku: variation.sku.trim(),
+          price: Number(variation.price),
+          comparePrice: variation.comparePrice ?? undefined,
+          description: variation.description.trim() || undefined,
+          modelParameters: variation.modelParameters?.trim() || undefined,
+          mainImage: variation.mainImage?.fileId,
+          images: variation.images.map(image => image.fileId),
+          sortOrder: index,
+          attributes: [],
+        }).unwrap()
+
+        const createdId = created.data?.id
+        if (!createdId) {
+          throw new Error('Вариация создана без id')
+        }
+        keyToId.set(variation.key, createdId)
       }
 
-      await updateProduct({ id: product.id, body }).unwrap()
-      openNotification('success', ['Товар сохранён'])
-      navigate('/products')
-    } catch (error) {
-      if (error && typeof error === 'object' && 'errorFields' in error) {
-        return
+      await Promise.all(
+        variations.flatMap((variation, index) =>
+          variation.id
+            ? [
+                updateVariation({
+                  id: variation.id,
+                  productId: product.id,
+                  body: {
+                    colorId: variation.colorId,
+                    name: variation.name.trim(),
+                    slug: variation.slug.trim(),
+                    sku: variation.sku.trim(),
+                    price: Number(variation.price),
+                    comparePrice: variation.comparePrice ?? undefined,
+                    description: variation.description.trim() || undefined,
+                    modelParameters: variation.modelParameters?.trim() || undefined,
+                    mainImage: variation.mainImage?.fileId,
+                    images: variation.images.map(image => image.fileId),
+                    sortOrder: index,
+                  },
+                }).unwrap(),
+              ]
+            : []
+        )
+      )
+
+      const currentIds = new Set([...keyToId.values()])
+      for (const id of snapshot.variationIds) {
+        if (currentIds.has(id)) continue
+        await deleteVariation({ id, productId: product.id }).unwrap()
       }
-      openNotification('error', ['Не удалось сохранить товар'])
+
+      await updateProduct({
+        id: product.id,
+        body: {
+          name: basics.name.trim(),
+          slug: basics.slug.trim(),
+          description: basics.description.trim() || undefined,
+          modelParameters: basics.modelParameters.trim() || undefined,
+          price: Number(basics.price),
+          categoryId: basics.categoryId,
+          brand: basics.brand.trim(),
+          material: basics.material.trim(),
+          isActive: basics.isActive,
+          isFeatured: basics.isFeatured,
+          showOnLanding: basics.showOnLanding,
+          images: collectShowcaseImages(variations, snapshot.images),
+          attributes: attributeSelections
+            .filter(item => item.valueIds.length > 0)
+            .map(item => ({
+              attributeId: item.attributeId,
+              valueIds: item.valueIds,
+            })),
+        },
+      }).unwrap()
+
+      const orderedIds = variations.map(item => keyToId.get(item.key)).filter(Boolean) as string[]
+      if (orderedIds.length > 1) {
+        await reorderVariations({ productId: product.id, orderedIds }).unwrap()
+      }
+
+      const remainingVariationIds = new Set(orderedIds)
+      const currentStockIds = new Set(
+        stockRows.map(row => row.id).filter((id): id is string => Boolean(id))
+      )
+
+      for (const item of snapshot.stock) {
+        if (currentStockIds.has(item.id)) continue
+        if (!remainingVariationIds.has(item.variationId)) continue
+        if (item.reserved > 0) {
+          throw new Error('Нельзя удалить складскую позицию с резервом')
+        }
+        await deleteStockItem({ id: item.id, variationId: item.variationId }).unwrap()
+      }
+
+      const stockToCreate = []
+      const stockToUpdate = []
+
+      for (const row of stockRows) {
+        const variationId = keyToId.get(row.variationKey)
+        if (!variationId || !row.sizeId) continue
+
+        if (row.id) {
+          stockToUpdate.push(
+            updateStockItem({
+              id: row.id,
+              variationId,
+              body: {
+                sku: row.sku.trim() || undefined,
+                quantity: Number(row.quantity) || 0,
+                location: row.location?.trim() || undefined,
+              },
+            }).unwrap()
+          )
+        } else {
+          stockToCreate.push({
+            productId: product.id,
+            variationId,
+            sizeId: row.sizeId,
+            sku: row.sku.trim() || undefined,
+            quantity: Number(row.quantity) || 0,
+            location: row.location?.trim() || undefined,
+          })
+        }
+      }
+
+      if (stockToUpdate.length) {
+        await Promise.all(stockToUpdate)
+      }
+      if (stockToCreate.length) {
+        await createStockBulk({ items: stockToCreate }).unwrap()
+      }
+
+      hydratedTokenRef.current = null
+      snapshotRef.current = null
+      setReady(false)
+      openNotification('success', ['Товар сохранён'])
+    } catch (error) {
+      const text = extractErrorMessage(error, 'Не удалось сохранить товар')
+      setSubmitError(text)
+      openNotification('error', [text])
     }
   }
 
-  const handleDelete = () => {
+  const handleDeleteProduct = () => {
     if (!product) return
 
     Modal.confirm({
@@ -428,7 +388,12 @@ export default function ProductDetailPage() {
     })
   }
 
-  if (isError) {
+  const stepItems = ([0, 1, 2, 3] as WizardStep[]).map(step => ({
+    title: STEP_LABELS[step],
+    disabled: !(step <= wizard.state.maxReachedStep || wizard.canEnterStep(step)),
+  }))
+
+  if (isProductError) {
     return (
       <Container className="product-detail admin-page">
         <PageHeader title="Товар не найден" />
@@ -440,187 +405,132 @@ export default function ProductDetailPage() {
   return (
     <Container className="product-detail admin-page">
       {contextHolder}
-      <PageHeader
-        title={product?.name || 'Товар'}
-        subtitle={product ? `slug: ${product.slug}` : 'Загрузка...'}
-        actions={
-          <Space>
-            <Button onClick={() => navigate('/products')}>К списку</Button>
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              loading={isDeleting}
-              disabled={!product}
-              onClick={handleDelete}
-            >
-              Удалить
-            </Button>
-            <Button type="primary" loading={isSaving} onClick={() => void handleSave()}>
-              Сохранить
-            </Button>
-          </Space>
-        }
-      />
-
-      <section className="product-detail__section">
-        <h2 className="product-detail__section-title">Основные данные</h2>
-        <Form form={form} layout="vertical" disabled={isLoading || !product}>
-          <div className="product-detail__grid">
-            <Form.Item
-              label="Название"
-              name="name"
-              rules={[{ required: true, message: 'Укажите название' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label="Slug"
-              name="slug"
-              rules={[{ required: true, message: 'Укажите slug' }]}
-              extra="Меняется вместе с названием, пока вы сами не отредактируете slug"
-            >
-              <Input
-                onChange={() => {
-                  slugLockedRef.current = true
-                }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Цена"
-              name="price"
-              rules={[{ required: true, message: 'Укажите цену' }]}
-            >
-              <InputNumber min={0.01} style={{ width: '100%' }} />
-            </Form.Item>
-            <Form.Item
-              label="Категория"
-              name="categoryId"
-              rules={[{ required: true, message: 'Выберите категорию' }]}
-            >
-              <Select
-                options={categoryOptions}
-                showSearch
-                optionFilterProp="label"
-                placeholder="Категория"
-              />
-            </Form.Item>
-            <Form.Item
-              label="Бренд"
-              name="brand"
-              rules={[{ required: true, message: 'Укажите бренд' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label="Материал"
-              name="material"
-              rules={[{ required: true, message: 'Укажите материал' }]}
-            >
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label={productSwitchLabel('На витрине', PRODUCT_SWITCH_TOOLTIPS.isActive)}
-              name="isActive"
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              label={productSwitchLabel('Рекомендуемый', PRODUCT_SWITCH_TOOLTIPS.isFeatured)}
-              name="isFeatured"
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item
-              label={productSwitchLabel(
-                'На главной лендинга',
-                PRODUCT_SWITCH_TOOLTIPS.showOnLanding
-              )}
-              name="showOnLanding"
-              valuePropName="checked"
-            >
-              <Switch />
-            </Form.Item>
-            <Form.Item className="product-detail__full" label="Описание" name="description">
-              <Input.TextArea rows={4} />
-            </Form.Item>
-            <Form.Item
-              className="product-detail__full"
-              label="Параметры модели"
-              name="modelParameters"
-            >
-              <Input.TextArea rows={2} />
-            </Form.Item>
-          </div>
-        </Form>
-      </section>
-
-      <section className="product-detail__section product-detail__section--showcase">
-        <h2 className="product-detail__section-title">
-          Все фото вариаций{' '}
-          <Tooltip title="Все фото всех вариаций этого товара подряд. «На витрине» — показать на сайте (зелёная рамка). Порядок на сайте = порядок карточек с этой меткой (перетаскивайте за ⋮⋮). Корзина удаляет фото из вариации.">
-            <QuestionCircleOutlined className="product-detail__title-help" />
-          </Tooltip>
-        </h2>
-        <ProductVariationPhotosGallery
-          items={variationImagePool}
-          showcaseFileIds={showcaseFileIds}
-          onShowcaseChange={setShowcaseFileIds}
-          onRemove={item => void handleRemoveVariationPhoto(item)}
-        />
-      </section>
-
-      <section className="product-detail__section">
-        <div className="product-detail__section-head">
-          <h2 className="product-detail__section-title">Вариации</h2>
-          <Button type="primary" onClick={() => navigate(`/products/${productId}/variations/new`)}>
-            Добавить вариацию
-          </Button>
-        </div>
-        {isLoading ? (
-          <p className="product-detail__variations-empty">Загрузка...</p>
-        ) : !orderedVariations.length ? (
-          <p className="product-detail__variations-empty">У товара пока нет вариаций</p>
-        ) : (
-          <div className={`product-detail__variations ${isReordering ? 'is-reordering' : ''}`}>
-            <div className="product-detail__variations-scroll">
-              <div className="product-detail__variations-head">
-                <span />
-                <span>Фото</span>
-                <span>Название</span>
-                <span>SKU</span>
-                <span>Цена</span>
-                <span>Статус</span>
-                <span />
-              </div>
-              <Reorder.Group
-                axis="y"
-                values={orderedVariations}
-                onReorder={setOrderedVariations}
-                as="div"
-                className="product-detail__variations-list"
+      <div className="product-create">
+        <PageHeader
+          title={product?.name || 'Товар'}
+          subtitle={
+            product
+              ? 'Те же шаги, что при создании: товар, вариации с цветом, опции, размеры и сток'
+              : 'Загрузка...'
+          }
+          actions={
+            <Space wrap>
+              <Button onClick={() => navigate('/products')}>К списку</Button>
+              <Button
+                danger
+                icon={<DeleteOutlined />}
+                loading={isDeletingProduct}
+                disabled={!product}
+                onClick={handleDeleteProduct}
               >
-                {orderedVariations.map(record => (
-                  <VariationSortableRow
-                    key={record.id}
-                    record={record}
-                    productId={productId}
-                    onDragEnd={handleDragEnd}
-                    onDelete={handleDeleteVariation}
-                  />
-                ))}
-              </Reorder.Group>
-            </div>
-          </div>
-        )}
-      </section>
+                Удалить
+              </Button>
+            </Space>
+          }
+        />
 
-      <div className="product-detail__footer">
-        <Button onClick={() => navigate('/products')}>Отмена</Button>
-        <Button type="primary" loading={isSaving} onClick={() => void handleSave()}>
-          Сохранить
-        </Button>
+        {isStockError ? (
+          <Alert
+            type="error"
+            showIcon
+            message="Не удалось загрузить склад"
+            description="Без остатков сохранение может затереть сток. Обновите страницу и попробуйте снова."
+            style={{ marginBottom: 16 }}
+          />
+        ) : null}
+
+        {isProductLoading || isStockLoading || !ready ? (
+          <Empty description="Загрузка товара..." />
+        ) : (
+          <>
+            <Steps
+              current={wizard.state.step}
+              items={stepItems}
+              onChange={value => wizard.goToStep(value as WizardStep)}
+              className="product-create__steps"
+            />
+
+            <div className="product-create__body">
+              {wizard.state.step === 0 && (
+                <StepProductBasics
+                  value={wizard.state.basics}
+                  categories={categoriesResponse?.data || []}
+                  onChange={wizard.updateBasics}
+                />
+              )}
+
+              {wizard.state.step === 1 && (
+                <StepVariations
+                  variations={wizard.state.variations}
+                  colorOptions={wizard.colorOptions}
+                  onAdd={wizard.addVariation}
+                  onChange={wizard.updateVariation}
+                  onRemove={handleRemoveVariation}
+                  onReorder={wizard.reorderVariations}
+                />
+              )}
+
+              {wizard.state.step === 2 && (
+                <StepAttributes
+                  attributes={attributes}
+                  sizeParameters={sizeParameters}
+                  sizeChartName={sizeChart?.name}
+                  sizeChartMissing={Boolean(wizard.state.basics.categoryId) && isSizeChartMissing}
+                  selections={wizard.state.attributeSelections}
+                  selectedSizeIds={wizard.state.selectedSizeIds}
+                  onAddAttribute={wizard.addAttributeSelection}
+                  onAttributeChange={wizard.setAttributeSelection}
+                  onRemoveAttribute={wizard.removeAttributeSelection}
+                  onSizesChange={handleSizesChange}
+                  sizesHint="Размеры, по которым ведёте остатки. Снятие размера удалит позицию склада при сохранении — кроме тех, где есть резерв."
+                />
+              )}
+
+              {wizard.state.step === 3 && (
+                <StepStock
+                  rows={wizard.state.stockRows}
+                  variations={wizard.state.variations}
+                  sizeParameters={sizeParameters}
+                  onChange={wizard.updateStockRow}
+                  showInventoryDetails
+                />
+              )}
+            </div>
+
+            {isSizeChartLoading && wizard.state.step === 2 ? (
+              <Alert type="info" showIcon message="Загружаем размерную сетку категории..." />
+            ) : null}
+
+            {submitError ? <Alert type="error" showIcon message={submitError} /> : null}
+
+            <div className="product-create__footer">
+              <Space>
+                <Button onClick={() => navigate('/products')}>Отмена</Button>
+                <Button disabled={wizard.state.step === 0 || isSaving} onClick={wizard.prevStep}>
+                  Назад
+                </Button>
+                {wizard.state.step < 3 ? (
+                  <Button
+                    disabled={
+                      !wizard.canEnterStep((wizard.state.step + 1) as WizardStep) || isSaving
+                    }
+                    onClick={wizard.nextStep}
+                  >
+                    Далее
+                  </Button>
+                ) : null}
+                <Button
+                  type="primary"
+                  loading={isSaving}
+                  disabled={!wizard.canEnterStep(3) || isStockError}
+                  onClick={() => void handleSave()}
+                >
+                  Сохранить
+                </Button>
+              </Space>
+            </div>
+          </>
+        )}
       </div>
     </Container>
   )

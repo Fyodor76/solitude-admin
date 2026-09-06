@@ -50,6 +50,7 @@ export interface ProductSize {
 export interface ProductVariation {
   id: string
   productId?: string
+  colorId?: string
   name: string
   description: string
   modelParameters: string

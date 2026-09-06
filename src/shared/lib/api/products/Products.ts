@@ -94,8 +94,10 @@ export const apiProducts = baseApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, body) => {
         const variationIds = [...new Set(body.items.map(item => item.variationId))]
+        const productIds = [...new Set(body.items.map(item => item.productId))]
         return [
           ...variationIds.map(id => ({ type: 'Stock' as const, id })),
+          ...productIds.map(id => ({ type: 'Stock' as const, id: `PRODUCT_${id}` })),
           { type: 'Stock', id: 'LIST' },
         ]
       },

@@ -8,12 +8,20 @@ interface StepStockProps {
   variations: DraftVariation[]
   sizeParameters: SizeParameter[]
   onChange: (key: string, patch: Partial<StockDraftRow>) => void
+  showInventoryDetails?: boolean
 }
 
-export function StepStock({ rows, variations, sizeParameters, onChange }: StepStockProps) {
+export function StepStock({
+  rows,
+  variations,
+  sizeParameters,
+  onChange,
+  showInventoryDetails = false,
+}: StepStockProps) {
   const variationName = (key: string) => variations.find(item => item.key === key)?.name || key
 
   const sizeName = (id: string) => {
+    if (!id) return 'Без размера'
     const size = sizeParameters.find(item => item.id === id)
     if (!size) return id
     return size.russianSize
@@ -32,7 +40,7 @@ export function StepStock({ rows, variations, sizeParameters, onChange }: StepSt
           rowKey="key"
           pagination={false}
           dataSource={rows}
-          scroll={{ x: 640 }}
+          scroll={{ x: showInventoryDetails ? 920 : 640 }}
           columns={[
             {
               title: 'Вариация',
@@ -65,11 +73,36 @@ export function StepStock({ rows, variations, sizeParameters, onChange }: StepSt
                 />
               ),
             },
+            ...(showInventoryDetails
+              ? [
+                  {
+                    title: 'Резерв',
+                    dataIndex: 'reserved',
+                    width: 90,
+                    render: (value: number | undefined) => value ?? 0,
+                  },
+                  {
+                    title: 'Локация',
+                    dataIndex: 'location',
+                    render: (value: string | undefined, row: StockDraftRow) => (
+                      <Input
+                        value={value || ''}
+                        placeholder="Склад"
+                        onChange={e => onChange(row.key, { location: e.target.value })}
+                      />
+                    ),
+                  },
+                ]
+              : []),
           ]}
         />
       </div>
       <Space style={{ marginTop: 12 }}>
-        <span>Можно оставить 0 — позиция всё равно создастся с нулевым остатком.</span>
+        <span>
+          {showInventoryDetails
+            ? 'Резерв меняется заказами. Снятый на шаге размеров размер удалится со склада (кроме позиций с резервом).'
+            : 'Можно оставить 0 — позиция всё равно создастся с нулевым остатком.'}
+        </span>
       </Space>
     </Card>
   )

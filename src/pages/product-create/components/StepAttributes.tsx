@@ -17,6 +17,7 @@ interface StepAttributesProps {
   onAttributeChange: (attributeId: string, valueIds: string[]) => void
   onRemoveAttribute: (attributeId: string) => void
   onSizesChange: (sizeIds: string[]) => void
+  sizesHint?: string
 }
 
 export function StepAttributes({
@@ -30,6 +31,7 @@ export function StepAttributes({
   onAttributeChange,
   onRemoveAttribute,
   onSizesChange,
+  sizesHint,
 }: StepAttributesProps) {
   const [attributeToAdd, setAttributeToAdd] = useState<string>()
 
@@ -71,8 +73,8 @@ export function StepAttributes({
         }
       >
         <p className="product-create__hint">
-          Выберите размеры, по которым будете вести остатки (S/M/L и т.д.). Это берётся из размерной
-          сетки категории.
+          {sizesHint ||
+            'Выберите размеры, по которым будете вести остатки (S/M/L и т.д.). Это берётся из размерной сетки категории.'}
         </p>
 
         {sizeChartMissing ? (

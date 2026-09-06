@@ -43,31 +43,38 @@ function isVariationsValid(variations: DraftVariation[]): boolean {
   )
 }
 
-export function useProductCreateWizard(colorAttributes: ProductAttributeResponse[]) {
+const EMPTY_WIZARD_STATE = (): ProductCreateWizardState => ({
+  step: 0,
+  maxReachedStep: 0,
+  basics: { ...INITIAL_BASICS },
+  variations: [],
+  attributeSelections: [],
+  selectedSizeIds: [],
+  stockRows: [],
+})
+
+export function useProductCreateWizard(
+  colorAttributes: ProductAttributeResponse[],
+  options: { persistDraft?: boolean } = {}
+) {
+  const persistDraft = options.persistDraft ?? true
   const sizeCodeByIdRef = useRef<Record<string, string>>({})
   const [state, setState] = useState<ProductCreateWizardState>(() => {
-    return (
-      loadProductCreateDraft() || {
-        step: 0,
-        maxReachedStep: 0,
-        basics: { ...INITIAL_BASICS },
-        variations: [],
-        attributeSelections: [],
-        selectedSizeIds: [],
-        stockRows: [],
-      }
-    )
+    if (!persistDraft) return EMPTY_WIZARD_STATE()
+    return loadProductCreateDraft() || EMPTY_WIZARD_STATE()
   })
 
   useEffect(() => {
+    if (!persistDraft) return
     if (!hasProductCreateDraftContent(state)) {
       clearProductCreateDraft()
       return
     }
     saveProductCreateDraft(state)
-  }, [state])
+  }, [persistDraft, state])
 
   useEffect(() => {
+    if (!persistDraft) return
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       if (!hasProductCreateDraftContent(state)) return
       event.preventDefault()
@@ -75,7 +82,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
-  }, [state])
+  }, [persistDraft, state])
 
   const setSizeCodeById = useCallback((sizeCodeById: Record<string, string>) => {
     sizeCodeByIdRef.current = sizeCodeById
@@ -156,6 +163,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
         comparePrice: null,
         colorId: colorOptions[0]?.value || '',
         description: '',
+        modelParameters: prev.basics.modelParameters || '',
         mainImage: null,
         images: [],
         showcaseFileIds: [],
@@ -235,16 +243,25 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   }, [])
 
   const setSelectedSizeIds = useCallback((sizeIds: string[]) => {
-    setState(prev => ({ ...prev, selectedSizeIds: sizeIds }))
+    setState(prev => {
+      const removed = prev.selectedSizeIds.filter(id => !sizeIds.includes(id))
+      const blocked = prev.stockRows
+        .filter(row => removed.includes(row.sizeId) && (row.reserved ?? 0) > 0)
+        .map(row => row.sizeId)
+      const nextIds = blocked.length ? [...new Set([...sizeIds, ...blocked])] : sizeIds
+      return { ...prev, selectedSizeIds: nextIds }
+    })
   }, [])
 
   const rebuildStockRows = useCallback(() => {
     setState(prev => {
       const nextRows: StockDraftRow[] = []
+      const usedKeys = new Set<string>()
 
       for (const variation of prev.variations) {
         for (const sizeId of prev.selectedSizeIds) {
           const key = `${variation.key}:${sizeId}`
+          usedKeys.add(key)
           const existing = prev.stockRows.find(row => row.key === key)
           const sizeCode = sizeCodeByIdRef.current[sizeId] || 'SIZE'
           nextRows.push({
@@ -252,8 +269,17 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
             variationKey: variation.key,
             sizeId,
             quantity: existing?.quantity ?? 0,
-            sku: buildSku(variation.sku, sizeCode),
+            sku: existing?.sku || buildSku(variation.sku, sizeCode),
+            id: existing?.id,
+            reserved: existing?.reserved ?? 0,
+            location: existing?.location ?? '',
           })
+        }
+      }
+
+      for (const row of prev.stockRows) {
+        if (row.id && !row.sizeId && !usedKeys.has(row.key)) {
+          nextRows.push(row)
         }
       }
 
@@ -295,6 +321,7 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
       price: Number(item.price),
       comparePrice: item.comparePrice ?? undefined,
       description: item.description.trim() || undefined,
+      modelParameters: item.modelParameters?.trim() || undefined,
       mainImage: item.mainImage?.fileId,
       images: item.images.map(image => image.fileId),
       sortOrder: index,
@@ -336,16 +363,12 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
   }, [state])
 
   const clearDraft = useCallback(() => {
-    clearProductCreateDraft()
-    setState({
-      step: 0,
-      maxReachedStep: 0,
-      basics: { ...INITIAL_BASICS },
-      variations: [],
-      attributeSelections: [],
-      selectedSizeIds: [],
-      stockRows: [],
-    })
+    if (persistDraft) clearProductCreateDraft()
+    setState(EMPTY_WIZARD_STATE())
+  }, [persistDraft])
+
+  const hydrate = useCallback((next: ProductCreateWizardState) => {
+    setState(next)
   }, [])
 
   return {
@@ -369,7 +392,8 @@ export function useProductCreateWizard(colorAttributes: ProductAttributeResponse
     rebuildStockRows,
     buildCreatePayload,
     clearDraft,
-    hasDraft: hasProductCreateDraftContent(state),
+    hydrate,
+    hasDraft: persistDraft && hasProductCreateDraftContent(state),
     isBasicsValid: isBasicsValid(state.basics),
     isVariationsValid: isVariationsValid(state.variations),
   }

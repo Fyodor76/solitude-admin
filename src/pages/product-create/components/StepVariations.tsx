@@ -142,6 +142,16 @@ function VariationCard({
           </div>
 
           <div className="product-create__field product-create__field--full">
+            <span>Параметры модели</span>
+            <Input.TextArea
+              rows={2}
+              value={item.modelParameters || ''}
+              onChange={e => onChange(item.key, { modelParameters: e.target.value })}
+              placeholder="Рост 178, размер L"
+            />
+          </div>
+
+          <div className="product-create__field product-create__field--full">
             <span>Фото вариации</span>
             <ProductImageUpload
               value={

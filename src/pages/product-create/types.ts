@@ -23,6 +23,8 @@ export interface ProductBasicsForm {
 
 export interface DraftVariation {
   key: string
+  /** id существующей вариации; нет — ещё не создана */
+  id?: string
   name: string
   slug: string
   sku: string
@@ -32,6 +34,7 @@ export interface DraftVariation {
   comparePrice: number | null
   colorId: string
   description: string
+  modelParameters?: string
   mainImage: ProductImageItem | null
   images: ProductImageItem[]
   /** fileId для product.images / карточки коллекции */
@@ -49,6 +52,10 @@ export interface StockDraftRow {
   sizeId: string
   quantity: number
   sku: string
+  /** id существующей складской позиции */
+  id?: string
+  reserved?: number
+  location?: string
 }
 
 export interface ProductCreateWizardState {
