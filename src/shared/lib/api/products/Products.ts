@@ -30,7 +30,8 @@ export const apiProducts = baseApi.injectEndpoints({
       ProductSearchFilters
     >({
       query: body => ({
-        url: `/products/search`,
+        // Список/склад админки не нуждаются в полном enrich (сток, размеры, атрибуты).
+        url: `/products/search/plain`,
         method: 'POST',
         body,
       }),

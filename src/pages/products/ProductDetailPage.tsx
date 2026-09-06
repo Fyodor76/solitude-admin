@@ -352,8 +352,8 @@ export default function ProductDetailPage() {
 
       hydratedTokenRef.current = null
       snapshotRef.current = null
-      setReady(false)
       openNotification('success', ['Товар сохранён'])
+      navigate('/products')
     } catch (error) {
       const text = extractErrorMessage(error, 'Не удалось сохранить товар')
       setSubmitError(text)

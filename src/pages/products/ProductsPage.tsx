@@ -27,6 +27,7 @@ type ProductListItem = Pick<
 > & {
   variations?: Product['variations']
   sortOrder?: number
+  variationCount?: number
 }
 
 type ActiveFilter = 'all' | 'active' | 'inactive'
@@ -121,7 +122,7 @@ function ProductSortableRow({
         {Number(product.price || 0).toLocaleString('ru-RU')} ₽
       </span>
       <span className="products-page__cell products-page__cell--variations">
-        {product.variations?.length ?? '—'}
+        {product.variations?.length ?? product.variationCount ?? '—'}
       </span>
 
       <ProductStatusTags product={product} />
