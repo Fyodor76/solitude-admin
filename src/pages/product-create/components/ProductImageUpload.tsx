@@ -101,7 +101,11 @@ function SortableImageItem({
             <button
               type="button"
               className="product-create-images__badge product-create-images__badge--showcase"
-              onClick={() => onToggleShowcase(item.fileId)}
+              onClick={event => {
+                event.preventDefault()
+                event.stopPropagation()
+                onToggleShowcase(item.fileId)
+              }}
             >
               Витрина
             </button>
@@ -110,7 +114,11 @@ function SortableImageItem({
               type="default"
               size="small"
               className="product-create-images__action-btn"
-              onClick={() => onToggleShowcase(item.fileId)}
+              onClick={event => {
+                event.preventDefault()
+                event.stopPropagation()
+                onToggleShowcase(item.fileId)
+              }}
             >
               На витрине
             </Button>
@@ -169,6 +177,10 @@ export function ProductImageUpload({
       }
 
       onChange(multiple ? [...value, ...uploaded] : uploaded.slice(0, 1))
+      if (onShowcaseChange) {
+        const uploadedIds = uploaded.map(item => item.fileId)
+        onShowcaseChange([...(showcaseFileIds ?? []), ...uploadedIds])
+      }
       openNotification(
         'success',
         uploaded.length === 1
@@ -312,7 +324,11 @@ export function ProductImageUpload({
                       <button
                         type="button"
                         className="product-create-images__badge product-create-images__badge--showcase"
-                        onClick={() => toggleShowcase(item.fileId)}
+                        onClick={event => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          toggleShowcase(item.fileId)
+                        }}
                       >
                         Витрина
                       </button>
@@ -321,7 +337,11 @@ export function ProductImageUpload({
                         type="default"
                         size="small"
                         className="product-create-images__action-btn"
-                        onClick={() => toggleShowcase(item.fileId)}
+                        onClick={event => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          toggleShowcase(item.fileId)
+                        }}
                       >
                         На витрине
                       </Button>

@@ -333,16 +333,9 @@ export function useProductCreateWizard(
       attributes: [],
     }))
 
-    // Витрина = отмеченные «На витрине» со всех вариаций (без лимита).
+    // Витрина = только явно отмеченные фото со всех вариаций.
     const showcaseImages = state.variations.flatMap(item => item.showcaseFileIds ?? [])
-    const uniqueShowcase = [...new Set(showcaseImages)]
-    const fallbackMain =
-      state.variations[0]?.mainImage?.fileId || state.variations[0]?.images[0]?.fileId
-    const productImages = uniqueShowcase.length
-      ? uniqueShowcase
-      : fallbackMain
-        ? [fallbackMain]
-        : []
+    const productImages = [...new Set(showcaseImages)]
 
     const storefrontFlags = aggregateStorefrontFlags(state.variations)
 

@@ -27,21 +27,11 @@ export function VariationStorefrontSwitches({
       </p>
       <div className="product-create__switches">
         <label className="product-create__switch">
-          <Switch
-            checked={isActive}
-            onChange={next =>
-              onChange(next ? { isActive: true } : { isActive: false, showOnLanding: false })
-            }
-          />
+          <Switch checked={isActive} onChange={next => onChange({ isActive: next })} />
           {productSwitchLabel('На витрине', PRODUCT_SWITCH_TOOLTIPS.isActive)}
         </label>
         <label className="product-create__switch">
-          <Switch
-            checked={showOnLanding}
-            onChange={next =>
-              onChange(next ? { isActive: true, showOnLanding: true } : { showOnLanding: false })
-            }
-          />
+          <Switch checked={showOnLanding} onChange={next => onChange({ showOnLanding: next })} />
           {productSwitchLabel('На главной лендинга', PRODUCT_SWITCH_TOOLTIPS.showOnLanding)}
         </label>
       </div>

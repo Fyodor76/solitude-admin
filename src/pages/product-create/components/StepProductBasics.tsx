@@ -95,9 +95,9 @@ export function StepProductBasics({ value, categories, onChange }: StepProductBa
         </div>
 
         <div className="product-create__field product-create__field--full">
-          <p className="product-create__hint" style={{ marginBottom: 8 }}>
-            Карточки в коллекции и на главной включаются у каждого цвета на шаге «Вариации». Здесь
-            остаётся только пометка модели для подборок.
+          <p className="product-create__hint">
+            Карточки в коллекции и на главной включаются у каждого цвета на шаге «Вариации».
+            «Рекомендуемый» — пометка всей модели; сейчас сайт её нигде не показывает.
           </p>
           <div className="product-create__switches">
             <label className="product-create__switch">
