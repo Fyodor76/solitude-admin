@@ -158,7 +158,7 @@ export function LandingStageEditorPage({ mode }: LandingStageEditorPageProps) {
                 style={{ width: '100%' }}
               />
             </Form.Item>
-            <Form.Item label="На витрине" className="landing-stage-editor__active">
+            <Form.Item label="Активен" className="landing-stage-editor__active">
               <Switch checked={isActive} onChange={setIsActive} />
             </Form.Item>
           </div>
