@@ -9,7 +9,7 @@ import classNames from 'classnames'
 
 interface StageImageFieldProps {
   label: string
-  hint?: string
+  hint: string
   variant: 'desktop' | 'mobile'
   fileId: string | null
   onChange: (fileId: string | null) => void
@@ -43,55 +43,33 @@ export function StageImageField({ label, hint, variant, fileId, onChange }: Stag
   return (
     <div
       className={classNames(
-        'landing-stage-editor__image-field',
-        `landing-stage-editor__image-field--${variant}`
+        'landing-stage-editor__media-row',
+        `landing-stage-editor__media-row--${variant}`
       )}
     >
-      <div className="landing-stage-editor__image-label">{label}</div>
-      {hint ? <p className="landing-stage-editor__image-hint">{hint}</p> : null}
-      {previewUrl ? (
-        <div className="landing-stage-editor__preview">
-          <div
-            className={classNames(
-              'landing-stage-editor__frame',
-              `landing-stage-editor__frame--${variant}`
-            )}
-          >
-            <img src={previewUrl} alt={label} className="landing-stage-editor__frame-img" />
-          </div>
-          <div className="landing-stage-editor__preview-actions">
-            <Upload
-              accept="image/*"
-              multiple={false}
-              showUploadList={false}
-              disabled={uploading}
-              beforeUpload={file => {
-                void handleUpload(file)
-                return false
-              }}
-            >
-              <Button size="small" loading={uploading}>
-                Заменить
-              </Button>
-            </Upload>
-            <Button
-              type="text"
-              size="small"
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => onChange(null)}
-              aria-label={`Удалить ${label}`}
-            >
-              Удалить
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <Upload.Dragger
-          className={classNames(
-            'landing-stage-editor__uploader',
-            `landing-stage-editor__uploader--${variant}`
-          )}
+      <div
+        className={classNames(
+          'landing-stage-editor__thumb',
+          `landing-stage-editor__thumb--${variant}`,
+          !previewUrl && 'landing-stage-editor__thumb--empty'
+        )}
+      >
+        {previewUrl ? (
+          <img src={previewUrl} alt={label} />
+        ) : uploading ? (
+          <Spin size="small" />
+        ) : (
+          <InboxOutlined />
+        )}
+      </div>
+
+      <div className="landing-stage-editor__media-meta">
+        <div className="landing-stage-editor__media-title">{label}</div>
+        <div className="landing-stage-editor__media-hint">{hint}</div>
+      </div>
+
+      <div className="landing-stage-editor__media-actions">
+        <Upload
           accept="image/*"
           multiple={false}
           showUploadList={false}
@@ -101,10 +79,20 @@ export function StageImageField({ label, hint, variant, fileId, onChange }: Stag
             return false
           }}
         >
-          <p className="ant-upload-drag-icon">{uploading ? <Spin /> : <InboxOutlined />}</p>
-          <p className="ant-upload-text">Загрузить</p>
-        </Upload.Dragger>
-      )}
+          <Button loading={uploading}>{previewUrl ? 'Заменить' : 'Загрузить'}</Button>
+        </Upload>
+        {previewUrl ? (
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => onChange(null)}
+            aria-label={`Удалить ${label}`}
+          >
+            Удалить
+          </Button>
+        ) : null}
+      </div>
     </div>
   )
 }

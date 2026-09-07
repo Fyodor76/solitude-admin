@@ -54,7 +54,7 @@ export function LandingStageEditorPage({ mode }: LandingStageEditorPageProps) {
 
   const handleSubmit = async () => {
     if (!imageDesktop || !imageMobile) {
-      openNotification('error', ['Загрузите desktop и mobile изображения'])
+      openNotification('error', ['Загрузите десктоп и мобильное изображения'])
       return
     }
 
@@ -110,7 +110,7 @@ export function LandingStageEditorPage({ mode }: LandingStageEditorPageProps) {
         title={isEdit ? 'Редактирование стейджа' : 'Новый стейдж'}
         actions={
           <Space>
-            <Button onClick={() => navigate('/landing-stages')}>К списку</Button>
+            <Button onClick={() => navigate('/landing-stages')}>Отмена</Button>
             <Button
               type="primary"
               loading={isSaving}
@@ -124,41 +124,45 @@ export function LandingStageEditorPage({ mode }: LandingStageEditorPageProps) {
       />
 
       <section className="landing-stage-editor__section">
-        <Form layout="vertical" className="landing-stage-editor__form">
-          <div className="landing-stage-editor__images">
-            <StageImageField
-              label="Десктоп"
-              hint="Горизонтальный кадр"
-              variant="desktop"
-              fileId={imageDesktop}
-              onChange={setImageDesktop}
-            />
-            <StageImageField
-              label="Мобильный"
-              hint="Вертикальный кадр"
-              variant="mobile"
-              fileId={imageMobile}
-              onChange={setImageMobile}
-            />
-          </div>
+        <h2 className="landing-stage-editor__section-title">Изображения</h2>
+        <div className="landing-stage-editor__media-list">
+          <StageImageField
+            label="Десктоп"
+            hint="Горизонтальный кадр для больших экранов"
+            variant="desktop"
+            fileId={imageDesktop}
+            onChange={setImageDesktop}
+          />
+          <StageImageField
+            label="Мобильный"
+            hint="Вертикальный кадр для телефонов"
+            variant="mobile"
+            fileId={imageMobile}
+            onChange={setImageMobile}
+          />
+        </div>
+      </section>
 
-          <div className="landing-stage-editor__fields">
-            <Form.Item label="Alt-текст" className="landing-stage-editor__alt">
+      <section className="landing-stage-editor__section">
+        <h2 className="landing-stage-editor__section-title">Параметры</h2>
+        <Form layout="vertical">
+          <div className="landing-stage-editor__grid">
+            <Form.Item label="Alt-текст">
               <Input
                 value={alt}
                 onChange={event => setAlt(event.target.value)}
-                placeholder="Краткое описание"
+                placeholder="Краткое описание изображения"
                 maxLength={120}
               />
             </Form.Item>
-            <Form.Item label="Порядок" className="landing-stage-editor__order">
+            <Form.Item label="Порядок">
               <InputNumber
                 value={sortOrder}
                 onChange={value => setSortOrder(typeof value === 'number' ? value : 0)}
                 style={{ width: '100%' }}
               />
             </Form.Item>
-            <Form.Item label="Активен" className="landing-stage-editor__active">
+            <Form.Item label="Активен на главной">
               <Switch checked={isActive} onChange={setIsActive} />
             </Form.Item>
           </div>
