@@ -10,6 +10,13 @@ export const LandingStagesApi = baseApi.injectEndpoints({
       }),
       providesTags: [{ type: 'LandingStages', id: 'LIST' }],
     }),
+    getLandingStageById: builder.query<ApiResponse<LandingStage, unknown>, string>({
+      query: id => ({
+        url: `/landing-stages/${id}`,
+        method: 'GET',
+      }),
+      providesTags: (_result, _error, id) => [{ type: 'LandingStages', id }],
+    }),
     createLandingStage: builder.mutation<ApiResponse<LandingStage, unknown>, LandingStageRequest>({
       query: body => ({
         url: '/landing-stages',
@@ -27,7 +34,10 @@ export const LandingStagesApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: data,
       }),
-      invalidatesTags: [{ type: 'LandingStages', id: 'LIST' }],
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: 'LandingStages', id: 'LIST' },
+        { type: 'LandingStages', id },
+      ],
     }),
     deleteLandingStage: builder.mutation<ApiResponse<DeleteLandingStageResponse, unknown>, string>({
       query: id => ({
@@ -41,6 +51,7 @@ export const LandingStagesApi = baseApi.injectEndpoints({
 
 export const {
   useGetAllLandingStagesQuery,
+  useGetLandingStageByIdQuery,
   useCreateLandingStageMutation,
   useUpdateLandingStageMutation,
   useDeleteLandingStageMutation,

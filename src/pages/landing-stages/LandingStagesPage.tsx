@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 import {
-  useCreateLandingStageMutation,
   useDeleteLandingStageMutation,
   useGetAllLandingStagesQuery,
   useUpdateLandingStageMutation,
@@ -12,51 +11,26 @@ import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import Container from '@/shared/ui/container/Container'
 import { PageHeader } from '@/shared/ui/page-header'
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Empty, Image, Popconfirm, Space, Spin, Switch, Table, Tag } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
+import { Button, Empty, Popconfirm, Space, Spin, Switch, Tag } from 'antd'
+import { Link } from 'react-router-dom'
 
-import { LandingStageFormValues, LandingStageModal } from './components/LandingStageModal'
 import './LandingStagesPage.scss'
 
+function StageThumb({ fileId, className }: { fileId: string; className: string }) {
+  const src = resolveMediaUrl(fileId)
+  if (!src) {
+    return <div className={`${className} ${className}--empty`} />
+  }
+  return <img src={src} alt="" className={className} />
+}
+
 export function LandingStagesPage() {
-  const { openNotification } = useNotificationHandler()
+  const { openNotification, contextHolder } = useNotificationHandler()
   const { data, isLoading, isFetching, refetch } = useGetAllLandingStagesQuery()
-  const [createStage, { isLoading: isCreating }] = useCreateLandingStageMutation()
-  const [updateStage, { isLoading: isUpdating }] = useUpdateLandingStageMutation()
+  const [updateStage] = useUpdateLandingStageMutation()
   const [deleteStage] = useDeleteLandingStageMutation()
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
-  const [editing, setEditing] = useState<LandingStage | null>(null)
-
-  const stages = data?.data ?? []
-
-  const openCreate = () => {
-    setModalMode('create')
-    setEditing(null)
-    setModalOpen(true)
-  }
-
-  const openEdit = (stage: LandingStage) => {
-    setModalMode('edit')
-    setEditing(stage)
-    setModalOpen(true)
-  }
-
-  const handleSubmit = async (values: LandingStageFormValues) => {
-    try {
-      if (modalMode === 'create') {
-        await createStage(values).unwrap()
-        openNotification('success', ['Стейдж создан'])
-      } else if (editing) {
-        await updateStage({ id: editing.id, data: values }).unwrap()
-        openNotification('success', ['Стейдж обновлён'])
-      }
-      setModalOpen(false)
-    } catch {
-      openNotification('error', ['Не удалось сохранить стейдж'])
-    }
-  }
+  const stages = useMemo(() => data?.data ?? [], [data?.data])
 
   const handleDelete = async (id: string) => {
     try {
@@ -75,89 +49,9 @@ export function LandingStagesPage() {
     }
   }
 
-  const columns: ColumnsType<LandingStage> = useMemo(
-    () => [
-      {
-        title: 'Desktop',
-        dataIndex: 'imageDesktop',
-        width: 120,
-        render: (value: string) => {
-          const src = resolveMediaUrl(value)
-          return src ? (
-            <Image src={src} width={72} height={48} style={{ objectFit: 'cover' }} />
-          ) : (
-            '—'
-          )
-        },
-      },
-      {
-        title: 'Mobile',
-        dataIndex: 'imageMobile',
-        width: 120,
-        render: (value: string) => {
-          const src = resolveMediaUrl(value)
-          return src ? (
-            <Image src={src} width={48} height={72} style={{ objectFit: 'cover' }} />
-          ) : (
-            '—'
-          )
-        },
-      },
-      {
-        title: 'Порядок',
-        dataIndex: 'sortOrder',
-        width: 90,
-      },
-      {
-        title: 'Статус',
-        dataIndex: 'isActive',
-        width: 130,
-        render: (isActive: boolean, record) => (
-          <Space>
-            <Switch
-              checked={isActive}
-              size="small"
-              onChange={checked => void handleToggleActive(record, checked)}
-            />
-            <Tag color={isActive ? 'green' : 'default'}>{isActive ? 'Активен' : 'Выкл'}</Tag>
-          </Space>
-        ),
-      },
-      {
-        title: 'Alt',
-        dataIndex: 'alt',
-        ellipsis: true,
-        render: (value: string | null) => value || '—',
-      },
-      {
-        title: '',
-        key: 'actions',
-        width: 100,
-        render: (_, record) => (
-          <Space>
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              onClick={() => openEdit(record)}
-              aria-label="Редактировать"
-            />
-            <Popconfirm
-              title="Удалить стейдж?"
-              okText="Удалить"
-              cancelText="Отмена"
-              onConfirm={() => void handleDelete(record.id)}
-            >
-              <Button type="text" danger icon={<DeleteOutlined />} aria-label="Удалить" />
-            </Popconfirm>
-          </Space>
-        ),
-      },
-    ],
-    []
-  )
-
   return (
     <Container className="landing-stages-page admin-page">
+      {contextHolder}
       <PageHeader
         title="Стейджи главной"
         subtitle="Картинки первого экрана. Если слайдов больше одного — на витрине будет слайдер."
@@ -166,9 +60,11 @@ export function LandingStagesPage() {
             <Button loading={isFetching} onClick={() => void refetch()}>
               Обновить
             </Button>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}>
-              Создать
-            </Button>
+            <Link to="/landing-stages/create">
+              <Button type="primary" icon={<PlusOutlined />}>
+                Создать
+              </Button>
+            </Link>
           </Space>
         }
       />
@@ -178,25 +74,77 @@ export function LandingStagesPage() {
           <Spin />
         </div>
       ) : stages.length === 0 ? (
-        <Empty description="Пока нет стейджей" />
+        <Empty
+          className="landing-stages-page__empty"
+          description="Пока нет стейджей"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        >
+          <Link to="/landing-stages/create">
+            <Button type="primary" icon={<PlusOutlined />}>
+              Создать первый
+            </Button>
+          </Link>
+        </Empty>
       ) : (
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={stages}
-          pagination={false}
-          scroll={{ x: 800 }}
-        />
-      )}
+        <div className="landing-stages-page__list-wrap">
+          <div className="landing-stages-page__list-head">
+            <span>Превью</span>
+            <span>Порядок</span>
+            <span>Статус</span>
+            <span>Alt</span>
+            <span>Действия</span>
+          </div>
+          <ul className="landing-stages-page__list">
+            {stages.map(stage => (
+              <li key={stage.id} className="landing-stages-page__row">
+                <div className="landing-stages-page__previews">
+                  <StageThumb
+                    fileId={stage.imageDesktop}
+                    className="landing-stages-page__thumb-desktop"
+                  />
+                  <StageThumb
+                    fileId={stage.imageMobile}
+                    className="landing-stages-page__thumb-mobile"
+                  />
+                </div>
 
-      <LandingStageModal
-        open={modalOpen}
-        mode={modalMode}
-        initial={editing}
-        confirmLoading={isCreating || isUpdating}
-        onCancel={() => setModalOpen(false)}
-        onSubmit={values => void handleSubmit(values)}
-      />
+                <div className="landing-stages-page__order">
+                  <span className="landing-stages-page__order-value">{stage.sortOrder}</span>
+                </div>
+
+                <div className="landing-stages-page__status">
+                  <Switch
+                    checked={stage.isActive}
+                    size="small"
+                    onChange={checked => void handleToggleActive(stage, checked)}
+                  />
+                  <Tag color={stage.isActive ? 'green' : 'default'}>
+                    {stage.isActive ? 'Активен' : 'Выкл'}
+                  </Tag>
+                </div>
+
+                <div className="landing-stages-page__alt" title={stage.alt ?? undefined}>
+                  {stage.alt || '—'}
+                </div>
+
+                <div className="landing-stages-page__actions">
+                  <Link to={`/landing-stages/${stage.id}/edit`}>
+                    <Button type="text" icon={<EditOutlined />} aria-label="Редактировать" />
+                  </Link>
+                  <Popconfirm
+                    title="Удалить стейдж?"
+                    okText="Удалить"
+                    cancelText="Отмена"
+                    onConfirm={() => void handleDelete(stage.id)}
+                  >
+                    <Button type="text" danger icon={<DeleteOutlined />} aria-label="Удалить" />
+                  </Popconfirm>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Container>
   )
 }
