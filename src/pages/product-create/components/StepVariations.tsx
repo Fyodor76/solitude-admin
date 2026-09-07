@@ -1,5 +1,5 @@
 import { HolderOutlined } from '@ant-design/icons'
-import { Button, Card, Empty, Input, InputNumber, Select } from 'antd'
+import { Button, Card, Empty, Input, InputNumber, Select, Tag } from 'antd'
 import { Reorder, useDragControls } from 'framer-motion'
 
 import { DraftVariation } from '../types'
@@ -64,6 +64,9 @@ function VariationCard({
               <HolderOutlined />
             </button>
             Вариация {index + 1}
+            <Tag color={item.isActive === true ? 'green' : 'default'}>
+              {item.isActive === true ? 'На витрине' : 'Скрыта'}
+            </Tag>
           </span>
         }
         extra={
@@ -73,6 +76,14 @@ function VariationCard({
         }
       >
         <div className="product-create__grid">
+          <div className="product-create__field product-create__field--full">
+            <VariationStorefrontSwitches
+              isActive={item.isActive === true}
+              showOnLanding={item.showOnLanding === true}
+              onChange={patch => onChange(item.key, patch)}
+            />
+          </div>
+
           <div className="product-create__field">
             <span>Название *</span>
             <Input value={item.name} onChange={e => onChange(item.key, { name: e.target.value })} />
@@ -153,14 +164,6 @@ function VariationCard({
           </div>
 
           <div className="product-create__field product-create__field--full">
-            <VariationStorefrontSwitches
-              isActive={item.isActive === true}
-              showOnLanding={item.showOnLanding === true}
-              onChange={patch => onChange(item.key, patch)}
-            />
-          </div>
-
-          <div className="product-create__field product-create__field--full">
             <span>Фото вариации</span>
             <ProductImageUpload
               value={
@@ -203,8 +206,9 @@ export function StepVariations({
     <div className="product-create__stack">
       <div className="product-create__toolbar">
         <p className="product-create__hint">
-          Добавьте вариации (например, по цвету). Каждая вариация с включённым «На витрине» станет
-          отдельной карточкой в коллекции. Цвет обязателен — из раздела «Опции товаров».
+          Каждый цвет — отдельная вариация. В коллекции появятся только те, у которых включено «На
+          витрине»: из 30 цветов можно оставить топ-5. Скрытый цвет всё равно останется в товаре и
+          на странице модели.
         </p>
         <Button type="primary" onClick={onAdd}>
           Добавить вариацию

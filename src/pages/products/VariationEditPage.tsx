@@ -370,7 +370,7 @@ export default function VariationEditPage() {
             </div>
             <div className="variation-edit__full">
               <p className="variation-edit__images-hint">
-                «На витрине» у фото — снимок попадёт в карточку этой цветомодели в коллекции. Не
+                Метка «Витрина» у фото выбирает, какие снимки попадут на карточку этого цвета. Не
                 забудьте сохранить.
               </p>
               <ProductImageUpload

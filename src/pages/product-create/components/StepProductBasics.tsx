@@ -94,11 +94,20 @@ export function StepProductBasics({ value, categories, onChange }: StepProductBa
           />
         </div>
 
-        <div className="product-create__switches">
-          <label className="product-create__switch">
-            <Switch checked={value.isFeatured} onChange={isFeatured => onChange({ isFeatured })} />
-            {productSwitchLabel('Рекомендуемый', PRODUCT_SWITCH_TOOLTIPS.isFeatured)}
-          </label>
+        <div className="product-create__field product-create__field--full">
+          <p className="product-create__hint" style={{ marginBottom: 8 }}>
+            Карточки в коллекции и на главной включаются у каждого цвета на шаге «Вариации». Здесь
+            остаётся только пометка модели для подборок.
+          </p>
+          <div className="product-create__switches">
+            <label className="product-create__switch">
+              <Switch
+                checked={value.isFeatured}
+                onChange={isFeatured => onChange({ isFeatured })}
+              />
+              {productSwitchLabel('Рекомендуемый', PRODUCT_SWITCH_TOOLTIPS.isFeatured)}
+            </label>
+          </div>
         </div>
       </div>
     </Card>
