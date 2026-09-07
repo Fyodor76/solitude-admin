@@ -14,11 +14,7 @@
   }
 
   &__empty {
-    margin-top: 24px;
-    padding: 32px 16px;
-    border: 1px solid #f0f0f0;
-    border-radius: 8px;
-    background: #fff;
+    padding: 40px 16px;
   }
 
   &__list-wrap {
@@ -34,10 +30,10 @@
   &__list-head,
   &__row {
     display: grid;
-    grid-template-columns: minmax(180px, 220px) 88px 150px minmax(140px, 1fr) 96px;
-    gap: 16px;
+    grid-template-columns: 120px minmax(200px, 1.6fr) 100px minmax(160px, 1fr) 140px;
+    gap: 12px;
     align-items: center;
-    min-width: 720px;
+    min-width: 760px;
   }
 
   &__list-head {
@@ -55,114 +51,145 @@
   }
 
   &__row {
-    min-height: 88px;
-    padding: 14px 16px;
+    position: relative;
+    min-height: 80px;
+    padding: 16px;
     border-bottom: 1px solid #f5f5f5;
     background: #fff;
+    list-style: none;
 
     &:last-child {
       border-bottom: none;
     }
-
-    &:hover {
-      background: #fafafa;
-    }
   }
 
-  &__previews {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-  }
-
-  &__thumb-desktop,
-  &__thumb-mobile {
-    display: block;
-    object-fit: cover;
-    border-radius: 6px;
-    background: #f5f5f5;
-    border: 1px solid #f0f0f0;
-
-    &--empty {
-      background: #f5f5f5;
-    }
-  }
-
-  &__thumb-desktop {
-    width: 96px;
-    height: 60px;
-  }
-
-  &__thumb-mobile {
-    width: 40px;
-    height: 60px;
-  }
-
-  &__order-value {
-    font-variant-numeric: tabular-nums;
-    font-weight: 500;
-  }
-
-  &__status {
+  &__thumbs {
     display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
   }
 
-  &__alt {
-    color: rgba(0, 0, 0, 0.65);
-    font-size: 13px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  &__thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f5f5f5;
+
+    &--mobile {
+      width: 40px;
+      height: 64px;
+    }
+  }
+
+  &__thumb-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    background: #f0f0f0;
+
+    &--mobile {
+      width: 40px;
+      height: 64px;
+    }
+  }
+
+  &__name {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     min-width: 0;
+    max-width: 360px;
+
+    a {
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+  }
+
+  &__slug {
+    color: #8c8c8c;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  &__cell {
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  &__status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
   }
 
   &__actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 2px;
+    justify-self: end;
   }
 
-  @media (max-width: 768px) {
-    &__list-head {
-      display: none;
-    }
-
+  @media (max-width: 900px) {
     &__list-wrap {
+      overflow: visible;
       border: none;
       background: transparent;
-      overflow: visible;
+    }
+
+    &__list-head {
+      display: none;
     }
 
     &__list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     &__row {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 12px;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      grid-template-areas:
+        'thumb name'
+        'thumb meta'
+        'actions actions';
+      gap: 10px 12px;
       min-width: 0;
       min-height: 0;
-      padding: 14px 16px;
+      padding: 14px;
       border: 1px solid #f0f0f0;
       border-radius: 12px;
-      border-bottom: 1px solid #f0f0f0;
+    }
 
-      &:last-child {
-        border-bottom: 1px solid #f0f0f0;
-      }
+    &__thumbs {
+      grid-area: thumb;
+    }
+
+    &__name {
+      grid-area: name;
+      max-width: none;
+    }
+
+    &__cell,
+    &__status {
+      grid-area: meta;
+    }
+
+    &__cell {
+      display: none;
     }
 
     &__actions {
-      justify-content: flex-start;
-      padding-top: 4px;
+      grid-area: actions;
+      justify-self: start;
+      width: 100%;
+      padding-top: 8px;
       border-top: 1px solid #f5f5f5;
     }
   }
