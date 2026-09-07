@@ -39,6 +39,8 @@ export interface DraftVariation {
   images: ProductImageItem[]
   /** fileId для product.images / карточки коллекции */
   showcaseFileIds: string[]
+  isActive: boolean
+  showOnLanding: boolean
 }
 
 export interface AttributeSelection {

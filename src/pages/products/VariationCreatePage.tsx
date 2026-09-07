@@ -28,10 +28,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { ProductImageUpload } from '../product-create/components/ProductImageUpload'
 import { StepStock } from '../product-create/components/StepStock'
+import { VariationStorefrontSwitches } from '../product-create/components/VariationStorefrontSwitches'
 import { buildSku, slugify } from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
 import { DraftVariation, ProductImageItem, StockDraftRow } from '../product-create/types'
 import './ProductsPage.scss'
+import { aggregateStorefrontFlags } from './storefrontFlags'
 import {
   clearVariationCreateDraft,
   hasVariationCreateDraftContent,
@@ -50,6 +52,8 @@ type VariationCreateFormValues = {
   modelParameters?: string
   price: number
   comparePrice?: number | null
+  isActive: boolean
+  showOnLanding: boolean
 }
 
 const DRAFT_KEY = 'new-variation'
@@ -89,6 +93,8 @@ export default function VariationCreatePage() {
 
   const product = productResponse?.data
   const isSaving = isCreating || isUpdatingProduct || isCreatingStock
+  const isActiveWatched = Form.useWatch('isActive', form) ?? false
+  const showOnLandingWatched = Form.useWatch('showOnLanding', form) ?? false
 
   const {
     data: sizeChartResponse,
@@ -140,6 +146,8 @@ export default function VariationCreatePage() {
       description: '',
       modelParameters: product.modelParameters || '',
       colorId: colorOptions[0]?.value,
+      isActive: false,
+      showOnLanding: false,
     })
     setImageItems([])
     setShowcaseFileIds(product.images ?? [])
@@ -164,6 +172,8 @@ export default function VariationCreatePage() {
         modelParameters: draft.form.modelParameters || '',
         price: draft.form.price ?? product.price,
         comparePrice: draft.form.comparePrice ?? null,
+        isActive: draft.form.isActive ?? false,
+        showOnLanding: draft.form.showOnLanding ?? false,
       })
       setImageItems(draft.imageItems)
       setShowcaseFileIds(draft.showcaseFileIds)
@@ -364,6 +374,8 @@ export default function VariationCreatePage() {
         mainImage: imageIds[0],
         images: imageIds,
         sortOrder: product.variations?.length ?? 0,
+        isActive: values.isActive ?? false,
+        showOnLanding: values.showOnLanding ?? false,
         attributes: [],
       }).unwrap()
 
@@ -373,29 +385,28 @@ export default function VariationCreatePage() {
       }
 
       const nextShowcase = [...new Set(showcaseFileIds)]
-      const productImagesChanged =
-        nextShowcase.length !== (product.images?.length ?? 0) ||
-        nextShowcase.some((id, index) => product.images?.[index] !== id)
+      const storefrontFlags = aggregateStorefrontFlags([
+        ...(product.variations ?? []),
+        { isActive: values.isActive ?? false, showOnLanding: values.showOnLanding ?? false },
+      ])
 
-      if (productImagesChanged) {
-        await updateProduct({
-          id: product.id,
-          body: {
-            name: product.name,
-            slug: product.slug,
-            description: product.description,
-            modelParameters: product.modelParameters,
-            price: product.price,
-            categoryId: product.categoryId,
-            brand: product.brand,
-            material: product.material,
-            isActive: product.isActive,
-            isFeatured: product.isFeatured,
-            showOnLanding: product.showOnLanding,
-            images: nextShowcase,
-          },
-        }).unwrap()
-      }
+      await updateProduct({
+        id: product.id,
+        body: {
+          name: product.name,
+          slug: product.slug,
+          description: product.description,
+          modelParameters: product.modelParameters,
+          price: product.price,
+          categoryId: product.categoryId,
+          brand: product.brand,
+          material: product.material,
+          isActive: storefrontFlags.isActive,
+          isFeatured: product.isFeatured,
+          showOnLanding: storefrontFlags.showOnLanding,
+          images: nextShowcase,
+        },
+      }).unwrap()
 
       const stockItems = stockRows.map(row => ({
         productId: product.id,
@@ -494,6 +505,7 @@ export default function VariationCreatePage() {
               layout="vertical"
               disabled={!product || !colorOptions.length}
               preserve
+              initialValues={{ isActive: false, showOnLanding: false }}
               onValuesChange={() => {
                 setUserTouched(true)
                 setFormVersion(v => v + 1)
@@ -545,9 +557,22 @@ export default function VariationCreatePage() {
                 >
                   <Input.TextArea rows={2} />
                 </Form.Item>
+                <Form.Item name="isActive" valuePropName="checked" hidden>
+                  <span />
+                </Form.Item>
+                <Form.Item name="showOnLanding" valuePropName="checked" hidden>
+                  <span />
+                </Form.Item>
+                <div className="variation-edit__full">
+                  <VariationStorefrontSwitches
+                    isActive={isActiveWatched}
+                    showOnLanding={showOnLandingWatched}
+                    onChange={patch => form.setFieldsValue(patch)}
+                  />
+                </div>
                 <div className="variation-edit__full">
                   <p className="variation-edit__images-hint">
-                    «На витрине» — фото попадёт в карточку товара в коллекции.
+                    «На витрине» у фото — снимок попадёт в карточку этой цветомодели в коллекции.
                   </p>
                   <ProductImageUpload
                     value={imageItems}

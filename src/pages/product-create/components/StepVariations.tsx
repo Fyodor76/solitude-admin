@@ -4,6 +4,7 @@ import { Reorder, useDragControls } from 'framer-motion'
 
 import { DraftVariation } from '../types'
 import { ProductImageUpload } from './ProductImageUpload'
+import { VariationStorefrontSwitches } from './VariationStorefrontSwitches'
 
 interface ColorOption {
   label: string
@@ -152,6 +153,14 @@ function VariationCard({
           </div>
 
           <div className="product-create__field product-create__field--full">
+            <VariationStorefrontSwitches
+              isActive={item.isActive === true}
+              showOnLanding={item.showOnLanding === true}
+              onChange={patch => onChange(item.key, patch)}
+            />
+          </div>
+
+          <div className="product-create__field product-create__field--full">
             <span>Фото вариации</span>
             <ProductImageUpload
               value={
@@ -194,7 +203,8 @@ export function StepVariations({
     <div className="product-create__stack">
       <div className="product-create__toolbar">
         <p className="product-create__hint">
-          Добавьте вариации (например, по цвету). Цвет обязателен — из раздела «Опции товаров».
+          Добавьте вариации (например, по цвету). Каждая вариация с включённым «На витрине» станет
+          отдельной карточкой в коллекции. Цвет обязателен — из раздела «Опции товаров».
         </p>
         <Button type="primary" onClick={onAdd}>
           Добавить вариацию

@@ -79,6 +79,8 @@ export function mapProductToEditState(
       mainImage: ordered[0] || null,
       images: ordered,
       showcaseFileIds: productImages.filter(id => imageIdSet.has(id)),
+      isActive: variation.isActive ?? false,
+      showOnLanding: variation.showOnLanding ?? false,
     }
   })
 

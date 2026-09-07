@@ -11,6 +11,8 @@ export type VariationCreateFormDraft = {
   modelParameters?: string
   price?: number | null
   comparePrice?: number | null
+  isActive?: boolean
+  showOnLanding?: boolean
 }
 
 export type VariationCreateDraft = {

@@ -37,6 +37,7 @@ import {
 import '../product-create/ProductCreate.scss'
 import { WizardStep } from '../product-create/types'
 import './ProductsPage.scss'
+import { aggregateStorefrontFlags } from './storefrontFlags'
 
 function extractErrorMessage(error: unknown, fallback: string): string {
   const payload = error as { data?: { error?: unknown }; error?: unknown; message?: unknown }
@@ -227,6 +228,8 @@ export default function ProductDetailPage() {
           mainImage: variation.mainImage?.fileId,
           images: variation.images.map(image => image.fileId),
           sortOrder: index,
+          isActive: variation.isActive === true,
+          showOnLanding: variation.showOnLanding === true,
           attributes: [],
         }).unwrap()
 
@@ -256,6 +259,8 @@ export default function ProductDetailPage() {
                     mainImage: variation.mainImage?.fileId,
                     images: variation.images.map(image => image.fileId),
                     sortOrder: index,
+                    isActive: variation.isActive === true,
+                    showOnLanding: variation.showOnLanding === true,
                   },
                 }).unwrap(),
               ]
@@ -269,6 +274,8 @@ export default function ProductDetailPage() {
         await deleteVariation({ id, productId: product.id }).unwrap()
       }
 
+      const storefrontFlags = aggregateStorefrontFlags(variations)
+
       await updateProduct({
         id: product.id,
         body: {
@@ -280,9 +287,9 @@ export default function ProductDetailPage() {
           categoryId: basics.categoryId,
           brand: basics.brand.trim(),
           material: basics.material.trim(),
-          isActive: basics.isActive,
+          isActive: storefrontFlags.isActive,
           isFeatured: basics.isFeatured,
-          showOnLanding: basics.showOnLanding,
+          showOnLanding: storefrontFlags.showOnLanding,
           images: collectShowcaseImages(variations, snapshot.images),
           attributes: attributeSelections
             .filter(item => item.valueIds.length > 0)

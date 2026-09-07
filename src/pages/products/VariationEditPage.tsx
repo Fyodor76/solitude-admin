@@ -16,10 +16,12 @@ import { Button, Form, Input, InputNumber, Modal, Select, Space } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { ProductImageUpload } from '../product-create/components/ProductImageUpload'
+import { VariationStorefrontSwitches } from '../product-create/components/VariationStorefrontSwitches'
 import { suggestSkuFromName, suggestSlugFromName } from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
 import { ProductImageItem } from '../product-create/types'
 import './ProductsPage.scss'
+import { aggregateStorefrontFlags } from './storefrontFlags'
 
 type VariationFormValues = {
   name: string
@@ -30,6 +32,8 @@ type VariationFormValues = {
   modelParameters?: string
   price: number
   comparePrice?: number | null
+  isActive: boolean
+  showOnLanding: boolean
 }
 
 function toImageItems(images: string[] | undefined): ProductImageItem[] {
@@ -80,6 +84,8 @@ export default function VariationEditPage() {
   }, [attributesResponse?.data])
   const isSaving = isSavingVariation || isSavingProduct || isDeleting
   const nameWatched = Form.useWatch('name', form)
+  const isActiveWatched = Form.useWatch('isActive', form) ?? false
+  const showOnLandingWatched = Form.useWatch('showOnLanding', form) ?? false
   const previousNameRef = useRef('')
   const loadedVariationIdRef = useRef<string | null>(null)
   const slugLockedRef = useRef(false)
@@ -103,6 +109,8 @@ export default function VariationEditPage() {
       modelParameters: variation.modelParameters,
       price: variation.price,
       comparePrice: variation.comparePrice,
+      isActive: variation.isActive ?? false,
+      showOnLanding: variation.showOnLanding ?? false,
     })
     const items = toImageItems(variation.images)
     const mainId = variation.mainImage || items[0]?.fileId
@@ -180,8 +188,16 @@ export default function VariationEditPage() {
           comparePrice: values.comparePrice ?? undefined,
           mainImage: mainImageId || imageIds[0],
           images: imageIds,
+          isActive: values.isActive ?? false,
+          showOnLanding: values.showOnLanding ?? false,
         },
       }).unwrap()
+
+      const siblings = (product.variations ?? []).filter(item => item.id !== variationId)
+      const storefrontFlags = aggregateStorefrontFlags([
+        ...siblings,
+        { isActive: values.isActive ?? false, showOnLanding: values.showOnLanding ?? false },
+      ])
 
       await updateProduct({
         id: product.id,
@@ -194,9 +210,9 @@ export default function VariationEditPage() {
           categoryId: product.categoryId,
           brand: product.brand,
           material: product.material,
-          isActive: product.isActive,
+          isActive: storefrontFlags.isActive,
           isFeatured: product.isFeatured,
-          showOnLanding: product.showOnLanding,
+          showOnLanding: storefrontFlags.showOnLanding,
           images: showcaseFileIds,
         },
       }).unwrap()
@@ -339,10 +355,23 @@ export default function VariationEditPage() {
             >
               <Input.TextArea rows={2} />
             </Form.Item>
+            <Form.Item name="isActive" valuePropName="checked" hidden>
+              <span />
+            </Form.Item>
+            <Form.Item name="showOnLanding" valuePropName="checked" hidden>
+              <span />
+            </Form.Item>
+            <div className="variation-edit__full">
+              <VariationStorefrontSwitches
+                isActive={isActiveWatched}
+                showOnLanding={showOnLandingWatched}
+                onChange={patch => form.setFieldsValue(patch)}
+              />
+            </div>
             <div className="variation-edit__full">
               <p className="variation-edit__images-hint">
-                «На витрине» — фото попадёт в карточку товара в коллекции (можно с разных цветов,
-                без лимита). Не забудьте сохранить.
+                «На витрине» у фото — снимок попадёт в карточку этой цветомодели в коллекции. Не
+                забудьте сохранить.
               </p>
               <ProductImageUpload
                 value={imageItems}

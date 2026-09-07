@@ -22,6 +22,8 @@ export interface ProductVariationCreatePayload {
   images?: string[]
   mainImage?: string
   sortOrder?: number
+  isActive?: boolean
+  showOnLanding?: boolean
   attributes?: VariationAttributeCreatePayload[]
 }
 
@@ -118,5 +120,6 @@ export interface ProductVariationUpdatePayload {
   mainImage?: string
   attributes?: VariationAttributeCreatePayload[]
   isActive?: boolean
+  showOnLanding?: boolean
   sortOrder?: number
 }

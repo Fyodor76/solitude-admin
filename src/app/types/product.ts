@@ -65,6 +65,7 @@ export interface ProductVariation {
   size: ProductSize[]
   color?: AttributeValue
   isActive: boolean
+  showOnLanding?: boolean
   sortOrder?: number
   inStock?: boolean
   createdAt?: string

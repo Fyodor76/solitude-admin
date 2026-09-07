@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ProductAttributeResponse } from '@/shared/lib/api/product-attributes/types'
 
+import { aggregateStorefrontFlags } from '../../products/storefrontFlags'
 import { INITIAL_BASICS } from '../constants'
 import {
   clearProductCreateDraft,
@@ -167,6 +168,8 @@ export function useProductCreateWizard(
         mainImage: null,
         images: [],
         showcaseFileIds: [],
+        isActive: false,
+        showOnLanding: false,
       }
       return { ...prev, variations: [...prev.variations, next] }
     })
@@ -325,6 +328,8 @@ export function useProductCreateWizard(
       mainImage: item.mainImage?.fileId,
       images: item.images.map(image => image.fileId),
       sortOrder: index,
+      isActive: item.isActive === true,
+      showOnLanding: item.showOnLanding === true,
       attributes: [],
     }))
 
@@ -339,6 +344,8 @@ export function useProductCreateWizard(
         ? [fallbackMain]
         : []
 
+    const storefrontFlags = aggregateStorefrontFlags(state.variations)
+
     return {
       name: state.basics.name.trim(),
       slug: state.basics.slug.trim() || undefined,
@@ -348,9 +355,9 @@ export function useProductCreateWizard(
       categoryId: state.basics.categoryId,
       brand: state.basics.brand.trim(),
       material: state.basics.material.trim(),
-      isActive: state.basics.isActive,
+      isActive: storefrontFlags.isActive,
       isFeatured: state.basics.isFeatured,
-      showOnLanding: state.basics.showOnLanding,
+      showOnLanding: storefrontFlags.showOnLanding,
       modelParameters: state.basics.modelParameters.trim() || undefined,
       attributes: state.attributeSelections
         .filter(item => item.valueIds.length > 0)
