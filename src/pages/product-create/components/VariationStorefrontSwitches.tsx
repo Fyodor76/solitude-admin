@@ -1,6 +1,6 @@
 import { Switch } from 'antd'
 
-import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from '../products/productSwitchLabels'
+import { PRODUCT_SWITCH_TOOLTIPS, productSwitchLabel } from '../../products/productSwitchLabels'
 
 interface VariationStorefrontSwitchesProps {
   isActive: boolean
