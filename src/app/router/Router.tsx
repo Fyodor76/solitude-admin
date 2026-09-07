@@ -1,6 +1,7 @@
 import { ValidationProvider } from '@/context/validation/provider'
 import { Categories } from '@/pages/categories'
 import CallbackFormPage from '@/pages/forms/callback-form/CallbackFormPage'
+import { LandingStagesPage } from '@/pages/landing-stages'
 import { MainPage } from '@/pages/main'
 import { NotificationsPage } from '@/pages/notifications'
 import { OrderDetailPage, OrdersPage } from '@/pages/orders'
@@ -67,6 +68,10 @@ export const Router: RouteObject[] = [
           {
             path: 'platform-images',
             element: <PlatformImages />,
+          },
+          {
+            path: 'landing-stages',
+            element: <LandingStagesPage />,
           },
           {
             path: 'size-charts',

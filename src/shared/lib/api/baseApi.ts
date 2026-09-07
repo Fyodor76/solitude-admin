@@ -230,6 +230,7 @@ export const baseApi = createApi({
     'Orders',
     'Order',
     'OrdersAttention',
+    'LandingStages',
   ],
   endpoints: () => ({}),
 })

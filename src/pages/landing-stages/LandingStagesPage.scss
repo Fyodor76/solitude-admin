@@ -1,0 +1,29 @@
+.landing-stages-page {
+  &__loading {
+    display: flex;
+    justify-content: center;
+    padding: 48px 0;
+  }
+}
+
+.landing-stages-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__image-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__image-label {
+    font-weight: 500;
+  }
+
+  &__preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

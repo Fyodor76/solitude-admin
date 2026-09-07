@@ -56,6 +56,12 @@ export const menuSidebar: MenuItem[] = [
     hasArrow: true,
     subItems: [
       {
+        id: SIDEBAR_MENU_ITEM_ID.LANDING_STAGES,
+        text: 'Стейджи главной',
+        href: '/landing-stages',
+        icon: 'gallery',
+      },
+      {
         id: SIDEBAR_MENU_ITEM_ID.PLATFORM_IMAGES,
         text: 'Изображения платформы',
         href: '/platform-images',

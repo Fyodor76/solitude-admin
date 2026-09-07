@@ -9,6 +9,7 @@ export const SIDEBAR_MENU_ITEM_ID = {
   CATEGORIES: 'categories',
   CONTENT: 'content',
   PLATFORM_IMAGES: 'platform-images',
+  LANDING_STAGES: 'landing-stages',
   FORMS: 'forms',
   CALLBACK_FORM: 'callback-form',
   ORDERS: 'orders',
