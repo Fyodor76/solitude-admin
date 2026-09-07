@@ -30,10 +30,10 @@
   &__list-head,
   &__row {
     display: grid;
-    grid-template-columns: 120px minmax(200px, 1.6fr) 100px minmax(160px, 1fr) 140px;
+    grid-template-columns: 120px minmax(120px, 0.8fr) minmax(160px, 1.4fr) 90px 120px 140px;
     gap: 12px;
     align-items: center;
-    min-width: 760px;
+    min-width: 820px;
   }
 
   &__list-head {
@@ -96,32 +96,26 @@
   }
 
   &__name {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
     min-width: 0;
-    max-width: 360px;
 
     a {
       font-size: 16px;
       font-weight: 500;
       line-height: 1.35;
-      overflow-wrap: anywhere;
-      word-break: break-word;
     }
-  }
-
-  &__slug {
-    color: #8c8c8c;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-    word-break: break-word;
   }
 
   &__cell {
     min-width: 0;
     font-size: 15px;
     line-height: 1.4;
+
+    &--alt {
+      color: rgba(0, 0, 0, 0.65);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   &__status {
@@ -157,9 +151,10 @@
       grid-template-columns: 120px 1fr;
       grid-template-areas:
         'thumb name'
+        'thumb alt'
         'thumb meta'
         'actions actions';
-      gap: 10px 12px;
+      gap: 8px 12px;
       min-width: 0;
       min-height: 0;
       padding: 14px;
@@ -173,15 +168,19 @@
 
     &__name {
       grid-area: name;
-      max-width: none;
     }
 
-    &__cell,
+    &__cell--alt {
+      grid-area: alt;
+      white-space: normal;
+    }
+
+    &__cell:not(&__cell--alt),
     &__status {
       grid-area: meta;
     }
 
-    &__cell {
+    &__cell:not(.landing-stages-page__cell--alt) {
       display: none;
     }
 

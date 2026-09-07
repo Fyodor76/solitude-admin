@@ -4,16 +4,18 @@ import { useUploadImageMutation } from '@/shared/lib/api/upload-files/uploadFile
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
 import { DeleteOutlined, InboxOutlined } from '@ant-design/icons'
-import { Button, Image, Spin, Upload } from 'antd'
+import { Button, Spin, Upload } from 'antd'
+import classNames from 'classnames'
 
 interface StageImageFieldProps {
   label: string
   hint?: string
+  variant: 'desktop' | 'mobile'
   fileId: string | null
   onChange: (fileId: string | null) => void
 }
 
-export function StageImageField({ label, hint, fileId, onChange }: StageImageFieldProps) {
+export function StageImageField({ label, hint, variant, fileId, onChange }: StageImageFieldProps) {
   const { openNotification } = useNotificationHandler()
   const [uploadImage] = useUploadImageMutation()
   const [uploading, setUploading] = useState(false)
@@ -39,17 +41,24 @@ export function StageImageField({ label, hint, fileId, onChange }: StageImageFie
   }
 
   return (
-    <div className="landing-stage-editor__image-field">
+    <div
+      className={classNames(
+        'landing-stage-editor__image-field',
+        `landing-stage-editor__image-field--${variant}`
+      )}
+    >
       <div className="landing-stage-editor__image-label">{label}</div>
       {hint ? <p className="landing-stage-editor__image-hint">{hint}</p> : null}
       {previewUrl ? (
         <div className="landing-stage-editor__preview">
-          <Image
-            src={previewUrl}
-            alt={label}
-            className="landing-stage-editor__preview-img"
-            preview={{ mask: 'Просмотр' }}
-          />
+          <div
+            className={classNames(
+              'landing-stage-editor__frame',
+              `landing-stage-editor__frame--${variant}`
+            )}
+          >
+            <img src={previewUrl} alt={label} className="landing-stage-editor__frame-img" />
+          </div>
           <div className="landing-stage-editor__preview-actions">
             <Upload
               accept="image/*"
@@ -61,10 +70,13 @@ export function StageImageField({ label, hint, fileId, onChange }: StageImageFie
                 return false
               }}
             >
-              <Button loading={uploading}>Заменить</Button>
+              <Button size="small" loading={uploading}>
+                Заменить
+              </Button>
             </Upload>
             <Button
               type="text"
+              size="small"
               danger
               icon={<DeleteOutlined />}
               onClick={() => onChange(null)}
@@ -76,7 +88,10 @@ export function StageImageField({ label, hint, fileId, onChange }: StageImageFie
         </div>
       ) : (
         <Upload.Dragger
-          className="landing-stage-editor__uploader"
+          className={classNames(
+            'landing-stage-editor__uploader',
+            `landing-stage-editor__uploader--${variant}`
+          )}
           accept="image/*"
           multiple={false}
           showUploadList={false}
@@ -87,8 +102,7 @@ export function StageImageField({ label, hint, fileId, onChange }: StageImageFie
           }}
         >
           <p className="ant-upload-drag-icon">{uploading ? <Spin /> : <InboxOutlined />}</p>
-          <p className="ant-upload-text">Загрузить {label.toLowerCase()}</p>
-          <p className="ant-upload-hint">PNG, JPG, WEBP</p>
+          <p className="ant-upload-text">Загрузить</p>
         </Upload.Dragger>
       )}
     </div>

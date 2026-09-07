@@ -39,14 +39,6 @@ function StageThumb({ stage }: { stage: LandingStage }) {
   )
 }
 
-function StageStatusTags({ stage }: { stage: LandingStage }) {
-  return (
-    <div className="landing-stages-page__status">
-      <Tag color={stage.isActive ? 'green' : 'default'}>{stage.isActive ? 'Активен' : 'Выкл'}</Tag>
-    </div>
-  )
-}
-
 function StageRow({
   stage,
   index,
@@ -58,7 +50,8 @@ function StageRow({
   isDeleting: boolean
   onDelete: (stage: LandingStage) => void
 }) {
-  const title = stage.alt?.trim() || `Стейдж ${index + 1}`
+  const title = `Стейдж ${index + 1}`
+  const alt = stage.alt?.trim() || '—'
 
   return (
     <li className="landing-stages-page__row">
@@ -66,14 +59,19 @@ function StageRow({
 
       <div className="landing-stages-page__name">
         <Link to={`/landing-stages/${stage.id}/edit`}>{title}</Link>
-        <span className="landing-stages-page__slug">
-          desktop + mobile · порядок {stage.sortOrder}
-        </span>
       </div>
+
+      <span className="landing-stages-page__cell landing-stages-page__cell--alt" title={alt}>
+        {alt}
+      </span>
 
       <span className="landing-stages-page__cell">{stage.sortOrder}</span>
 
-      <StageStatusTags stage={stage} />
+      <div className="landing-stages-page__status">
+        <Tag color={stage.isActive ? 'green' : 'default'}>
+          {stage.isActive ? 'Активен' : 'Выкл'}
+        </Tag>
+      </div>
 
       <Space size={4} className="landing-stages-page__actions">
         <Link to={`/landing-stages/${stage.id}/edit`}>
@@ -100,14 +98,9 @@ export function LandingStagesPage() {
   const stages = useMemo(() => data?.data ?? [], [data?.data])
 
   const handleDelete = (stage: LandingStage) => {
-    const title = stage.alt?.trim() || 'этот стейдж'
     Modal.confirm({
       title: 'Удалить стейдж?',
-      content: (
-        <>
-          Будет удалён <strong>{title}</strong>. Восстановить будет невозможно.
-        </>
-      ),
+      content: 'Восстановить будет невозможно.',
       okText: 'Удалить',
       okType: 'danger',
       cancelText: 'Отмена',
@@ -158,7 +151,8 @@ export function LandingStagesPage() {
         <div className="landing-stages-page__list-wrap">
           <div className="landing-stages-page__list-head">
             <span />
-            <span>Название</span>
+            <span>Стейдж</span>
+            <span>Alt</span>
             <span>Порядок</span>
             <span>Статус</span>
             <span />

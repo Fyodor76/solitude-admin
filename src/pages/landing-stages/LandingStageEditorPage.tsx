@@ -108,7 +108,6 @@ export function LandingStageEditorPage({ mode }: LandingStageEditorPageProps) {
       {contextHolder}
       <PageHeader
         title={isEdit ? 'Редактирование стейджа' : 'Новый стейдж'}
-        subtitle="Desktop и mobile картинки для первого экрана главной."
         actions={
           <Space>
             <Button onClick={() => navigate('/landing-stages')}>К списку</Button>
@@ -125,38 +124,41 @@ export function LandingStageEditorPage({ mode }: LandingStageEditorPageProps) {
       />
 
       <section className="landing-stage-editor__section">
-        <Form layout="vertical">
+        <Form layout="vertical" className="landing-stage-editor__form">
           <div className="landing-stage-editor__images">
             <StageImageField
-              label="Desktop"
-              hint="Широкий кадр для экранов от планшета."
+              label="Десктоп"
+              hint="Горизонтальный кадр"
+              variant="desktop"
               fileId={imageDesktop}
               onChange={setImageDesktop}
             />
             <StageImageField
-              label="Mobile"
-              hint="Вертикальный кадр для телефонов."
+              label="Мобильный"
+              hint="Вертикальный кадр"
+              variant="mobile"
               fileId={imageMobile}
               onChange={setImageMobile}
             />
           </div>
 
-          <div className="landing-stage-editor__grid">
-            <Form.Item label="Alt" className="landing-stage-editor__full">
+          <div className="landing-stage-editor__fields">
+            <Form.Item label="Alt-текст" className="landing-stage-editor__alt">
               <Input
                 value={alt}
                 onChange={event => setAlt(event.target.value)}
-                placeholder="Описание изображения"
+                placeholder="Краткое описание"
+                maxLength={120}
               />
             </Form.Item>
-            <Form.Item label="Порядок">
+            <Form.Item label="Порядок" className="landing-stage-editor__order">
               <InputNumber
                 value={sortOrder}
                 onChange={value => setSortOrder(typeof value === 'number' ? value : 0)}
                 style={{ width: '100%' }}
               />
             </Form.Item>
-            <Form.Item label="Активен на витрине">
+            <Form.Item label="На витрине" className="landing-stage-editor__active">
               <Switch checked={isActive} onChange={setIsActive} />
             </Form.Item>
           </div>
