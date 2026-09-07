@@ -194,10 +194,31 @@ export function ProductImageUpload({
     }
   }
 
+  const syncShowcaseOrder = (next: ProductImageItem[]) => {
+    if (!onShowcaseChange || !(showcaseFileIds ?? []).length) return
+
+    const currentShowcase = showcaseFileIds ?? []
+    const showcaseSet = new Set(currentShowcase)
+    const variationIds = new Set(next.map(item => item.fileId))
+    const orderedFromThis = next.map(item => item.fileId).filter(id => showcaseSet.has(id))
+    if (!orderedFromThis.length) return
+
+    let queueIndex = 0
+    const merged = currentShowcase.map(id => {
+      if (variationIds.has(id) && showcaseSet.has(id)) {
+        return orderedFromThis[queueIndex++] ?? id
+      }
+      return id
+    })
+    onShowcaseChange(merged)
+  }
+
   const setAsMain = (fileId: string) => {
     const selected = value.find(item => item.fileId === fileId)
     if (!selected) return
-    onChange([selected, ...value.filter(item => item.fileId !== fileId)])
+    const next = [selected, ...value.filter(item => item.fileId !== fileId)]
+    onChange(next)
+    syncShowcaseOrder(next)
   }
 
   const toggleShowcase = (fileId: string) => {
@@ -212,21 +233,7 @@ export function ProductImageUpload({
 
   const handleReorder = (next: ProductImageItem[]) => {
     onChange(next)
-    if (!onShowcaseChange || !(showcaseFileIds ?? []).length) return
-
-    const showcaseSet = new Set(showcaseFileIds)
-    const variationIds = new Set(next.map(item => item.fileId))
-    const orderedFromThis = next.map(item => item.fileId).filter(id => showcaseSet.has(id))
-    if (!orderedFromThis.length) return
-
-    let queueIndex = 0
-    const merged = (showcaseFileIds ?? []).map(id => {
-      if (variationIds.has(id) && showcaseSet.has(id)) {
-        return orderedFromThis[queueIndex++] ?? id
-      }
-      return id
-    })
-    onShowcaseChange(merged)
+    syncShowcaseOrder(next)
   }
 
   const removeImage = (fileId: string) => {

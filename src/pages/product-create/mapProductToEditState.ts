@@ -61,7 +61,12 @@ export function mapProductToEditState(
           ...items.filter(item => item.fileId !== mainId),
         ]
       : items
-    const imageIdSet = new Set(imageIds)
+    const showcaseSet = new Set(productImages)
+    const showcaseFileIds: string[] = []
+    for (const id of [mainId, ...imageIds]) {
+      if (!id || !showcaseSet.has(id) || showcaseFileIds.includes(id)) continue
+      showcaseFileIds.push(id)
+    }
 
     return {
       key: variation.id,
@@ -78,7 +83,7 @@ export function mapProductToEditState(
       modelParameters: variation.modelParameters || '',
       mainImage: ordered[0] || null,
       images: ordered,
-      showcaseFileIds: productImages.filter(id => imageIdSet.has(id)),
+      showcaseFileIds,
       isActive: variation.isActive ?? false,
       showOnLanding: variation.showOnLanding ?? false,
     }
@@ -141,17 +146,14 @@ export function mapProductToEditState(
   }
 }
 
-/** Порядок витрины: сначала уже стоявшие на сайте, затем новые отметки. */
+/** Порядок витрины: по галерее каждой вариации (главная этого цвета первая). */
 export function collectShowcaseImages(
   variations: DraftVariation[],
-  originalImages: string[]
+  _originalImages: string[]
 ): string[] {
-  const showcased = variations.flatMap(item => item.showcaseFileIds ?? [])
-  const showcasedSet = new Set(showcased)
-  const preserved = originalImages.filter(id => showcasedSet.has(id))
-  const extra: string[] = []
-  for (const id of showcased) {
-    if (!preserved.includes(id) && !extra.includes(id)) extra.push(id)
+  const unique: string[] = []
+  for (const id of variations.flatMap(item => item.showcaseFileIds ?? [])) {
+    if (id && !unique.includes(id)) unique.push(id)
   }
-  return [...preserved, ...extra]
+  return unique
 }

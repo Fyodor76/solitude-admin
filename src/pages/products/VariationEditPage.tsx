@@ -21,7 +21,7 @@ import { suggestSkuFromName, suggestSlugFromName } from '../product-create/helpe
 import '../product-create/ProductCreate.scss'
 import { ProductImageItem } from '../product-create/types'
 import './ProductsPage.scss'
-import { aggregateStorefrontFlags } from './storefrontFlags'
+import { aggregateStorefrontFlags, landingEnabled } from './storefrontFlags'
 
 type VariationFormValues = {
   name: string
@@ -189,14 +189,17 @@ export default function VariationEditPage() {
           mainImage: mainImageId || imageIds[0],
           images: imageIds,
           isActive: values.isActive ?? false,
-          showOnLanding: values.showOnLanding ?? false,
+          showOnLanding: landingEnabled(values.isActive, values.showOnLanding),
         },
       }).unwrap()
 
       const siblings = (product.variations ?? []).filter(item => item.id !== variationId)
       const storefrontFlags = aggregateStorefrontFlags([
         ...siblings,
-        { isActive: values.isActive ?? false, showOnLanding: values.showOnLanding ?? false },
+        {
+          isActive: values.isActive ?? false,
+          showOnLanding: landingEnabled(values.isActive, values.showOnLanding),
+        },
       ])
 
       await updateProduct({

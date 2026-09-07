@@ -229,7 +229,7 @@ export default function ProductDetailPage() {
           images: variation.images.map(image => image.fileId),
           sortOrder: index,
           isActive: variation.isActive === true,
-          showOnLanding: variation.showOnLanding === true,
+          showOnLanding: variation.isActive === true && variation.showOnLanding === true,
           attributes: [],
         }).unwrap()
 
@@ -260,7 +260,7 @@ export default function ProductDetailPage() {
                     images: variation.images.map(image => image.fileId),
                     sortOrder: index,
                     isActive: variation.isActive === true,
-                    showOnLanding: variation.showOnLanding === true,
+                    showOnLanding: variation.isActive === true && variation.showOnLanding === true,
                   },
                 }).unwrap(),
               ]

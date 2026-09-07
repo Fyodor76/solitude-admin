@@ -33,7 +33,7 @@ import { buildSku, slugify } from '../product-create/helpers'
 import '../product-create/ProductCreate.scss'
 import { DraftVariation, ProductImageItem, StockDraftRow } from '../product-create/types'
 import './ProductsPage.scss'
-import { aggregateStorefrontFlags } from './storefrontFlags'
+import { aggregateStorefrontFlags, landingEnabled } from './storefrontFlags'
 import {
   clearVariationCreateDraft,
   hasVariationCreateDraftContent,
@@ -375,7 +375,7 @@ export default function VariationCreatePage() {
         images: imageIds,
         sortOrder: product.variations?.length ?? 0,
         isActive: values.isActive ?? false,
-        showOnLanding: values.showOnLanding ?? false,
+        showOnLanding: landingEnabled(values.isActive, values.showOnLanding),
         attributes: [],
       }).unwrap()
 
@@ -387,7 +387,10 @@ export default function VariationCreatePage() {
       const nextShowcase = [...new Set(showcaseFileIds)]
       const storefrontFlags = aggregateStorefrontFlags([
         ...(product.variations ?? []),
-        { isActive: values.isActive ?? false, showOnLanding: values.showOnLanding ?? false },
+        {
+          isActive: values.isActive ?? false,
+          showOnLanding: landingEnabled(values.isActive, values.showOnLanding),
+        },
       ])
 
       await updateProduct({

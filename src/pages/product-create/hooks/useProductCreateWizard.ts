@@ -329,7 +329,7 @@ export function useProductCreateWizard(
       images: item.images.map(image => image.fileId),
       sortOrder: index,
       isActive: item.isActive === true,
-      showOnLanding: item.showOnLanding === true,
+      showOnLanding: item.isActive === true && item.showOnLanding === true,
       attributes: [],
     }))
 
