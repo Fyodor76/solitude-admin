@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 
 import { useUploadImageMutation } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
-import { ImageEditModal } from '@/shared/ui/image-edit-modal'
 import { DeleteOutlined, EditOutlined, HolderOutlined, InboxOutlined } from '@ant-design/icons'
 import { Button, Image, Spin, Upload } from 'antd'
 import type { RcFile } from 'antd/es/upload'
 import { Reorder, useDragControls } from 'framer-motion'
 
 import { ProductImageItem } from '../types'
+
+const ImageEditModal = lazy(() =>
+  import('@/shared/ui/image-edit-modal').then(mod => ({ default: mod.ImageEditModal }))
+)
 
 interface ProductImageUploadProps {
   value: ProductImageItem[]
@@ -428,12 +431,16 @@ export function ProductImageUpload({
         )
       ) : null}
 
-      <ImageEditModal
-        open={Boolean(editingItem)}
-        imageUrl={editingItem?.url || ''}
-        onCancel={() => setEditingItem(null)}
-        onSave={replaceEditedImage}
-      />
+      {editingItem ? (
+        <Suspense fallback={null}>
+          <ImageEditModal
+            open
+            imageUrl={editingItem.url}
+            onCancel={() => setEditingItem(null)}
+            onSave={replaceEditedImage}
+          />
+        </Suspense>
+      ) : null}
     </div>
   )
 }
