@@ -1,7 +1,7 @@
 .image-edit-modal {
   position: fixed;
   inset: 0;
-  z-index: 1100;
+  z-index: 2100;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,11 +13,17 @@
     border: none;
     background: rgba(0, 0, 0, 0.55);
     cursor: pointer;
+
+    &:disabled {
+      cursor: wait;
+    }
   }
 
   &__panel {
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
     width: min(1120px, 100%);
     height: min(820px, calc(100vh - 32px));
     overflow: hidden;
@@ -26,11 +32,37 @@
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
   }
 
+  &__bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  &__bar-hint {
+    color: #389e0d;
+    font-size: 13px;
+  }
+
+  &__bar-error {
+    color: #cf1322;
+    font-size: 13px;
+  }
+
   &__editor,
   &__loading {
     position: relative;
     width: 100%;
     height: 100%;
+  }
+
+  &__editor {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   &__loading {

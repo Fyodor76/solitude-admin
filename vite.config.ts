@@ -60,8 +60,8 @@ export default defineConfig({
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // Filerobot image editor chunk > 2 MiB; keep build green, load editor on demand
-        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
+        // Filerobot / bg-removal chunks can exceed 2 MiB
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
       devOptions: {
         enabled: true,
