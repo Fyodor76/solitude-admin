@@ -137,7 +137,11 @@ function SortableImageItem({
           size="small"
           className="product-create-images__edit"
           icon={<EditOutlined />}
-          onClick={() => onEdit(item)}
+          onClick={event => {
+            event.preventDefault()
+            event.stopPropagation()
+            onEdit(item)
+          }}
           aria-label="Редактировать фото"
         />
         <Button
@@ -146,7 +150,11 @@ function SortableImageItem({
           size="small"
           className="product-create-images__remove"
           icon={<DeleteOutlined />}
-          onClick={() => onRemove(item.fileId)}
+          onClick={event => {
+            event.preventDefault()
+            event.stopPropagation()
+            onRemove(item.fileId)
+          }}
           aria-label="Удалить фото"
         />
       </div>
@@ -412,7 +420,11 @@ export function ProductImageUpload({
                     size="small"
                     className="product-create-images__edit"
                     icon={<EditOutlined />}
-                    onClick={() => setEditingItem(item)}
+                    onClick={event => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      setEditingItem(item)
+                    }}
                     aria-label="Редактировать фото"
                   />
                   <Button
@@ -421,7 +433,11 @@ export function ProductImageUpload({
                     size="small"
                     className="product-create-images__remove"
                     icon={<DeleteOutlined />}
-                    onClick={() => removeImage(item.fileId)}
+                    onClick={event => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      removeImage(item.fileId)
+                    }}
                     aria-label="Удалить фото"
                   />
                 </div>
