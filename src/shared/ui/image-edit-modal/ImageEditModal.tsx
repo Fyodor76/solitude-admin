@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 
-import { Spin } from 'antd'
+import { Button, Spin } from 'antd'
 import FilerobotImageEditor, { TABS, TOOLS } from 'react-filerobot-image-editor'
+
+import { API_URL } from '@/app/constans/url'
 
 import './ImageEditModal.scss'
 
@@ -15,7 +17,10 @@ type SavedImageData = {
 
 type ImageEditModalProps = {
   open: boolean
+  /** CDN URL — fallback, если нет fileId */
   imageUrl: string
+  /** fileId в CDN — грузим через API (обход CORS CDN) */
+  fileId?: string
   onCancel: () => void
   onSave: (file: File) => Promise<void>
 }
@@ -42,51 +47,94 @@ async function savedDataToFile(data: SavedImageData): Promise<File> {
   throw new Error('Нет данных изображения для сохранения')
 }
 
-async function resolveEditableSource(
-  imageUrl: string
-): Promise<{ url: string; revoke: () => void }> {
+function fileIdFromUrl(imageUrl: string): string | null {
   try {
-    const response = await fetch(imageUrl, { mode: 'cors' })
-    if (!response.ok) throw new Error('fetch failed')
-    const blob = await response.blob()
-    const objectUrl = URL.createObjectURL(blob)
-    return {
-      url: objectUrl,
-      revoke: () => URL.revokeObjectURL(objectUrl),
-    }
+    const pathname = new URL(imageUrl).pathname
+    const segment = pathname.split('/').filter(Boolean).pop()
+    return segment || null
   } catch {
-    return { url: imageUrl, revoke: () => undefined }
+    return null
   }
 }
 
-export function ImageEditModal({ open, imageUrl, onCancel, onSave }: ImageEditModalProps) {
+async function fetchViaApi(fileId: string): Promise<Blob> {
+  const token = localStorage.getItem('access')
+  const response = await fetch(`${API_URL}/cdn/file/${encodeURIComponent(fileId)}`, {
+    headers: token ? { authorization: `Bearer ${token}` } : {},
+  })
+  if (!response.ok) {
+    throw new Error(`API download failed: ${response.status}`)
+  }
+  return response.blob()
+}
+
+async function resolveEditableSource(
+  imageUrl: string,
+  fileId?: string
+): Promise<{ url: string; revoke: () => void }> {
+  const resolvedId = fileId || fileIdFromUrl(imageUrl)
+
+  if (resolvedId && API_URL) {
+    try {
+      const blob = await fetchViaApi(resolvedId)
+      const objectUrl = URL.createObjectURL(blob)
+      return {
+        url: objectUrl,
+        revoke: () => URL.revokeObjectURL(objectUrl),
+      }
+    } catch {
+      // fall through to direct CDN fetch
+    }
+  }
+
+  const response = await fetch(imageUrl, { mode: 'cors' })
+  if (!response.ok) throw new Error('fetch failed')
+  const blob = await response.blob()
+  const objectUrl = URL.createObjectURL(blob)
+  return {
+    url: objectUrl,
+    revoke: () => URL.revokeObjectURL(objectUrl),
+  }
+}
+
+export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: ImageEditModalProps) {
   const [source, setSource] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!open || !imageUrl) {
       setSource(null)
+      setLoadError(null)
       return
     }
 
     let cancelled = false
     let revoke: () => void = () => undefined
+    setSource(null)
+    setLoadError(null)
 
-    void resolveEditableSource(imageUrl).then(result => {
-      if (cancelled) {
-        result.revoke()
-        return
-      }
-      revoke = result.revoke
-      setSource(result.url)
-    })
+    void resolveEditableSource(imageUrl, fileId)
+      .then(result => {
+        if (cancelled) {
+          result.revoke()
+          return
+        }
+        revoke = result.revoke
+        setSource(result.url)
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError('Не удалось загрузить фото для редактирования. Проверьте доступ к API/CDN.')
+        }
+      })
 
     return () => {
       cancelled = true
       revoke()
       setSource(null)
     }
-  }, [open, imageUrl])
+  }, [open, imageUrl, fileId])
 
   if (!open) return null
 
@@ -115,7 +163,14 @@ export function ImageEditModal({ open, imageUrl, onCancel, onSave }: ImageEditMo
         onClick={onCancel}
       />
       <div className="image-edit-modal__panel">
-        {!source ? (
+        {loadError ? (
+          <div className="image-edit-modal__loading image-edit-modal__error">
+            <p>{loadError}</p>
+            <Button type="primary" onClick={onCancel}>
+              Закрыть
+            </Button>
+          </div>
+        ) : !source ? (
           <div className="image-edit-modal__loading">
             <Spin tip="Загрузка фото..." />
           </div>

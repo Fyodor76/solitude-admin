@@ -35,9 +35,23 @@
 
   &__loading {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 16px;
     background: #fafafa;
+  }
+
+  &__error {
+    padding: 24px;
+    text-align: center;
+    color: #434343;
+
+    p {
+      margin: 0;
+      max-width: 420px;
+      line-height: 1.5;
+    }
   }
 
   &__saving {

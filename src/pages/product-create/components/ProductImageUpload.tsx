@@ -452,6 +452,7 @@ export function ProductImageUpload({
           <ImageEditModal
             open
             imageUrl={editingItem.url}
+            fileId={editingItem.fileId}
             onCancel={() => setEditingItem(null)}
             onSave={replaceEditedImage}
           />
