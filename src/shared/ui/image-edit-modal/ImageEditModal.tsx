@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import Portal from '@/shared/ui/portal'
-import { Button, Spin } from 'antd'
+import { Button, message, Spin } from 'antd'
+import { createPortal } from 'react-dom'
 import FilerobotImageEditor, { TABS, TOOLS } from 'react-filerobot-image-editor'
 
 import { API_URL } from '@/app/constans/url'
@@ -106,8 +107,10 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
   const [removingBg, setRemovingBg] = useState(false)
   const [bgProgress, setBgProgress] = useState<string | null>(null)
   const [bgRemoved, setBgRemoved] = useState(false)
-  const [bgError, setBgError] = useState<string | null>(null)
+  const [topbarSlot, setTopbarSlot] = useState<HTMLElement | null>(null)
+  const [canvasHost, setCanvasHost] = useState<HTMLElement | null>(null)
   const revokeRef = useRef<(() => void) | null>(null)
+  const editorRootRef = useRef<HTMLDivElement | null>(null)
 
   const replaceSource = (url: string, revoke: () => void) => {
     revokeRef.current?.()
@@ -121,7 +124,6 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
       setSource(null)
       setLoadError(null)
       setBgRemoved(false)
-      setBgError(null)
       setBgProgress(null)
       return
     }
@@ -130,7 +132,6 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
     setSource(null)
     setLoadError(null)
     setBgRemoved(false)
-    setBgError(null)
     setBgProgress(null)
 
     void resolveEditableSource(imageUrl, fileId)
@@ -155,6 +156,82 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
     }
   }, [open, imageUrl, fileId])
 
+  useEffect(() => {
+    if (!source) {
+      setTopbarSlot(null)
+      setCanvasHost(null)
+      return
+    }
+
+    let cancelled = false
+    setTopbarSlot(null)
+    setCanvasHost(null)
+
+    const pick = () => {
+      const root = editorRootRef.current
+      if (!root) return false
+      const topbar = root.querySelector('.FIE_topbar-buttons-wrapper') as HTMLElement | null
+      const canvas = root.querySelector('.FIE_canvas-container') as HTMLElement | null
+      if (!topbar || !canvas) return false
+      if (!cancelled) {
+        setTopbarSlot(topbar)
+        setCanvasHost(canvas)
+      }
+      return true
+    }
+
+    if (pick()) return
+
+    const intervalId = window.setInterval(() => {
+      if (pick()) window.clearInterval(intervalId)
+    }, 50)
+    const timeoutId = window.setTimeout(() => window.clearInterval(intervalId), 4000)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(intervalId)
+      window.clearTimeout(timeoutId)
+    }
+  }, [source, editorKey])
+
+  const busy = saving || removingBg
+  const busyLabel = removingBg ? bgProgress || 'Удаление фона...' : 'Сохранение...'
+  const busyRef = useRef(false)
+  busyRef.current = busy
+
+  useEffect(() => {
+    if (!open || !source) return
+
+    const root = editorRootRef.current
+    if (!root) return
+
+    const handleCloseClick = (event: Event) => {
+      const target = event.target as HTMLElement | null
+      if (!target?.closest('.FIE_buttons-close-btn')) return
+      event.preventDefault()
+      event.stopPropagation()
+      if (busyRef.current) return
+      onCancel()
+    }
+
+    root.addEventListener('click', handleCloseClick, true)
+    return () => root.removeEventListener('click', handleCloseClick, true)
+  }, [open, source, topbarSlot, editorKey, onCancel])
+
+  useEffect(() => {
+    if (!open) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      if (busyRef.current) return
+      event.preventDefault()
+      onCancel()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [open, onCancel])
+
   if (!open) return null
 
   const handleSave = async (data: SavedImageData) => {
@@ -172,7 +249,6 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
     if (!source || removingBg || saving) return
 
     setRemovingBg(true)
-    setBgError(null)
     setBgProgress('Загрузка модели...')
 
     try {
@@ -194,15 +270,14 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
       replaceSource(objectUrl, () => URL.revokeObjectURL(objectUrl))
       setBgRemoved(true)
       setBgProgress(null)
+      message.success('Фон убран')
     } catch {
-      setBgError('Не удалось убрать фон. Попробуйте ещё раз.')
       setBgProgress(null)
+      message.error('Не удалось убрать фон. Попробуйте ещё раз.')
     } finally {
       setRemovingBg(false)
     }
   }
-
-  const busy = saving || removingBg
 
   return (
     <Portal>
@@ -229,54 +304,61 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
             </div>
           ) : !source ? (
             <div className="image-edit-modal__loading">
-              <Spin tip="Загрузка фото..." />
+              <div className="image-edit-modal__busy-inner">
+                <Spin size="large" />
+                <span>Загрузка фото...</span>
+              </div>
             </div>
           ) : (
-            <>
-              <div className="image-edit-modal__bar">
-                <Button
-                  type="default"
-                  loading={removingBg}
-                  disabled={busy}
-                  onClick={handleRemoveBackground}
-                >
-                  Убрать фон
-                </Button>
-                {bgRemoved ? (
-                  <span className="image-edit-modal__bar-hint">Фон убран · сохранение в PNG</span>
-                ) : null}
-                {bgError ? <span className="image-edit-modal__bar-error">{bgError}</span> : null}
-              </div>
-              <div className="image-edit-modal__editor">
-                {busy ? (
-                  <div className="image-edit-modal__saving">
-                    <Spin tip={removingBg ? bgProgress || 'Удаление фона...' : 'Сохранение...'} />
-                  </div>
-                ) : null}
-                <FilerobotImageEditor
-                  key={editorKey}
-                  source={source}
-                  onBeforeSave={() => false}
-                  onSave={handleSave}
-                  onClose={() => {
-                    if (!busy) onCancel()
-                  }}
-                  closeAfterSave={false}
-                  disableSaveIfNoChanges={!bgRemoved}
-                  tabsIds={[TABS.ADJUST, TABS.FINETUNE]}
-                  defaultTabId={TABS.ADJUST}
-                  defaultToolId={TOOLS.CROP}
-                  defaultSavedImageType={bgRemoved ? 'png' : 'jpeg'}
-                  defaultSavedImageQuality={0.92}
-                  savingPixelRatio={1}
-                  previewPixelRatio={
-                    typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
-                  }
-                  observePluginContainerSize
-                  language="en"
-                />
-              </div>
-            </>
+            <div className="image-edit-modal__editor" ref={editorRootRef}>
+              {topbarSlot
+                ? createPortal(
+                    <Button
+                      type="default"
+                      size="small"
+                      className="image-edit-modal__bg-btn"
+                      loading={removingBg}
+                      disabled={busy}
+                      onClick={handleRemoveBackground}
+                    >
+                      Убрать фон
+                    </Button>,
+                    topbarSlot
+                  )
+                : null}
+              {busy && canvasHost
+                ? createPortal(
+                    <div className="image-edit-modal__saving">
+                      <div className="image-edit-modal__busy-inner">
+                        <Spin size="large" />
+                        <span>{busyLabel}</span>
+                      </div>
+                    </div>,
+                    canvasHost
+                  )
+                : null}
+              <FilerobotImageEditor
+                key={editorKey}
+                source={source}
+                onBeforeSave={() => false}
+                onSave={handleSave}
+                onClose={() => {
+                  if (!busyRef.current) onCancel()
+                }}
+                closeAfterSave={false}
+                avoidChangesNotSavedAlertOnLeave
+                disableSaveIfNoChanges={!bgRemoved}
+                tabsIds={[TABS.ADJUST, TABS.FINETUNE]}
+                defaultTabId={TABS.ADJUST}
+                defaultToolId={TOOLS.CROP}
+                defaultSavedImageType={bgRemoved ? 'png' : 'jpeg'}
+                defaultSavedImageQuality={0.92}
+                savingPixelRatio={1}
+                previewPixelRatio={typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1}
+                observePluginContainerSize
+                language="en"
+              />
+            </div>
           )}
         </div>
       </div>

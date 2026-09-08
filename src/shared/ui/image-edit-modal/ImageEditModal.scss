@@ -1,7 +1,7 @@
 .image-edit-modal {
   position: fixed;
   inset: 0;
-  z-index: 2100;
+  z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -32,27 +32,6 @@
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
   }
 
-  &__bar {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 10px 14px;
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  &__bar-hint {
-    color: #389e0d;
-    font-size: 13px;
-  }
-
-  &__bar-error {
-    color: #cf1322;
-    font-size: 13px;
-  }
-
   &__editor,
   &__loading {
     position: relative;
@@ -63,18 +42,34 @@
   &__editor {
     flex: 1 1 auto;
     min-height: 0;
+
+    .FIE_topbar-buttons-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .FIE_canvas-container {
+      position: relative;
+    }
+  }
+
+  &__bg-btn {
+    height: 32px !important;
+    padding: 0 12px !important;
+    font-size: 13px !important;
   }
 
   &__loading {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
     background: #fafafa;
   }
 
   &__error {
+    flex-direction: column;
+    gap: 16px;
     padding: 24px;
     text-align: center;
     color: #434343;
@@ -89,10 +84,32 @@
   &__saving {
     position: absolute;
     inset: 0;
-    z-index: 2;
+    z-index: 30;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.55);
+    pointer-events: all;
   }
+
+  &__busy-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #262626;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+
+    .ant-spin {
+      line-height: 1;
+    }
+  }
+}
+
+/* Confirm Filerobot (discard) выше нашей модалки, если вдруг всё же откроется */
+[data-testid='FIE-modal-container'] {
+  z-index: 2300 !important;
 }
