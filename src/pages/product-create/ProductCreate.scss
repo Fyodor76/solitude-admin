@@ -326,10 +326,10 @@
       box-shadow: 0 0 0 1px #389e0d;
     }
 
+    /* Главная + витрина: одна рамка, статусы читаются по бейджам */
     &--main#{&}--showcase {
-      box-shadow:
-        0 0 0 1px #1677ff,
-        0 0 0 3px #389e0d;
+      border-color: #1677ff;
+      box-shadow: 0 0 0 1px #1677ff;
     }
 
     &:hover {
