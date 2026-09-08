@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# ONNX/WASM для удаления фона (~350MB) — качается скриптом ensure-bg-removal-data
+public/background-removal-data
+.bg-removal-tmp
+bg-removal-data.tgz
+
 # Environment files
 .env
 

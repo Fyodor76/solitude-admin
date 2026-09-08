@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import Portal from '@/shared/ui/portal'
 import { Button, message, Spin } from 'antd'
 import { createPortal } from 'react-dom'
-import FilerobotImageEditor, { TABS, TOOLS } from 'react-filerobot-image-editor'
+import FilerobotImageEditor, { TABS } from 'react-filerobot-image-editor'
 
 import { API_URL } from '@/app/constans/url'
 
@@ -249,11 +249,18 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
     if (!source || removingBg || saving) return
 
     setRemovingBg(true)
-    setBgProgress('Загрузка модели...')
+    setBgProgress('Подготовка модели...')
 
     try {
       const { removeBackground } = await import('@imgly/background-removal')
+      const publicPath = new URL(
+        `${import.meta.env.BASE_URL}background-removal-data/`,
+        window.location.href
+      ).href
       const blob = await removeBackground(source, {
+        publicPath,
+        // компактная квантованная модель — быстрее грузится с нашего хоста
+        model: 'isnet_quint8',
         output: { format: 'image/png', quality: 0.9 },
         progress: (key, current, total) => {
           if (key === 'compute:inference') {
@@ -262,7 +269,7 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
           }
           if (total > 0) {
             const pct = Math.round((current / total) * 100)
-            setBgProgress(`Загрузка модели… ${pct}%`)
+            setBgProgress(`Подготовка модели… ${pct}%`)
           }
         },
       })
@@ -350,7 +357,6 @@ export function ImageEditModal({ open, imageUrl, fileId, onCancel, onSave }: Ima
                 disableSaveIfNoChanges={!bgRemoved}
                 tabsIds={[TABS.ADJUST, TABS.FINETUNE]}
                 defaultTabId={TABS.ADJUST}
-                defaultToolId={TOOLS.CROP}
                 defaultSavedImageType={bgRemoved ? 'png' : 'jpeg'}
                 defaultSavedImageQuality={0.92}
                 savingPixelRatio={1}

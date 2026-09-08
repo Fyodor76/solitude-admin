@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/ensure-bg-removal-data.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "bg-removal:data": "node scripts/ensure-bg-removal-data.mjs"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",

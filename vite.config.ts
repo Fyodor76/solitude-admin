@@ -60,6 +60,7 @@ export default defineConfig({
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globIgnores: ['**/background-removal-data/**'],
         // Filerobot / bg-removal chunks can exceed 2 MiB
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
       },
