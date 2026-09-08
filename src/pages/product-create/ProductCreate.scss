@@ -334,7 +334,7 @@
 
     &:hover {
       .product-create-images__actions,
-      .product-create-images__remove,
+      .product-create-images__toolbar,
       .product-create-images__drag-handle {
         opacity: 1;
         pointer-events: auto;
@@ -412,15 +412,22 @@
     background: rgba(255, 255, 255, 0.94) !important;
   }
 
-  &__remove {
+  &__toolbar {
     position: absolute;
     top: 2px;
     right: 2px;
     z-index: 1;
-    background: rgba(255, 255, 255, 0.9) !important;
+    display: flex;
+    align-items: center;
+    gap: 2px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease;
+  }
+
+  &__edit,
+  &__remove {
+    background: rgba(255, 255, 255, 0.9) !important;
   }
 }
 

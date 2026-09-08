@@ -104,15 +104,17 @@ function VariationPhotoCard({
           </Button>
         )}
       </div>
-      <Button
-        type="text"
-        danger
-        size="small"
-        className="product-create-images__remove"
-        icon={<DeleteOutlined />}
-        onClick={() => onRemove(item)}
-        aria-label="Удалить фото"
-      />
+      <div className="product-create-images__toolbar">
+        <Button
+          type="text"
+          danger
+          size="small"
+          className="product-create-images__remove"
+          icon={<DeleteOutlined />}
+          onClick={() => onRemove(item)}
+          aria-label="Удалить фото"
+        />
+      </div>
     </Reorder.Item>
   )
 }

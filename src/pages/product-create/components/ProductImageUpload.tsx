@@ -3,7 +3,8 @@ import { useState } from 'react'
 import { useUploadImageMutation } from '@/shared/lib/api/upload-files/uploadFiles'
 import { useNotificationHandler } from '@/shared/lib/hooks/useNotificationHandler'
 import { resolveMediaUrl } from '@/shared/lib/utils/resolveMediaUrl'
-import { DeleteOutlined, HolderOutlined, InboxOutlined } from '@ant-design/icons'
+import { ImageEditModal } from '@/shared/ui/image-edit-modal'
+import { DeleteOutlined, EditOutlined, HolderOutlined, InboxOutlined } from '@ant-design/icons'
 import { Button, Image, Spin, Upload } from 'antd'
 import type { RcFile } from 'antd/es/upload'
 import { Reorder, useDragControls } from 'framer-motion'
@@ -28,6 +29,7 @@ function SortableImageItem({
   showcaseEnabled,
   onSetMain,
   onToggleShowcase,
+  onEdit,
   onRemove,
 }: {
   item: ProductImageItem
@@ -38,6 +40,7 @@ function SortableImageItem({
   showcaseEnabled: boolean
   onSetMain: (fileId: string) => void
   onToggleShowcase: (fileId: string) => void
+  onEdit: (item: ProductImageItem) => void
   onRemove: (fileId: string) => void
 }) {
   const controls = useDragControls()
@@ -125,14 +128,25 @@ function SortableImageItem({
           )
         ) : null}
       </div>
-      <Button
-        type="text"
-        danger
-        size="small"
-        className="product-create-images__remove"
-        icon={<DeleteOutlined />}
-        onClick={() => onRemove(item.fileId)}
-      />
+      <div className="product-create-images__toolbar">
+        <Button
+          type="text"
+          size="small"
+          className="product-create-images__edit"
+          icon={<EditOutlined />}
+          onClick={() => onEdit(item)}
+          aria-label="Редактировать фото"
+        />
+        <Button
+          type="text"
+          danger
+          size="small"
+          className="product-create-images__remove"
+          icon={<DeleteOutlined />}
+          onClick={() => onRemove(item.fileId)}
+          aria-label="Удалить фото"
+        />
+      </div>
     </Reorder.Item>
   )
 }
@@ -148,6 +162,7 @@ export function ProductImageUpload({
   const { openNotification } = useNotificationHandler()
   const [uploadImage] = useUploadImageMutation()
   const [uploading, setUploading] = useState(false)
+  const [editingItem, setEditingItem] = useState<ProductImageItem | null>(null)
 
   const showcaseEnabled = Boolean(onShowcaseChange)
   const showcaseSet = new Set(showcaseFileIds ?? [])
@@ -243,6 +258,38 @@ export function ProductImageUpload({
     }
   }
 
+  const replaceEditedImage = async (file: File) => {
+    if (!editingItem) return
+
+    const oldFileId = editingItem.fileId
+    setUploading(true)
+    try {
+      const response = await uploadImage({ file }).unwrap()
+      const fileId = response.data?.fileId
+      if (!fileId) {
+        openNotification('error', ['Не удалось сохранить отредактированное фото'])
+        return
+      }
+
+      const nextItem: ProductImageItem = {
+        fileId,
+        url: response.data.url || resolveMediaUrl(fileId) || fileId,
+      }
+
+      onChange(value.map(item => (item.fileId === oldFileId ? nextItem : item)))
+      if (onShowcaseChange && (showcaseFileIds ?? []).includes(oldFileId)) {
+        onShowcaseChange((showcaseFileIds ?? []).map(id => (id === oldFileId ? fileId : id)))
+      }
+
+      setEditingItem(null)
+      openNotification('success', ['Фото обновлено'])
+    } catch {
+      openNotification('error', ['Ошибка сохранения отредактированного фото'])
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="product-create-images">
       <Upload.Dragger
@@ -297,6 +344,7 @@ export function ProductImageUpload({
                 showcaseEnabled={showcaseEnabled}
                 onSetMain={setAsMain}
                 onToggleShowcase={toggleShowcase}
+                onEdit={setEditingItem}
                 onRemove={removeImage}
               />
             ))}
@@ -355,19 +403,37 @@ export function ProductImageUpload({
                     )
                   ) : null}
                 </div>
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  className="product-create-images__remove"
-                  icon={<DeleteOutlined />}
-                  onClick={() => removeImage(item.fileId)}
-                />
+                <div className="product-create-images__toolbar">
+                  <Button
+                    type="text"
+                    size="small"
+                    className="product-create-images__edit"
+                    icon={<EditOutlined />}
+                    onClick={() => setEditingItem(item)}
+                    aria-label="Редактировать фото"
+                  />
+                  <Button
+                    type="text"
+                    danger
+                    size="small"
+                    className="product-create-images__remove"
+                    icon={<DeleteOutlined />}
+                    onClick={() => removeImage(item.fileId)}
+                    aria-label="Удалить фото"
+                  />
+                </div>
               </div>
             ))}
           </div>
         )
       ) : null}
+
+      <ImageEditModal
+        open={Boolean(editingItem)}
+        imageUrl={editingItem?.url || ''}
+        onCancel={() => setEditingItem(null)}
+        onSave={replaceEditedImage}
+      />
     </div>
   )
 }

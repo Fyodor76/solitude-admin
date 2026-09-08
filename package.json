@@ -24,9 +24,12 @@
     "lodash": "^4.18.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "react-filerobot-image-editor": "^5.0.0-beta.159",
+    "react-konva": "^19.2.6",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.10.1",
     "socket.io-client": "^4.8.3",
+    "styled-components": "^6.5.3",
     "ts-loader": "^9.5.4",
     "typescript": "^5.9.3"
   },
